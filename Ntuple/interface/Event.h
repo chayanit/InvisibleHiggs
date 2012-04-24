@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: $
+// $Id: Event.h,v 1.1 2012/04/10 16:58:55 jbrooke Exp $
 //
 //
 
@@ -40,7 +40,8 @@ class Event { //: public TObject {
   // helper methods
   void addL1Jet(double et, double eta, double phi, int type);
   void addHltJet(double et, double eta, double phi);
-  void addJet(double et, double eta, double phi, double ethad, double etem, int n60, int n90, double fhpd, int n90hits);
+  void addCaloJet(double et, double etcorr, double eta, double phi, double emf, int n60, int n90, double fhpd, double frbx, int n90hits);
+  void addPFJet(double et, double etcorr, double eta, double phi, double emf);
   void addMuon(double pt, double eta, double phi, int type);
   void addElectron(double pt, double eta, double phi);
   void addVertex(double z, double rho, double phi, int ndof);
@@ -78,18 +79,26 @@ class Event { //: public TObject {
   double hltCaloMET;
   double hltPFMHT;
 
-  // reco jets
-  unsigned jet_N;
-  std::vector<Double_t> jetEt;
-  std::vector<Double_t> jetEtCorr;
-  std::vector<Double_t> jetEta;
-  std::vector<Double_t> jetPhi;
-  std::vector<Double_t> jetEtHad;
-  std::vector<Double_t> jetEtEm;
-  std::vector<UInt_t> jetN60;
-  std::vector<UInt_t> jetN90;
-  std::vector<Double_t> jetFHPD;
-  std::vector<UInt_t> jetN90Hits;
+  // calo jets
+  unsigned caloJet_N;
+  std::vector<Double_t> caloJetEt;
+  std::vector<Double_t> caloJetEtCorr;
+  std::vector<Double_t> caloJetEta;
+  std::vector<Double_t> caloJetPhi;
+  std::vector<Double_t> caloJetEMF;
+  std::vector<UInt_t> caloJetN60;
+  std::vector<UInt_t> caloJetN90;
+  std::vector<Double_t> caloJetFHPD;
+  std::vector<Double_t> caloJetFRBX;
+  std::vector<UInt_t> caloJetN90Hits;
+
+  // PF jets
+  unsigned pfJet_N;
+  std::vector<Double_t> pfJetEt;
+  std::vector<Double_t> pfJetEtCorr;
+  std::vector<Double_t> pfJetEta;
+  std::vector<Double_t> pfJetPhi;
+  std::vector<Double_t> pfJetEMF;
 
   // reco muons
   unsigned mu_N;
