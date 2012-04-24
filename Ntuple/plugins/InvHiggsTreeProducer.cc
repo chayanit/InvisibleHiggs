@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsTreeProducer.cc,v 1.2 2012/04/24 12:30:39 jbrooke Exp $
+// $Id: InvHiggsTreeProducer.cc,v 1.1 2012/04/24 15:21:38 jbrooke Exp $
 //
 //
 
@@ -91,6 +91,9 @@
 // MC
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
 
+// Math
+#include "DataFormats/Math/interface/LorentzVector.h"
+
 // ROOT output stuff
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -99,7 +102,7 @@
 #include "TF1.h"
 
 // TTree definition
-#include "InvisibleHiggs/Ntuple/interface/Event.h"
+#include "InvisibleHiggs/Ntuple/interface/InvHiggsEvent.h"
 
 
 //
@@ -150,7 +153,7 @@ private:
   
   // tree
   TTree * tree_;
-  Event* event_;
+  InvHiggsEvent* event_;
 
   // EDM input tags
   bool usePAT_;
@@ -206,7 +209,7 @@ InvHiggsTreeProducer::InvHiggsTreeProducer(const edm::ParameterSet& iConfig):
 {
   // set up output
   tree_=fs_->make<TTree>("InvHiggsTree", "");
-  tree_->Branch("events", "Event", &event_, 64000, 1);
+  tree_->Branch("events", "InvHiggsEvent", &event_, 640000, 1);
   
 }
 
@@ -277,7 +280,7 @@ void
 InvHiggsTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
  
-  event_ = new Event();
+  event_ = new InvHiggsEvent();
  
   //  doMC(iEvent);
  
@@ -493,6 +496,14 @@ void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::Event
       event_->addCaloJet(et, etcorr, eta, phi, emf, n60, n90, fhpd, frbx, n90hits); 
       
     } // loop over jets
+
+    // calo mjj
+    double mjj = 0.;
+    if (jets->size()>2) {
+      math::XYZTLorentzVector pair = jets->at(0).p4() + jets->at(1).p4();
+      event_->caloMjj = pair.M();
+    }
+
   } // if (caloJets.isValid())
   
 }
@@ -525,6 +536,13 @@ void InvHiggsTreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSe
       event_->addPFJet(et, etcorr, eta, phi, emf); 
       
     } // loop over jets
+
+    double mjj = 0.;
+    if (jets->size()>2) {
+      math::XYZTLorentzVector pair = jets->at(0).p4() + jets->at(1).p4();
+      event_->pfMjj = pair.M();
+    }
+
   } // if (caloJets.isValid())
   
 }
@@ -603,11 +621,6 @@ void InvHiggsTreeProducer::doVertices(const edm::Event& iEvent) {
 
 
 void InvHiggsTreeProducer::doGlobal(const edm::Event& iEvent) {
-
-  // MJJ
-  
-
-
 
   // calo MET
 

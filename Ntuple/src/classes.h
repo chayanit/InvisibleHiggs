@@ -1,6 +1,6 @@
 #ifndef classes_h
 #define classes_h
 
-#include "InvisibleHiggs/Ntuple/interface/Event.h"
+#include "InvisibleHiggs/Ntuple/interface/InvHiggsEvent.h"
 
 #endif
