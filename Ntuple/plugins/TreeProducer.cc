@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: $
+// $Id: TreeProducer.cc,v 1.1 2012/04/10 16:58:55 jbrooke Exp $
 //
 //
 
@@ -58,7 +58,22 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
-// candidates
+// calo jets
+#include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/JetReco/interface/JetID.h"
+#include "DataFormats/Common/interface/ValueMap.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+
+// PF jets
+#include "DataFormats/JetReco/interface/PFJetCollection.h"
+
+// Muons
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+
+// Electrons
+#include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
+
+// PAT candidates
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -113,7 +128,8 @@ private:
   void doTrigger(const edm::Event&, const edm::EventSetup&);
 
   // write basic RECO objects
-  void doJets(const edm::Event&, const edm::EventSetup&);
+  void doCaloJets(const edm::Event&, const edm::EventSetup&);
+  void doPFJets(const edm::Event&, const edm::EventSetup&);
   void doMuons(const edm::Event&);
   void doElectrons(const edm::Event&);
   void doVertices(const edm::Event&);
@@ -137,6 +153,7 @@ private:
   Event* event_;
 
   // EDM input tags
+  bool usePAT_;
   std::string l1JetsTag_;
   edm::InputTag l1BitsTag_;
   edm::InputTag hltResultsTag_;
@@ -147,7 +164,9 @@ private:
   std::string mcProducer_;
   edm::InputTag hepProducer_;
   std::string jetCorrectorServiceName_;
-  edm::InputTag jetTag_;
+  edm::InputTag caloJetTag_;
+  edm::InputTag caloJetIDTag_;
+  edm::InputTag pfJetTag_;
   edm::InputTag muonTag_;
   edm::InputTag electronTag_;
   edm::InputTag metTag_;
@@ -166,6 +185,7 @@ private:
 TreeProducer::TreeProducer(const edm::ParameterSet& iConfig):
   tree_(0),
   event_(0),
+  usePAT_(iConfig.getUntrackedParameter<bool>("usePAT",false)),
   l1JetsTag_(iConfig.getUntrackedParameter<std::string>("l1JetsTag",std::string("l1extraParticles"))),
   l1BitsTag_(iConfig.getUntrackedParameter<edm::InputTag>("l1BitsTag",edm::InputTag("gtDigis"))),
   hltResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("hltResultsTag",edm::InputTag("TriggerResults","","HLT"))),
@@ -176,7 +196,9 @@ TreeProducer::TreeProducer(const edm::ParameterSet& iConfig):
   mcProducer_ (iConfig.getUntrackedParameter<std::string>("producer", "g4SimHits")),
   hepProducer_ (iConfig.getUntrackedParameter<edm::InputTag>("hepMCProducerTag", edm::InputTag("generator", "", "SIM"))),
   jetCorrectorServiceName_(iConfig.getUntrackedParameter<std::string>("jetCorrectorServiceName","ic5CaloL1L2L3Residual")),
-  jetTag_(iConfig.getUntrackedParameter<edm::InputTag>("jetTag",edm::InputTag("patPFJets"))),
+  caloJetTag_(iConfig.getUntrackedParameter<edm::InputTag>("caloJetTag",edm::InputTag("ak5CaloJets"))),
+  caloJetIDTag_(iConfig.getUntrackedParameter<edm::InputTag>("caloJetIDTag",edm::InputTag("ak5CaloJets"))),
+  pfJetTag_(iConfig.getUntrackedParameter<edm::InputTag>("pfJetTag",edm::InputTag("ak5PFJets"))),
   muonTag_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag",edm::InputTag("patMuons"))),
   electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag",edm::InputTag("patElectrons"))),
   metTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("patCaloMET"))),
@@ -263,8 +285,9 @@ TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   doEventInfo(iEvent);
   doTrigger(iEvent, iSetup);
 
-  // general RECO info
-  doJets(iEvent, iSetup);
+  //  AOD info
+  doCaloJets(iEvent, iSetup);
+  doPFJets(iEvent, iSetup);
   doMuons(iEvent);
   doElectrons(iEvent);
   doVertices(iEvent);
@@ -284,12 +307,12 @@ void TreeProducer::doMC(const edm::Event& iEvent) {
   edm::Handle<edm::HepMCProduct> mcHandle;
   iEvent.getByLabel(mcTag_,mcHandle);
   
-  if (mcHandle.isValid()) {
+//   if (mcHandle.isValid()) {
     
-    const edm::HepMCProduct *mcProd = mcHandle.product();
-    const HepMC::GenEvent *evt = mcProd->GetEvent();
+//     const edm::HepMCProduct *mcProd = mcHandle.product();
+//     const HepMC::GenEvent *evt = mcProd->GetEvent();
     
-  }
+//   }
 
 }
 
@@ -434,51 +457,87 @@ void TreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
 
-void TreeProducer::doJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void TreeProducer::doCaloJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  //  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
+  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
 
-  edm::Handle<reco::PFCandidateCollection> jets;
-   iEvent.getByLabel(jetTag_, jets);
-   unsigned njet=0;
+  edm::Handle<reco::CaloJetCollection> jets;
+  edm::Handle<edm::ValueMap<reco::JetID> > jetIDs;
 
-   if (jets.isValid()) {
+  iEvent.getByLabel(caloJetTag_, jets);
+  iEvent.getByLabel(caloJetIDTag_,jetIDs);
+  
+  unsigned njet=0;
+  
+  if (jets.isValid()) {
+    
+    for(CaloJetCollection::const_iterator it=jets->begin(); 
+	it!=jets->end();
+	++it, ++njet) {
+      
+      edm::RefToBase<reco::Jet> jetRef(edm::Ref<reco::CaloJetCollection>(jets,njet));  
+      double scale = jetCorrector->correction(*it,jetRef,iEvent,iSetup);
+      
+      // store jet in TTree
+      double et = it->et();
+      double etcorr = it->et()*scale;
+      double eta = it->eta();
+      double phi = it->phi();
+      double emf = it->emEnergyFraction();
+      int n60 = it->n60();
+      int n90 = it->n90();
+      double fhpd = (*jetIDs)[jetRef].fHPD;
+      double frbx = (*jetIDs)[jetRef].fRBX;
+      int n90hits = int((*jetIDs)[jetRef].n90Hits);
+      
+      event_->addCaloJet(et, etcorr, eta, phi, emf, n60, n90, fhpd, frbx, n90hits); 
+      
+    } // loop over jets
+  } // if (caloJets.isValid())
+  
+}
 
-     for(PFCandidateCollection::const_iterator it=jets->begin(); 
-	 it!=jets->end();
-	 ++it, ++njet) {
 
-       //	 edm::RefToBase<reco::PFJet> jetRef(edm::Ref<reco::PFJetCollection>(jets,njet));  
-       //	 double scale = jetCorrector->correction(*it,jetRef,iEvent,iSetup);
+void TreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-	 // store jet in TTree
-	 double et = it->et();
-	 double et_corr = it->et();
-	 double eta = it->eta();
-	 double phi = it->phi();
-	 double etEm = 0.; //it->emEnergyInEB();
-	 double etHad = 0.; //it->hadEnergyInHB();
-	 int n60 = 0; //it->n60();
-	 int n90 = 0; //it->n90();
-	 double fhpd = 0.;
-	 int n90hits = 0;
+  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
 
-	 event_->addJet(et, eta, phi, etEm, etHad, n60, n90, fhpd, n90hits); 
-
-     } // loop over jets
-   } // if (caloJets.isValid())
- 
+  edm::Handle<reco::PFJetCollection> jets;
+  iEvent.getByLabel(pfJetTag_, jets);
+  unsigned njet=0;
+  
+  if (jets.isValid()) {
+    
+    for(PFJetCollection::const_iterator it=jets->begin(); 
+	it!=jets->end();
+	++it, ++njet) {
+      
+      edm::RefToBase<reco::Jet> jetRef(edm::Ref<reco::PFJetCollection>(jets,njet));  
+      double scale = jetCorrector->correction(*it,jetRef,iEvent,iSetup);
+      
+      // store jet in TTree
+      double et = it->et();
+      double etcorr = it->et() * scale;
+      double eta = it->eta();
+      double phi = it->phi();
+      double emf = 0.;
+      
+      event_->addPFJet(et, etcorr, eta, phi, emf); 
+      
+    } // loop over jets
+  } // if (caloJets.isValid())
+  
 }
 
 
 void TreeProducer::doMuons(const edm::Event& iEvent) {
 
   // loop over reco muons
-  edm::Handle<pat::MuonCollection> muons;
+  edm::Handle<reco::MuonCollection> muons;
   iEvent.getByLabel(muonTag_,muons);
 
   if (muons.isValid()) {
-    for(pat::MuonCollection::const_iterator it =muons->begin();
+    for(reco::MuonCollection::const_iterator it =muons->begin();
 	it!=muons->end();
 	it++) {
 
@@ -497,11 +556,11 @@ void TreeProducer::doMuons(const edm::Event& iEvent) {
 
 void TreeProducer::doElectrons(const edm::Event& iEvent) {
 
-  edm::Handle<pat::ElectronCollection> electrons;
+  edm::Handle<reco::GsfElectronCollection> electrons;
   iEvent.getByLabel(electronTag_,electrons);
 
   if (electrons.isValid()) {
-    for(pat::ElectronCollection::const_iterator it =electrons->begin();
+    for(reco::GsfElectronCollection::const_iterator it =electrons->begin();
 	it!=electrons->end();
 	it++) {
 

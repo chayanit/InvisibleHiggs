@@ -22,17 +22,23 @@ Event::Event() :
   hltJetEta(0),
   hltJetPhi(0),
   hltJetType(0),
-  jet_N(0),
-  jetEt(0),
-  jetEtCorr(0),
-  jetEta(0),
-  jetPhi(0),
-  jetEtHad(0),
-  jetEtEm(0),
-  jetN60(0),
-  jetN90(0),
-  jetFHPD(0),
-  jetN90Hits(0),
+  caloJet_N(0),
+  caloJetEt(0),
+  caloJetEtCorr(0),
+  caloJetEta(0),
+  caloJetPhi(0),
+  caloJetEMF(0),
+  caloJetN60(0),
+  caloJetN90(0),
+  caloJetFHPD(0),
+  caloJetFRBX(0),
+  caloJetN90Hits(0),
+  pfJet_N(0),
+  pfJetEt(0),
+  pfJetEtCorr(0),
+  pfJetEta(0),
+  pfJetPhi(0),
+  pfJetEMF(0),
   mu_N(0),
   muPt(0),
   muEta(0),
@@ -79,19 +85,30 @@ void Event::addHltJet(double et, double eta, double phi) {
  }
 }
 
-void Event::addJet(double et, double eta, double phi, double ethad, double etem, int n60, int n90, double fhpd, int n90hits) {
-  if (jet_N < MAX_N_JETS) {
-    jetEt.push_back(et);
-    //    jetEtCorr.push_back(et_corr);
-    jetEta.push_back(eta);
-    jetPhi.push_back(phi);
-    jetEtHad.push_back(ethad);
-    jetEtEm.push_back(etem);
-    jetN60.push_back(n60);
-    jetN90.push_back(n90);
-    jetFHPD.push_back(fhpd);
-    jetN90Hits.push_back(n90hits);
-    ++jet_N;
+void Event::addCaloJet(double et, double etcorr, double eta, double phi, double emf, int n60, int n90, double fhpd, double frbx, int n90hits) {
+  if (caloJet_N < MAX_N_JETS) {
+    caloJetEt.push_back(et);
+    caloJetEtCorr.push_back(etcorr);
+    caloJetEta.push_back(eta);
+    caloJetPhi.push_back(phi);
+    caloJetEMF.push_back(emf);
+    caloJetN60.push_back(n60);
+    caloJetN90.push_back(n90);
+    caloJetFHPD.push_back(fhpd);
+    caloJetFRBX.push_back(frbx);
+    caloJetN90Hits.push_back(n90hits);
+    ++caloJet_N;
+  }
+}
+
+void Event::addPFJet(double et, double etcorr, double eta, double phi, double emf) {
+  if (pfJet_N < MAX_N_JETS) {
+    pfJetEt.push_back(et);
+    pfJetEtCorr.push_back(etcorr);
+    pfJetEta.push_back(eta);
+    pfJetPhi.push_back(phi);
+    pfJetEMF.push_back(emf);
+    ++pfJet_N;
   }
 }
 
