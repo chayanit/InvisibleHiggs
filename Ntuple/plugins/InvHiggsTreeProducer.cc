@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // Package:    InvisibleHiggs/Analysis
-// Class:      TTreeProducer
+// Class:      TInvHiggsTreeProducer
 // 
-/**\class TreeProducer TreeProducer.cc InvisibleHiggs/Analysis/src/TreeProducer.cc
+/**\class InvHiggsTreeProducer InvHiggsTreeProducer.cc InvisibleHiggs/Analysis/src/InvHiggsTreeProducer.cc
 
  Description: Produce invisible Higgs TTree
 
@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: TreeProducer.cc,v 1.1 2012/04/10 16:58:55 jbrooke Exp $
+// $Id: InvHiggsTreeProducer.cc,v 1.2 2012/04/24 12:30:39 jbrooke Exp $
 //
 //
 
@@ -108,10 +108,10 @@
 
 using namespace reco;
 
-class TreeProducer : public edm::EDAnalyzer {
+class InvHiggsTreeProducer : public edm::EDAnalyzer {
 public:
-  explicit TreeProducer(const edm::ParameterSet&);
-  ~TreeProducer();
+  explicit InvHiggsTreeProducer(const edm::ParameterSet&);
+  ~InvHiggsTreeProducer();
   
 private:
   virtual void beginJob() ;
@@ -182,7 +182,7 @@ private:
 
 
 
-TreeProducer::TreeProducer(const edm::ParameterSet& iConfig):
+InvHiggsTreeProducer::InvHiggsTreeProducer(const edm::ParameterSet& iConfig):
   tree_(0),
   event_(0),
   usePAT_(iConfig.getUntrackedParameter<bool>("usePAT",false)),
@@ -211,7 +211,7 @@ TreeProducer::TreeProducer(const edm::ParameterSet& iConfig):
 }
 
 
-TreeProducer::~TreeProducer() {
+InvHiggsTreeProducer::~InvHiggsTreeProducer() {
 
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
@@ -224,12 +224,12 @@ TreeProducer::~TreeProducer() {
 //
 
 // ------------ method called once each job just before starting event loop  ------------
-void TreeProducer::beginJob()
+void InvHiggsTreeProducer::beginJob()
 {
 }
 
 // -- called once per run
-void TreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
+void InvHiggsTreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
 {
   // Get PDT Table if MC
   //iSetup.getData(fPDGTable);
@@ -253,14 +253,14 @@ void TreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup
       }
     if (hltBit_==(hltConfig_.triggerNames()).size())
       {
-	edm::LogWarning("TreeProducer") << "Could not find an HLT path matching "<<hltPathName_<<".  Branch will not be filled."<<std::endl;
+	edm::LogWarning("InvHiggsTreeProducer") << "Could not find an HLT path matching "<<hltPathName_<<".  Branch will not be filled."<<std::endl;
 	doHltBit_ = false;
       }
     else
-      edm::LogInfo("TreeProducer") << hltPathName_ << " index is " << hltBit_ << std::endl;
+      edm::LogInfo("InvHiggsTreeProducer") << hltPathName_ << " index is " << hltBit_ << std::endl;
   } // end of try loop
   catch (cms::Exception e) {
-    edm::LogWarning("TreeProducer") << "HLTJetNoBPTX:  Could not find an HLT path matching " << hltPathName_ << ".  Branch will not be filled" << std::endl;
+    edm::LogWarning("InvHiggsTreeProducer") << "HLTJetNoBPTX:  Could not find an HLT path matching " << hltPathName_ << ".  Branch will not be filled" << std::endl;
     doHltBit_ = false;
   }
 
@@ -269,12 +269,12 @@ void TreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-TreeProducer::endJob() {
+InvHiggsTreeProducer::endJob() {
 }
 
 // ------------ method called to for each event  ------------
 void
-TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+InvHiggsTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
  
   event_ = new Event();
@@ -302,7 +302,7 @@ TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-void TreeProducer::doMC(const edm::Event& iEvent) {
+void InvHiggsTreeProducer::doMC(const edm::Event& iEvent) {
 
   edm::Handle<edm::HepMCProduct> mcHandle;
   iEvent.getByLabel(mcTag_,mcHandle);
@@ -316,7 +316,7 @@ void TreeProducer::doMC(const edm::Event& iEvent) {
 
 }
 
-void TreeProducer::doEventInfo(const edm::Event& iEvent) {
+void InvHiggsTreeProducer::doEventInfo(const edm::Event& iEvent) {
 
   unsigned long id          = iEvent.id().event();
   unsigned long bx          = iEvent.bunchCrossing();
@@ -333,7 +333,7 @@ void TreeProducer::doEventInfo(const edm::Event& iEvent) {
 }
   
 
-void TreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void InvHiggsTreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // get GT data
 //   edm::ESHandle<L1GtTriggerMenu> menuRcd;
@@ -457,7 +457,7 @@ void TreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
 
-void TreeProducer::doCaloJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   const JetCorrector* jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
 
@@ -498,7 +498,7 @@ void TreeProducer::doCaloJets(const edm::Event& iEvent, const edm::EventSetup& i
 }
 
 
-void TreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void InvHiggsTreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   const JetCorrector* jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
 
@@ -530,7 +530,7 @@ void TreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSetup& iSe
 }
 
 
-void TreeProducer::doMuons(const edm::Event& iEvent) {
+void InvHiggsTreeProducer::doMuons(const edm::Event& iEvent) {
 
   // loop over reco muons
   edm::Handle<reco::MuonCollection> muons;
@@ -554,7 +554,7 @@ void TreeProducer::doMuons(const edm::Event& iEvent) {
 }
 
 
-void TreeProducer::doElectrons(const edm::Event& iEvent) {
+void InvHiggsTreeProducer::doElectrons(const edm::Event& iEvent) {
 
   edm::Handle<reco::GsfElectronCollection> electrons;
   iEvent.getByLabel(electronTag_,electrons);
@@ -576,7 +576,7 @@ void TreeProducer::doElectrons(const edm::Event& iEvent) {
 }
 
 
-void TreeProducer::doVertices(const edm::Event& iEvent) {
+void InvHiggsTreeProducer::doVertices(const edm::Event& iEvent) {
 
   edm::Handle<reco::VertexCollection> vertices;
   iEvent.getByLabel(vertexTag_, vertices);
@@ -599,10 +599,10 @@ void TreeProducer::doVertices(const edm::Event& iEvent) {
     }
   }
   
-} // void TreeProducer::doVertices(const edm::Event& iEvent)
+} // void InvHiggsTreeProducer::doVertices(const edm::Event& iEvent)
 
 
-void TreeProducer::doGlobal(const edm::Event& iEvent) {
+void InvHiggsTreeProducer::doGlobal(const edm::Event& iEvent) {
 
   // MJJ
   
@@ -633,4 +633,4 @@ void TreeProducer::doGlobal(const edm::Event& iEvent) {
 
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(TreeProducer);
+DEFINE_FWK_MODULE(InvHiggsTreeProducer);

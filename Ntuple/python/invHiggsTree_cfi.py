@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 invHiggsTree = cms.EDAnalyzer(
-    "TreeProducer",
+    "InvHiggsTreeProducer",
 
     # control
     usePAT = cms.untracked.bool(False),
