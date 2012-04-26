@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsTreeProducer.cc,v 1.1 2012/04/24 15:21:38 jbrooke Exp $
+// $Id: InvHiggsTreeProducer.cc,v 1.2 2012/04/24 15:43:09 jbrooke Exp $
 //
 //
 
@@ -498,12 +498,13 @@ void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::Event
     } // loop over jets
 
     // calo mjj
-    double mjj = 0.;
+    double mass = 0.;
     if (jets->size()>2) {
       math::XYZTLorentzVector pair = jets->at(0).p4() + jets->at(1).p4();
-      event_->caloMjj = pair.M();
+      mass = pair.M();
     }
-
+    event_->caloMjj = mass;
+    
   } // if (caloJets.isValid())
   
 }
@@ -537,12 +538,14 @@ void InvHiggsTreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSe
       
     } // loop over jets
 
-    double mjj = 0.;
+    // mjj
+    double mass = 0.;
     if (jets->size()>2) {
       math::XYZTLorentzVector pair = jets->at(0).p4() + jets->at(1).p4();
-      event_->pfMjj = pair.M();
+      mass = pair.M();
     }
-
+    event_->pfMjj = mass;
+    
   } // if (caloJets.isValid())
   
 }
@@ -567,6 +570,15 @@ void InvHiggsTreeProducer::doMuons(const edm::Event& iEvent) {
       event_->addMuon(pt, eta, phi, type);
 
     }
+
+    // leading pair mass
+    double mass = 0.;
+    if (muons->size()>2) {
+      math::XYZTLorentzVector pair = muons->at(0).p4() + muons->at(1).p4();
+      mass = pair.M();
+    }
+    event_->mMuMu = mass;
+
   }
   
 }
@@ -589,6 +601,15 @@ void InvHiggsTreeProducer::doElectrons(const edm::Event& iEvent) {
       event_->addElectron(pt, eta, phi);
 
     }
+
+    // leading pair mass
+    double mass = 0.;
+    if (electrons->size()>2) {
+      math::XYZTLorentzVector pair = electrons->at(0).p4() + electrons->at(1).p4();
+      mass = pair.M();
+    }
+    event_->mEE = mass;
+    
   }
   
 }
@@ -614,6 +635,7 @@ void InvHiggsTreeProducer::doVertices(const edm::Event& iEvent) {
 	event_->addVertex(z, rho, phi, ndof);
 
       }
+      
     }
   }
   
