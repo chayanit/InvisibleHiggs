@@ -31,7 +31,8 @@ invHiggsTree = cms.EDAnalyzer(
     electronTag = cms.untracked.InputTag("gsfElectrons"),
 
     # MET
-    metTag = cms.untracked.InputTag("met"),
+    caloMETTag = cms.untracked.InputTag("met"),
+    pfMETTag = cms.untracked.InputTag("pfMet"),
 
     # MHT
 #    mhtTag = cms.untracked.InputTag("patPFMht"),

@@ -64,6 +64,6 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-    'file:patTuple.root'
+    'file:/gpfs_phys/storm/cms/data/Run2011B/ZeroBiasHPF0/RECO/PromptReco-v1/000/178/104/AEC3A79D-4CF6-E011-B36A-001D09F242EF.root'
     ] );
 

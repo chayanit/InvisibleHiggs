@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsEvent.h,v 1.1 2012/04/26 23:14:30 jbrooke Exp $
+// $Id: InvHiggsEvent.h,v 1.2 2012/04/29 14:25:29 jbrooke Exp $
 //
 //
 
@@ -61,23 +61,19 @@ class InvHiggsEvent { //: public TObject {
   bool l1Result;
   bool hltResult;
 
-  unsigned l1Jet_N;
-  std::vector<Double_t> l1JetEt;
-  std::vector<Double_t> l1JetEta;
-  std::vector<Double_t> l1JetPhi;
-  std::vector<UInt_t> l1JetType;
+  // Global variables
+  Double_t caloMjj;
+  Double_t pfMjj;
+  Double_t caloMET;
+  Double_t caloMETSig;
+  Double_t pfMET;
+  Double_t pfMETSig;
+  Double_t pfMHT;
+  Double_t mEE;
+  Double_t mMuMu;
 
-  double l1MET;
-
-  unsigned hltJet_N;
-  std::vector<Double_t> hltJetE;
-  std::vector<Double_t> hltJetEt;
-  std::vector<Double_t> hltJetEta;
-  std::vector<Double_t> hltJetPhi;
-  std::vector<UInt_t> hltJetType;
-
-  double hltCaloMET;
-  double hltPFMHT;
+  // Beam Halo ID
+  bool beamHalo;
 
   // calo jets
   unsigned caloJet_N;
@@ -113,6 +109,25 @@ class InvHiggsEvent { //: public TObject {
   std::vector<Double_t> eleEta;
   std::vector<Double_t> elePhi;
 
+  // trigger objects
+  unsigned l1Jet_N;
+  std::vector<Double_t> l1JetEt;
+  std::vector<Double_t> l1JetEta;
+  std::vector<Double_t> l1JetPhi;
+  std::vector<UInt_t> l1JetType;
+
+  double l1MET;
+
+  unsigned hltJet_N;
+  std::vector<Double_t> hltJetE;
+  std::vector<Double_t> hltJetEt;
+  std::vector<Double_t> hltJetEta;
+  std::vector<Double_t> hltJetPhi;
+  std::vector<UInt_t> hltJetType;
+
+  double hltCaloMET;
+  double hltPFMHT;
+
   // vertices
   unsigned vtx_N;
   std::vector<Double_t> vtxZ;
@@ -120,19 +135,7 @@ class InvHiggsEvent { //: public TObject {
   std::vector<Double_t> vtxPhi;
   std::vector<UInt_t> vtxNDOF;
 
-  // Global variables
-  Double_t caloMjj;
-  Double_t pfMjj;
-  Double_t caloMET;
-  Double_t caloMETSig;
-  Double_t pfMET;
-  Double_t pfMETSig;
-  Double_t pfMHT;
-  Double_t mEE;
-  Double_t mMuMu;
 
-  // Beam Halo ID
-  bool beamHalo;
 
 };
 
