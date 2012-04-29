@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsEvent.h,v 1.2 2012/04/24 12:23:58 jbrooke Exp $
+// $Id: InvHiggsEvent.h,v 1.1 2012/04/26 23:14:30 jbrooke Exp $
 //
 //
 
@@ -124,14 +124,15 @@ class InvHiggsEvent { //: public TObject {
   Double_t caloMjj;
   Double_t pfMjj;
   Double_t caloMET;
+  Double_t caloMETSig;
+  Double_t pfMET;
+  Double_t pfMETSig;
   Double_t pfMHT;
   Double_t mEE;
   Double_t mMuMu;
 
-  // Beam Halo data
-  bool beamHaloCSCTight;
-  bool beamHaloCSCLoose;
-
+  // Beam Halo ID
+  bool beamHalo;
 
 };
 

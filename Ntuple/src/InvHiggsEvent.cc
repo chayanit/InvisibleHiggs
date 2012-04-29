@@ -48,17 +48,16 @@ InvHiggsEvent::InvHiggsEvent() :
   elePt(0),
   eleEta(0),
   elePhi(0),
-  vtx_N(0),
-  vtxZ(0),
-  vtxRho(0),
-  vtxPhi(0),
-  vtxNDOF(0),
+//   vtx_N(0),
+//   vtxZ(0),
+//   vtxRho(0),
+//   vtxPhi(0),
+//   vtxNDOF(0),
   caloMjj(0.),
   pfMjj(0.),
   caloMET(0.),
   pfMHT(0.),
-  beamHaloCSCTight(false),
-  beamHaloCSCLoose(false)
+  beamHalo(false)
 {
 
 }

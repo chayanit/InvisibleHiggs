@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsTreeProducer.cc,v 1.2 2012/04/24 15:43:09 jbrooke Exp $
+// $Id: InvHiggsTreeProducer.cc,v 1.3 2012/04/26 23:13:30 jbrooke Exp $
 //
 //
 
@@ -72,6 +72,10 @@
 
 // Electrons
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
+
+// MET
+#include "DataFormats/METReco/interface/CaloMETFwd.h"
+#include "DataFormats/METReco/interface/PFMETFwd.h"
 
 // PAT candidates
 #include "DataFormats/PatCandidates/interface/Jet.h"
@@ -172,8 +176,10 @@ private:
   edm::InputTag pfJetTag_;
   edm::InputTag muonTag_;
   edm::InputTag electronTag_;
-  edm::InputTag metTag_;
+  edm::InputTag caloMETTag_;
+  edm::InputTag pfMETTag_;
   edm::InputTag vertexTag_;
+  edm::InputTag haloTag_;
 
   // HLT config helper
   HLTConfigProvider hltConfig_;
@@ -202,10 +208,12 @@ InvHiggsTreeProducer::InvHiggsTreeProducer(const edm::ParameterSet& iConfig):
   caloJetTag_(iConfig.getUntrackedParameter<edm::InputTag>("caloJetTag",edm::InputTag("ak5CaloJets"))),
   caloJetIDTag_(iConfig.getUntrackedParameter<edm::InputTag>("caloJetIDTag",edm::InputTag("ak5CaloJets"))),
   pfJetTag_(iConfig.getUntrackedParameter<edm::InputTag>("pfJetTag",edm::InputTag("ak5PFJets"))),
-  muonTag_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag",edm::InputTag("patMuons"))),
-  electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag",edm::InputTag("patElectrons"))),
-  metTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("patCaloMET"))),
-  vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("verticesTag", edm::InputTag("offlinePrimaryVertices")))
+  muonTag_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag",edm::InputTag("muons"))),
+  electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag",edm::InputTag("GsfElectrons"))),
+  caloMETTag_(iConfig.getUntrackedParameter<edm::InputTag>("caloMETTag",edm::InputTag("caloMET"))),
+  pfMETTag_(iConfig.getUntrackedParameter<edm::InputTag>("pfMETTag",edm::InputTag("pfMET"))),
+  vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("verticesTag", edm::InputTag("offlinePrimaryVertices"))),
+  haloTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("BeamHaloSummary")))
 {
   // set up output
   tree_=fs_->make<TTree>("InvHiggsTree", "");
@@ -645,21 +653,35 @@ void InvHiggsTreeProducer::doVertices(const edm::Event& iEvent) {
 void InvHiggsTreeProducer::doGlobal(const edm::Event& iEvent) {
 
   // calo MET
+  edm::Handle<reco::CaloMETCollection> calomet;
+  iEvent.getByLabel(caloMETTag_, calomet);
 
+  if (calomet.isValid()) {
 
+    event_->caloMET = calomet->at(0).pt();
+    event_->caloMETSig = calomet->at(0).mEtSig();
+
+  }
 
   // PFMHT
-  
+  edm::Handle<reco::PFMETCollection> pfmet;
+  iEvent.getByLabel(pfMETTag_, pfmet);
+
+  if (pfmet.isValid()) {
+
+    event_->pfMET = pfmet->at(0).pt();
+    event_->pfMETSig = pfmet->at(0).mEtSig();
+
+  }
 
 
 
   // beam halo
   edm::Handle<BeamHaloSummary> haloSummary;
-  iEvent.getByLabel("BeamHaloSummary", haloSummary);
+  iEvent.getByLabel(haloTag_, haloSummary);
 
   if (haloSummary.isValid()) {
-    event_->beamHaloCSCTight = haloSummary->CSCTightHaloId();
-    event_->beamHaloCSCLoose = haloSummary->CSCLooseHaloId();
+    event_->beamHalo = haloSummary->CSCTightHaloId();
   }
 
   return;
