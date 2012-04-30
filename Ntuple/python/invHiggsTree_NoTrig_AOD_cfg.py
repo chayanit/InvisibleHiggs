@@ -1,10 +1,11 @@
-import InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg
+import InvisibleHiggs.Ntuple.invHiggsTree_AOD_cfg
+
+# mods for this use case
+process.tree.remove(process.hltHighLevel)
+
 
 
 ### THINGS TO EDIT BELOW ###
-
-# change Global Tag
-process.GlobalTag.globaltag = 'START44_V6::All'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 

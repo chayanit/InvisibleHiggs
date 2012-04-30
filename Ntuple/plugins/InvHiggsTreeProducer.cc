@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsTreeProducer.cc,v 1.3 2012/04/26 23:13:30 jbrooke Exp $
+// $Id: InvHiggsTreeProducer.cc,v 1.4 2012/04/29 14:25:28 jbrooke Exp $
 //
 //
 
@@ -142,6 +142,13 @@ private:
   void doVertices(const edm::Event&);
   void doGlobal(const edm::Event&);
 
+  // write PAT objects
+  void doPATCaloJets(const edm::Event&);
+  void doPATPFJets(const edm::Event&);
+  void doPATElectrons(const edm::Event&);
+  void doPATMuons(const edm::Event&);
+  void doPATGlobal(const edm::Event&);
+
 public:
   
   struct l1jet_gt : public std::binary_function<l1extra::L1JetParticle, l1extra::L1JetParticle, bool> {
@@ -178,6 +185,7 @@ private:
   edm::InputTag electronTag_;
   edm::InputTag caloMETTag_;
   edm::InputTag pfMETTag_;
+  edm::InputTag pfMHTTag_;
   edm::InputTag vertexTag_;
   edm::InputTag haloTag_;
 
@@ -212,6 +220,7 @@ InvHiggsTreeProducer::InvHiggsTreeProducer(const edm::ParameterSet& iConfig):
   electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag",edm::InputTag("GsfElectrons"))),
   caloMETTag_(iConfig.getUntrackedParameter<edm::InputTag>("caloMETTag",edm::InputTag("caloMET"))),
   pfMETTag_(iConfig.getUntrackedParameter<edm::InputTag>("pfMETTag",edm::InputTag("pfMET"))),
+  pfMHTTag_(iConfig.getUntrackedParameter<edm::InputTag>("pfMHTTag",edm::InputTag("pfMHT"))),
   vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("verticesTag", edm::InputTag("offlinePrimaryVertices"))),
   haloTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("BeamHaloSummary")))
 {
@@ -540,9 +549,8 @@ void InvHiggsTreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSe
       double etcorr = it->et() * scale;
       double eta = it->eta();
       double phi = it->phi();
-      double emf = 0.;
       
-      event_->addPFJet(et, etcorr, eta, phi, emf); 
+      event_->addPFJet(et, etcorr, eta, phi); 
       
     } // loop over jets
 
@@ -663,7 +671,7 @@ void InvHiggsTreeProducer::doGlobal(const edm::Event& iEvent) {
 
   }
 
-  // PFMHT
+  // PFMET
   edm::Handle<reco::PFMETCollection> pfmet;
   iEvent.getByLabel(pfMETTag_, pfmet);
 
@@ -674,7 +682,8 @@ void InvHiggsTreeProducer::doGlobal(const edm::Event& iEvent) {
 
   }
 
-
+  // calculate PFMHT from jets
+  // TODO !
 
   // beam halo
   edm::Handle<BeamHaloSummary> haloSummary;
@@ -687,6 +696,173 @@ void InvHiggsTreeProducer::doGlobal(const edm::Event& iEvent) {
   return;
 }
 
+
+void InvHiggsTreeProducer::doPATCaloJets(const edm::Event& iEvent) {
+
+  edm::Handle<pat::JetCollection> jets;
+  iEvent.getByLabel(caloJetTag_, jets);
+  unsigned njet=0;
+  
+  if (jets.isValid()) {
+    
+    for(pat::JetCollection::const_iterator it=jets->begin(); 
+	it!=jets->end();
+	++it, ++njet) {
+
+      // store jet in TTree
+      double et = it->et();
+      double eta = it->eta();
+      double phi = it->phi();
+      double emf = it->emEnergyFraction();
+      int n60 = it->n60();
+      int n90 = it->n90();
+//       double fhpd = (*jetIDs)[jetRef].fHPD;
+//       double frbx = (*jetIDs)[jetRef].fRBX;
+//       int n90hits = int((*jetIDs)[jetRef].n90Hits);
+      
+      event_->addCaloJet(et, 0., eta, phi, emf, n60, n90, 0., 0., 0); 
+
+    }
+
+  }
+
+}
+
+
+void InvHiggsTreeProducer::doPATPFJets(const edm::Event& iEvent) {
+
+  edm::Handle<pat::JetCollection> jets;
+  iEvent.getByLabel(pfJetTag_, jets);
+  unsigned njet=0;
+  
+  if (jets.isValid()) {
+    
+    for(pat::JetCollection::const_iterator it=jets->begin(); 
+	it!=jets->end();
+	++it, ++njet) {
+
+      // store jet in TTree
+      double et = it->et();
+      double eta = it->eta();
+      double phi = it->phi();
+      
+      event_->addPFJet(et, 0., eta, phi);
+
+    }
+
+  }
+
+}
+
+void InvHiggsTreeProducer::doPATMuons(const edm::Event& iEvent) {
+
+  // loop over reco muons
+  edm::Handle<pat::MuonCollection> muons;
+  iEvent.getByLabel(muonTag_,muons);
+
+  if (muons.isValid()) {
+    for(pat::MuonCollection::const_iterator it =muons->begin();
+	it!=muons->end();
+	it++) {
+
+      double pt = it->pt();
+      double eta = it->eta();
+      double phi = it->phi();
+      int type = (0xf & it->type());
+
+      event_->addMuon(pt, eta, phi, type);
+
+    }
+
+    // leading pair mass
+    double mass = 0.;
+    if (muons->size()>2) {
+      math::XYZTLorentzVector pair = muons->at(0).p4() + muons->at(1).p4();
+      mass = pair.M();
+    }
+    event_->mMuMu = mass;
+
+  }
+  
+}
+
+
+void InvHiggsTreeProducer::doPATElectrons(const edm::Event& iEvent) {
+
+  edm::Handle<pat::ElectronCollection> electrons;
+  iEvent.getByLabel(electronTag_,electrons);
+
+  if (electrons.isValid()) {
+    for(pat::ElectronCollection::const_iterator it =electrons->begin();
+	it!=electrons->end();
+	it++) {
+
+      double pt = it->pt();
+      double eta = it->eta();
+      double phi = it->phi();
+
+      event_->addElectron(pt, eta, phi);
+
+    }
+
+    // leading pair mass
+    double mass = 0.;
+    if (electrons->size()>2) {
+      math::XYZTLorentzVector pair = electrons->at(0).p4() + electrons->at(1).p4();
+      mass = pair.M();
+    }
+    event_->mEE = mass;
+    
+  }
+  
+}
+
+
+void InvHiggsTreeProducer::doPATGlobal(const edm::Event& iEvent) {
+
+  // calo MET
+  edm::Handle<pat::METCollection> calomet;
+  iEvent.getByLabel(caloMETTag_, calomet);
+
+  if (calomet.isValid()) {
+
+    event_->caloMET = calomet->at(0).pt();
+    event_->caloMETSig = calomet->at(0).mEtSig();
+
+  }
+
+  // PFMET
+  edm::Handle<pat::METCollection> pfmet;
+  iEvent.getByLabel(pfMETTag_, pfmet);
+
+  if (pfmet.isValid()) {
+
+    event_->pfMET = pfmet->at(0).pt();
+    event_->pfMETSig = pfmet->at(0).mEtSig();
+
+  }
+
+  // PFMHT
+  edm::Handle<pat::MHTCollection> pfmht;
+  iEvent.getByLabel(pfMHTTag_, pfmht);
+
+  if (pfmht.isValid()) {
+
+    event_->pfMHT = pfmht->at(0).pt();
+    event_->pfMHTSig = pfmht->at(0).significance();
+
+  }
+
+  // beam halo
+  edm::Handle<BeamHaloSummary> haloSummary;
+  iEvent.getByLabel(haloTag_, haloSummary);
+
+  if (haloSummary.isValid()) {
+    event_->beamHalo = haloSummary->CSCTightHaloId();
+  }
+
+  return;
+}
 
 
 //define this as a plug-in

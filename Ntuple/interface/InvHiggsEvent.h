@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsEvent.h,v 1.2 2012/04/29 14:25:29 jbrooke Exp $
+// $Id: InvHiggsEvent.h,v 1.3 2012/04/29 18:38:59 jbrooke Exp $
 //
 //
 
@@ -41,7 +41,7 @@ class InvHiggsEvent { //: public TObject {
   void addL1Jet(double et, double eta, double phi, int type);
   void addHltJet(double et, double eta, double phi);
   void addCaloJet(double et, double etcorr, double eta, double phi, double emf, int n60, int n90, double fhpd, double frbx, int n90hits);
-  void addPFJet(double et, double etcorr, double eta, double phi, double emf);
+  void addPFJet(double et, double etcorr, double eta, double phi);
   void addMuon(double pt, double eta, double phi, int type);
   void addElectron(double pt, double eta, double phi);
   void addVertex(double z, double rho, double phi, int ndof);
@@ -69,6 +69,7 @@ class InvHiggsEvent { //: public TObject {
   Double_t pfMET;
   Double_t pfMETSig;
   Double_t pfMHT;
+  Double_t pfMHTSig;
   Double_t mEE;
   Double_t mMuMu;
 
@@ -94,7 +95,6 @@ class InvHiggsEvent { //: public TObject {
   std::vector<Double_t> pfJetEtCorr;
   std::vector<Double_t> pfJetEta;
   std::vector<Double_t> pfJetPhi;
-  std::vector<Double_t> pfJetEMF;
 
   // reco muons
   unsigned mu_N;

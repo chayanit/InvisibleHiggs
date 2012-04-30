@@ -4,7 +4,7 @@ import InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg
 ### THINGS TO EDIT BELOW ###
 
 # change Global Tag
-process.GlobalTag.globaltag = 'START44_V6::All'
+process.GlobalTag.globaltag = 'GR_R_52_V7::All'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
