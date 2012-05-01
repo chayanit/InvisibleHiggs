@@ -4,6 +4,7 @@ invHiggsTree = cms.EDAnalyzer(
     "InvHiggsTreeProducer",
 
     # control
+    useMC = cms.untracked.bool(False),
     usePAT = cms.untracked.bool(False),
     
     # trigger
@@ -12,16 +13,17 @@ invHiggsTree = cms.EDAnalyzer(
     hltResultsTag = cms.untracked.InputTag("TriggerResults","","HLT"),
     hltEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD","","HLT"),
     # Remove '*' from name, so that ntuple Producer can search for strings properly in C++
-    hltPathName = cms.untracked.string("HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v"),
+    hltPath1Name = cms.untracked.string("HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v"),
+    hltPath2Name = cms.untracked.string("HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v"),
     hltL3Tag = cms.untracked.InputTag("","","HLT"),
 
     # MC
     mcTag = cms.untracked.InputTag("generator"),
     
     # jets
-    jetCorrectorServiceName = cms.untracked.string("ak5CaloJetsL1L2L3Residual"),
+    jetCorrectorServiceName = cms.untracked.string("ak5CaloJetsL1L2L3Residual"),   # AOD
     caloJetTag = cms.untracked.InputTag("ak5CaloJets"),
-    caloJetIDTag = cms.untracked.InputTag("ak5JetID"),
+    caloJetIDTag = cms.untracked.InputTag("ak5JetID"),   # AOD
     pfJetTag = cms.untracked.InputTag("ak5PFJets"),
 
     # muons
@@ -30,12 +32,10 @@ invHiggsTree = cms.EDAnalyzer(
     # electrons
     electronTag = cms.untracked.InputTag("gsfElectrons"),
 
-    # MET
+    # energy sums
     caloMETTag = cms.untracked.InputTag("met"),
     pfMETTag = cms.untracked.InputTag("pfMet"),
-
-    # MHT
-#    mhtTag = cms.untracked.InputTag("patPFMht"),
+    pfMHTTag = cms.untracked.InputTag("pfMht"),  # only in PAT
 
     # vertices
     vertexTag = cms.untracked.InputTag("offlinePrimaryVertices")

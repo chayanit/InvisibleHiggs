@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsTreeProducer.cc,v 1.4 2012/04/29 14:25:28 jbrooke Exp $
+// $Id: InvHiggsTreeProducer.cc,v 1.5 2012/04/30 17:14:05 jbrooke Exp $
 //
 //
 
@@ -167,12 +167,14 @@ private:
   InvHiggsEvent* event_;
 
   // EDM input tags
+  bool useMC_;
   bool usePAT_;
   std::string l1JetsTag_;
   edm::InputTag l1BitsTag_;
   edm::InputTag hltResultsTag_;
   edm::InputTag hltEventTag_;
-  std::string hltPathName_;
+  std::string hltPath1Name_;
+  std::string hltPath2Name_;
   edm::InputTag hltL3Tag_;
   edm::InputTag mcTag_;
   std::string mcProducer_;
@@ -191,7 +193,8 @@ private:
 
   // HLT config helper
   HLTConfigProvider hltConfig_;
-  unsigned hltBit_;
+  unsigned hltBit1_;
+  unsigned hltBit2_;
   bool doHltBit_;
 
 };
@@ -202,12 +205,14 @@ private:
 InvHiggsTreeProducer::InvHiggsTreeProducer(const edm::ParameterSet& iConfig):
   tree_(0),
   event_(0),
+  useMC_(iConfig.getUntrackedParameter<bool>("useMC",false)),
   usePAT_(iConfig.getUntrackedParameter<bool>("usePAT",false)),
   l1JetsTag_(iConfig.getUntrackedParameter<std::string>("l1JetsTag",std::string("l1extraParticles"))),
   l1BitsTag_(iConfig.getUntrackedParameter<edm::InputTag>("l1BitsTag",edm::InputTag("gtDigis"))),
   hltResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("hltResultsTag",edm::InputTag("TriggerResults","","HLT"))),
   hltEventTag_(iConfig.getUntrackedParameter<edm::InputTag>("hltEventTag",edm::InputTag("hltTriggerSummaryAOD","","HLT"))),
-  hltPathName_(iConfig.getUntrackedParameter<std::string>("hltPathName",std::string("HLT_v1"))),
+  hltPath1Name_(iConfig.getUntrackedParameter<std::string>("hltPathName",std::string("HLT_v1"))),
+  hltPath2Name_(iConfig.getUntrackedParameter<std::string>("hltPathName",std::string("HLT_v1"))),
   hltL3Tag_(iConfig.getUntrackedParameter<edm::InputTag>("hltL3Tag",edm::InputTag("hltFilter","","HLT"))),
   mcTag_(iConfig.getUntrackedParameter<edm::InputTag>("mcTag",edm::InputTag("generator"))),
   mcProducer_ (iConfig.getUntrackedParameter<std::string>("producer", "g4SimHits")),
@@ -222,7 +227,11 @@ InvHiggsTreeProducer::InvHiggsTreeProducer(const edm::ParameterSet& iConfig):
   pfMETTag_(iConfig.getUntrackedParameter<edm::InputTag>("pfMETTag",edm::InputTag("pfMET"))),
   pfMHTTag_(iConfig.getUntrackedParameter<edm::InputTag>("pfMHTTag",edm::InputTag("pfMHT"))),
   vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("verticesTag", edm::InputTag("offlinePrimaryVertices"))),
-  haloTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("BeamHaloSummary")))
+  haloTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("BeamHaloSummary"))),
+  hltConfig_(),
+  hltBit1_(0),
+  hltBit2_(0),
+  doHltBit_(true)
 {
   // set up output
   tree_=fs_->make<TTree>("InvHiggsTree", "");
@@ -252,7 +261,9 @@ void InvHiggsTreeProducer::beginJob()
 void InvHiggsTreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
 {
   // Get PDT Table if MC
-  //iSetup.getData(fPDGTable);
+  if (useMC_) {
+    //iSetup.getData(fPDGTable);
+  }
 
   // HLT setup
   bool changed;
@@ -260,28 +271,38 @@ void InvHiggsTreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const
   
   // HLT Path -- No BPTX
   try{
-    hltBit_=(hltConfig_.triggerNames()).size();  // default setting -- trigger not found
+    hltBit1_=(hltConfig_.triggerNames()).size();  // default setting -- trigger not found
+    hltBit2_=(hltConfig_.triggerNames()).size();  // default setting -- trigger not found
     for (uint i=0;i<(hltConfig_.triggerNames()).size();++i) // loop over trigger names
       {
 	std::string trigName=hltConfig_.triggerName(i);
 
-	if (hltPathName_.size()>0 &&
-	    trigName.find(hltPathName_)!= std::string::npos)
+	if (hltPath1Name_.size()>0 &&
+	    trigName.find(hltPath1Name_)!= std::string::npos)
 	  {
-	    hltBit_ = hltConfig_.triggerIndex(trigName); // could just set to i, but let's be careful...
+	    hltBit1_ = hltConfig_.triggerIndex(trigName);
+	  }
+	if (hltPath2Name_.size()>0 &&
+	    trigName.find(hltPath2Name_)!= std::string::npos)
+	  {
+	    hltBit2_ = hltConfig_.triggerIndex(trigName);
 	  }
       }
-    if (hltBit_==(hltConfig_.triggerNames()).size())
+    if (hltBit1_==(hltConfig_.triggerNames()).size())
       {
-	edm::LogWarning("InvHiggsTreeProducer") << "Could not find an HLT path matching "<<hltPathName_<<".  Branch will not be filled."<<std::endl;
-	doHltBit_ = false;
+	edm::LogWarning("InvHiggsTreeProducer") << "Could not find an HLT path matching "<<hltPath1Name_<<std::endl;
+      }
+    if (hltBit2_==(hltConfig_.triggerNames()).size())
+      {
+	edm::LogWarning("InvHiggsTreeProducer") << "Could not find an HLT path matching "<<hltPath2Name_<<std::endl;
       }
     else
-      edm::LogInfo("InvHiggsTreeProducer") << hltPathName_ << " index is " << hltBit_ << std::endl;
+      edm::LogInfo("InvHiggsTreeProducer") << hltPath1Name_ << " index is " << hltBit1_ << std::endl;
+      edm::LogInfo("InvHiggsTreeProducer") << hltPath2Name_ << " index is " << hltBit2_ << std::endl;
   } // end of try loop
   catch (cms::Exception e) {
-    edm::LogWarning("InvHiggsTreeProducer") << "HLTJetNoBPTX:  Could not find an HLT path matching " << hltPathName_ << ".  Branch will not be filled" << std::endl;
-    doHltBit_ = false;
+    edm::LogWarning("InvHiggsTreeProducer") << "Exception while trying to find HLT bit numbers" << std::endl;
+    edm::LogWarning("InvHiggsTreeProducer") << e << std::endl;
   }
 
 }
@@ -299,19 +320,30 @@ InvHiggsTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
  
   event_ = new InvHiggsEvent();
  
-  //  doMC(iEvent);
+  if (useMC_) {
+    doMC(iEvent);
+  }
  
   // event & trigger info
   doEventInfo(iEvent);
   doTrigger(iEvent, iSetup);
 
-  //  AOD info
-  doCaloJets(iEvent, iSetup);
-  doPFJets(iEvent, iSetup);
-  doMuons(iEvent);
-  doElectrons(iEvent);
-  doVertices(iEvent);
-  doGlobal(iEvent);
+  if (!usePAT_) {
+    doCaloJets(iEvent, iSetup);
+    doPFJets(iEvent, iSetup);
+    doMuons(iEvent);
+    doElectrons(iEvent);
+    doVertices(iEvent);
+    doGlobal(iEvent);
+  }
+  else {
+    doPATCaloJets(iEvent);
+    doPATPFJets(iEvent);
+    doPATMuons(iEvent);
+    doPATElectrons(iEvent);
+    doPATGlobal(iEvent);
+  }
+
 
   // fill TTree
   tree_->Fill();
@@ -392,7 +424,8 @@ void InvHiggsTreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventS
 //   event_->gtTechWord = gtTechWord;
 
 
-  bool hltResult(false);
+  bool hltResult1(false);
+  bool hltResult2(false);
 
   // get HLT results
   edm::Handle<edm::TriggerResults> HLTR;
@@ -400,15 +433,17 @@ void InvHiggsTreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventS
 
   if (HLTR.isValid()) {
     // triggerIndex must be less than the size of HLTR or you get a CMSException: _M_range_check
-    if (doHltBit_ && hltBit_ < HLTR->size()) hltResult = HLTR->accept(hltBit_);
+    if (doHltBit_ && hltBit1_ < HLTR->size()) hltResult1 = HLTR->accept(hltBit1_);
+    if (doHltBit_ && hltBit2_ < HLTR->size()) hltResult2 = HLTR->accept(hltBit2_);
   }
   else {
-    if (doHltBit_) edm::LogWarning("MissingProduct") << "HLT information not found for HltBit1.  Branch will not be filled" << std::endl;
+    if (doHltBit_) edm::LogWarning("MissingProduct") << "HLT information not found.  Branch will not be filled" << std::endl;
     doHltBit_ = false;
   }
 
   // store bits
-  event_->hltResult = hltResult; 
+  event_->hltResult1 = hltResult1; 
+  event_->hltResult2 = hltResult2; 
 
   // Store HLT prescale info
 //   event_->hltPrescaleIndex=hltConfig_.prescaleSet(iEvent, iSetup);

@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsEvent.h,v 1.3 2012/04/29 18:38:59 jbrooke Exp $
+// $Id: InvHiggsEvent.h,v 1.4 2012/04/30 17:14:04 jbrooke Exp $
 //
 //
 
@@ -59,7 +59,8 @@ class InvHiggsEvent { //: public TObject {
 
   // trigger
   bool l1Result;
-  bool hltResult;
+  bool hltResult1;
+  bool hltResult2;
 
   // Global variables
   Double_t caloMjj;
