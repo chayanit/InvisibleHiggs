@@ -28,16 +28,34 @@ process.hltHighLevel.HLTPaths = cms.vstring(
 # Ntuple producer
 process.load('InvisibleHiggs/Ntuple/invHiggsTree_cfi')
 
-# get jet corrections
+# get jet corrections (inc re-running L1Fast jet)
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-process.invHiggsTree.jetCorrectorServiceName = cms.untracked.string("ak5CaloL2L3")
-#process.ak5CaloL1Offset.useCondDB = False
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+process.kt6PFJets.doRhoFastjet = True
+process.ak5PFJetsL1FastL2L3   = cms.EDProducer('PFJetCorrectionProducer',
+    src         = cms.InputTag('ak5PFJets'),
+    correctors  = cms.vstring('ak5PFL1FastL2L3')
+)
+process.ak5CaloJetsL1FastL2L3   = cms.EDProducer('CaloJetCorrectionProducer',
+    src         = cms.InputTag('ak5CaloJets'),
+    correctors  = cms.vstring('ak5CaloL1FastL2L3')
+)
+process.ak5CaloJets.doAreaFastjet = True
+process.ak5PFJets.doAreaFastjet = True
+
 
 # path
 process.tree = cms.Path(
 
 # filter on HLT bit
     process.hltHighLevel
+
+# jet corrections
+    +process.kt6PFJets
+    +process.ak5PFJets
+    +process.ak5PFJetsL1FastL2L3
+    +process.ak5CaloJets
+    +process.ak5CaloJetsL1FastL2L3
 
 # generate TTree    
     +process.invHiggsTree
