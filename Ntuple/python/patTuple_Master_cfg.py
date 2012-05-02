@@ -26,6 +26,7 @@ process.hltHighLevel.HLTPaths = cms.vstring(
 
 # Jet corrections (inc L1 Fast jet)
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+process.load('RecoJets.Configuration.RecoJets_cff')
 process.load('RecoJets.Configuration.RecoPFJets_cff')
 process.kt6PFJets.doRhoFastjet = True
 process.ak5PFJetsL1FastL2L3   = cms.EDProducer('PFJetCorrectionProducer',
@@ -36,7 +37,7 @@ process.ak5CaloJetsL1FastL2L3   = cms.EDProducer('CaloJetCorrectionProducer',
     src         = cms.InputTag('ak5CaloJets'),
     correctors  = cms.vstring('ak5CaloL1FastL2L3')
 )
-process.ak5CaloJets.doAreaFastJet = True
+process.ak5CaloJets.doAreaFastjet = True
 process.ak5PFJets.doAreaFastjet = True
 
 
@@ -50,8 +51,8 @@ process.p = cms.Path(
     +process.kt6PFJets
     +process.ak5PFJets
     +process.ak5PFJetsL1FastL2L3
-    +process.ak5CaloJets
-    +process.ak5CaloJetsL1FastL2L3
+#    +process.ak5CaloJets
+#    +process.ak5CaloJetsL1FastL2L3
 
 # generate PAT
     +process.patDefaultSequence
