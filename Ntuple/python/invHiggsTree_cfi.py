@@ -21,7 +21,7 @@ invHiggsTree = cms.EDAnalyzer(
     mcTag = cms.untracked.InputTag("generator"),
     
     # jets
-    jetCorrectorServiceName = cms.untracked.string(""),   # AOD
+    jetCorrectorServiceName = cms.untracked.string(""),   # for corrections on the fly
     caloJetTag = cms.untracked.InputTag("ak5CaloJets"),
     caloJetIDTag = cms.untracked.InputTag("ak5JetID"),   # AOD
     pfJetTag = cms.untracked.InputTag("ak5PFJets"),

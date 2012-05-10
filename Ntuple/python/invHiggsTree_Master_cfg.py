@@ -45,7 +45,7 @@ process.ak5PFJets.doAreaFastjet = True
 
 
 # path
-process.tree = cms.Path(
+process.path = cms.Path(
 
 # filter on HLT bit
     process.hltHighLevel

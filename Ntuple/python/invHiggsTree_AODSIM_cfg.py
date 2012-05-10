@@ -1,4 +1,6 @@
-import InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg
+from InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg import *
+
+process.path.remove(process.hltHighLevel)
 
 
 ### THINGS TO EDIT BELOW ###

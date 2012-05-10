@@ -1,4 +1,4 @@
-import InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg
+from InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg import *
 
 
 ### THINGS TO EDIT BELOW ###

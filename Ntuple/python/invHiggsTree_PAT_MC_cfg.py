@@ -1,4 +1,4 @@
-import InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg
+from InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg import *
 
 # no need for trigger filter
 process.path.remove(process.hltHighLevel)
@@ -12,14 +12,14 @@ process.path.remove(process.ak5CaloJetsL1FastL2L3)
 
 # read Tree info from PAT instead of AOD
 process.invHiggsTree.usePAT = cms.untracked.bool(True)
-process.invHiggsTree.caloJetTag = cms.untracked.InputTag("patCaloJets")
-process.invHiggsTree.pfJetTag = cms.untracked.InputTag("patPFJets")
-process.invHiggsTree.muonTag = cms.untracked.InputTag("patMuons")
-process.invHiggsTree.electronTag = cms.untracked.InputTag("patElectrons")
-process.invHiggsTree.caloMETTag = cms.untracked.InputTag("patMET")
-process.invHiggsTree.pfMETTag = cms.untracked.InputTag("patPFMet")
-process.invHiggsTree.mhtTag = cms.untracked.InputTag("patPFMht")
-process.invHiggsTree.vertexTag = cms.untracked.InputTag("offlinePrimaryVertices")
+#process.invHiggsTree.caloJetTag = cms.untracked.InputTag("patCaloJets")
+process.invHiggsTree.pfJetTag = cms.untracked.InputTag("cleanPatJets")
+process.invHiggsTree.muonTag = cms.untracked.InputTag("cleaPatMuons")
+process.invHiggsTree.electronTag = cms.untracked.InputTag("cleanPatElectrons")
+#process.invHiggsTree.caloMETTag = cms.untracked.InputTag("patMETs")
+process.invHiggsTree.pfMETTag = cms.untracked.InputTag("patMETs")
+#process.invHiggsTree.mhtTag = cms.untracked.InputTag("patPFMht")
+#process.invHiggsTree.vertexTag = cms.untracked.InputTag("offlinePrimaryVertices")
 
 
 
@@ -33,8 +33,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 # input files
 readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
-process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
-readFiles.extend( [
-    'file:/gpfs_phys/storm/cms/mc/Fall11/VBF_HToZZTo4Nu_M-120_7TeV-pythia6/GEN-SIM-RAW-HLTDEBUG-RECO/E7TeV_Ave32_50ns-v1/0000/04074BAA-0459-E111-91A3-003048D46300.root'
-    ] );
+process.source.fileNames = [
+    'file:invHiggs_patTuple.root'
+    ]
 

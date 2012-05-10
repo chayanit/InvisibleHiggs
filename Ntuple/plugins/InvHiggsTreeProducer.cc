@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsTreeProducer.cc,v 1.5 2012/04/30 17:14:05 jbrooke Exp $
+// $Id: InvHiggsTreeProducer.cc,v 1.6 2012/05/01 14:19:49 jbrooke Exp $
 //
 //
 
@@ -514,7 +514,8 @@ void InvHiggsTreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventS
 
 void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
+  const JetCorrector* jetCorrector=0;
+  if (jetCorrectorServiceName_.length()>0) jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
 
   edm::Handle<reco::CaloJetCollection> jets;
   edm::Handle<edm::ValueMap<reco::JetID> > jetIDs;
@@ -531,7 +532,8 @@ void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::Event
 	++it, ++njet) {
       
       edm::RefToBase<reco::Jet> jetRef(edm::Ref<reco::CaloJetCollection>(jets,njet));  
-      double scale = jetCorrector->correction(*it,jetRef,iEvent,iSetup);
+      double scale=0;
+      if (jetCorrector!=0) scale = jetCorrector->correction(*it,jetRef,iEvent,iSetup);
       
       // store jet in TTree
       double et = it->et();
@@ -541,10 +543,16 @@ void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::Event
       double emf = it->emEnergyFraction();
       int n60 = it->n60();
       int n90 = it->n90();
-      double fhpd = (*jetIDs)[jetRef].fHPD;
-      double frbx = (*jetIDs)[jetRef].fRBX;
-      int n90hits = int((*jetIDs)[jetRef].n90Hits);
+      double fhpd = 0.;
+      double frbx = 0.;
+      int n90hits = 0;
       
+      if (jetIDs.isValid()) {
+// 	fhpd = (*jetIDs)[jetRef].fHPD;
+// 	frbx = (*jetIDs)[jetRef].fRBX;
+// 	n90hits = int((*jetIDs)[jetRef].n90Hits);
+      }
+
       event_->addCaloJet(et, etcorr, eta, phi, emf, n60, n90, fhpd, frbx, n90hits); 
       
     } // loop over jets
@@ -564,7 +572,8 @@ void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::Event
 
 void InvHiggsTreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
+  const JetCorrector* jetCorrector=0;
+  if (jetCorrectorServiceName_.length()>0) jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
 
   edm::Handle<reco::PFJetCollection> jets;
   iEvent.getByLabel(pfJetTag_, jets);
@@ -577,7 +586,8 @@ void InvHiggsTreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSe
 	++it, ++njet) {
       
       edm::RefToBase<reco::Jet> jetRef(edm::Ref<reco::PFJetCollection>(jets,njet));  
-      double scale = jetCorrector->correction(*it,jetRef,iEvent,iSetup);
+      double scale=0;
+      if (jetCorrector!=0) scale = jetCorrector->correction(*it,jetRef,iEvent,iSetup);
       
       // store jet in TTree
       double et = it->et();

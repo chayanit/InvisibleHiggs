@@ -97,7 +97,7 @@ process.maxEvents.input = 100
 #                                         ##
 #   process.out.outputCommands = [ ... ]  ##  (e.g. taken from PhysicsTools/PatAlgos/python/patEventContent_cff.py)
 #                                         ##
-process.out.fileName = 'invHiggs_patTuple.root'
+process.out.fileName = 'patTuple.root'
 #                                         ##
 #   process.options.wantSummary = False   ##  (to suppress the long output at the end of the job)
 

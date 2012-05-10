@@ -1,4 +1,4 @@
-import InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg
+from InvisibleHiggs.Ntuple.invHiggsTree_Master_cfg import *
 
 # no need for trigger filter
 process.path.remove(process.hltHighLevel)
