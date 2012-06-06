@@ -11,9 +11,8 @@ process.path.remove(process.ak5CaloJets)
 process.path.remove(process.ak5CaloJetsL1FastL2L3)
 
 # read Tree info from PAT instead of AOD
-process.invHiggsTree.usePAT = cms.untracked.bool(True)
 #process.invHiggsTree.caloJetTag = cms.untracked.InputTag("patCaloJets")
-process.invHiggsTree.pfJetTag = cms.untracked.InputTag("cleanPatJets")
+process.invHiggsTree.jetTag = cms.untracked.InputTag("cleanPatJets")
 process.invHiggsTree.muonTag = cms.untracked.InputTag("cleaPatMuons")
 process.invHiggsTree.electronTag = cms.untracked.InputTag("cleanPatElectrons")
 #process.invHiggsTree.caloMETTag = cms.untracked.InputTag("patMETs")
@@ -34,6 +33,6 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source.fileNames = [
-    'file:invHiggs_patTuple.root'
+    'file:/storage/phjjb/invisibleHiggs/test/InvHiggs_PAT_Fall11_Testv1_WJetsToLNu_test.root'
     ]
 

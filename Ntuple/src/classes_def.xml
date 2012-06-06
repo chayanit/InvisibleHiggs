@@ -1,3 +1,4 @@
 <lcgdict>
   <class name="InvHiggsEvent"/>
+  <class name="InvHiggsInfo"/>
 </lcgdict>

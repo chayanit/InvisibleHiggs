@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
 // Package:    InvisibleHiggs/Analysis
-// Class:      TInvHiggsTreeProducer
+// Class:      InvHiggsTreeProducer
 // 
-/**\class InvHiggsTreeProducer InvHiggsTreeProducer.cc InvisibleHiggs/Analysis/src/InvHiggsTreeProducer.cc
+/**\class InvHiggsAODProducer InvHiggsAODProducer.cc InvisibleHiggs/Analysis/src/InvHiggsAODProducer.cc
 
  Description: Produce invisible Higgs TTree
 
@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsTreeProducer.cc,v 1.6 2012/05/01 14:19:49 jbrooke Exp $
+// $Id: InvHiggsAODProducer.cc,v 1.7 2012/05/10 14:26:23 jbrooke Exp $
 //
 //
 
@@ -69,6 +69,7 @@
 
 // Muons
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
 
 // Electrons
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
@@ -76,14 +77,7 @@
 // MET
 #include "DataFormats/METReco/interface/CaloMETFwd.h"
 #include "DataFormats/METReco/interface/PFMETFwd.h"
-
-// PAT candidates
-#include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/MET.h"
-#include "DataFormats/PatCandidates/interface/MHT.h"
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/METReco/interface/PFMET.h"
 
 // Vertices
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -94,6 +88,11 @@
 
 // MC
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
+
+// Lumi
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+
 
 // Math
 #include "DataFormats/Math/interface/LorentzVector.h"
@@ -109,16 +108,19 @@
 #include "InvisibleHiggs/Ntuple/interface/InvHiggsEvent.h"
 
 
+#include <algorithm>
+
+
 //
 // class declaration
 //
 
 using namespace reco;
 
-class InvHiggsTreeProducer : public edm::EDAnalyzer {
+class InvHiggsAODProducer : public edm::EDAnalyzer {
 public:
-  explicit InvHiggsTreeProducer(const edm::ParameterSet&);
-  ~InvHiggsTreeProducer();
+  explicit InvHiggsAODProducer(const edm::ParameterSet&);
+  ~InvHiggsAODProducer();
   
 private:
   virtual void beginJob() ;
@@ -142,12 +144,9 @@ private:
   void doVertices(const edm::Event&);
   void doGlobal(const edm::Event&);
 
-  // write PAT objects
-  void doPATCaloJets(const edm::Event&);
-  void doPATPFJets(const edm::Event&);
-  void doPATElectrons(const edm::Event&);
-  void doPATMuons(const edm::Event&);
-  void doPATGlobal(const edm::Event&);
+  void doVBFJetVariables(std::vector<reco::CaloJet> jets);
+
+  void doPUReweighting(const edm::Event&);
 
 public:
   
@@ -168,7 +167,6 @@ private:
 
   // EDM input tags
   bool useMC_;
-  bool usePAT_;
   std::string l1JetsTag_;
   edm::InputTag l1BitsTag_;
   edm::InputTag hltResultsTag_;
@@ -197,16 +195,18 @@ private:
   unsigned hltBit2_;
   bool doHltBit_;
 
+  // PU re-weighting
+  //edm::LumiReWeighting lumiWeights_;
+
 };
 
 
 
 
-InvHiggsTreeProducer::InvHiggsTreeProducer(const edm::ParameterSet& iConfig):
+InvHiggsAODProducer::InvHiggsAODProducer(const edm::ParameterSet& iConfig):
   tree_(0),
   event_(0),
   useMC_(iConfig.getUntrackedParameter<bool>("useMC",false)),
-  usePAT_(iConfig.getUntrackedParameter<bool>("usePAT",false)),
   l1JetsTag_(iConfig.getUntrackedParameter<std::string>("l1JetsTag",std::string("l1extraParticles"))),
   l1BitsTag_(iConfig.getUntrackedParameter<edm::InputTag>("l1BitsTag",edm::InputTag("gtDigis"))),
   hltResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("hltResultsTag",edm::InputTag("TriggerResults","","HLT"))),
@@ -232,15 +232,19 @@ InvHiggsTreeProducer::InvHiggsTreeProducer(const edm::ParameterSet& iConfig):
   hltBit1_(0),
   hltBit2_(0),
   doHltBit_(true)
+//   lumiWeights_(iConfig.getUntrackedParameter<std::string>("puMCFile", ""),
+// 	       iConfig.getUntrackedParameter<std::string>("puDataFile", ""),
+// 	       iConfig.getUntrackedParameter<std::string>("puMCHist", ""),
+// 	       iConfig.getUntrackedParameter<std::string>("puDataHist", ""))
 {
   // set up output
   tree_=fs_->make<TTree>("InvHiggsTree", "");
-  tree_->Branch("events", "InvHiggsEvent", &event_, 640000, 1);
+  tree_->Branch("events", "InvHiggsEvent", &event_, 1000000, 1);
   
 }
 
 
-InvHiggsTreeProducer::~InvHiggsTreeProducer() {
+InvHiggsAODProducer::~InvHiggsAODProducer() {
 
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
@@ -253,12 +257,12 @@ InvHiggsTreeProducer::~InvHiggsTreeProducer() {
 //
 
 // ------------ method called once each job just before starting event loop  ------------
-void InvHiggsTreeProducer::beginJob()
+void InvHiggsAODProducer::beginJob()
 {
 }
 
 // -- called once per run
-void InvHiggsTreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
+void InvHiggsAODProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
 {
   // Get PDT Table if MC
   if (useMC_) {
@@ -290,19 +294,19 @@ void InvHiggsTreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const
       }
     if (hltBit1_==(hltConfig_.triggerNames()).size())
       {
-	edm::LogWarning("InvHiggsTreeProducer") << "Could not find an HLT path matching "<<hltPath1Name_<<std::endl;
+	edm::LogWarning("InvHiggsAODProducer") << "Could not find an HLT path matching "<<hltPath1Name_<<std::endl;
       }
     if (hltBit2_==(hltConfig_.triggerNames()).size())
       {
-	edm::LogWarning("InvHiggsTreeProducer") << "Could not find an HLT path matching "<<hltPath2Name_<<std::endl;
+	edm::LogWarning("InvHiggsAODProducer") << "Could not find an HLT path matching "<<hltPath2Name_<<std::endl;
       }
     else
-      edm::LogInfo("InvHiggsTreeProducer") << hltPath1Name_ << " index is " << hltBit1_ << std::endl;
-      edm::LogInfo("InvHiggsTreeProducer") << hltPath2Name_ << " index is " << hltBit2_ << std::endl;
+      edm::LogInfo("InvHiggsAODProducer") << hltPath1Name_ << " index is " << hltBit1_ << std::endl;
+      edm::LogInfo("InvHiggsAODProducer") << hltPath2Name_ << " index is " << hltBit2_ << std::endl;
   } // end of try loop
   catch (cms::Exception e) {
-    edm::LogWarning("InvHiggsTreeProducer") << "Exception while trying to find HLT bit numbers" << std::endl;
-    edm::LogWarning("InvHiggsTreeProducer") << e << std::endl;
+    edm::LogWarning("InvHiggsAODProducer") << "Exception while trying to find HLT bit numbers" << std::endl;
+    edm::LogWarning("InvHiggsAODProducer") << e << std::endl;
   }
 
 }
@@ -310,40 +314,31 @@ void InvHiggsTreeProducer::beginRun(edm::Run const & iRun, edm::EventSetup const
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-InvHiggsTreeProducer::endJob() {
+InvHiggsAODProducer::endJob() {
 }
 
 // ------------ method called to for each event  ------------
 void
-InvHiggsTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+InvHiggsAODProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
  
   event_ = new InvHiggsEvent();
  
   if (useMC_) {
     doMC(iEvent);
+    doPUReweighting(iEvent);
   }
  
   // event & trigger info
   doEventInfo(iEvent);
   doTrigger(iEvent, iSetup);
 
-  if (!usePAT_) {
-    doCaloJets(iEvent, iSetup);
-    doPFJets(iEvent, iSetup);
-    doMuons(iEvent);
-    doElectrons(iEvent);
-    doVertices(iEvent);
-    doGlobal(iEvent);
-  }
-  else {
-    doPATCaloJets(iEvent);
-    doPATPFJets(iEvent);
-    doPATMuons(iEvent);
-    doPATElectrons(iEvent);
-    doPATGlobal(iEvent);
-  }
-
+  doCaloJets(iEvent, iSetup);
+  doPFJets(iEvent, iSetup);
+  doMuons(iEvent);
+  doElectrons(iEvent);
+  doVertices(iEvent);
+  doGlobal(iEvent);
 
   // fill TTree
   tree_->Fill();
@@ -354,7 +349,7 @@ InvHiggsTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 
 
-void InvHiggsTreeProducer::doMC(const edm::Event& iEvent) {
+void InvHiggsAODProducer::doMC(const edm::Event& iEvent) {
 
   edm::Handle<edm::HepMCProduct> mcHandle;
   iEvent.getByLabel(mcTag_,mcHandle);
@@ -368,7 +363,7 @@ void InvHiggsTreeProducer::doMC(const edm::Event& iEvent) {
 
 }
 
-void InvHiggsTreeProducer::doEventInfo(const edm::Event& iEvent) {
+void InvHiggsAODProducer::doEventInfo(const edm::Event& iEvent) {
 
   unsigned long id          = iEvent.id().event();
   unsigned long bx          = iEvent.bunchCrossing();
@@ -385,7 +380,7 @@ void InvHiggsTreeProducer::doEventInfo(const edm::Event& iEvent) {
 }
   
 
-void InvHiggsTreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void InvHiggsAODProducer::doTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // get GT data
 //   edm::ESHandle<L1GtTriggerMenu> menuRcd;
@@ -512,7 +507,7 @@ void InvHiggsTreeProducer::doTrigger(const edm::Event& iEvent, const edm::EventS
 
 
 
-void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void InvHiggsAODProducer::doCaloJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   const JetCorrector* jetCorrector=0;
   if (jetCorrectorServiceName_.length()>0) jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
@@ -564,13 +559,15 @@ void InvHiggsTreeProducer::doCaloJets(const edm::Event& iEvent, const edm::Event
       mass = pair.M();
     }
     event_->caloMjj = mass;
+
+    doVBFJetVariables(*jets);
     
   } // if (caloJets.isValid())
   
 }
 
 
-void InvHiggsTreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void InvHiggsAODProducer::doPFJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   const JetCorrector* jetCorrector=0;
   if (jetCorrectorServiceName_.length()>0) jetCorrector = JetCorrector::getJetCorrector(jetCorrectorServiceName_,iSetup);
@@ -612,7 +609,7 @@ void InvHiggsTreeProducer::doPFJets(const edm::Event& iEvent, const edm::EventSe
 }
 
 
-void InvHiggsTreeProducer::doMuons(const edm::Event& iEvent) {
+void InvHiggsAODProducer::doMuons(const edm::Event& iEvent) {
 
   // loop over reco muons
   edm::Handle<reco::MuonCollection> muons;
@@ -645,7 +642,7 @@ void InvHiggsTreeProducer::doMuons(const edm::Event& iEvent) {
 }
 
 
-void InvHiggsTreeProducer::doElectrons(const edm::Event& iEvent) {
+void InvHiggsAODProducer::doElectrons(const edm::Event& iEvent) {
 
   edm::Handle<reco::GsfElectronCollection> electrons;
   iEvent.getByLabel(electronTag_,electrons);
@@ -676,7 +673,7 @@ void InvHiggsTreeProducer::doElectrons(const edm::Event& iEvent) {
 }
 
 
-void InvHiggsTreeProducer::doVertices(const edm::Event& iEvent) {
+void InvHiggsAODProducer::doVertices(const edm::Event& iEvent) {
 
   edm::Handle<reco::VertexCollection> vertices;
   iEvent.getByLabel(vertexTag_, vertices);
@@ -700,10 +697,10 @@ void InvHiggsTreeProducer::doVertices(const edm::Event& iEvent) {
     }
   }
   
-} // void InvHiggsTreeProducer::doVertices(const edm::Event& iEvent)
+} // void InvHiggsAODProducer::doVertices(const edm::Event& iEvent)
 
 
-void InvHiggsTreeProducer::doGlobal(const edm::Event& iEvent) {
+void InvHiggsAODProducer::doGlobal(const edm::Event& iEvent) {
 
   // calo MET
   edm::Handle<reco::CaloMETCollection> calomet;
@@ -742,173 +739,119 @@ void InvHiggsTreeProducer::doGlobal(const edm::Event& iEvent) {
 }
 
 
-void InvHiggsTreeProducer::doPATCaloJets(const edm::Event& iEvent) {
 
-  edm::Handle<pat::JetCollection> jets;
-  iEvent.getByLabel(caloJetTag_, jets);
-  unsigned njet=0;
+/// identify tag jets and store some variables
+void InvHiggsAODProducer::doVBFJetVariables(std::vector<reco::CaloJet> jets) {
+
+  bool vbfFound = false;
+
+  for (unsigned i=0; i<jets.size()-1 && !vbfFound; ++i) {
+    for (unsigned j=i; j<jets.size() && !vbfFound; ++j) {
+
+      // VBF jet vector sum
+      math::XYZTLorentzVector v1=jets.at(i).p4();
+      math::XYZTLorentzVector v2=jets.at(j).p4();
+      math::XYZTLorentzVector vbfp4=v1+v2;
+
+      double deta = fabs(jets.at(i).eta() - jets.at(j).eta());
+
+      if (v1.Et() > 30. &&
+	  v2.Et() > 30. &&
+	  deta > 3.5 &&
+	  vbfp4.M() > 800.) {
+
+	vbfFound = true;
+
+	event_->vbfJet1Index = i;
+	event_->vbfJet2Index = j;
+	
+	event_->vbfEt  = vbfp4.Et();
+	event_->vbfEta = vbfp4.Eta();
+	event_->vbfPhi = vbfp4.Phi();
+	event_->vbfM   = vbfp4.M();
+
+	// find highest Et jet not in VBF pair
+	for (unsigned k=0; k< jets.size(); ++k) {
+	  if (k!=i && k!=j) {
+	    event_->vbfJet3Phi = jets.at(k).phi();	    
+	    break;
+	  }
+	}
+
+	// find nearest jet to vbf vector
+	double dRmin = 999.0;  // 
+	unsigned nrJetIndex = 999999;
+	for (unsigned k=0; k< jets.size(); ++k) {
+	  double dR = sqrt(pow(vbfp4.Eta()-jets.at(k).eta(), 2) + pow(vbfp4.Phi()-jets.at(k).phi(), 2));
+	  if (dR<dRmin) {
+	    nrJetIndex = k;
+	    dRmin = dR;
+	  }
+	}
+
+	if (nrJetIndex < jets.size()) {
+	  event_->vbfNearJetEt = jets.at(nrJetIndex).et();
+	  event_->vbfNearJetDR = dRmin;
+	}
+
+	// find highest et jet with eta between tag jets
+	double etamin = std::min(v1.Eta(), v2.Eta());
+	double etamax = std::max(v1.Eta(), v2.Eta());
+	for (unsigned k=0; k< jets.size(); ++k) {
+	  if (jets.at(k).eta() > etamin &&
+	      jets.at(k).eta() < etamax) {
+	    event_->vbfCenJetEt = jets.at(k).et();
+	    break;
+	  }
+	}
+	double etamin2 = std::min(v1.Eta(), v2.Eta())+0.5;
+	double etamax2 = std::max(v1.Eta(), v2.Eta())-0.5;
+	for (unsigned k=0; k< jets.size(); ++k) {
+	  if (jets.at(k).eta() > etamin2 &&
+	      jets.at(k).eta() < etamax2) {
+	    //event_->vbfCenJet2Et = jets.at(k).et();
+	    break;
+	  }
+	}
+
+      }
+
+    }
+  }
+
+
+}
+
+
+void InvHiggsAODProducer::doPUReweighting(const edm::Event& iEvent) {
+
+//   edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
+//   iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
   
-  if (jets.isValid()) {
+//   std::vector<PileupSummaryInfo>::const_iterator pvi;
+  
+//   float tnpv = -1;
+//   for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
     
-    for(pat::JetCollection::const_iterator it=jets->begin(); 
-	it!=jets->end();
-	++it, ++njet) {
-
-      // store jet in TTree
-      double et = it->et();
-      double eta = it->eta();
-      double phi = it->phi();
-      double emf = it->emEnergyFraction();
-      int n60 = it->n60();
-      int n90 = it->n90();
-//       double fhpd = (*jetIDs)[jetRef].fHPD;
-//       double frbx = (*jetIDs)[jetRef].fRBX;
-//       int n90hits = int((*jetIDs)[jetRef].n90Hits);
-      
-      event_->addCaloJet(et, 0., eta, phi, emf, n60, n90, 0., 0., 0); 
-
-    }
-
-  }
-
-}
-
-
-void InvHiggsTreeProducer::doPATPFJets(const edm::Event& iEvent) {
-
-  edm::Handle<pat::JetCollection> jets;
-  iEvent.getByLabel(pfJetTag_, jets);
-  unsigned njet=0;
-  
-  if (jets.isValid()) {
+//     int bx = pvi->getBunchCrossing();
     
-    for(pat::JetCollection::const_iterator it=jets->begin(); 
-	it!=jets->end();
-	++it, ++njet) {
-
-      // store jet in TTree
-      double et = it->et();
-      double eta = it->eta();
-      double phi = it->phi();
-      
-      event_->addPFJet(et, 0., eta, phi);
-
-    }
-
-  }
-
-}
-
-void InvHiggsTreeProducer::doPATMuons(const edm::Event& iEvent) {
-
-  // loop over reco muons
-  edm::Handle<pat::MuonCollection> muons;
-  iEvent.getByLabel(muonTag_,muons);
-
-  if (muons.isValid()) {
-    for(pat::MuonCollection::const_iterator it =muons->begin();
-	it!=muons->end();
-	it++) {
-
-      double pt = it->pt();
-      double eta = it->eta();
-      double phi = it->phi();
-      int type = (0xf & it->type());
-
-      event_->addMuon(pt, eta, phi, type);
-
-    }
-
-    // leading pair mass
-    double mass = 0.;
-    if (muons->size()>2) {
-      math::XYZTLorentzVector pair = muons->at(0).p4() + muons->at(1).p4();
-      mass = pair.M();
-    }
-    event_->mMuMu = mass;
-
-  }
-  
-}
-
-
-void InvHiggsTreeProducer::doPATElectrons(const edm::Event& iEvent) {
-
-  edm::Handle<pat::ElectronCollection> electrons;
-  iEvent.getByLabel(electronTag_,electrons);
-
-  if (electrons.isValid()) {
-    for(pat::ElectronCollection::const_iterator it =electrons->begin();
-	it!=electrons->end();
-	it++) {
-
-      double pt = it->pt();
-      double eta = it->eta();
-      double phi = it->phi();
-
-      event_->addElectron(pt, eta, phi);
-
-    }
-
-    // leading pair mass
-    double mass = 0.;
-    if (electrons->size()>2) {
-      math::XYZTLorentzVector pair = electrons->at(0).p4() + electrons->at(1).p4();
-      mass = pair.M();
-    }
-    event_->mEE = mass;
+//     if(bx == 0) { 
+//       tnpv = pvi->getTrueNumInteractions();
+//       continue;
+//     }
     
-  }
+//   }
   
-}
+//   double weight = lumiWeights_.weight( tnpv );
+  
+//   // example code below does not compile!
+//   //edm::EventBase* iEventB = dynamic_cast<edm::EventBase*>(&iEvent);
+//   //double weight = lumiWeights_.weight( (*iEventB) );
+  
+//   event_->puWeight = weight;
 
-
-void InvHiggsTreeProducer::doPATGlobal(const edm::Event& iEvent) {
-
-  // calo MET
-  edm::Handle<pat::METCollection> calomet;
-  iEvent.getByLabel(caloMETTag_, calomet);
-
-  if (calomet.isValid()) {
-
-    event_->caloMET = calomet->at(0).pt();
-    event_->caloMETSig = calomet->at(0).mEtSig();
-
-  }
-
-  // PFMET
-  edm::Handle<pat::METCollection> pfmet;
-  iEvent.getByLabel(pfMETTag_, pfmet);
-
-  if (pfmet.isValid()) {
-
-    event_->pfMET = pfmet->at(0).pt();
-    event_->pfMETSig = pfmet->at(0).mEtSig();
-
-  }
-
-  // PFMHT
-  edm::Handle<pat::MHTCollection> pfmht;
-  iEvent.getByLabel(pfMHTTag_, pfmht);
-
-  if (pfmht.isValid()) {
-
-    event_->pfMHT = pfmht->at(0).pt();
-    event_->pfMHTSig = pfmht->at(0).significance();
-
-  }
-
-  // beam halo
-  edm::Handle<BeamHaloSummary> haloSummary;
-  iEvent.getByLabel(haloTag_, haloSummary);
-
-  if (haloSummary.isValid()) {
-    event_->beamHalo = haloSummary->CSCTightHaloId();
-  }
-
-  return;
 }
 
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(InvHiggsTreeProducer);
+DEFINE_FWK_MODULE(InvHiggsAODProducer);

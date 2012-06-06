@@ -11,15 +11,15 @@ process.path.remove(process.ak5CaloJets)
 process.path.remove(process.ak5CaloJetsL1FastL2L3)
 
 # use PAT instead of AOD
-invHiggsTree.usePAT = cms.untracked.bool(True)
-invHiggsTree.caloJetTag = cms.untracked.InputTag("patCaloJets")
-invHiggsTree.pfJetTag = cms.untracked.InputTag("patPFJets")
-invHiggsTree.muonTag = cms.untracked.InputTag("patMuons")
-invHiggsTree.electronTag = cms.untracked.InputTag("patElectrons")
-invHiggsTree.caloMETTag = cms.untracked.InputTag("patMET")
-invHiggsTree.pfMETTag = cms.untracked.InputTag("patPFMet")
-invHiggsTree.mhtTag = cms.untracked.InputTag("patPFMht")
-invHiggsTree.vertexTag = cms.untracked.InputTag("offlinePrimaryVertices")
+process.invHiggsTree.usePAT = cms.untracked.bool(True)
+process.invHiggsTree.caloJetTag = cms.untracked.InputTag("patCaloJets")
+process.invHiggsTree.pfJetTag = cms.untracked.InputTag("patPFJets")
+process.invHiggsTree.muonTag = cms.untracked.InputTag("patMuons")
+process.invHiggsTree.electronTag = cms.untracked.InputTag("patElectrons")
+process.invHiggsTree.caloMETTag = cms.untracked.InputTag("patMET")
+process.invHiggsTree.pfMETTag = cms.untracked.InputTag("patPFMet")
+process.invHiggsTree.mhtTag = cms.untracked.InputTag("patPFMht")
+process.invHiggsTree.vertexTag = cms.untracked.InputTag("offlinePrimaryVertices")
 
 
 
@@ -35,6 +35,6 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-    'file:/gpfs_phys/storm/cms/mc/Fall11/VBF_HToZZTo4Nu_M-120_7TeV-pythia6/GEN-SIM-RAW-HLTDEBUG-RECO/E7TeV_Ave32_50ns-v1/0000/04074BAA-0459-E111-91A3-003048D46300.root'
+    'file:/storage/phjjb/invisibleHiggs/test/InvHiggs_PAT_Fall11_Testv1_WJetsToLNu_test.root'
     ] );
 

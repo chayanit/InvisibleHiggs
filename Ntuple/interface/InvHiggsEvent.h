@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsEvent.h,v 1.4 2012/04/30 17:14:04 jbrooke Exp $
+// $Id: InvHiggsEvent.h,v 1.5 2012/05/01 14:19:48 jbrooke Exp $
 //
 //
 
@@ -73,6 +73,19 @@ class InvHiggsEvent { //: public TObject {
   Double_t pfMHTSig;
   Double_t mEE;
   Double_t mMuMu;
+
+  // VBF jet topology
+  Int_t vbfJet1Index;
+  Int_t vbfJet2Index;
+  Double_t vbfEt;
+  Double_t vbfEta;
+  Double_t vbfPhi;
+  Double_t vbfM;
+
+  Double_t vbfJet3Phi;
+  Double_t vbfNearJetEt;
+  Double_t vbfNearJetDR;
+  Double_t vbfCenJetEt;
 
   // Beam Halo ID
   bool beamHalo;
@@ -136,6 +149,9 @@ class InvHiggsEvent { //: public TObject {
   std::vector<Double_t> vtxPhi;
   std::vector<UInt_t> vtxNDOF;
 
+
+  // pu weighting
+  //  double puWeight;
 
 
 };

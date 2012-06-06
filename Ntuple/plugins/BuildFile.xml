@@ -22,6 +22,9 @@
   <use name="CommonTools/UtilAlgos"/>
   <use name="SimGeneral/HepPDTRecord"/>
 
+  <use name="PhysicsTools/Utilities"/>
+  <use name="PhysicsTools/UtilAlgos"/>
+
   <use name="InvisibleHiggs/Ntuple"/>
   <flags EdmPlugin="1"/>
 

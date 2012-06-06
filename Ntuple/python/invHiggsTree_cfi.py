@@ -38,6 +38,12 @@ invHiggsTree = cms.EDAnalyzer(
     pfMHTTag = cms.untracked.InputTag("pfMht"),  # only in PAT
 
     # vertices
-    vertexTag = cms.untracked.InputTag("offlinePrimaryVertices")
+    vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
+
+    # PU re-weighting
+    puMCFile = cms.untracked.string(""),
+    puDataFile = cms.untracked.string(""),
+    puMCHist = cms.untracked.string(""),
+    puDataHist = cms.untracked.string("")
 
 )
