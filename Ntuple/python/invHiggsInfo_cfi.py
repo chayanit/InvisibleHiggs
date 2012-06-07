@@ -4,7 +4,6 @@ invHiggsInfo = cms.EDAnalyzer(
     "InvHiggsInfoProducer",
 
     # control
-    isMC = cms.untracked.bool(False),
     useLeadingJets = cms.untracked.bool(True),
     
     # trigger

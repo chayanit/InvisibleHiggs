@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.7 2012/05/10 14:26:23 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.1 2012/06/06 15:23:42 jbrooke Exp $
 //
 //
 
@@ -253,10 +253,8 @@ void InvHiggsInfoProducer::beginJob()
 // -- called once per run
 void InvHiggsInfoProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
 {
-  // Get PDT Table if MC
-  if (isMC_) {
-    //iSetup.getData(fPDGTable);
-  }
+  // Get PDT Table for MC
+  //iSetup.getData(fPDGTable);
 
   // HLT setup
   bool changed;
@@ -313,7 +311,7 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
  
   info_ = new InvHiggsInfo();
  
-  if (isMC_) {
+  if (! iEvent.eventAuxiliary().isRealData()) {
     doMC(iEvent);
     doPUReweighting(iEvent);
   }

@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsAODProducer.cc,v 1.1 2012/06/06 15:26:07 jbrooke Exp $
+// $Id: InvHiggsAODProducer.cc,v 1.2 2012/06/07 11:01:14 jbrooke Exp $
 //
 //
 
@@ -265,9 +265,7 @@ void InvHiggsAODProducer::beginJob()
 void InvHiggsAODProducer::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
 {
   // Get PDT Table if MC
-  if (useMC_) {
-    //iSetup.getData(fPDGTable);
-  }
+  //  iSetup.getData(fPDGTable);
 
   // HLT setup
   bool changed;
@@ -324,7 +322,7 @@ InvHiggsAODProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
  
   event_ = new InvHiggsEvent();
  
-  if (useMC_) {
+  if (! iEvent.eventAuxiliary().isRealData()) {
     doMC(iEvent);
     doPUReweighting(iEvent);
   }

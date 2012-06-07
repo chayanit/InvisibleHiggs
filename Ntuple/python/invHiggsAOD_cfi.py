@@ -3,9 +3,6 @@ import FWCore.ParameterSet.Config as cms
 invHiggsAOD = cms.EDAnalyzer(
     "InvHiggsAODProducer",
 
-    # control
-    useMC = cms.untracked.bool(False),
-    
     # trigger
     l1BitsTag = cms.untracked.InputTag("gtDigis"),
     l1JetsTag = cms.untracked.string("l1extraParticles"),
