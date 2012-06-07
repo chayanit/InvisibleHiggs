@@ -5,7 +5,7 @@
 // 
 /**\class InvHiggsAODProducer InvHiggsAODProducer.cc InvisibleHiggs/Analysis/src/InvHiggsAODProducer.cc
 
- Description: Produce invisible Higgs TTree
+ Description: Produce invisible Higgs TTreeom AOD/AODSIM
 
  Implementation:
      
@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsAODProducer.cc,v 1.7 2012/05/10 14:26:23 jbrooke Exp $
+// $Id: InvHiggsAODProducer.cc,v 1.1 2012/06/06 15:26:07 jbrooke Exp $
 //
 //
 
