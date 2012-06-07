@@ -17,7 +17,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 
 # Ntuple producer
-process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
+process.load('InvisibleHiggs/Ntuple/invHiggsAOD_cfi')
 
 # TTree output file
 process.load("CommonTools.UtilAlgos.TFileService_cfi")
@@ -25,7 +25,7 @@ process.TFileService.fileName = cms.string('invHiggsTree.root')
 
 # path
 process.path = cms.Path(
-    process.invHiggsInfo
+    process.invHiggsAOD
 )
 
 
@@ -42,6 +42,6 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-    'file:/storage/phjjb/invisibleHiggs/test/InvHiggs_PAT_Fall11_Testv1_WJetsToLNu_test.root'
+    'file:/gpfs_phys/storm/cms/mc/Fall11/VBF_HToZZTo4Nu_M-120_7TeV-pythia6/GEN-SIM-RAW-HLTDEBUG-RECO/E7TeV_Ave32_50ns-v1/0000/04074BAA-0459-E111-91A3-003048D46300.root'
     ] );
 

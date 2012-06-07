@@ -1,11 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 
-invHiggsTree = cms.EDAnalyzer(
-    "InvHiggsTreeProducer",
+invHiggsAOD = cms.EDAnalyzer(
+    "InvHiggsAODProducer",
 
     # control
     useMC = cms.untracked.bool(False),
-    usePAT = cms.untracked.bool(False),
     
     # trigger
     l1BitsTag = cms.untracked.InputTag("gtDigis"),
