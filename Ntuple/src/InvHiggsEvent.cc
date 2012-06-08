@@ -49,6 +49,12 @@ InvHiggsEvent::InvHiggsEvent() :
   pfJetEtCorr(0),
   pfJetEta(0),
   pfJetPhi(0),
+  pfNeutHadFrac(0.),
+  pfNeutEMFrac(0.),
+  pfChargHadFrac(0.),
+  pfChargEMFrac(0.),
+  pfNConst(0),
+  pfChargedMult(0),
   mu_N(0),
   muPt(0),
   muEta(0),
@@ -120,12 +126,18 @@ void InvHiggsEvent::addCaloJet(double et, double etcorr, double eta, double phi,
   }
 }
 
-void InvHiggsEvent::addPFJet(double et, double etcorr, double eta, double phi) {
+void InvHiggsEvent::addPFJet(double et, double etcorr, double eta, double phi, double nhf, double nef, double chf, double cef, int nconst, int cmult) {
   if (pfJet_N < MAX_N_JETS) {
     pfJetEt.push_back(et);
     pfJetEtCorr.push_back(etcorr);
     pfJetEta.push_back(eta);
     pfJetPhi.push_back(phi);
+    pfNeutHadFrac.push_back(nhf);
+    pfNeutEMFrac.push_back(nef);
+    pfChargHadFrac.push_back(chf);
+    pfChargEMFrac.push_back(cef);
+    pfNConst.push_back(nconst);
+    pfChargedMult.push_back(cmult);
     ++pfJet_N;
   }
 }

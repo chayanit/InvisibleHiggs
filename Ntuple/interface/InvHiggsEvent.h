@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsEvent.h,v 1.5 2012/05/01 14:19:48 jbrooke Exp $
+// $Id: InvHiggsEvent.h,v 1.6 2012/06/06 15:23:42 jbrooke Exp $
 //
 //
 
@@ -41,7 +41,7 @@ class InvHiggsEvent { //: public TObject {
   void addL1Jet(double et, double eta, double phi, int type);
   void addHltJet(double et, double eta, double phi);
   void addCaloJet(double et, double etcorr, double eta, double phi, double emf, int n60, int n90, double fhpd, double frbx, int n90hits);
-  void addPFJet(double et, double etcorr, double eta, double phi);
+  void addPFJet(double et, double etcorr, double eta, double phi, double nhf, double nef, double chf, double cef, int nconst, int cmult);
   void addMuon(double pt, double eta, double phi, int type);
   void addElectron(double pt, double eta, double phi);
   void addVertex(double z, double rho, double phi, int ndof);
@@ -109,6 +109,14 @@ class InvHiggsEvent { //: public TObject {
   std::vector<Double_t> pfJetEtCorr;
   std::vector<Double_t> pfJetEta;
   std::vector<Double_t> pfJetPhi;
+  std::vector<Double_t> pfNeutHadFrac;
+  std::vector<Double_t> pfNeutEMFrac;
+  std::vector<Double_t> pfChargHadFrac;
+  std::vector<Double_t> pfChargEMFrac;
+  std::vector<Int_t> pfNConst;
+  std::vector<Int_t> pfChargedMult;
+
+  
 
   // reco muons
   unsigned mu_N;

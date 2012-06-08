@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsAODProducer.cc,v 1.2 2012/06/07 11:01:14 jbrooke Exp $
+// $Id: InvHiggsAODProducer.cc,v 1.3 2012/06/07 11:13:47 jbrooke Exp $
 //
 //
 
@@ -541,9 +541,9 @@ void InvHiggsAODProducer::doCaloJets(const edm::Event& iEvent, const edm::EventS
       int n90hits = 0;
       
       if (jetIDs.isValid()) {
-// 	fhpd = (*jetIDs)[jetRef].fHPD;
-// 	frbx = (*jetIDs)[jetRef].fRBX;
-// 	n90hits = int((*jetIDs)[jetRef].n90Hits);
+	fhpd = (*jetIDs)[jetRef].fHPD;
+	frbx = (*jetIDs)[jetRef].fRBX;
+	n90hits = int((*jetIDs)[jetRef].n90Hits);
       }
 
       event_->addCaloJet(et, etcorr, eta, phi, emf, n60, n90, fhpd, frbx, n90hits); 
@@ -589,8 +589,14 @@ void InvHiggsAODProducer::doPFJets(const edm::Event& iEvent, const edm::EventSet
       double etcorr = it->et() * scale;
       double eta = it->eta();
       double phi = it->phi();
+      double nhf = it->neutralHadronEnergyFraction();
+      double nef = it->neutralEmEnergyFraction();
+      double chf = it->chargedHadronEnergyFraction();
+      double cef = it->chargedEmEnergyFraction();
+      int nconst = it->getPFConstituents().size();
+      int cmult  = it->chargedHadronMultiplicity();
       
-      event_->addPFJet(et, etcorr, eta, phi); 
+      event_->addPFJet(et, etcorr, eta, phi, nhf, nef, chf, cef, nconst, cmult); 
       
     } // loop over jets
 
