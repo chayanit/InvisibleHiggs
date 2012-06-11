@@ -33,7 +33,7 @@ process.path = cms.Path(
 ### THINGS TO EDIT BELOW ###
 
 # change Global Tag
-process.GlobalTag.globaltag = 'START44_V6::All'
+process.GlobalTag.globaltag = 'GR_R_52_V9::All'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
