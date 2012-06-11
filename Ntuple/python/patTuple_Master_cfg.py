@@ -1,20 +1,9 @@
+import FWCore.ParameterSet.Config as cms
+
+### load PAT, because it insists on defining the process for you
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-## ------------------------------------------------------
-#  NOTE: you can use a bunch of core tools of PAT to
-#  taylor your PAT configuration; for a few examples
-#  uncomment the lines below
-## ------------------------------------------------------
-#from PhysicsTools.PatAlgos.tools.coreTools import *
-
-## remove MC matching from the default sequence
-# removeMCMatching(process, ['Muons'])
-# runOnData(process)
-
-## remove certain objects from the default sequence
-# removeAllPATObjectsBut(process, ['Muons'])
-# removeSpecificPATObjects(process, ['Electrons', 'Muons', 'Taus'])
-
+### basic filters
 # trigger filter
 process.load('HLTrigger.HLTfilters.hltHighLevel_cfi')
 process.hltHighLevel.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
@@ -24,39 +13,77 @@ process.hltHighLevel.HLTPaths = cms.vstring(
     "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
 )
 
-# Jet corrections (inc L1 Fast jet)
+# track quality filter
+process.noscraping = cms.EDFilter("FilterOutScraping",
+                                  applyfilter = cms.untracked.bool(True),
+                                  debugOn = cms.untracked.bool(True),
+                                  numtrack = cms.untracked.uint32(10),
+                                  thresh = cms.untracked.double(0.25)
+                                  )
+
+# require a good vertex
+process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
+                                           vertexCollection = cms.InputTag('offlinePrimaryVertices'),
+                                           minimumNDOF = cms.uint32(4) ,
+                                           maxAbsZ = cms.double(24), 
+                                           maxd0 = cms.double(2) 
+                                           )
+
+
+### MET Filters ###
+# Beam halo filter
+process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
+
+# HCAL noise filter
+process.load('CommonTools.RecoAlgos.HBHENoiseFilter_cfi')
+
+# HCAL laser filter
+process.load('RecoMET.METFilters.hcalLaserEventFilter_cfi')
+process.hcalLaserEventFilter.vetoByRunEventNumber = cms.untracked.bool(False)
+process.hcalLaserEventFilter.vetoByHBHEOccupancy = cms.untracked.bool(True)
+
+# ECAL dead cells filter
+process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
+
+# tracking failure filter
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-process.load('RecoJets.Configuration.RecoJets_cff')
-process.load('RecoJets.Configuration.RecoPFJets_cff')
-process.kt6PFJets.doRhoFastjet = True
-process.ak5PFJetsL1FastL2L3   = cms.EDProducer('PFJetCorrectionProducer',
-    src         = cms.InputTag('ak5PFJets'),
-    correctors  = cms.vstring('ak5PFL1FastL2L3')
+process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
+
+process.goodVertices4TFF = cms.EDFilter(
+  "VertexSelector",
+  filter = cms.bool(False),
+  src = cms.InputTag("offlinePrimaryVertices"),
+  cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2")
 )
-process.ak5CaloJetsL1FastL2L3   = cms.EDProducer('CaloJetCorrectionProducer',
-    src         = cms.InputTag('ak5CaloJets'),
-    correctors  = cms.vstring('ak5CaloL1FastL2L3')
-)
-process.ak5CaloJets.doAreaFastjet = True
-process.ak5PFJets.doAreaFastjet = True
+process.trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
+process.trackingFailureFilter.VertexSource = cms.InputTag('goodVertices4TFF')
 
 
-## let it run
-process.p = cms.Path(
+### get JEC from SQLite file
+process.load("InvisibleHiggs.Ntuple.JEC_SQLite_cff")
 
-# trigger filter
-    process.hltHighLevel
-    
-# jet corrections
-    +process.kt6PFJets
-    +process.ak5PFJets
-    +process.ak5PFJetsL1FastL2L3
-#    +process.ak5CaloJets
-#    +process.ak5CaloJetsL1FastL2L3
 
-# generate PAT
-    +process.patDefaultSequence
-    )
+
+### customise PAT
+from PhysicsTools.PatAlgos.tools.coreTools import *
+from PhysicsTools.PatAlgos.tools.pfTools import *
+
+# use PF MET
+switchToPFMET(process, input=cms.InputTag('pfMet'))
+
+# use PF2PAT jets
+switchJetCollection(process, 
+                    cms.InputTag('ak5PFJets'),   
+                    doJTA            = True,            
+                    doBTagging       = False,            
+                    jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']),  
+                    doType1MET       = False,            
+                    genJetCollection = cms.InputTag("ak5GenJets"),
+                    doJetID      = False,
+                    jetIdLabel   = "ak5"
+#                    btagInfo = ['impactParameterTagInfos','secondaryVertexTagInfos']
+#                    btagdiscriminators=['simpleSecondaryVertexHighEffBJetTags','simpleSecondaryVertexHighPurBJetTags']
+                    )
 
 ## Trigger matching
 ## from PhysicsTools.PatAlgos.tools.trigTools import *
@@ -83,6 +110,32 @@ process.p = cms.Path(
 ## )
 
 ## switchOnTriggerMatchEmbedding( process, [ 'metTriggerMatch', 'jetTriggerMatch' ] )
+
+
+
+### the path 
+process.p = cms.Path(
+
+# trigger filter
+    process.hltHighLevel
+
+# basic filters
+    +process.noscraping
+    +process.primaryVertexFilter
+
+# MET filters
+    +process.HBHENoiseFilter 
+    +process.CSCTightHaloFilter
+    +process.hcalLaserEventFilter 
+    +process.EcalDeadCellTriggerPrimitiveFilter
+    +process.eeBadScFilter
+    +process.goodVertices4TFF
+    +process.trackingFailureFilter
+
+# generate PAT
+    +process.patDefaultSequence
+    )
+
 
 ## ------------------------------------------------------
 #  In addition you usually want to change the following

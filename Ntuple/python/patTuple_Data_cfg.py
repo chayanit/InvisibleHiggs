@@ -4,10 +4,10 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 
 ## remove MC matching from the default sequence
 #removeMCMatching(process, ['Electrons', 'Muons', 'Taus', 'Jets'])
-#runOnData(process)
+runOnData(process)
 
 ## stuff to edit
-process.GlobalTag.globaltag = 'GR_R_52_V7::All'
+process.GlobalTag.globaltag = 'GR_R_52_V9::All'
 
 process.maxEvents.input = -1
 
