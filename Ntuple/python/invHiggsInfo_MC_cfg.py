@@ -16,6 +16,7 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-    'file:patTuple.root'
+    'file:patTuple_MC.root'
+#    'file:/gpfs_phys/storm/cms/user/jbrooke/ZJetsToNuNu_50_HT_100_TuneZ2Star_8TeV_madgraph/InvHiggsPAT_Summer12_v2_ZJetsToNuNu_50_HT_100/861ac8814e4c5247588bc756da882dd0/patTuple_12_1_ymh.root'
     ] );
 

@@ -45,6 +45,9 @@ process.hcalLaserEventFilter.vetoByHBHEOccupancy = cms.untracked.bool(True)
 # ECAL dead cells filter
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 
+# ECAL bad supercluster filter
+process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+
 # tracking failure filter
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
@@ -59,31 +62,40 @@ process.trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
 process.trackingFailureFilter.VertexSource = cms.InputTag('goodVertices4TFF')
 
 
-### get JEC from SQLite file
-process.load("InvisibleHiggs.Ntuple.JEC_SQLite_cff")
-
-
 
 ### customise PAT
 from PhysicsTools.PatAlgos.tools.coreTools import *
-from PhysicsTools.PatAlgos.tools.pfTools import *
 
-# use PF MET
-switchToPFMET(process, input=cms.InputTag('pfMet'))
 
-# use PF2PAT jets
+# add the PF MET
+from PhysicsTools.PatAlgos.tools.metTools import *
+addPfMET(process, 'PF')
+
+# add PF jets
+from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJetCollection(process, 
                     cms.InputTag('ak5PFJets'),   
                     doJTA            = True,            
                     doBTagging       = False,            
-                    jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']),  
+                    jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute']),
                     doType1MET       = False,            
                     genJetCollection = cms.InputTag("ak5GenJets"),
-                    doJetID      = False,
-                    jetIdLabel   = "ak5"
-#                    btagInfo = ['impactParameterTagInfos','secondaryVertexTagInfos']
-#                    btagdiscriminators=['simpleSecondaryVertexHighEffBJetTags','simpleSecondaryVertexHighPurBJetTags']
+                    doJetID          = True,
+                    jetIdLabel       = "ak5"
                     )
+
+# apply loose PF jet ID
+from PhysicsTools.SelectorUtils.pfJetIDSelector_cfi import pfJetIDSelector
+process.goodPatJets = cms.EDFilter("PFJetIDSelectionFunctorFilter",
+                                   filterParams = pfJetIDSelector.clone(),
+                                   src = cms.InputTag("selectedPatJets"),
+                                   filter = cms.bool(True)
+                                   )
+
+# we're not interested in taus
+#removeSpecificPATObjects( process, ['Taus'] )
+#process.patDefaultSequence.remove( process.patTaus )
+
 
 ## Trigger matching
 ## from PhysicsTools.PatAlgos.tools.trigTools import *
@@ -117,23 +129,24 @@ switchJetCollection(process,
 process.p = cms.Path(
 
 # trigger filter
-    process.hltHighLevel
+    process.hltHighLevel *
 
 # basic filters
-    +process.noscraping
-    +process.primaryVertexFilter
+    process.noscraping *
+    process.primaryVertexFilter *
 
 # MET filters
-    +process.HBHENoiseFilter 
-    +process.CSCTightHaloFilter
-    +process.hcalLaserEventFilter 
-    +process.EcalDeadCellTriggerPrimitiveFilter
-    +process.eeBadScFilter
-    +process.goodVertices4TFF
-    +process.trackingFailureFilter
+    process.HBHENoiseFilter  *
+    process.CSCTightHaloFilter *
+    process.hcalLaserEventFilter  *
+    process.EcalDeadCellTriggerPrimitiveFilter *
+    process.eeBadScFilter *
+    process.goodVertices4TFF *
+    process.trackingFailureFilter *
 
 # generate PAT
-    +process.patDefaultSequence
+    process.patDefaultSequence *
+    process.goodPatJets
     )
 
 

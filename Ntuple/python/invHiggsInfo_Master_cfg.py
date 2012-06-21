@@ -21,7 +21,7 @@ process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
 
 # TTree output file
 process.load("CommonTools.UtilAlgos.TFileService_cfi")
-process.TFileService.fileName = cms.string('invHiggsPATTree.root')
+process.TFileService.fileName = cms.string('invHiggsInfo.root')
 
 # path
 process.path = cms.Path(
