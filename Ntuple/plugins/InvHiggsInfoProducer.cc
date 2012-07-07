@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.1 2012/06/06 15:23:42 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.2 2012/06/07 11:13:47 jbrooke Exp $
 //
 //
 
@@ -194,7 +194,7 @@ private:
   bool doHltBit_;
 
   // PU re-weighting
-  //  edm::LumiReWeighting lumiWeights_;
+  edm::LumiReWeighting lumiWeights_;
 
 };
 
@@ -591,31 +591,35 @@ void InvHiggsInfoProducer::doVBFVariables(std::vector<pat::Jet> jets, bool leadi
 
 
 void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
+  
+  double weight = 0.;
 
-//   edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
-//   iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
+  edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
+  iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
   
-//   std::vector<PileupSummaryInfo>::const_iterator pvi;
-  
-//   float tnpv = -1;
-//   for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
+  if (puInfo.isValid()) {
+    std::vector<PileupSummaryInfo>::const_iterator pvi;
     
-//     int bx = pvi->getBunchCrossing();
+    float tnpv = -1;
+    for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
+      
+      int bx = pvi->getBunchCrossing();
+      
+      if(bx == 0) { 
+	tnpv = pvi->getTrueNumInteractions();
+	continue;
+      }
+      
+    }
     
-//     if(bx == 0) { 
-//       tnpv = pvi->getTrueNumInteractions();
-//       continue;
-//     }
+    weight = lumiWeights_.weight( tnpv );
     
-//   }
-  
-//   double weight = lumiWeights_.weight( tnpv );
-  
-//   // example code below does not compile!
-//   //edm::EventBase* iEventB = dynamic_cast<edm::EventBase*>(&iEvent);
-//   //double weight = lumiWeights_.weight( (*iEventB) );
-  
-//   info_->puWeight = weight;
+    // example code below does not compile!
+    //edm::EventBase* iEventB = dynamic_cast<edm::EventBase*>(&iEvent);
+    //double weight = lumiWeights_.weight( (*iEventB) );
+  }
+ 
+  info_->puWeight = weight;
 
 }
 
