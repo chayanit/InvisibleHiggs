@@ -4,7 +4,7 @@ from InvisibleHiggs.Ntuple.patTuple_Master_cfg import *
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
 # No trigger filter
-process.p.remove(process.hltHighLevel)
+#process.p.remove(process.hltHighLevel)
 
 ## switchJetCollection(process, 
 ##                     cms.InputTag('ak5PFJets'),   
