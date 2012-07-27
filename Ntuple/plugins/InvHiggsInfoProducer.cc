@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.2 2012/06/07 11:13:47 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.3 2012/07/07 07:43:59 jbrooke Exp $
 //
 //
 
@@ -594,30 +594,30 @@ void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
   
   double weight = 0.;
 
-  edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
-  iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
+//   edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
+//   iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
   
-  if (puInfo.isValid()) {
-    std::vector<PileupSummaryInfo>::const_iterator pvi;
+//   if (puInfo.isValid()) {
+//     std::vector<PileupSummaryInfo>::const_iterator pvi;
     
-    float tnpv = -1;
-    for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
+//     float tnpv = -1;
+//     for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
       
-      int bx = pvi->getBunchCrossing();
+//       int bx = pvi->getBunchCrossing();
       
-      if(bx == 0) { 
-	tnpv = pvi->getTrueNumInteractions();
-	continue;
-      }
+//       if(bx == 0) { 
+// 	tnpv = pvi->getTrueNumInteractions();
+// 	continue;
+//       }
       
-    }
+//     }
     
-    weight = lumiWeights_.weight( tnpv );
+//     weight = lumiWeights_.weight( tnpv );
     
     // example code below does not compile!
     //edm::EventBase* iEventB = dynamic_cast<edm::EventBase*>(&iEvent);
     //double weight = lumiWeights_.weight( (*iEventB) );
-  }
+  //  }
  
   info_->puWeight = weight;
 
