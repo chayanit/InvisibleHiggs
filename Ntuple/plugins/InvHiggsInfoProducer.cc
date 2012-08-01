@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.3 2012/07/07 07:43:59 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.4 2012/07/27 09:07:57 jbrooke Exp $
 //
 //
 
@@ -109,6 +109,7 @@
 #include "TH1.h"
 #include "TTree.h"
 #include "TF1.h"
+#include "TMath.h"
 
 // TTree definition
 #include "InvisibleHiggs/Ntuple/interface/InvHiggsInfo.h"
@@ -143,12 +144,13 @@ private:
   void doTrigger(const edm::Event&, const edm::EventSetup&);
 
   // write PAT objects
-  void doJets(const edm::Event&);
-  void doMuons(const edm::Event&);
-  void doElectrons(const edm::Event&);
-  void doGlobal(const edm::Event&);
+  void doJets(std::vector<pat::Jet> jets);
+  void doMuons(std::vector<pat::Muon> muons);
+  void doElectrons(std::vector<pat::Electron> electrons);
+  void doMET(std::vector<pat::MET> met);
+  void doMHT(std::vector<pat::MHT> mht);
 
-  void doVBFVariables(std::vector<pat::Jet> jets, bool leading);
+  void doVBFVariables(std::vector<pat::Jet> jets, std::vector<pat::MET> met, bool leading);
 
   // other stuff
   void doPUReweighting(const edm::Event&);
@@ -205,8 +207,8 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   tree_(0),
   info_(0),
   hltResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("hltResultsTag",edm::InputTag("TriggerResults","","HLT"))),
-  hltPath1Name_(iConfig.getUntrackedParameter<std::string>("hltPathName",std::string("HLT_v1"))),
-  hltPath2Name_(iConfig.getUntrackedParameter<std::string>("hltPathName",std::string("HLT_v1"))),
+  hltPath1Name_(iConfig.getUntrackedParameter<std::string>("hltPath1Name",std::string("HLT_v1"))),
+  hltPath2Name_(iConfig.getUntrackedParameter<std::string>("hltPath2Name",std::string("HLT_v1"))),
 //   mcTag_(iConfig.getUntrackedParameter<edm::InputTag>("mcTag",edm::InputTag("generator"))),
 //   mcProducer_ (iConfig.getUntrackedParameter<std::string>("producer", "g4SimHits")),
 //   hepProducer_ (iConfig.getUntrackedParameter<edm::InputTag>("hepMCProducerTag", edm::InputTag("generator", "", "SIM"))),
@@ -320,10 +322,44 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   doEventInfo(iEvent);
   doTrigger(iEvent, iSetup);
 
-  doJets(iEvent);
-  doMuons(iEvent);
-  doElectrons(iEvent);
-  doGlobal(iEvent);
+  edm::Handle<pat::METCollection> met;
+  iEvent.getByLabel(metTag_, met);
+
+  edm::Handle<pat::MHTCollection> mht;
+  iEvent.getByLabel(mhtTag_, mht);
+
+  edm::Handle<pat::JetCollection> jets;
+  iEvent.getByLabel(jetTag_, jets);
+
+  edm::Handle<pat::MuonCollection> muons;
+  iEvent.getByLabel(muonTag_,muons);
+
+  edm::Handle<pat::ElectronCollection> electrons;
+  iEvent.getByLabel(electronTag_,electrons);
+
+  if (jets.isValid()) {
+    doJets(*jets);
+  }
+
+  if (met.isValid()) {
+    doMET(*met);
+  }
+
+  if (mht.isValid()) {
+    doMHT(*mht);
+  }
+
+  if (electrons.isValid()) {
+    doElectrons(*electrons);
+  }
+
+  if (muons.isValid()) {
+    doMuons(*muons);
+  }
+
+  if (jets.isValid() && met.isValid()) {
+    doVBFVariables(*jets, *met, useLeadingJets_);
+  }
 
   // fill TInfo
   tree_->Fill();
@@ -395,118 +431,84 @@ void InvHiggsInfoProducer::doTrigger(const edm::Event& iEvent, const edm::EventS
 }
 
 
-void InvHiggsInfoProducer::doJets(const edm::Event& iEvent) {
+void InvHiggsInfoProducer::doJets(std::vector<pat::Jet> jets) {
 
-  edm::Handle<pat::JetCollection> jets;
-  iEvent.getByLabel(jetTag_, jets);
   unsigned njet=0;
   
-  if (jets.isValid()) {
-    
-    if (jets->size()>0) {
-      info_->jet1Pt = jets->at(0).pt();    
-      info_->jet1Eta = jets->at(0).eta();    
-      info_->jet1Phi = jets->at(0).phi();    
-      info_->jet1Mass = jets->at(0).mass();    
-    }
-    if (jets->size() > 1) {
-      info_->jet2Pt = jets->at(1).pt();    
-      info_->jet2Eta = jets->at(1).eta();    
-      info_->jet2Phi = jets->at(1).phi();    
-      info_->jet2Mass = jets->at(1).mass();    
-    }
-
+  if (jets.size()>0) {
+    info_->jet1Pt = jets.at(0).pt();    
+    info_->jet1Eta = jets.at(0).eta();    
+    info_->jet1Phi = jets.at(0).phi();    
+    info_->jet1Mass = jets.at(0).mass();    
   }
-
-  doVBFVariables(*jets, useLeadingJets_);
+  if (jets.size() > 1) {
+    info_->jet2Pt = jets.at(1).pt();    
+    info_->jet2Eta = jets.at(1).eta();    
+    info_->jet2Phi = jets.at(1).phi();    
+    info_->jet2Mass = jets.at(1).mass();    
+  }
 
 }
 
-void InvHiggsInfoProducer::doMuons(const edm::Event& iEvent) {
+void InvHiggsInfoProducer::doMuons(std::vector<pat::Muon> muons) {
 
-  // loop over reco muons
-  edm::Handle<pat::MuonCollection> muons;
-  iEvent.getByLabel(muonTag_,muons);
-
-  if (muons.isValid()) {
-
-    if (muons->size()>0) {
-      info_->mu1Pt = muons->at(0).pt();    
-      info_->mu1Eta = muons->at(0).eta();    
-      info_->mu1Phi = muons->at(0).phi();    
-    }
-    if (muons->size()>1) {
-      info_->mu2Pt = muons->at(1).pt();    
-      info_->mu2Eta = muons->at(1).eta();    
-      info_->mu2Phi = muons->at(1).phi();    
-      
-      // leading pair mass
-      math::XYZTLorentzVector pair = muons->at(0).p4() + muons->at(1).p4();
-      info_->mMuMu = pair.M();
-    }
+  if (muons.size()>0) {
+    info_->mu1Pt = muons.at(0).pt();    
+    info_->mu1Eta = muons.at(0).eta();    
+    info_->mu1Phi = muons.at(0).phi();    
+  }
+  if (muons.size()>1) {
+    info_->mu2Pt = muons.at(1).pt();    
+    info_->mu2Eta = muons.at(1).eta();    
+    info_->mu2Phi = muons.at(1).phi();    
     
+    // leading pair mass
+    math::XYZTLorentzVector pair = muons.at(0).p4() + muons.at(1).p4();
+    info_->mMuMu = pair.M();
   }
   
 }
 
 
-void InvHiggsInfoProducer::doElectrons(const edm::Event& iEvent) {
+void InvHiggsInfoProducer::doElectrons(std::vector<pat::Electron> electrons) {
 
-  edm::Handle<pat::ElectronCollection> electrons;
-  iEvent.getByLabel(electronTag_,electrons);
-
-  if (electrons.isValid()) {
-
-    if (electrons->size()>0) {
-      info_->ele1Pt = electrons->at(0).pt();    
-      info_->ele1Eta = electrons->at(0).eta();    
-      info_->ele1Phi = electrons->at(0).phi();    
-    }
-    if (electrons->size()>1) {
-      info_->ele2Pt = electrons->at(1).pt();    
-      info_->ele2Eta = electrons->at(1).eta();    
-      info_->ele2Phi = electrons->at(1).phi();    
-      
-      // leading pair mass
-      math::XYZTLorentzVector pair = electrons->at(0).p4() + electrons->at(1).p4();
-      info_->mEE = pair.M();
-    }
+  if (electrons.size()>0) {
+    info_->ele1Pt = electrons.at(0).pt();    
+    info_->ele1Eta = electrons.at(0).eta();    
+    info_->ele1Phi = electrons.at(0).phi();    
+  }
+  if (electrons.size()>1) {
+    info_->ele2Pt = electrons.at(1).pt();    
+    info_->ele2Eta = electrons.at(1).eta();    
+    info_->ele2Phi = electrons.at(1).phi();    
     
+    // leading pair mass
+    math::XYZTLorentzVector pair = electrons.at(0).p4() + electrons.at(1).p4();
+    info_->mEE = pair.M();
   }
   
 }
 
 
-void InvHiggsInfoProducer::doGlobal(const edm::Event& iEvent) {
+void InvHiggsInfoProducer::doMET(std::vector<pat::MET> met) {
 
-  // PFMET
-  edm::Handle<pat::METCollection> met;
-  iEvent.getByLabel(metTag_, met);
+  info_->met    = met.at(0).pt();
+  info_->metPhi = met.at(0).phi();
+  //    info_->metSig = met->at(0).mEtSig();
 
-  if (met.isValid()) {
+}
 
-    info_->met = met->at(0).pt();
-    //    info_->metSig = met->at(0).mEtSig();
+void InvHiggsInfoProducer::doMHT(std::vector<pat::MHT> mht) {
 
-  }
+  info_->mht    = mht.at(0).pt();
+  info_->mhtPhi = mht.at(0).phi();
+  //    info_->mhtSig = mht->at(0).significance();
 
-  // PFMHT
-  edm::Handle<pat::MHTCollection> mht;
-  iEvent.getByLabel(mhtTag_, mht);
-
-  if (mht.isValid()) {
-
-    info_->mht = mht->at(0).pt();
-    //    info_->mhtSig = mht->at(0).significance();
-
-  }
-
-  return;
 }
 
 
 /// identify tag jets and store some variables
-void InvHiggsInfoProducer::doVBFVariables(std::vector<pat::Jet> jets, bool leading) {
+void InvHiggsInfoProducer::doVBFVariables(std::vector<pat::Jet> jets, std::vector<pat::MET> met, bool leading) {
 
   bool vbfFound = false;
 
@@ -586,6 +588,12 @@ void InvHiggsInfoProducer::doVBFVariables(std::vector<pat::Jet> jets, bool leadi
 	
     }
   }
+
+  double jmdphi1 = abs(abs(abs(met.at(0).phi()-jets.at(0).phi())-TMath::Pi())-TMath::Pi());
+  double jmdphi2 = abs(abs(abs(met.at(0).phi()-jets.at(1).phi())-TMath::Pi())-TMath::Pi());
+
+  info_->jetMETdPhi = std::min(jmdphi1, jmdphi2);
+
 
 }
 

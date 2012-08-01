@@ -5,6 +5,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 ## remove MC matching from the default sequence
 removeMCMatching(process, ['All'])
 runOnData(process)
+addPfMET(process, 'PF')
 
 ## apply L2L3residual JEC
 switchJetCollection(process, 
@@ -13,7 +14,7 @@ switchJetCollection(process,
                     doBTagging       = False,            
                     jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']),  
                     doType1MET       = False,            
-                    genJetCollection = cms.InputTag("ak5GenJets"),
+                    genJetCollection = cms.InputTag(""),
                     doJetID          = True,
                     jetIdLabel       = "ak5"
                     )

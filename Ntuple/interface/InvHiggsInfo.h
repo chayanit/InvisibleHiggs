@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsEvent.h,v 1.5 2012/05/01 14:19:48 jbrooke Exp $
+// $Id: InvHiggsInfo.h,v 1.1 2012/06/06 15:23:42 jbrooke Exp $
 //
 //
 
@@ -61,7 +61,9 @@ class InvHiggsInfo { //: public TObject {
 
   // Global variables
   Double_t met;
+  Double_t metPhi;
   Double_t mht;
+  Double_t mhtPhi;
 
   // VBF jet variables
   Double_t vbfEt;
@@ -73,6 +75,8 @@ class InvHiggsInfo { //: public TObject {
   Double_t vbfNearJetEt;
   Double_t vbfNearJetDR;
   Double_t vbfCenJetEt;
+
+  Double_t jetMETdPhi;
 
   // electrons
   Double_t ele1Pt;

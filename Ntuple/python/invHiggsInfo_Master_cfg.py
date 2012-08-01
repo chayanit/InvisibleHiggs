@@ -6,6 +6,8 @@ process.load('Configuration/StandardSequences/Services_cff')
 process.load('FWCore/MessageService/MessageLogger_cfi')
 process.MessageLogger.cerr.threshold = ''
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+#process.MessageLogger.cerr.INFO.limit = cms.untracked.int32(100)
+#process.MessageLogger.suppressInfo = cms.untracked.vstring("SiStripDetInfoFileReader:  (NoModuleName)")
 
 
 ## # geometry & magnetic field

@@ -66,12 +66,11 @@ process.trackingFailureFilter.VertexSource = cms.InputTag('goodVertices4TFF')
 ### customise PAT
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
-
 # add the PF MET
-from PhysicsTools.PatAlgos.tools.metTools import *
-addPfMET(process, 'PF')
+#from PhysicsTools.PatAlgos.tools.metTools import *
+#addPfMET(process, 'PF')
 
-# add PF jets
+# switch to PF jets
 from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJetCollection(process, 
                     cms.InputTag('ak5PFJets'),   
@@ -84,6 +83,18 @@ switchJetCollection(process,
                     jetIdLabel       = "ak5"
                     )
 
+# apply type 0 MET corrections based on PFCandidate
+process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
+process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+    cms.InputTag('pfMETcorrType0'),
+    cms.InputTag('pfJetMETcorr', 'type1')        
+)
+
+
+# remove overlaps ???
+process.cleanPatJets.finalCut = "!hasOverlaps('electrons') && !hasOverlaps('muons')"
+
 # apply loose PF jet ID
 from PhysicsTools.SelectorUtils.pfJetIDSelector_cfi import pfJetIDSelector
 process.goodPatJets = cms.EDFilter("PFJetIDSelectionFunctorFilter",
@@ -91,6 +102,20 @@ process.goodPatJets = cms.EDFilter("PFJetIDSelectionFunctorFilter",
                                    src = cms.InputTag("selectedPatJets"),
                                    filter = cms.bool(True)
                                    )
+
+# load the PU JetID sequence
+process.load("CMGTools.External.pujetidsequence_cff")
+
+
+### Leptons
+# apply selection
+process.selectedPatMuons.cut = cms.string("isGlobalMuon && pt>10. && abs(eta)<2.5");
+# && isPFMuon && globalTrack.normalizedChi2<10. && globalTrack.hitPattern.numberOfValidMuonHits>0 && numberOfMatchedStations>1 && db<0.2")
+
+process.selectedPatElectrons.cut = cms.string("pt>10. && abs(eta)<2.5")
+
+### MET
+
 
 # we're not interested in taus
 #removeSpecificPATObjects( process, ['Taus'] )
@@ -144,10 +169,26 @@ process.p = cms.Path(
     process.goodVertices4TFF *
     process.trackingFailureFilter *
 
+    process.type0PFMEtCorrection *
+    
 # generate PAT
     process.patDefaultSequence *
-    process.goodPatJets
-    )
+    process.goodPatJets *
+    process.puJetIdSqeuence 
+)
+
+# adjust event content
+process.out.outputCommands += [
+    'keep edmTriggerResults_*_*_HLT'
+    ,'keep edmTriggerResults_*_*_*'
+    ,'keep *_puJetId_*_*' # input variables
+    ,'keep *_puJetMva_*_*' # final MVAs and working point flags
+    ,'keep *_hltTriggerSummaryAOD_*_*'
+    ,'keep *_offlineBeamSpot_*_*'
+    ,'keep *_offlinePrimaryVertices*_*_*'
+    ,'keep *_goodOfflinePrimaryVertices*_*_*'
+    ]
+
 
 
 ## ------------------------------------------------------
