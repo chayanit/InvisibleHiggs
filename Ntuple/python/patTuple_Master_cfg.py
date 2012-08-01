@@ -67,8 +67,8 @@ process.trackingFailureFilter.VertexSource = cms.InputTag('goodVertices4TFF')
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
 # add the PF MET
-#from PhysicsTools.PatAlgos.tools.metTools import *
-#addPfMET(process, 'PF')
+from PhysicsTools.PatAlgos.tools.metTools import *
+addPfMET(process, 'PF')
 
 # switch to PF jets
 from PhysicsTools.PatAlgos.tools.jetTools import *
@@ -179,7 +179,6 @@ process.p = cms.Path(
 
 # adjust event content
 process.out.outputCommands += [
-    'keep edmTriggerResults_*_*_HLT'
     ,'keep edmTriggerResults_*_*_*'
     ,'keep *_puJetId_*_*' # input variables
     ,'keep *_puJetMva_*_*' # final MVAs and working point flags
