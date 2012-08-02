@@ -13,13 +13,10 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.4 2012/07/27 09:07:57 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.5 2012/08/01 15:47:37 jbrooke Exp $
 //
 //
 
-
-// system include files
-#include <memory>
 
 // framework
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -115,6 +112,10 @@
 #include "InvisibleHiggs/Ntuple/interface/InvHiggsInfo.h"
 
 
+// system include files
+#include <memory>
+#include <sys/stat.h>
+
 #include <algorithm>
 
 
@@ -197,6 +198,7 @@ private:
 
   // PU re-weighting
   edm::LumiReWeighting lumiWeights_;
+  bool doPUWeights_;
 
 };
 
@@ -222,15 +224,29 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   hltConfig_(),
   hltBit1_(0),
   hltBit2_(0),
-  doHltBit_(true)
-//   lumiWeights_(iConfig.getUntrackedParameter<std::string>("puMCFile", ""),
-// 	       iConfig.getUntrackedParameter<std::string>("puDataFile", ""),
-// 	       iConfig.getUntrackedParameter<std::string>("puMCHist", ""),
-// 	       iConfig.getUntrackedParameter<std::string>("puDataHist", ""))
+  doHltBit_(true),
+  lumiWeights_(),
+  doPUWeights_(false)
 {
   // set up output
   tree_=fs_->make<TTree>("InvHiggsInfo", "");
   tree_->Branch("events", "InvHiggsInfo", &info_, 1000000, 1);
+
+  // check PU files exists, and reweight if they do
+  std::string puMCFile = iConfig.getUntrackedParameter<std::string>("puMCFile", "");
+  std::string puDataFile = iConfig.getUntrackedParameter<std::string>("puDataFile", "");
+
+  struct stat buf;
+  if ((stat(puMCFile.c_str(), &buf) != -1) && (stat(puDataFile.c_str(), &buf) != -1)) {
+    lumiWeights_ = edm::LumiReWeighting(puMCFile,
+					puDataFile,
+					iConfig.getUntrackedParameter<std::string>("puMCHist", "pileup"),
+					iConfig.getUntrackedParameter<std::string>("puDataHist", "pileup"));
+    doPUWeights_ = true;
+  }
+  else {
+    edm::LogWarning("InvHiggsInfoProducer") << "No PU reweighting inputs - not going to calculate weights"<<std::endl;
+  }
   
 }
 
@@ -314,8 +330,11 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   info_ = new InvHiggsInfo();
  
   if (! iEvent.eventAuxiliary().isRealData()) {
+
     doMC(iEvent);
-    doPUReweighting(iEvent);
+
+    if (doPUWeights_) doPUReweighting(iEvent);
+
   }
  
   // event & trigger info
@@ -602,31 +621,28 @@ void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
   
   double weight = 0.;
 
-//   edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
-//   iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
+  edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
+  iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
   
-//   if (puInfo.isValid()) {
-//     std::vector<PileupSummaryInfo>::const_iterator pvi;
+  if (puInfo.isValid()) {
+    std::vector<PileupSummaryInfo>::const_iterator pvi;
     
-//     float tnpv = -1;
-//     for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
+    float tnpv = -1;
+    for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
       
-//       int bx = pvi->getBunchCrossing();
+      int bx = pvi->getBunchCrossing();
       
-//       if(bx == 0) { 
-// 	tnpv = pvi->getTrueNumInteractions();
-// 	continue;
-//       }
+      if(bx == 0) { 
+	tnpv = pvi->getTrueNumInteractions();
+	continue;
+      }
       
-//     }
+    }
     
-//     weight = lumiWeights_.weight( tnpv );
+    weight = lumiWeights_.weight( tnpv );
     
-    // example code below does not compile!
-    //edm::EventBase* iEventB = dynamic_cast<edm::EventBase*>(&iEvent);
-    //double weight = lumiWeights_.weight( (*iEventB) );
-  //  }
- 
+  }
+
   info_->puWeight = weight;
 
 }

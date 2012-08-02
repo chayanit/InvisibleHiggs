@@ -83,6 +83,9 @@ switchJetCollection(process,
                     jetIdLabel       = "ak5"
                     )
 
+# jet selection
+process.selectedPatJets.cut = cms.string("pt>10. && abs(eta)<5.")
+
 # apply type 0 MET corrections based on PFCandidate
 process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
 process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
@@ -109,7 +112,7 @@ process.load("CMGTools.External.pujetidsequence_cff")
 
 ### Leptons
 # apply selection
-process.selectedPatMuons.cut = cms.string("isGlobalMuon && pt>10. && abs(eta)<2.5");
+process.selectedPatMuons.cut = cms.string("isGlobalMuon && pt>10. && abs(eta)<2.5")
 # && isPFMuon && globalTrack.normalizedChi2<10. && globalTrack.hitPattern.numberOfValidMuonHits>0 && numberOfMatchedStations>1 && db<0.2")
 
 process.selectedPatElectrons.cut = cms.string("pt>10. && abs(eta)<2.5")
@@ -179,10 +182,13 @@ process.p = cms.Path(
 
 # adjust event content
 process.out.outputCommands += [
-    ,'keep edmTriggerResults_*_*_*'
-    ,'keep *_puJetId_*_*' # input variables
-    ,'keep *_puJetMva_*_*' # final MVAs and working point flags
+    # trigger results
+    'keep edmTriggerResults_*_*_*'
     ,'keep *_hltTriggerSummaryAOD_*_*'
+    # PU jet ID
+    ,'keep *_puJetId_*_*'
+    ,'keep *_puJetMva_*_*'
+    # vertices
     ,'keep *_offlineBeamSpot_*_*'
     ,'keep *_offlinePrimaryVertices*_*_*'
     ,'keep *_goodOfflinePrimaryVertices*_*_*'

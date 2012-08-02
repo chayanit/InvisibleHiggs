@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.1 2012/06/06 15:23:42 jbrooke Exp $
+// $Id: InvHiggsInfo.h,v 1.2 2012/08/01 15:47:37 jbrooke Exp $
 //
 //
 
@@ -100,7 +100,8 @@ class InvHiggsInfo { //: public TObject {
 
   Double_t mMuMu;
 
-  // pu re-weighting
+  // PU
+  Int_T nVtx;
   Double_t puWeight;
 
   // MC info
