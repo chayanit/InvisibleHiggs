@@ -182,7 +182,7 @@ process.p = cms.Path(
 
 # adjust event content
 process.out.outputCommands += [
-    # trigger results
+    # trigger results
     'keep edmTriggerResults_*_*_*'
     ,'keep *_hltTriggerSummaryAOD_*_*'
     # PU jet ID
