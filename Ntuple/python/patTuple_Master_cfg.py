@@ -84,7 +84,7 @@ switchJetCollection(process,
                     )
 
 # jet selection
-process.selectedPatJets.cut = cms.string("pt>10. && abs(eta)<5.")
+#process.selectedPatJets.cut = cms.string("pt>10. && abs(eta)<5.")
 
 # apply type 0 MET corrections based on PFCandidate
 process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
@@ -96,7 +96,7 @@ process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
 
 
 # remove overlaps ???
-process.cleanPatJets.finalCut = "!hasOverlaps('electrons') && !hasOverlaps('muons')"
+#process.cleanPatJets.finalCut = "!hasOverlaps('electrons') && !hasOverlaps('muons')"
 
 # apply loose PF jet ID
 from PhysicsTools.SelectorUtils.pfJetIDSelector_cfi import pfJetIDSelector
