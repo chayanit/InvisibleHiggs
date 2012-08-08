@@ -22,9 +22,9 @@ invHiggsInfo = cms.EDAnalyzer(
     mhtTag = cms.untracked.InputTag("patMHTs"),
 
     # PU re-weighting
-    puMCFile = cms.untracked.string("PUHistogramsMC.root"),
-    puDataFile = cms.untracked.string("PUHistogramsData.root"),
-    puMCHist = cms.untracked.string("pileup"),
-    puDataHist = cms.untracked.string("pileup")
+    puMCFile = cms.untracked.string(""),
+    puDataFile = cms.untracked.string(""),
+    puMCHist = cms.untracked.string(""),
+    puDataHist = cms.untracked.string("")
 
 )

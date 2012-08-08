@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.5 2012/08/01 15:47:37 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.6 2012/08/02 13:48:09 jbrooke Exp $
 //
 //
 
@@ -608,8 +608,8 @@ void InvHiggsInfoProducer::doVBFVariables(std::vector<pat::Jet> jets, std::vecto
     }
   }
 
-  double jmdphi1 = abs(abs(abs(met.at(0).phi()-jets.at(0).phi())-TMath::Pi())-TMath::Pi());
-  double jmdphi2 = abs(abs(abs(met.at(0).phi()-jets.at(1).phi())-TMath::Pi())-TMath::Pi());
+  double jmdphi1 = fabs(fabs(fabs(met.at(0).phi()-jets.at(0).phi())-TMath::Pi())-TMath::Pi());
+  double jmdphi2 = fabs(fabs(fabs(met.at(0).phi()-jets.at(1).phi())-TMath::Pi())-TMath::Pi());
 
   info_->jetMETdPhi = std::min(jmdphi1, jmdphi2);
 
@@ -619,7 +619,7 @@ void InvHiggsInfoProducer::doVBFVariables(std::vector<pat::Jet> jets, std::vecto
 
 void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
   
-  double weight = 0.;
+  double weight = 1.;
 
   edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
   iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
