@@ -36,6 +36,9 @@ process.GlobalTag.globaltag = 'START52_V9B::All'
 process.maxEvents.input = -1
 
 process.source.fileNames = [
-    'file:/storage/phjjb/invisibleHiggs/test/ZJetsToNuNu_400_HT_inf-PU_S7_START52_V9-AODSIM.root'
+    '/store/mc/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S7_START52_V9-v1/0000/FC4BFF72-F48B-E111-81B4-002590200810.root'
     ]
+
+process.out.fileName = 'patTuple_DYJetsToLL.root'
+
 

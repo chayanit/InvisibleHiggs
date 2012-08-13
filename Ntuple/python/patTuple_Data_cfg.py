@@ -1,6 +1,8 @@
+
 from InvisibleHiggs.Ntuple.patTuple_Master_cfg import *
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
+
 
 ## remove MC matching from the default sequence
 removeMCMatching(process, ['All'])
@@ -27,5 +29,12 @@ process.GlobalTag.globaltag = 'GR_R_52_V9::All'
 process.maxEvents.input = -1
 
 process.source.fileNames = [
-    'file:/storage/phjjb/invisibleHiggs/test/MET-Run2012A-Run193621-AOD.root'
+    '/store/data/Run2012A/MET/RECO/PromptReco-v1/000/190/945/B000D689-0886-E111-BDE0-5404A63886B6.root'
+#    '/store/data/Run2012A/DoubleMu/AOD/PromptReco-v1/000/190/490/96550922-2F81-E111-A37F-001D09F2462D.root'
     ]
+ 
+process.out.fileName = 'patTuple_MET2012.root'
+#process.out.fileName = 'patTuple_DoubleMu.root'
+
+
+

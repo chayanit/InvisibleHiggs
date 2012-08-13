@@ -182,8 +182,11 @@ process.p = cms.Path(
 
 # adjust event content
 process.out.outputCommands += [
+     'keep edmTriggerResults_*_*_*'
+    ,'keep *_puJetId_*_*' # input variables
+    ,'keep *_puJetMva_*_*' # final MVAs and working point flags
     # trigger results
-    'keep edmTriggerResults_*_*_*'
+    ,'keep edmTriggerResults_*_*_*'
     ,'keep *_hltTriggerSummaryAOD_*_*'
     # PU jet ID
     ,'keep *_puJetId_*_*'

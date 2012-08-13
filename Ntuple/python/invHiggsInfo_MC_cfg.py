@@ -21,7 +21,6 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-#    'file:patTuple_MC.root'
-    'file:/gpfs_phys/storm/cms/user/jbrooke/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/InvHiggsPAT_Summer12_v5_WJetsToLNu/dc0b67fb76a75169bf58598357984118/patTuple_820_2_9fC.root'
+	'/uscms_data/d3/chayanit/VplusJetsAnalysis2012/CMSSW_5_2_5/src/InvisibleHiggs/Ntuple/python/testroot/patTuple_DYJetsToLLTrig.root'
     ] );
 
