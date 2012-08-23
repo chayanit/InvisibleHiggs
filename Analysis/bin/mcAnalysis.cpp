@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
   std::string odir("Summer12_v6b");
 
   Datasets datasets;
-  datasets.readFile("InvisibleHiggs/MCAnalysis/data/datasets_v6.txt");
+  datasets.readFile("InvisibleHiggs/Ntuple/data/datasets_v6.txt");
 
   // cuts
   Cuts cuts;
