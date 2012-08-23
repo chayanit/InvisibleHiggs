@@ -79,12 +79,12 @@ switchJetCollection(process,
                     jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute']),
                     doType1MET       = True,            
                     genJetCollection = cms.InputTag("ak5GenJets"),
-                    doJetID          = True,
+                    doJetID          = False,
                     jetIdLabel       = "ak5"
                     )
 
 # jet selection
-#process.selectedPatJets.cut = cms.string("pt>10. && abs(eta)<5.")
+process.selectedPatJets.cut = cms.string("pt>10. && abs(eta)<5.")
 
 # apply type 0 MET corrections based on PFCandidate
 process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
@@ -108,7 +108,8 @@ process.goodPatJets = cms.EDFilter("PFJetIDSelectionFunctorFilter",
 
 # load the PU JetID sequence
 process.load("CMGTools.External.pujetidsequence_cff")
-
+process.puJetMva.jets = cms.InputTag("goodPatJets")
+process.puJetId.jets = cms.InputTag("goodPatJets")
 
 ### Leptons
 # apply selection
@@ -185,6 +186,8 @@ process.out.outputCommands += [
     # trigger results
     'keep edmTriggerResults_*_*_*'
     ,'keep *_hltTriggerSummaryAOD_*_*'
+    # good jets
+    ,'keep *_goodPatJets_*_*'
     # PU jet ID
     ,'keep *_puJetId_*_*'
     ,'keep *_puJetMva_*_*'

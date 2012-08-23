@@ -17,7 +17,7 @@ switchJetCollection(process,
                     jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']),  
                     doType1MET       = True,            
                     genJetCollection = cms.InputTag(""),
-                    doJetID          = True,
+                    doJetID          = False,
                     jetIdLabel       = "ak5"
                     )
 
@@ -33,8 +33,7 @@ process.source.fileNames = [
 #    '/store/data/Run2012A/DoubleMu/AOD/PromptReco-v1/000/190/490/96550922-2F81-E111-A37F-001D09F2462D.root'
     ]
  
-process.out.fileName = 'patTuple_MET2012.root'
-#process.out.fileName = 'patTuple_DoubleMu.root'
+process.out.fileName = 'patTuple_Data.root'
 
 
 

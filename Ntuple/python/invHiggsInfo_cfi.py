@@ -15,11 +15,17 @@ invHiggsInfo = cms.EDAnalyzer(
     mcTag = cms.untracked.InputTag("generator"),
     
     # tags
-    jetTag = cms.untracked.InputTag("cleanPatJets"),
+    jetTag = cms.untracked.InputTag("goodPatJets"),
+    puJetMvaTag = cms.untracked.InputTag("puJetMva", "fullDiscriminant"),
+    puJetIdTag = cms.untracked.InputTag("puJetMva", "fullId"),
     muonTag = cms.untracked.InputTag("cleanPatMuons"),
     electronTag = cms.untracked.InputTag("cleanPatElectrons"),
     metTag = cms.untracked.InputTag("patMETs"),
     mhtTag = cms.untracked.InputTag("patMHTs"),
+    zMuTag = cms.untracked.InputTag("bestZMuMu"),
+    zElTag = cms.untracked.InputTag(""),
+    wMuTag = cms.untracked.InputTag("bestWMuNu"),
+    wElTag = cms.untracked.InputTag("bestWENu"),
 
     # PU re-weighting
     puMCFile = cms.untracked.string(""),

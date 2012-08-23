@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.3 2012/08/02 13:48:09 jbrooke Exp $
+// $Id: InvHiggsInfo.h,v 1.4 2012/08/03 10:44:08 jbrooke Exp $
 //
 //
 
@@ -53,11 +53,15 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet1Eta;
   Double_t jet1Phi;
   Double_t jet1Mass;
+  Double_t jet1PUMVA;
+  Int_t    jet1PUFlag;
 
   Double_t jet2Pt;
   Double_t jet2Eta;
   Double_t jet2Phi;
   Double_t jet2Mass;
+  Double_t jet2PUMVA;
+  Int_t    jet2PUFlag;
 
   // Global variables
   Double_t met;
@@ -87,8 +91,6 @@ class InvHiggsInfo { //: public TObject {
   Double_t ele2Eta;
   Double_t ele2Phi;
 
-  Double_t mEE;
-
   // muons
   Double_t mu1Pt;
   Double_t mu1Eta;
@@ -98,7 +100,21 @@ class InvHiggsInfo { //: public TObject {
   Double_t mu2Eta;
   Double_t mu2Phi;
 
-  Double_t mMuMu;
+  // W candidates
+  Int_t nW;
+  Double_t wPt;
+  Double_t wEta;
+  Double_t wPhi;
+  Double_t wMt;
+  Double_t wChannel;
+
+  // Z candidates
+  Int_t nZ;
+  Double_t zPt;
+  Double_t zEta;
+  Double_t zPhi;
+  Double_t zMass;
+  Double_t zChannel;
 
   // PU
   Int_t nVtx;

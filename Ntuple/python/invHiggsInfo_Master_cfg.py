@@ -18,6 +18,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 # conditions
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 
+# Z and W candidates
+process.load('InvisibleHiggs/Ntuple/WCandidates_cff')
+process.load('InvisibleHiggs/Ntuple/ZCandidates_cff')
+
 # Ntuple producer
 process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
 
@@ -27,7 +31,9 @@ process.TFileService.fileName = cms.string('invHiggsInfo.root')
 
 # path
 process.path = cms.Path(
-    process.invHiggsInfo
+    process.WSequence
+    * process.ZSequence
+    * process.invHiggsInfo
 )
 
 
