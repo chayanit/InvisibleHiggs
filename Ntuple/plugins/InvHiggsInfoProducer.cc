@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.7 2012/08/08 16:35:08 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.8 2012/08/23 01:42:56 jbrooke Exp $
 //
 //
 
@@ -83,6 +83,9 @@
 #include "DataFormats/PatCandidates/interface/MHT.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
+// PU jet ID
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
+
 // vertices
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -143,26 +146,25 @@ private:
   void doMC(const edm::Event&);
 
   /// write trigger info
-  void doTrigger(const edm::Event&, const edm::EventSetup&);
+  void doTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+
+  // PU re-weighting
+  void doVertices(const std::vector<reco::Vertex>& vertices);
+  void doPUReweighting(const edm::Event&);
 
   // write PAT objects
   void doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	      edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
 	      edm::Handle<edm::ValueMap<int> > puJetIdFlags);
+  void doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
+		  edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
+		  edm::Handle<edm::ValueMap<int> > puJetIdFlags);
   void doMuons(const std::vector<pat::Muon>& muons);
   void doElectrons(const std::vector<pat::Electron>& electrons);
   void doMET(const std::vector<pat::MET>& met);
   void doMHT(const std::vector<pat::MHT>& mht);
-
-  void doVBFVariables(const edm::View<pat::Jet>& jets,
-		      const std::vector<pat::MET>& met,
-		      bool leading);
-
   void doZs(const reco::CandidateView& zs, int channel);
   void doWs(const reco::CandidateView& ws, int channel);
-
-  // other stuff
-  void doPUReweighting(const edm::Event&);
 
 public:
   
@@ -188,6 +190,7 @@ private:
 //   edm::InputTag mcTag_;
 //   std::string mcProducer_;
 //   edm::InputTag hepProducer_;
+  edm::InputTag vtxTag_;
   edm::InputTag jetTag_;
   edm::InputTag puJetMvaTag_;
   edm::InputTag puJetIdTag_;
@@ -214,6 +217,14 @@ private:
   edm::LumiReWeighting lumiWeights_;
   bool doPUWeights_;
 
+  // VBF jets
+  unsigned tagJet1Index_;
+  unsigned tagJet2Index_;
+  math::XYZTLorentzVector tagJet1_;
+  math::XYZTLorentzVector tagJet2_;
+  double tagJetEtaMin_;
+  double tagJetEtaMax_;
+
 };
 
 
@@ -228,6 +239,7 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
 //   mcTag_(iConfig.getUntrackedParameter<edm::InputTag>("mcTag",edm::InputTag("generator"))),
 //   mcProducer_ (iConfig.getUntrackedParameter<std::string>("producer", "g4SimHits")),
 //   hepProducer_ (iConfig.getUntrackedParameter<edm::InputTag>("hepMCProducerTag", edm::InputTag("generator", "", "SIM"))),
+  vtxTag_(iConfig.getUntrackedParameter<edm::InputTag>("vtxTag",edm::InputTag("offlinePrimaryVertices"))),
   jetTag_(iConfig.getUntrackedParameter<edm::InputTag>("jetTag",edm::InputTag("patJets"))),
   puJetMvaTag_(iConfig.getUntrackedParameter<edm::InputTag>("puJetMvaTag",edm::InputTag("puJetMva:fullDiscriminant"))),
   puJetIdTag_(iConfig.getUntrackedParameter<edm::InputTag>("puJetIdTag",edm::InputTag("puJetMva:fullId"))),
@@ -246,7 +258,12 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   hltBit2_(0),
   doHltBit_(true),
   lumiWeights_(),
-  doPUWeights_(false)
+  doPUWeights_(false),
+  tagJet1Index_(-1),
+  tagJet2Index_(-1),
+  tagJetEtaMin_(0.),
+  tagJetEtaMax_(0.)
+  
 {
   // set up output
   tree_=fs_->make<TTree>("InvHiggsInfo", "");
@@ -361,11 +378,8 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   doEventInfo(iEvent);
   doTrigger(iEvent, iSetup);
 
-  edm::Handle<pat::METCollection> met;
-  iEvent.getByLabel(metTag_, met);
-
-  edm::Handle<pat::MHTCollection> mht;
-  iEvent.getByLabel(mhtTag_, mht);
+  edm::Handle<std::vector<reco::Vertex> > vertices;
+  iEvent.getByLabel(vtxTag_, vertices);
 
   edm::Handle<edm::View<pat::Jet> > jets;
   iEvent.getByLabel(jetTag_, jets);
@@ -375,6 +389,12 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   
   edm::Handle<edm::ValueMap<int> > puJetIdFlag;
   iEvent.getByLabel(puJetIdTag_,puJetIdFlag);
+
+  edm::Handle<pat::METCollection> met;
+  iEvent.getByLabel(metTag_, met);
+
+  edm::Handle<pat::MHTCollection> mht;
+  iEvent.getByLabel(mhtTag_, mht);
 
   edm::Handle<pat::MuonCollection> muons;
   iEvent.getByLabel(muonTag_,muons);
@@ -394,16 +414,16 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::Handle<reco::CandidateView> wEls;
   iEvent.getByLabel(wElTag_, wEls);
 
+  if (vertices.isValid()) doVertices(*vertices);
 
+  // do jets before MET etc. because this defines the VBF pair
   if (jets.isValid()) doJets(jets, puJetIdMVA, puJetIdFlag);
+
+  if (jets.isValid()) doThirdJet(jets, puJetIdMVA, puJetIdFlag);
 
   if (met.isValid()) doMET(*met);
 
   if (mht.isValid()) doMHT(*mht);
-
-  if (jets.isValid() && met.isValid()) {
-    doVBFVariables(*jets, *met, useLeadingJets_);
-  }
 
   if (electrons.isValid()) doElectrons(*electrons);
 
@@ -487,35 +507,171 @@ void InvHiggsInfoProducer::doTrigger(const edm::Event& iEvent, const edm::EventS
 }
 
 
+void InvHiggsInfoProducer::doVertices(const std::vector<reco::Vertex>&  vertices) {
+
+  std::vector<reco::Vertex>::const_iterator v;
+  for (v=vertices.begin(); v!=vertices.end(); ++v) {
+
+    if (v->isValid() && 
+	!v->isFake() &&
+	v->ndof() > 4 &&
+	abs(v->z()) <= 24 &&
+	v->position().rho() < 2) info_->nVtx++;
+
+  }
+
+}
+
+
+void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
+  
+  double weight = 1.;
+
+  edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
+  iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
+  
+  if (puInfo.isValid()) {
+    std::vector<PileupSummaryInfo>::const_iterator pvi;
+    
+    float tnpv = -1;
+    for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
+      
+      int bx = pvi->getBunchCrossing();
+      
+      if(bx == 0) { 
+	tnpv = pvi->getTrueNumInteractions();
+	continue;
+      }
+      
+    }
+    
+    weight = lumiWeights_.weight( tnpv );
+    
+  }
+
+  info_->puWeight = weight;
+
+}
+
+
 void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets, 
 				  edm::Handle<edm::ValueMap<float> > puJetIdMVAs, 
 				  edm::Handle<edm::ValueMap<int> > puJetIdFlags) {
 
-  //  unsigned njet=0;
+  // VBF jets defined here
+
+  // reset local variables
+  tagJet1Index_ = -1;
+  tagJet1Index_ = -1;
+  tagJet1_.SetXYZT(0., 0., 0., 0.);
+  tagJet2_.SetXYZT(0., 0., 0., 0.);
+  tagJetEtaMin_ = 0.;
+  tagJetEtaMax_ = 0.;
+
+  // find VBF jets
+  bool foundFirst = false;
+  bool foundSecond = false;
+
+  for (unsigned i=0; i<jets->size() && !foundSecond; ++i) {
+    
+    // check jet is associated with PV
+    int puflag = (*puJetIdFlags)[jets->refAt(i)];
+    if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) ) {
+      
+      // currently just taking the leading pair
+      // could check here that second jet  is in opposite hemisphere
+      if (foundFirst && !foundSecond) {
+	
+	tagJet2Index_ = i;
+	tagJet2_ = jets->at(i).p4();
+	
+	info_->jet2Pt     = jets->at(i).pt();    
+	info_->jet2Eta    = jets->at(i).eta();    
+	info_->jet2Phi    = jets->at(i).phi();    
+	info_->jet2M      = jets->at(i).mass();    
+	info_->jet2PUMVA  = (*puJetIdMVAs)[jets->refAt(i)];
+	info_->jet2PUFlag = (*puJetIdFlags)[jets->refAt(i)];
+
+	foundSecond = true;
+
+      }
+      
+      if (!foundFirst) {
+	
+	tagJet1Index_ = i;
+	tagJet1_ = jets->at(i).p4();
+	
+	info_->jet1Pt     = jets->at(i).pt();    
+	info_->jet1Eta    = jets->at(i).eta();    
+	info_->jet1Phi    = jets->at(i).phi();    
+	info_->jet1M      = jets->at(i).mass();
+	info_->jet1PUMVA  = (*puJetIdMVAs)[jets->refAt(i)];
+	info_->jet1PUFlag = (*puJetIdFlags)[jets->refAt(i)];
+	
+	foundFirst = true;
+	
+      }
+
+    }
+  }
   
-//   int njets = jets->size();
-//   int n = puJetIdMVAs->size();
-//   edm::LogWarning("Inv Higgs") << "N jets : " << njets << "  ValueMap size : " << n << std::endl;
-  //  edm::LogWarning("Inv Higgs") << "PU jet ID : jet 0 ref     : " << (jets->refAt(0)) << std::endl;
+  // save some info about the VBF pair
 
-  if (jets->size() > 0) {
-    info_->jet1Pt = jets->at(0).pt();    
-    info_->jet1Eta = jets->at(0).eta();    
-    info_->jet1Phi = jets->at(0).phi();    
-    info_->jet1Mass = jets->at(0).mass();
-    info_->jet1PUMVA = (*puJetIdMVAs)[jets->refAt(0)];
-    info_->jet1PUFlag = (*puJetIdFlags)[jets->refAt(0)];
-  }
-  if (jets->size() > 1) {
-    info_->jet2Pt = jets->at(1).pt();    
-    info_->jet2Eta = jets->at(1).eta();    
-    info_->jet2Phi = jets->at(1).phi();    
-    info_->jet2Mass = jets->at(1).mass();    
-    info_->jet2PUMVA = (*puJetIdMVAs)[jets->refAt(1)];
-    info_->jet2PUFlag = (*puJetIdFlags)[jets->refAt(1)];
-  }
+  tagJetEtaMin_ = std::min(tagJet1_.eta(), tagJet2_.eta());
+  tagJetEtaMax_ = std::max(tagJet1_.eta(), tagJet2_.eta());
 
+  math::XYZTLorentzVector vbfp4=tagJet1_ + tagJet2_;
+  info_->vbfEt   = vbfp4.Pt();
+  info_->vbfEta  = vbfp4.Eta();
+  info_->vbfPhi  = vbfp4.Phi();
+  info_->vbfM    = vbfp4.M();
+  info_->vbfDEta = fabs(tagJet1_.eta() - tagJet2_.eta());
+  info_->vbfDPhi = fabs(fabs(fabs(tagJet1_.phi()-tagJet2_.phi())-TMath::Pi())-TMath::Pi());
+ 
 }
+
+
+void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets, 
+				      edm::Handle<edm::ValueMap<float> > puJetIdMVAs, 
+				      edm::Handle<edm::ValueMap<int> > puJetIdFlags) 
+{
+
+  // find 3rd jet
+  for (unsigned i=0; i<jets->size(); ++i) {
+
+    // associated with PV and not tag jet
+    int puflag = (*puJetIdFlags)[jets->refAt(i)];
+    if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) &&
+	 i != tagJet1Index_ &&
+	 i != tagJet2Index_) {
+
+      // store in ntuple
+      info_->jet3Et  = jets->at(i).pt();
+      info_->jet3Eta = jets->at(i).eta();
+      info_->jet3Phi = jets->at(i).phi();
+      info_->jet3M   = jets->at(i).mass();
+
+      // calculate Zeppenfeld variable
+      info_->jet3EtaStar = jets->at(i).eta() - (tagJetEtaMin_ + tagJetEtaMax_) / 2;
+
+      // check if it is between tag jets in eta
+      if (jets->at(i).eta() > tagJetEtaMin_ &&
+	  jets->at(i).eta() < tagJetEtaMax_ ) {
+
+	// store in ntuple
+	info_->cenJetEt  = jets->at(i).pt();
+	info_->cenJetEta = jets->at(i).eta();
+	info_->cenJetPhi = jets->at(i).phi();
+	info_->cenJetM   = jets->at(i).mass();
+
+      }
+
+    }
+
+  }
+  
+}
+
 
 void InvHiggsInfoProducer::doMuons(const std::vector<pat::Muon>& muons) {
 
@@ -563,6 +719,12 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met) {
   info_->metPhi = met.at(0).phi();
   //    info_->metSig = met->at(0).mEtSig();
 
+  // delta phi between MET and nearest tag jet
+  double jmdphi1 = fabs(fabs(fabs(met.at(0).phi()-tagJet1_.phi())-TMath::Pi())-TMath::Pi());
+  double jmdphi2 = fabs(fabs(fabs(met.at(0).phi()-tagJet2_.phi())-TMath::Pi())-TMath::Pi());
+  
+  info_->jetMETdPhi = std::min(jmdphi1, jmdphi2);
+
 }
 
 void InvHiggsInfoProducer::doMHT(const std::vector<pat::MHT>& mht) {
@@ -570,99 +732,6 @@ void InvHiggsInfoProducer::doMHT(const std::vector<pat::MHT>& mht) {
   info_->mht    = mht.at(0).pt();
   info_->mhtPhi = mht.at(0).phi();
   //    info_->mhtSig = mht->at(0).significance();
-
-}
-
-
-/// identify tag jets and store some variables
-void InvHiggsInfoProducer::doVBFVariables(const edm::View<pat::Jet>& jets,
-					  const std::vector<pat::MET>& met, 
-					  bool leading) {
-
-  bool vbfFound = false;
-
-  for (unsigned i=0; i<jets.size()-1 && !vbfFound; ++i) {
-    for (unsigned j=i+1; j<jets.size() && !vbfFound; ++j) {
-
-      // VBF jet vector sum
-      math::XYZTLorentzVector v1=jets.at(i).p4();
-      math::XYZTLorentzVector v2=jets.at(j).p4();
-      math::XYZTLorentzVector vbfp4=v1+v2;
-      
-      double deta = fabs(jets.at(i).eta() - jets.at(j).eta());
-      
-      // stop if this pair passes VBF conditions
-      // or is the first pair
-      if (leading ||
-	  (v1.Pt() > 30. &&
-      	  v2.Pt() > 30. &&
-      	  deta > 3.5 &&
-	   vbfp4.M() > 800.)) {
-	
-      	vbfFound = true;
-	
-//       	info_->vbfJet1Index = i;
-//       	info_->vbfJet2Index = j;
-      
-	info_->vbfEt  = vbfp4.Pt();
-	info_->vbfEta = vbfp4.Eta();
-	info_->vbfPhi = vbfp4.Phi();
-	info_->vbfM   = vbfp4.M();
-	
-	// find highest Et jet not in VBF pair
-	for (unsigned k=0; k< jets.size(); ++k) {
-	  if (k!=i && k!=j) {
-	    info_->vbfJet3Phi = jets.at(k).phi();	    
-	    break;
-	  }
-	}
-	
-	// find nearest jet to vbf vector
-	double dRmin = 999.0;  // 
-	unsigned nrJetIndex = 999999;
-	for (unsigned k=0; k< jets.size(); ++k) {
-	  double dR = sqrt(pow(vbfp4.Eta()-jets.at(k).eta(), 2) + pow(vbfp4.Phi()-jets.at(k).phi(), 2));
-	  if (dR<dRmin) {
-	    nrJetIndex = k;
-	    dRmin = dR;
-	  }
-	}
-	
-	if (nrJetIndex < jets.size()) {
-	  info_->vbfNearJetEt = jets.at(nrJetIndex).et();
-	  info_->vbfNearJetDR = dRmin;
-	}
-	
-	// find highest et jet with eta between tag jets
-	double etamin = std::min(v1.Eta(), v2.Eta());
-	double etamax = std::max(v1.Eta(), v2.Eta());
-	for (unsigned k=0; k< jets.size(); ++k) {
-	  if (jets.at(k).eta() > etamin &&
-	      jets.at(k).eta() < etamax) {
-	    info_->vbfCenJetEt = jets.at(k).et();
-	    break;
-	  }
-	}
-	double etamin2 = std::min(v1.Eta(), v2.Eta())+0.5;
-	double etamax2 = std::max(v1.Eta(), v2.Eta())-0.5;
-	for (unsigned k=0; k< jets.size(); ++k) {
-	  if (jets.at(k).eta() > etamin2 &&
-	      jets.at(k).eta() < etamax2) {
-	    //info_->vbfCenJet2Et = jets.at(k).et();
-	    break;
-	  }
-	}
-
-      }
-	
-    }
-  }
-
-  double jmdphi1 = fabs(fabs(fabs(met.at(0).phi()-jets.at(0).phi())-TMath::Pi())-TMath::Pi());
-  double jmdphi2 = fabs(fabs(fabs(met.at(0).phi()-jets.at(1).phi())-TMath::Pi())-TMath::Pi());
-
-  info_->jetMETdPhi = std::min(jmdphi1, jmdphi2);
-
 
 }
 
@@ -710,36 +779,6 @@ void InvHiggsInfoProducer::doWs(const reco::CandidateView& ws, int channel) {
   
 }
 
-
-void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
-  
-  double weight = 1.;
-
-  edm::Handle<std::vector< PileupSummaryInfo > >  puInfo;
-  iEvent.getByLabel(edm::InputTag("addPileupInfo"), puInfo);
-  
-  if (puInfo.isValid()) {
-    std::vector<PileupSummaryInfo>::const_iterator pvi;
-    
-    float tnpv = -1;
-    for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
-      
-      int bx = pvi->getBunchCrossing();
-      
-      if(bx == 0) { 
-	tnpv = pvi->getTrueNumInteractions();
-	continue;
-      }
-      
-    }
-    
-    weight = lumiWeights_.weight( tnpv );
-    
-  }
-
-  info_->puWeight = weight;
-
-}
 
 
 //define this as a plug-in

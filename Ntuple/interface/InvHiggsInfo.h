@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.4 2012/08/03 10:44:08 jbrooke Exp $
+// $Id: InvHiggsInfo.h,v 1.5 2012/08/23 01:42:56 jbrooke Exp $
 //
 //
 
@@ -52,20 +52,23 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet1Pt;
   Double_t jet1Eta;
   Double_t jet1Phi;
-  Double_t jet1Mass;
+  Double_t jet1M;
   Double_t jet1PUMVA;
   Int_t    jet1PUFlag;
 
   Double_t jet2Pt;
   Double_t jet2Eta;
   Double_t jet2Phi;
-  Double_t jet2Mass;
+  Double_t jet2M;
   Double_t jet2PUMVA;
   Int_t    jet2PUFlag;
 
-  // Global variables
+  // MET
   Double_t met;
   Double_t metPhi;
+  Double_t jetMETdPhi;
+
+  // MHT
   Double_t mht;
   Double_t mhtPhi;
 
@@ -75,12 +78,23 @@ class InvHiggsInfo { //: public TObject {
   Double_t vbfPhi;
   Double_t vbfM;
 
-  Double_t vbfJet3Phi;
-  Double_t vbfNearJetEt;
-  Double_t vbfNearJetDR;
-  Double_t vbfCenJetEt;
+  Double_t vbfDEta;
+  Double_t vbfDPhi;
 
-  Double_t jetMETdPhi;
+  // third jet
+  Double_t jet3Et;
+  Double_t jet3Eta;
+  Double_t jet3Phi;
+  Double_t jet3M;
+
+  // 3rd jet Zeppenfeld variable
+  Double_t jet3EtaStar;
+
+  // central jet
+  Double_t cenJetEt;
+  Double_t cenJetEta;
+  Double_t cenJetPhi;
+  Double_t cenJetM;
 
   // electrons
   Double_t ele1Pt;
@@ -100,7 +114,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t mu2Eta;
   Double_t mu2Phi;
 
-  // W candidates
+  // Ws
   Int_t nW;
   Double_t wPt;
   Double_t wEta;
@@ -108,7 +122,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t wMt;
   Double_t wChannel;
 
-  // Z candidates
+  // Zs
   Int_t nZ;
   Double_t zPt;
   Double_t zEta;
@@ -141,11 +155,8 @@ class InvHiggsInfo { //: public TObject {
   Double_t mcVBFPhi;
   Double_t mcVBFM;
 
-  Double_t mcVBFJet3Phi;
-  Double_t mcVBFNearJetEt;
-  Double_t mcVBFNearJetDR;
-  Double_t mcVBFCenJetEt;
-
+  Double_t mcVBFDEta;
+  Double_t mcVBFDPhi;
 
 };
 
