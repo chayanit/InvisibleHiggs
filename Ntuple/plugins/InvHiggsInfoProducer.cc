@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.8 2012/08/23 01:42:56 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.9 2012/08/23 15:06:45 jbrooke Exp $
 //
 //
 
@@ -206,6 +206,8 @@ private:
   // logic
   bool isMC_;
   bool useLeadingJets_;
+  bool doPUWeights_;
+  bool doPUJetID_;
 
   // HLT config helper
   HLTConfigProvider hltConfig_;
@@ -215,7 +217,6 @@ private:
 
   // PU re-weighting
   edm::LumiReWeighting lumiWeights_;
-  bool doPUWeights_;
 
   // VBF jets
   unsigned tagJet1Index_;
@@ -253,12 +254,13 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   wElTag_(iConfig.getUntrackedParameter<edm::InputTag>("wElTag",edm::InputTag(""))),
   isMC_(iConfig.getUntrackedParameter<bool>("isMC",false)),
   useLeadingJets_(iConfig.getUntrackedParameter<bool>("useLeadingJets",true)),
+  doPUWeights_(false),
+  doPUJetID_(iConfig.getUntrackedParameter<bool>("doPUJetID",true)),
   hltConfig_(),
   hltBit1_(0),
   hltBit2_(0),
   doHltBit_(true),
   lumiWeights_(),
-  doPUWeights_(false),
   tagJet1Index_(-1),
   tagJet2Index_(-1),
   tagJetEtaMin_(0.),

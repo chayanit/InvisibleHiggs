@@ -1,0 +1,26 @@
+
+from subprocess import *
+
+from optparse import OptionParser
+
+# get options
+parser = OptionParser()
+parser.add_option("-i","--indir",
+                  action="store",
+                  default=os.getcwd(),
+                  dest="indir",
+                  help="Input directory")
+parser.add_option("-o","--outdir",
+                  action="store",
+                  default=os.getcwd(),
+                  dest="outdir",
+                  help="Output directory")
+parser.add_option("-d","--outfile",
+                  action="store",
+                  default="",
+                  dest="dataset",
+                  help="Dataset to merge")
+
+(options,args)=parser.parse_args()
+
+merge.py
