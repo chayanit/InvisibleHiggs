@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.5 2012/08/23 01:42:56 jbrooke Exp $
+// $Id: InvHiggsInfo.h,v 1.6 2012/08/23 15:06:45 jbrooke Exp $
 //
 //
 
@@ -49,6 +49,7 @@ class InvHiggsInfo { //: public TObject {
   bool hltResult2;
 
   // jets
+  Int_t    jet1Index;
   Double_t jet1Pt;
   Double_t jet1Eta;
   Double_t jet1Phi;
@@ -56,6 +57,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet1PUMVA;
   Int_t    jet1PUFlag;
 
+  Int_t    jet2Index;
   Double_t jet2Pt;
   Double_t jet2Eta;
   Double_t jet2Phi;

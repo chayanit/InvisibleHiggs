@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.9 2012/08/23 15:06:45 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.10 2012/08/25 14:23:23 jbrooke Exp $
 //
 //
 
@@ -587,6 +587,7 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	tagJet2Index_ = i;
 	tagJet2_ = jets->at(i).p4();
 	
+	info_->jet2Index  = i;
 	info_->jet2Pt     = jets->at(i).pt();    
 	info_->jet2Eta    = jets->at(i).eta();    
 	info_->jet2Phi    = jets->at(i).phi();    
@@ -603,6 +604,7 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	tagJet1Index_ = i;
 	tagJet1_ = jets->at(i).p4();
 	
+	info_->jet1Index  = i;
 	info_->jet1Pt     = jets->at(i).pt();    
 	info_->jet1Eta    = jets->at(i).eta();    
 	info_->jet1Phi    = jets->at(i).phi();    
