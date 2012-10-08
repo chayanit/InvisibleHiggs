@@ -7806,6 +7806,20 @@ process.countPatTaus = cms.EDFilter("PATCandViewCountFilter",
 )
 
 
+process.ecalLaserCorrFilter = cms.EDFilter("EcalLaserCorrFilter",
+    EBEnegyMIN = cms.double(10.0),
+    EBLaserMAX = cms.double(3.0),
+    EELaserMIN = cms.double(0.3),
+    EELaserMAX = cms.double(8.0),
+    EEEnegyMIN = cms.double(10.0),
+    EBRecHitSource = cms.InputTag("reducedEcalRecHitsEB"),
+    EBLaserMIN = cms.double(0.3),
+    EERecHitSource = cms.InputTag("reducedEcalRecHitsEE"),
+    taggingMode = cms.bool(False),
+    Debug = cms.bool(False)
+)
+
+
 process.eeBadScFilter = cms.EDFilter("EEBadScFilter",
     SCsize = cms.int32(5),
     badscEE = cms.vint32(-1023023, 1048098, -1078063),
@@ -7828,7 +7842,7 @@ process.goodPatJets = cms.EDFilter("PFJetIDSelectionFunctorFilter",
 )
 
 
-process.goodVertices4TFF = cms.EDFilter("VertexSelector",
+process.goodVertices = cms.EDFilter("VertexSelector",
     filter = cms.bool(False),
     src = cms.InputTag("offlinePrimaryVertices"),
     cut = cms.string('!isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2')
@@ -7922,11 +7936,10 @@ process.pfPileUpAllChargedParticles = cms.EDFilter("PdgIdPFCandidateSelector",
 )
 
 
-process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
-    vertexCollection = cms.InputTag("offlinePrimaryVertices"),
-    maxd0 = cms.double(2),
-    minimumNDOF = cms.uint32(4),
-    maxAbsZ = cms.double(24)
+process.primaryVertexFilter = cms.EDFilter("VertexSelector",
+    filter = cms.bool(True),
+    src = cms.InputTag("offlinePrimaryVertices"),
+    cut = cms.string('!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2')
 )
 
 
@@ -7996,7 +8009,7 @@ process.trackingFailureFilter = cms.EDFilter("TrackingFailureFilter",
     taggingMode = cms.bool(False),
     debug = cms.bool(False),
     DzTrVtxMax = cms.double(1),
-    VertexSource = cms.InputTag("goodVertices4TFF")
+    VertexSource = cms.InputTag("goodVertices")
 )
 
 
@@ -8182,7 +8195,7 @@ process.patCandidates = cms.Sequence(process.makePatElectrons+process.makePatMuo
 process.patDefaultSequence = cms.Sequence(process.patElectrons+process.patMuons+process.patPFCandidateIsoDepositSelection+process.patPFTauIsolation+process.patTaus+process.patPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.patJetCharge+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates)
 
 
-process.p = cms.Path(process.hltHighLevel+process.noscraping+process.primaryVertexFilter+process.HBHENoiseFilter+process.CSCTightHaloFilter+process.hcalLaserEventFilter+process.EcalDeadCellTriggerPrimitiveFilter+process.eeBadScFilter+process.goodVertices4TFF+process.trackingFailureFilter+process.type0PFMEtCorrection+process.patDefaultSequence+process.goodPatJets+process.puJetIdSqeuence)
+process.p = cms.Path(process.hltHighLevel+process.noscraping+process.primaryVertexFilter+process.HBHENoiseFilter+process.CSCTightHaloFilter+process.hcalLaserEventFilter+process.EcalDeadCellTriggerPrimitiveFilter+process.eeBadScFilter+process.ecalLaserCorrFilter+process.goodVertices+process.trackingFailureFilter+process.type0PFMEtCorrection+process.patDefaultSequence+process.goodPatJets+process.puJetIdSqeuence)
 
 
 process.outpath = cms.EndPath(process.out)

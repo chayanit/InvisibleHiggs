@@ -22,41 +22,42 @@ process.MessageLogger.cerr.FwkReport = cms.untracked.PSet(
 process.load('HLTrigger.HLTfilters.hltHighLevel_cfi')
 process.hltHighLevel.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 process.hltHighLevel.throw = cms.bool(False)
-process.hltHighLevel.HLTPaths = cms.vstring("HLT_Mu17_Mu8_v*")
-#process.hltHighLevel.HLTPaths = cms.vstring(
-#    "HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
-#    "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
-#)
+#process.hltHighLevel.HLTPaths = cms.vstring("HLT_Mu17_Mu8_v*")              #DoubleMu
+#process.hltHighLevel.HLTPaths = cms.vstring("HLT_IsoMu24_v*","HLT_Mu40_v*") #SingleMu
+process.hltHighLevel.HLTPaths = cms.vstring(                                #MET
+    "HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
+    "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
+)
+
 
 # track quality filter
-process.noscraping = cms.EDFilter("FilterOutScraping",
-                                  applyfilter = cms.untracked.bool(True),
-                                  debugOn = cms.untracked.bool(False), #default = True
-                                  numtrack = cms.untracked.uint32(10),
-                                  thresh = cms.untracked.double(0.25)
-                                  )
+process.noscraping = cms.EDFilter(
+    "FilterOutScraping",
+    applyfilter = cms.untracked.bool(True),
+    debugOn = cms.untracked.bool(False),
+    numtrack = cms.untracked.uint32(10),
+    thresh = cms.untracked.double(0.25)
+    )
 
 # require a good vertex
-process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
-                                           vertexCollection = cms.InputTag('offlinePrimaryVertices'),
-                                           minimumNDOF = cms.uint32(4) ,
-                                           maxAbsZ = cms.double(24), 
-                                           maxd0 = cms.double(2) 
-                                           )
+process.primaryVertexFilter = cms.EDFilter(
+    "VertexSelector",
+    src = cms.InputTag("offlinePrimaryVertices"),
+    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
+    filter = cms.bool(True)
+    )
 
 
 ###--------------------------------------------------------------
 ### MET Filters
-# Beam halo filter
-process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
-
 # HCAL noise filter
 process.load('CommonTools.RecoAlgos.HBHENoiseFilter_cfi')
 
+# Beam halo filter
+process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
+
 # HCAL laser filter
 process.load('RecoMET.METFilters.hcalLaserEventFilter_cfi')
-process.hcalLaserEventFilter.vetoByRunEventNumber = cms.untracked.bool(False)
-process.hcalLaserEventFilter.vetoByHBHEOccupancy = cms.untracked.bool(True)
 
 # ECAL dead cells filter
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
@@ -64,19 +65,22 @@ process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 # ECAL bad supercluster filter
 process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 
+# The ECAL laser correction filter
+process.load('RecoMET.METFilters.ecalLaserCorrFilter_cfi')
+
 # tracking failure filter
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 
 # good vertices for tracking failure filter
-process.goodVertices4TFF = cms.EDFilter(
+process.goodVertices = cms.EDFilter(
   "VertexSelector",
   filter = cms.bool(False),
   src = cms.InputTag("offlinePrimaryVertices"),
   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2")
 )
-process.trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
-process.trackingFailureFilter.VertexSource = cms.InputTag('goodVertices4TFF')
+#process.trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
+#process.trackingFailureFilter.VertexSource = cms.InputTag('goodVertices4TFF')
 
 
 ###--------------------------------------------------------------
@@ -195,7 +199,8 @@ process.p = cms.Path(
     process.hcalLaserEventFilter  *
     process.EcalDeadCellTriggerPrimitiveFilter *
     process.eeBadScFilter *
-    process.goodVertices4TFF *
+    process.ecalLaserCorrFilter *
+    process.goodVertices *
     process.trackingFailureFilter *
 
     process.type0PFMEtCorrection *
@@ -247,6 +252,6 @@ process.out.fileName = 'patTuple_Data.root'
 
 ###---------------------------------------------------------------
 ### Dump
-file = open('InvHiggs_Data_DoubleMu_V7A_cfg.py','w')
-file.write(str(process.dumpPython()))
-file.close()
+#file = open('InvHiggs_Data_MET_V7A_cfg.py','w')
+#file.write(str(process.dumpPython()))
+#file.close()
