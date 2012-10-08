@@ -41,10 +41,11 @@ process.noscraping = cms.EDFilter(
 
 # require a good vertex
 process.primaryVertexFilter = cms.EDFilter(
-    "VertexSelector",
-    src = cms.InputTag("offlinePrimaryVertices"),
-    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
-    filter = cms.bool(True)
+    "GoodVertexFilter",
+    vertexCollection = cms.InputTag('offlinePrimaryVertices'),
+    minimumNDOF = cms.uint32(4) ,
+    maxAbsZ = cms.double(24), 
+    maxd0 = cms.double(2) 
     )
 
 
@@ -58,6 +59,8 @@ process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
 
 # HCAL laser filter
 process.load('RecoMET.METFilters.hcalLaserEventFilter_cfi')
+process.hcalLaserEventFilter.vetoByRunEventNumber = cms.untracked.bool(False)
+process.hcalLaserEventFilter.vetoByHBHEOccupancy = cms.untracked.bool(True)
 
 # ECAL dead cells filter
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
@@ -66,21 +69,21 @@ process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 
 # The ECAL laser correction filter
-process.load('RecoMET.METFilters.ecalLaserCorrFilter_cfi')
+#process.load('RecoMET.METFilters.ecalLaserCorrFilter_cfi')
 
 # tracking failure filter
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 
 # good vertices for tracking failure filter
-process.goodVertices = cms.EDFilter(
+process.goodVertices4TFF = cms.EDFilter(
   "VertexSelector",
   filter = cms.bool(False),
   src = cms.InputTag("offlinePrimaryVertices"),
   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2")
 )
-#process.trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
-#process.trackingFailureFilter.VertexSource = cms.InputTag('goodVertices4TFF')
+process.trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
+process.trackingFailureFilter.VertexSource = cms.InputTag('goodVertices4TFF')
 
 
 ###--------------------------------------------------------------
@@ -199,8 +202,8 @@ process.p = cms.Path(
     process.hcalLaserEventFilter  *
     process.EcalDeadCellTriggerPrimitiveFilter *
     process.eeBadScFilter *
-    process.ecalLaserCorrFilter *
-    process.goodVertices *
+    #process.ecalLaserCorrFilter *
+    process.goodVertices4TFF *
     process.trackingFailureFilter *
 
     process.type0PFMEtCorrection *
@@ -215,10 +218,11 @@ process.p = cms.Path(
 ### additional parameter
 # Global tag
 #process.GlobalTag.globaltag = 'GR_R_53_V14::All'
-process.GlobalTag.globaltag = 'GR_P_V41_AN2::All'
+#process.GlobalTag.globaltag = 'GR_P_V41_AN2::All'
+process.GlobalTag.globaltag = 'GR_R_52_V9::All'
 
 # Sources
-process.source.fileNames =  ['/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/FEB6B5F2-3902-E211-8B50-003048D2BC52.root']
+process.source.fileNames =  ['/store/data/Run2012B/MET/AOD/PromptReco-v1/000/194/912/00015404-34A8-E111-BADB-0025901D5D78.root']
 process.maxEvents.input = -1
 
 # JSON (interactive run only)
