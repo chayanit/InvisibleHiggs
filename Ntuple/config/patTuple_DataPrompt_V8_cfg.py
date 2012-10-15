@@ -311,6 +311,7 @@ process.out.outputCommands += [
     ,'keep *_offlineBeamSpot_*_*'
     ,'keep *_offlinePrimaryVertices*_*_*'
     ,'keep *_goodOfflinePrimaryVertices*_*_*'
+    ,'keep double_*_rho_*'
     ]
 
 if iRunOnData == False:
