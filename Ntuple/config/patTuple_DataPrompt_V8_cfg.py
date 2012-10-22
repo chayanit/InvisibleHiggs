@@ -9,7 +9,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 ###--------------------------------------------------------------
 ### Set these parameters
 iRunOnData = True
-iHLTFilter = "MET"  #MET, SingleMu, DoubleMu
+iHLTFilter = "MET"  #MET, SingleMu, DoubleMu, SingleElectron, DoubleElectron
 iDump      = False
 
 # Input + GlobalTag
@@ -54,6 +54,10 @@ if (iHLTFilter.find("DoubleMu")==0):
     process.hltHighLevel.HLTPaths = cms.vstring("HLT_Mu17_Mu8_v*")
 elif (iHLTFilter.find("SingleMu")==0):
     process.hltHighLevel.HLTPaths = cms.vstring("HLT_IsoMu24_eta2p1_v*","HLT_Mu40_eta2p1_v*")
+elif (iHLTFilter.find("DoubleElectron")==0):
+    process.hltHighLevel.HLTPaths = cms.vstring("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")
+elif (iHLTFilter.find("SingleElectron")==0):
+    process.hltHighLevel.HLTPaths = cms.vstring("HLT_Ele27_WP80_v*")
 else:
     process.hltHighLevel.HLTPaths = cms.vstring(
         "HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
