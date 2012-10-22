@@ -312,7 +312,6 @@ process.out.outputCommands += [
     ,'keep *_offlinePrimaryVertices*_*_*'
     ,'keep *_goodOfflinePrimaryVertices*_*_*'
     ,'keep double_*_rho_*'
-    ,'keep *_kt6*_*_*'
     ]
 
 if iRunOnData == False:
