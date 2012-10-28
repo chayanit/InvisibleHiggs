@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.6 2012/08/23 15:06:45 jbrooke Exp $
+// $Id: InvHiggsInfo.h,v 1.7 2012/09/24 09:18:22 jbrooke Exp $
 //
 //
 
@@ -48,7 +48,16 @@ class InvHiggsInfo { //: public TObject {
   bool hltResult1;
   bool hltResult2;
 
-  // jets
+  // MET filters
+  bool metflag0;
+  bool metflag1;
+  bool metflag2;
+  bool metflag3;
+  bool metflag4;
+  bool metflag5;
+  bool metflag6;
+
+  // Jets
   Int_t    jet1Index;
   Double_t jet1Pt;
   Double_t jet1Eta;
@@ -69,6 +78,17 @@ class InvHiggsInfo { //: public TObject {
   Double_t met;
   Double_t metPhi;
   Double_t jetMETdPhi;
+  //Double_t metXYCorr;
+  //Double_t metXYCorrPhi;
+  //Double_t jetMETXYCorrdPhi;
+  Double_t metnomuon;
+  Double_t metnomuonPhi;
+  //Double_t metnomuXYCorr; 
+  //Double_t metnomuXYCorrPhi; 
+  Double_t metnoelectron;
+  Double_t metnoelectronPhi;
+  //Double_t metnoelectronXYCorr; 
+  //Double_t metnoelectronXYCorrPhi;
 
   // MHT
   Double_t mht;
@@ -83,7 +103,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t vbfDEta;
   Double_t vbfDPhi;
 
-  // third jet
+  // Third jet
   Double_t jet3Et;
   Double_t jet3Eta;
   Double_t jet3Phi;
@@ -92,13 +112,13 @@ class InvHiggsInfo { //: public TObject {
   // 3rd jet Zeppenfeld variable
   Double_t jet3EtaStar;
 
-  // central jet
+  // Central jet
   Double_t cenJetEt;
   Double_t cenJetEta;
   Double_t cenJetPhi;
   Double_t cenJetM;
 
-  // electrons
+  // Electrons
   Double_t ele1Pt;
   Double_t ele1Eta;
   Double_t ele1Phi;
@@ -107,7 +127,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t ele2Eta;
   Double_t ele2Phi;
 
-  // muons
+  // Muons
   Double_t mu1Pt;
   Double_t mu1Eta;
   Double_t mu1Phi;

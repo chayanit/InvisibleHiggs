@@ -9,7 +9,6 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 #process.MessageLogger.cerr.INFO.limit = cms.untracked.int32(100)
 #process.MessageLogger.suppressInfo = cms.untracked.vstring("SiStripDetInfoFileReader:  (NoModuleName)")
 
-
 ## # geometry & magnetic field
 ## process.load('Configuration/StandardSequences/GeometryIdeal_cff')
 ## process.load("Configuration.StandardSequences.MagneticField_38T_cff")
@@ -17,6 +16,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # conditions
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
+
+# Physics Object Candidates
+process.load('InvisibleHiggs/Ntuple/PhysicsObjectCandidates_cff')
 
 # Z and W candidates
 process.load('InvisibleHiggs/Ntuple/WCandidates_cff')
@@ -31,11 +33,11 @@ process.TFileService.fileName = cms.string('invHiggsInfo.root')
 
 # path
 process.path = cms.Path(
-    process.WSequence
+    process.PhysicsObjectSequence
+    * process.WSequence
     * process.ZSequence
     * process.invHiggsInfo
 )
-
 
 
 ### THINGS TO EDIT BELOW ###
@@ -52,4 +54,3 @@ process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNa
 readFiles.extend( [
     'file:patTuple.root'
     ] );
-

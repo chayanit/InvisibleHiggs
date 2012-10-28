@@ -7,7 +7,7 @@ process.TFileService.fileName = cms.string('invHiggsInfo_Data.root')
 ### THINGS TO EDIT BELOW ###
 
 # change Global Tag
-process.GlobalTag.globaltag = 'GR_P_V41_AN2::All'
+process.GlobalTag.globaltag = 'GR_R_53_V14::All'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 

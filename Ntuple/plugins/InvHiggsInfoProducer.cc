@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.10 2012/08/25 14:23:23 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.11 2012/09/24 09:18:22 jbrooke Exp $
 //
 //
 
@@ -103,6 +103,7 @@
 
 // Math
 #include "DataFormats/Math/interface/LorentzVector.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 // ROOT output stuff
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -146,7 +147,13 @@ private:
   void doMC(const edm::Event&);
 
   /// write trigger info
-  void doTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+  void doTrigger(const edm::Event& iEvent, 
+		 const edm::EventSetup& iSetup);
+
+  /// write met filter info
+  void doMETFilter(const edm::Event& iEvent, 
+		   const edm::EventSetup& iSetup,
+		   edm::Handle<edm::TriggerResults> metFlag);
 
   // PU re-weighting
   void doVertices(const std::vector<reco::Vertex>& vertices);
@@ -155,13 +162,19 @@ private:
   // write PAT objects
   void doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	      edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
-	      edm::Handle<edm::ValueMap<int> > puJetIdFlags);
+	      edm::Handle<edm::ValueMap<int> > puJetIdFlags,
+	      const std::vector<pat::Muon>& muons,
+	      const std::vector<pat::Electron>& electrons);
   void doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
 		  edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
-		  edm::Handle<edm::ValueMap<int> > puJetIdFlags);
+		  edm::Handle<edm::ValueMap<int> > puJetIdFlags,
+		  const std::vector<pat::Muon>& muons,
+		  const std::vector<pat::Electron>& electrons);
   void doMuons(const std::vector<pat::Muon>& muons);
   void doElectrons(const std::vector<pat::Electron>& electrons);
-  void doMET(const std::vector<pat::MET>& met);
+  void doMET(const std::vector<pat::MET>& met,
+	     const std::vector<pat::Muon>& muons,
+	     const std::vector<pat::Electron>& electrons);
   void doMHT(const std::vector<pat::MHT>& mht);
   void doZs(const reco::CandidateView& zs, int channel);
   void doWs(const reco::CandidateView& ws, int channel);
@@ -187,6 +200,7 @@ private:
   edm::InputTag hltResultsTag_;
   std::string hltPath1Name_;
   std::string hltPath2Name_;
+  edm::InputTag metResultsTag_;
 //   edm::InputTag mcTag_;
 //   std::string mcProducer_;
 //   edm::InputTag hepProducer_;
@@ -234,12 +248,21 @@ private:
 InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   tree_(0),
   info_(0),
+
+  // Trigger
   hltResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("hltResultsTag",edm::InputTag("TriggerResults","","HLT"))),
   hltPath1Name_(iConfig.getUntrackedParameter<std::string>("hltPath1Name",std::string("HLT_v1"))),
   hltPath2Name_(iConfig.getUntrackedParameter<std::string>("hltPath2Name",std::string("HLT_v1"))),
-//   mcTag_(iConfig.getUntrackedParameter<edm::InputTag>("mcTag",edm::InputTag("generator"))),
-//   mcProducer_ (iConfig.getUntrackedParameter<std::string>("producer", "g4SimHits")),
-//   hepProducer_ (iConfig.getUntrackedParameter<edm::InputTag>("hepMCProducerTag", edm::InputTag("generator", "", "SIM"))),
+
+  // MET filters
+  metResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("metResultsTag",edm::InputTag("TriggerResults","","PAT"))),
+
+  // MC information
+  //mcTag_(iConfig.getUntrackedParameter<edm::InputTag>("mcTag",edm::InputTag("generator"))),
+  //mcProducer_ (iConfig.getUntrackedParameter<std::string>("producer", "g4SimHits")),
+  //hepProducer_ (iConfig.getUntrackedParameter<edm::InputTag>("hepMCProducerTag", edm::InputTag("generator", "", "SIM"))),
+  
+  // Physics objects
   vtxTag_(iConfig.getUntrackedParameter<edm::InputTag>("vtxTag",edm::InputTag("offlinePrimaryVertices"))),
   jetTag_(iConfig.getUntrackedParameter<edm::InputTag>("jetTag",edm::InputTag("patJets"))),
   puJetMvaTag_(iConfig.getUntrackedParameter<edm::InputTag>("puJetMvaTag",edm::InputTag("puJetMva:fullDiscriminant"))),
@@ -248,10 +271,14 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag",edm::InputTag("patElectrons"))),
   metTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("patMET"))),
   mhtTag_(iConfig.getUntrackedParameter<edm::InputTag>("mhtTag",edm::InputTag("patMHT"))),
+
+  // W,Z candidates
   zMuTag_(iConfig.getUntrackedParameter<edm::InputTag>("zMuTag",edm::InputTag(""))),
   zElTag_(iConfig.getUntrackedParameter<edm::InputTag>("zElTag",edm::InputTag(""))),
   wMuTag_(iConfig.getUntrackedParameter<edm::InputTag>("wMuTag",edm::InputTag(""))),
   wElTag_(iConfig.getUntrackedParameter<edm::InputTag>("wElTag",edm::InputTag(""))),
+  
+  //
   isMC_(iConfig.getUntrackedParameter<bool>("isMC",false)),
   useLeadingJets_(iConfig.getUntrackedParameter<bool>("useLeadingJets",true)),
   doPUWeights_(false),
@@ -380,6 +407,12 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   doEventInfo(iEvent);
   doTrigger(iEvent, iSetup);
 
+  // met filters
+  edm::Handle<edm::TriggerResults> metFlag;
+  iEvent.getByLabel(metResultsTag_, metFlag);
+  //if (!metFlag.isValid()) return;
+  doMETFilter(iEvent, iSetup, metFlag);
+
   edm::Handle<std::vector<reco::Vertex> > vertices;
   iEvent.getByLabel(vtxTag_, vertices);
 
@@ -419,11 +452,11 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   if (vertices.isValid()) doVertices(*vertices);
 
   // do jets before MET etc. because this defines the VBF pair
-  if (jets.isValid()) doJets(jets, puJetIdMVA, puJetIdFlag);
+  if (jets.isValid()) doJets(jets, puJetIdMVA, puJetIdFlag, *muons, *electrons);
 
-  if (jets.isValid()) doThirdJet(jets, puJetIdMVA, puJetIdFlag);
+  if (jets.isValid()) doThirdJet(jets, puJetIdMVA, puJetIdFlag, *muons, *electrons);
 
-  if (met.isValid()) doMET(*met);
+  if (met.isValid()) doMET(*met, *muons, *electrons);
 
   if (mht.isValid()) doMHT(*mht);
 
@@ -466,10 +499,10 @@ void InvHiggsInfoProducer::doEventInfo(const edm::Event& iEvent) {
 
   unsigned long id          = iEvent.id().event();
   unsigned long bx          = iEvent.bunchCrossing();
-  unsigned long orbit       = iEvent.orbitNumber();
+  //unsigned long orbit       = iEvent.orbitNumber();
   unsigned long lb          = iEvent.luminosityBlock();
   unsigned long run         = iEvent.id().run();
-  double time               = iEvent.time().value();
+  //double time               = iEvent.time().value();
 
   info_->id = id;
   info_->bx = bx;
@@ -506,6 +539,26 @@ void InvHiggsInfoProducer::doTrigger(const edm::Event& iEvent, const edm::EventS
 //   info_->hltPrescaleIndex=hltConfig_.prescaleSet(iEvent, iSetup);
 //   info_->hltPrescale=hltConfig_.prescaleValue(iEvent, iSetup, hltPathName_);
   
+}
+
+
+void InvHiggsInfoProducer::doMETFilter(const edm::Event& iEvent, 
+				       const edm::EventSetup& iSetup, 
+				       edm::Handle<edm::TriggerResults> metFlag) {
+
+  bool METFlag[10]={false,false,false,false,false,false,false,false,false,false};
+
+  for(unsigned ii = 0 ; ii < metFlag->size(); ii++){
+    METFlag[ii] = metFlag->accept(ii);
+    //std::cout<<ii<<" "<<METFlag[ii]<<std::endl;
+  }
+  info_->metflag0=METFlag[0];
+  info_->metflag1=METFlag[1];
+  info_->metflag2=METFlag[2];
+  info_->metflag3=METFlag[3];
+  info_->metflag4=METFlag[4];
+  info_->metflag5=METFlag[5];
+  info_->metflag6=METFlag[6];  
 }
 
 
@@ -558,7 +611,9 @@ void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
 
 void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets, 
 				  edm::Handle<edm::ValueMap<float> > puJetIdMVAs, 
-				  edm::Handle<edm::ValueMap<int> > puJetIdFlags) {
+				  edm::Handle<edm::ValueMap<int> > puJetIdFlags,
+				  const std::vector<pat::Muon>& muons,
+				  const std::vector<pat::Electron>& electrons) {
 
   // VBF jets defined here
 
@@ -573,8 +628,24 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
   // find VBF jets
   bool foundFirst = false;
   bool foundSecond = false;
-
+  
   for (unsigned i=0; i<jets->size() && !foundSecond; ++i) {
+
+    // Check overlap between jet and (muon, electron)
+    bool checkOverlap = false;
+    for(unsigned iLep=0; iLep<muons.size(); iLep++){
+      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue;
+      checkOverlap = true;
+      //std::cout<<"Overlap with muons"<<std::endl;
+      break;
+    }
+    for(unsigned iLep=0; iLep<electrons.size(); iLep++){ 
+      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue; 
+      checkOverlap = true;
+      //std::cout<<"Overlap with electrons"<<std::endl;
+      break;
+    }
+    if(checkOverlap) continue;
     
     // check jet is associated with PV
     int puflag = (*puJetIdFlags)[jets->refAt(i)];
@@ -637,17 +708,36 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 
 void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets, 
 				      edm::Handle<edm::ValueMap<float> > puJetIdMVAs, 
-				      edm::Handle<edm::ValueMap<int> > puJetIdFlags) 
+				      edm::Handle<edm::ValueMap<int> > puJetIdFlags,
+				      const std::vector<pat::Muon>& muons,
+				      const std::vector<pat::Electron>& electrons) 
 {
 
-  // find 3rd jet
+  // Find 3rd jet
   for (unsigned i=0; i<jets->size(); ++i) {
+
+    // Not Jet1 or Jet2
+    if( i == tagJet1Index_ || i == tagJet2Index_ ) continue;
+
+    // Check overlap between jet and (muon, electron) 
+    bool checkOverlap = false;
+    for(unsigned iLep=0; iLep<muons.size(); iLep++){
+      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue;
+      checkOverlap = true;
+      //std::cout<<"Overlap with muons"<<std::endl;
+      break;
+    }
+    for(unsigned iLep=0; iLep<electrons.size(); iLep++){ 
+      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue; 
+      checkOverlap = true;
+      //std::cout<<"Overlap with electrons"<<std::endl;
+      break;
+    }
+    if(checkOverlap) continue;
 
     // associated with PV and not tag jet
     int puflag = (*puJetIdFlags)[jets->refAt(i)];
-    if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) &&
-	 i != tagJet1Index_ &&
-	 i != tagJet2Index_) {
+    if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) ) {
 
       // store in ntuple
       info_->jet3Et  = jets->at(i).pt();
@@ -717,7 +807,9 @@ void InvHiggsInfoProducer::doElectrons(const std::vector<pat::Electron>& electro
 }
 
 
-void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met) {
+void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
+				 const std::vector<pat::Muon>& muons,
+				 const std::vector<pat::Electron>& electrons) {
 
   info_->met    = met.at(0).pt();
   info_->metPhi = met.at(0).phi();
@@ -728,7 +820,26 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met) {
   double jmdphi2 = fabs(fabs(fabs(met.at(0).phi()-tagJet2_.phi())-TMath::Pi())-TMath::Pi());
   
   info_->jetMETdPhi = std::min(jmdphi1, jmdphi2);
+  
+  //metnomu
+  Double_t metx = met.at(0).px();
+  Double_t mety = met.at(0).py();
+  for(unsigned iLep=0; iLep<muons.size(); iLep++){
+    metx = metx + muons.at(iLep).px();
+    mety = mety + muons.at(iLep).py();
+  }
+  info_->metnomuon = TMath::Sqrt(metx*metx + mety*mety);
+  info_->metnomuonPhi = TMath::ATan2(mety,metx);
 
+  //metnoelectron
+  metx = met.at(0).px();
+  mety = met.at(0).py();
+  for(unsigned iLep=0; iLep<electrons.size(); iLep++){
+    metx = metx + electrons.at(iLep).px();
+    mety = mety + electrons.at(iLep).py();
+  }
+  info_->metnoelectron = TMath::Sqrt(metx*metx + mety*mety);
+  info_->metnoelectronPhi = TMath::ATan2(mety,metx);
 }
 
 void InvHiggsInfoProducer::doMHT(const std::vector<pat::MHT>& mht) {

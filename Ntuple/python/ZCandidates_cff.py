@@ -1,27 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
-isQCD = False
+# Electrons/Muons are selected from PhysicsObjectCandidates_cff.py
 
-isolationCutString = cms.string("")
-if isQCD:
-#    isolationCutString = "(isolationR03().sumPt+isolationR03().emEt+isolationR03().hadEt)/pt> 0.1"
-    isolationCutString = "(pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt> 0.12"
-else:
-#    isolationCutString = "(isolationR03().sumPt+isolationR03().emEt+isolationR03().hadEt)/pt< 0.3"
-    isolationCutString = "(pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt< 0.12"
-
-selectMuons = cms.EDFilter("PATMuonSelector",
-    src = cms.InputTag("cleanPatMuons"),
-    cut = cms.string("pt>20 && isGlobalMuon && isPFMuon && abs(eta)<2.1"
-                     " && globalTrack().normalizedChi2<10"
-                     " && globalTrack().hitPattern().numberOfValidMuonHits>0"
-                     " && globalTrack().hitPattern().numberOfValidPixelHits>0"
-                     " && numberOfMatchedStations>1"
-                     " && globalTrack().hitPattern().trackerLayersWithMeasurement>5"
-                     " && " + isolationCutString
-                     )
-)
-
+# Z->Mu+ Mu-
 zToMuMu = cms.EDProducer("NamedCandViewShallowCloneCombiner",
     cut = cms.string('60 < mass < 120'),
     name = cms.string('zToMuMu'),
@@ -35,6 +16,22 @@ bestZMuMu = cms.EDFilter("LargestPtCandViewSelector",
     src = cms.InputTag("zToMuMu")
 )
 
-ZSequence = cms.Sequence(selectMuons
-                         *zToMuMu
-                         *bestZMuMu)
+# Z->E+ E-
+zToEE = cms.EDProducer("NamedCandViewShallowCloneCombiner",
+    cut = cms.string('60 < mass < 120'),
+    name = cms.string('zToEE'),
+    roles = cms.vstring('electron1', 'electron2'),
+    decay = cms.string('selectElectrons@+ selectElectrons@-'),
+    checkCharge = cms.bool(True)
+)
+
+bestZEE = cms.EDFilter("LargestPtCandViewSelector",
+    maxNumber = cms.uint32(1),
+    src = cms.InputTag("zToEE")
+)
+
+ZSequence = cms.Sequence(zToMuMu
+                         * bestZMuMu
+                         * zToEE
+                         * bestZEE
+                         )
