@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.11 2012/09/24 09:18:22 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.12 2012/10/28 03:46:08 srimanob Exp $
 //
 //
 
@@ -95,6 +95,8 @@
 
 // MC
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 // Lumi
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
@@ -144,7 +146,7 @@ private:
   void doEventInfo(const edm::Event&);
 
   /// write MC info
-  void doMC(const edm::Event&);
+  void doMC(const GenEventInfoProduct& genEvt, const GenParticleCollection& genParticles);
 
   /// write trigger info
   void doTrigger(const edm::Event& iEvent, 
@@ -196,14 +198,15 @@ private:
   TTree * tree_;
   InvHiggsInfo* info_;
 
-  // EDM input tags
+  // MC config
+  edm::InputTag genEvtTag_;
+  edm::InputTag genParticleTag_;
+  bool mcPYTHIA_;
+
   edm::InputTag hltResultsTag_;
   std::string hltPath1Name_;
   std::string hltPath2Name_;
   edm::InputTag metResultsTag_;
-//   edm::InputTag mcTag_;
-//   std::string mcProducer_;
-//   edm::InputTag hepProducer_;
   edm::InputTag vtxTag_;
   edm::InputTag jetTag_;
   edm::InputTag puJetMvaTag_;
@@ -218,6 +221,7 @@ private:
   edm::InputTag wElTag_;
   
   // logic
+
   bool isMC_;
   bool useLeadingJets_;
   bool doPUWeights_;
@@ -248,6 +252,11 @@ private:
 InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   tree_(0),
   info_(0),
+
+  // MC
+  genEvtTag_(iConfig.getUntrackedParameter<edm::InputTag>("genEvtTag",edm::InputTag("generator","","SIM"))),
+  genParticleTag_(iConfig.getUntrackedParameter<edm::InputTag>("genParticleTag", edm::InputTag("genParticles","","SIM"))),
+  mcPYTHIA_(iConfig.getUntrackedParameter<bool>("mcPYTHIA",true)),
 
   // Trigger
   hltResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("hltResultsTag",edm::InputTag("TriggerResults","","HLT"))),
@@ -397,8 +406,17 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
  
   if (! iEvent.eventAuxiliary().isRealData()) {
 
-    doMC(iEvent);
-
+    edm::Handle<GenEventInfoProduct> genEvt;
+    iEvent.getByLabel(genEvtTag_,genEvt);
+    
+    edm::Handle<GenParticleCollection> genParticles;
+    iEvent.getByLabel(genParticleTag_, genParticles);   
+    
+    if (genEvt.isValid() && genParticles.isValid()) doMC(*genEvt, *genParticles);
+    else {
+      edm::LogWarning("InvHiggsInfoProducer") << "GenEventInfoProduct not found, branch will not be filled!" << std::endl;
+    }
+    
     if (doPUWeights_) doPUReweighting(iEvent);
 
   }
@@ -481,18 +499,53 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 
 
-void InvHiggsInfoProducer::doMC(const edm::Event& iEvent) {
+void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenParticleCollection& genParticles) {
 
-//   edm::Handle<edm::HepMCProduct> mcHandle;
-//   iEvent.getByLabel(mcTag_,mcHandle);
+  //   const HepMC::GenEvent *evt = genEvt.GetEvent();
   
-//   if (mcHandle.isValid()) {
+  //   for(HepMC::GenEvent::vertex_const_iterator v = evt->vertices_begin();
+  //       v!= evt->vertices_end();
+  //       ++v) {
+  
+  //     if((*v)->barcode()==-1)  {
+  
+  //       info_->mcVtxX = (*v)->point3d().x();
+  //       info_->mcVtxY = (*v)->point3d().y();
+  //       info_->mcVtxR = (*v)->point3d().r();
+  //       info_->mcVtxZ = (*v)->point3d().z();
+  
+  //     }
+  //   }
+  
+  // find Higgs and tag quarks assuming PYTHIA process 123,124
+  if (mcPYTHIA_) {
+  
+    const GenParticle& higgs = genParticles[8];
+    info_->mcHiggsMass = higgs.mass();
+    info_->mcHiggsPt   = higgs.pt();
+    info_->mcHiggsPhi  = higgs.phi();
+    info_->mcHiggsEta  = higgs.eta();
     
-//     const edm::HepMCProduct *mcProd = mcHandle.product();
-//     const HepMC::GenEvent *evt = mcProd->GetEvent();
+    const GenParticle& q1 = genParticles[6];
+    info_->mcQ1Pt   = q1.pt();
+    info_->mcQ1Eta  = q1.eta();
+    info_->mcQ1Phi  = q1.phi();
     
-//   }
-
+    const GenParticle& q2 = genParticles[7];
+    info_->mcQ2Pt   = q2.pt();
+    info_->mcQ2Eta  = q2.eta();
+    info_->mcQ2Phi  = q2.phi();
+    
+    math::XYZTLorentzVector mcVbfP4=q1.p4() + q2.p4();
+    info_->mcVBFEt   = mcVbfP4.Pt();
+    info_->mcVBFEta  = mcVbfP4.Eta();
+    info_->mcVBFPhi  = mcVbfP4.Phi();
+    info_->mcVBFM    = mcVbfP4.M();
+    info_->mcVBFDEta = fabs(q1.eta() - q2.eta());
+    info_->mcVBFDPhi = fabs(fabs(fabs(q1.phi()-q2.phi())-TMath::Pi())-TMath::Pi());
+    
+  }
+  
 }
 
 void InvHiggsInfoProducer::doEventInfo(const edm::Event& iEvent) {

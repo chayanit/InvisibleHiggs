@@ -24,7 +24,8 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-    'file:patTuple_MC.root'
+    #'file:patTuple_MC.root'
+    'file:/gpfs_phys/storm/cms/user/jbrooke/VBF_HToZZTo4Nu_M-120_8TeV-pythia6/InvHiggsPAT_Summer12_v8b_VBF_HToZZTo4Nu_M120/29f44275b86ba3c8c8b1c1b02271b2a5/patTuple_1_1_Le2.root'
     #'file:/gpfs_phys/storm/cms/user/chayanit/VBF_HToZZTo4Nu_M-120_8TeV-pythia6/InvHiggsPAT_Summer12_v6A_VBF_HToZZTo4Nu_M120/5f2442bea011b43a734a0e8981525e8b/patTuple_6_1_deN.root'
     #'/uscms_data/d3/chayanit/VplusJetsAnalysis2012/CMSSW_5_2_5/src/InvisibleHiggs/Ntuple/python/testroot/patTuple_DYJetsToLLTrig.root'
     ] );
