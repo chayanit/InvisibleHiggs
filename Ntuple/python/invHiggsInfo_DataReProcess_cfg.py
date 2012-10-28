@@ -2,6 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 from InvisibleHiggs.Ntuple.invHiggsInfo_Master_cfg import *
 
+process.invHiggsInfo.mcPYTHIA   = cms.untracked.bool(False)
+
 process.TFileService.fileName = cms.string('invHiggsInfo_Data.root')
 
 ### THINGS TO EDIT BELOW ###

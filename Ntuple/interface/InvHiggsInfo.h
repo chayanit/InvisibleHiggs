@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.7 2012/09/24 09:18:22 jbrooke Exp $
+// $Id: InvHiggsInfo.h,v 1.8 2012/10/28 03:45:31 srimanob Exp $
 //
 //
 
@@ -74,21 +74,23 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet2PUMVA;
   Int_t    jet2PUFlag;
 
-  // MET
+  // MET (need XY correction?)
   Double_t met;
   Double_t metPhi;
   Double_t jetMETdPhi;
-  //Double_t metXYCorr;
-  //Double_t metXYCorrPhi;
-  //Double_t jetMETXYCorrdPhi;
-  Double_t metnomuon;
-  Double_t metnomuonPhi;
-  //Double_t metnomuXYCorr; 
-  //Double_t metnomuXYCorrPhi; 
-  Double_t metnoelectron;
-  Double_t metnoelectronPhi;
-  //Double_t metnoelectronXYCorr; 
-  //Double_t metnoelectronXYCorrPhi;
+  //
+  Double_t metNoMuon;
+  Double_t metNoMuonPhi; 
+  Double_t metNoLooseMuon;
+  Double_t metNoLooseMuonPhi;
+  // 
+  //
+  Double_t metNoElectron;
+  Double_t metNoElectronPhi;
+  Double_t metNoLooseElectron;
+  Double_t metNoLooseElectronPhi;
+  // 
+  //
 
   // MHT
   Double_t mht;

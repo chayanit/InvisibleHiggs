@@ -1,7 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 
-# Muons: We are now using tight muons
+######################
+# Muons
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId
+######################
 # Definition bases on PhysicsTools/PatAlgos/plugins/PATObjectSelector.cc 
+
+# Tight muons
 isQCD = False
 isolationCutString = cms.string("")
 if isQCD:
@@ -11,7 +16,8 @@ else:
     #isolationCutString = "(isolationR03().sumPt+isolationR03().emEt+isolationR03().hadEt)/pt< 0.3"
     isolationCutString = "(pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt< 0.12"
 
-selectMuons = cms.EDFilter("PATMuonSelector",
+selectMuons = cms.EDFilter(
+    "PATMuonSelector",
     src = cms.InputTag("cleanPatMuons"),
     cut = cms.string("pt>20 && isGlobalMuon && isPFMuon && abs(eta)<2.1"
                      " && globalTrack().normalizedChi2<10"
@@ -23,11 +29,31 @@ selectMuons = cms.EDFilter("PATMuonSelector",
                      )
 )
 
-# Electron: We are now using tight electrons
+# Loose muons
+selectLooseMuons = cms.EDFilter(
+    "PATMuonSelector",
+    src = cms.InputTag("cleanPatMuons"),
+    cut = cms.string("pt>20 && isGlobalMuon && isPFMuon && abs(eta)<2.1")
+)
+
+######################
+# Electrons
+# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipes
+######################
 # Definition bases on InvisibleHiggs/Ntuple/plugins/ElectronIdSelector.cc
+
+# Tight electrons
 selectElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
     src = cms.InputTag( "cleanPatElectrons" ),
     idLabel = cms.string("tight"),
+    #useMVAbasedID   = cms.bool(True)
+    useMVAbasedID   = cms.bool(False)
+)
+
+# Loose electrons
+selectLooseElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
+    src = cms.InputTag( "cleanPatElectrons" ),
+    idLabel = cms.string("loose"),
     #useMVAbasedID   = cms.bool(True)
     useMVAbasedID   = cms.bool(False)
 )
@@ -37,5 +63,7 @@ selectElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
 # Tau: We are now using
 
 PhysicsObjectSequence = cms.Sequence(selectMuons
+                                     * selectLooseMuons
                                      * selectElectrons
+                                     * selectLooseElectrons
                                     )

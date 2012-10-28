@@ -3,10 +3,11 @@ import FWCore.ParameterSet.Config as cms
 from InvisibleHiggs.Ntuple.invHiggsInfo_Master_cfg import *
 
 # PU re-weighting
-process.invHiggsInfo.puMCFile = cms.untracked.string("PUHistS10.root")
+process.invHiggsInfo.puMCFile   = cms.untracked.string("PUHistS10.root")
 process.invHiggsInfo.puDataFile = cms.untracked.string("PUHistRun2012ABC_Fix.root")
-process.invHiggsInfo.puMCHist = cms.untracked.string("pileup")
+process.invHiggsInfo.puMCHist   = cms.untracked.string("pileup")
 process.invHiggsInfo.puDataHist = cms.untracked.string("pileup")
+process.invHiggsInfo.mcPYTHIA   = cms.untracked.bool(False)
 
 process.TFileService.fileName = cms.string('invHiggsInfo_MC.root')
 

@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.12 2012/10/28 03:46:08 srimanob Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.13 2012/10/28 13:54:43 jbrooke Exp $
 //
 //
 
@@ -165,18 +165,20 @@ private:
   void doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	      edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
 	      edm::Handle<edm::ValueMap<int> > puJetIdFlags,
-	      const std::vector<pat::Muon>& muons,
-	      const std::vector<pat::Electron>& electrons);
+	      const std::vector<pat::Muon>& muons,               //Loose muons
+	      const std::vector<pat::Electron>& electrons);      //Loose electrons
   void doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
 		  edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
 		  edm::Handle<edm::ValueMap<int> > puJetIdFlags,
-		  const std::vector<pat::Muon>& muons,
-		  const std::vector<pat::Electron>& electrons);
-  void doMuons(const std::vector<pat::Muon>& muons);
-  void doElectrons(const std::vector<pat::Electron>& electrons);
+		  const std::vector<pat::Muon>& muons,           //Loose muons
+		  const std::vector<pat::Electron>& electrons);  //Loose electrons
+  void doMuons(const std::vector<pat::Muon>& muons);             //Loose muons
+  void doElectrons(const std::vector<pat::Electron>& electrons); //Loose electrons
   void doMET(const std::vector<pat::MET>& met,
-	     const std::vector<pat::Muon>& muons,
-	     const std::vector<pat::Electron>& electrons);
+	     const std::vector<pat::Muon>& muons,                //Tight muons
+	     const std::vector<pat::Muon>& looseMuons,           //Loose muons
+	     const std::vector<pat::Electron>& electrons,        //Tight electrons
+	     const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
   void doMHT(const std::vector<pat::MHT>& mht);
   void doZs(const reco::CandidateView& zs, int channel);
   void doWs(const reco::CandidateView& ws, int channel);
@@ -211,8 +213,13 @@ private:
   edm::InputTag jetTag_;
   edm::InputTag puJetMvaTag_;
   edm::InputTag puJetIdTag_;
+  //
   edm::InputTag muonTag_;
+  edm::InputTag looseMuonTag_;
+  //
   edm::InputTag electronTag_;
+  edm::InputTag looseElectronTag_;
+  //
   edm::InputTag metTag_;
   edm::InputTag mhtTag_;
   edm::InputTag zMuTag_;
@@ -276,8 +283,13 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   jetTag_(iConfig.getUntrackedParameter<edm::InputTag>("jetTag",edm::InputTag("patJets"))),
   puJetMvaTag_(iConfig.getUntrackedParameter<edm::InputTag>("puJetMvaTag",edm::InputTag("puJetMva:fullDiscriminant"))),
   puJetIdTag_(iConfig.getUntrackedParameter<edm::InputTag>("puJetIdTag",edm::InputTag("puJetMva:fullId"))),
+  
   muonTag_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag",edm::InputTag("patMuons"))),
+  looseMuonTag_(iConfig.getUntrackedParameter<edm::InputTag>("looseMuonTag",edm::InputTag("patMuons"))),
+  
   electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag",edm::InputTag("patElectrons"))),
+  looseElectronTag_(iConfig.getUntrackedParameter<edm::InputTag>("looseElectronTag",edm::InputTag("patElectrons"))),
+  
   metTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("patMET"))),
   mhtTag_(iConfig.getUntrackedParameter<edm::InputTag>("mhtTag",edm::InputTag("patMHT"))),
 
@@ -452,8 +464,14 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::Handle<pat::MuonCollection> muons;
   iEvent.getByLabel(muonTag_,muons);
 
+  edm::Handle<pat::MuonCollection> looseMuons;
+  iEvent.getByLabel(looseMuonTag_,looseMuons);
+
   edm::Handle<pat::ElectronCollection> electrons;
-  iEvent.getByLabel(electronTag_,electrons);
+  iEvent.getByLabel(electronTag_,electrons); 
+
+  edm::Handle<pat::ElectronCollection> looseElectrons;
+  iEvent.getByLabel(looseElectronTag_,looseElectrons);
 
   edm::Handle<reco::CandidateView> zMus;
   iEvent.getByLabel(zMuTag_, zMus);
@@ -470,25 +488,25 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   if (vertices.isValid()) doVertices(*vertices);
 
   // do jets before MET etc. because this defines the VBF pair
-  if (jets.isValid()) doJets(jets, puJetIdMVA, puJetIdFlag, *muons, *electrons);
+  if (jets.isValid()) doJets(jets, puJetIdMVA, puJetIdFlag, *looseMuons, *looseElectrons);
 
-  if (jets.isValid()) doThirdJet(jets, puJetIdMVA, puJetIdFlag, *muons, *electrons);
+  if (jets.isValid()) doThirdJet(jets, puJetIdMVA, puJetIdFlag, *looseMuons, *looseElectrons);
 
-  if (met.isValid()) doMET(*met, *muons, *electrons);
+  if (met.isValid()) doMET(*met, *muons, *looseMuons, *electrons, *looseElectrons);
 
   if (mht.isValid()) doMHT(*mht);
 
-  if (electrons.isValid()) doElectrons(*electrons);
+  if (looseMuons.isValid()) doMuons(*looseMuons);
 
-  if (muons.isValid()) doMuons(*muons);
+  if (looseElectrons.isValid()) doElectrons(*looseElectrons);
+  
+  if (zMus.isValid()) doZs(*zMus, 1);
 
-  if (zMus.isValid()) doZs(*zMus, 0);
+  if (zEls.isValid()) doZs(*zEls, 2);
 
-  if (zEls.isValid()) doZs(*zEls, 1);
+  if (wMus.isValid()) doWs(*wMus, 1);
 
-  if (wMus.isValid()) doWs(*wMus, 0);
-
-  if (wEls.isValid()) doWs(*wEls, 1);
+  if (wEls.isValid()) doWs(*wEls, 2);
 
   // fill TInfo
   tree_->Fill();
@@ -833,8 +851,8 @@ void InvHiggsInfoProducer::doMuons(const std::vector<pat::Muon>& muons) {
     info_->mu2Phi = muons.at(1).phi();    
     
     // leading pair mass
-//     math::XYZTLorentzVector pair = muons.at(0).p4() + muons.at(1).p4();
-//     info_->mMuMu = pair.M();
+    // math::XYZTLorentzVector pair = muons.at(0).p4() + muons.at(1).p4();
+    // info_->mMuMu = pair.M();
   }
   
 }
@@ -862,7 +880,9 @@ void InvHiggsInfoProducer::doElectrons(const std::vector<pat::Electron>& electro
 
 void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
 				 const std::vector<pat::Muon>& muons,
-				 const std::vector<pat::Electron>& electrons) {
+				 const std::vector<pat::Muon>& looseMuons,
+				 const std::vector<pat::Electron>& electrons,
+				 const std::vector<pat::Electron>& looseElectrons) {
 
   info_->met    = met.at(0).pt();
   info_->metPhi = met.at(0).phi();
@@ -874,25 +894,45 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
   
   info_->jetMETdPhi = std::min(jmdphi1, jmdphi2);
   
-  //metnomu
+  //metNoMuon
   Double_t metx = met.at(0).px();
   Double_t mety = met.at(0).py();
   for(unsigned iLep=0; iLep<muons.size(); iLep++){
     metx = metx + muons.at(iLep).px();
     mety = mety + muons.at(iLep).py();
   }
-  info_->metnomuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metnomuonPhi = TMath::ATan2(mety,metx);
+  info_->metNoMuon = TMath::Sqrt(metx*metx + mety*mety);
+  info_->metNoMuonPhi = TMath::ATan2(mety,metx);
 
-  //metnoelectron
+  //metNoLooseMuon
+  metx = met.at(0).px();
+  mety = met.at(0).py();
+  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
+    metx = metx + looseMuons.at(iLep).px();
+    mety = mety + looseMuons.at(iLep).py();
+  }
+  info_->metNoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
+  info_->metNoLooseMuonPhi = TMath::ATan2(mety,metx);
+  
+  //metNoElectron
   metx = met.at(0).px();
   mety = met.at(0).py();
   for(unsigned iLep=0; iLep<electrons.size(); iLep++){
     metx = metx + electrons.at(iLep).px();
     mety = mety + electrons.at(iLep).py();
   }
-  info_->metnoelectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metnoelectronPhi = TMath::ATan2(mety,metx);
+  info_->metNoElectron = TMath::Sqrt(metx*metx + mety*mety);
+  info_->metNoElectronPhi = TMath::ATan2(mety,metx);  
+
+  //metNoLooseElectron
+  metx = met.at(0).px();
+  mety = met.at(0).py();
+  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
+    metx = metx + looseElectrons.at(iLep).px();
+    mety = mety + looseElectrons.at(iLep).py();
+  }
+  info_->metNoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
+  info_->metNoLooseElectronPhi = TMath::ATan2(mety,metx);
 }
 
 void InvHiggsInfoProducer::doMHT(const std::vector<pat::MHT>& mht) {
