@@ -13,7 +13,7 @@
 //
 // Original Author:  Phat Srimanobhas,40 1-A11,+41227671646,
 //         Created:  Tue Apr 10 16:47:40 CEST 2012
-// $Id: InvHiggsPUJetNtuple.cc,v 1.1 2012/10/29 20:10:37 srimanob Exp $
+// $Id: InvHiggsPUJetNtuple.cc,v 1.2 2012/10/29 21:17:57 srimanob Exp $
 //
 //
 
@@ -255,13 +255,13 @@ InvHiggsPUJetNtuple::InvHiggsPUJetNtuple(const edm::ParameterSet& iConfig)
   MyNtuple_->Branch("bunchCrossing",    &bunchCrossing,   "bunchCrossing/I");
 
   // METFlag
-  MyNtuple_->Branch("metflag0",         &metflag0,        "metflag0");
-  MyNtuple_->Branch("metflag1",         &metflag1,        "metflag1");
-  MyNtuple_->Branch("metflag2",         &metflag2,        "metflag2");
-  MyNtuple_->Branch("metflag3",         &metflag3,        "metflag3");
-  MyNtuple_->Branch("metflag4",         &metflag4,        "metflag4");
-  MyNtuple_->Branch("metflag5",         &metflag5,        "metflag5");
-  MyNtuple_->Branch("metflag6",         &metflag6,        "metflag6");
+  MyNtuple_->Branch("metflag0",         &metflag0,        "metflag0/I");
+  MyNtuple_->Branch("metflag1",         &metflag1,        "metflag1/I");
+  MyNtuple_->Branch("metflag2",         &metflag2,        "metflag2/I");
+  MyNtuple_->Branch("metflag3",         &metflag3,        "metflag3/I");
+  MyNtuple_->Branch("metflag4",         &metflag4,        "metflag4/I");
+  MyNtuple_->Branch("metflag5",         &metflag5,        "metflag5/I");
+  MyNtuple_->Branch("metflag6",         &metflag6,        "metflag6/I");
   
   // Primary Vertex
   MyNtuple_->Branch("nPV",              &nPV,             "nPV/I");
