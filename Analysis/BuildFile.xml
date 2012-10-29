@@ -1,8 +1,0 @@
-
-<use name="root"/>
-<use name="rootgraphics"/>
-<use name="boost"/>
-
-<export>
-  <lib name="InvisibleHiggsAnalysis"/>
-</export>
