@@ -104,7 +104,42 @@ InvHiggsInfo::InvHiggsInfo() :
   mcVBFPhi(0.),
   mcVBFM(0.),
   mcVBFDEta(0.),
-  mcVBFDPhi(0.)
+  mcVBFDPhi(0.),
+  
+  // MC Info -- W
+  wgenmass(-10.),
+  wgenpt(-10.),
+  wgenmt(-10.),
+  wgeneta(-10.),
+  wgenphi(-10.),
+  wgene(-10.),
+  wltype(0),
+  wlpt(-10.),
+  wleta(-10.),
+  wlphi(-10.),
+  wle(-10.),
+  wtauhadron(0),
+  wmetpt(-10.),
+  wmeteta(-10.),
+  wmetphi(-10.),
+  wmete(-10.),
+
+  // MC Info -- Z
+  zgenmass(-10.),
+  zgenpt(-10.),
+  zgenmt(-10.),
+  zgeneta(-10.),
+  zgenphi(-10.),
+  zgene(-10.),
+  zltype(0),
+  zlmpt(-10.),
+  zlmeta(-10.),
+  zlmphi(-10.),
+  zlme(-10.),
+  zlppt(-10.),
+  zlpeta(-10.),
+  zlpphi(-10.),
+  zlpe(-10.)
 {
 
 }

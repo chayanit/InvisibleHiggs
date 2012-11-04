@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.13 2012/10/28 13:54:43 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.14 2012/10/28 21:25:51 srimanob Exp $
 //
 //
 
@@ -147,6 +147,7 @@ private:
 
   /// write MC info
   void doMC(const GenEventInfoProduct& genEvt, const GenParticleCollection& genParticles);
+  int hadronicTau(const reco::Candidate*);
 
   /// write trigger info
   void doTrigger(const edm::Event& iEvent, 
@@ -516,7 +517,6 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 }
 
 
-
 void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenParticleCollection& genParticles) {
 
   //   const HepMC::GenEvent *evt = genEvt.GetEvent();
@@ -536,8 +536,10 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
   //   }
   
   // find Higgs and tag quarks assuming PYTHIA process 123,124
+  // W,Z MC information
   if (mcPYTHIA_) {
   
+    //Higgs
     const GenParticle& higgs = genParticles[8];
     info_->mcHiggsMass = higgs.mass();
     info_->mcHiggsPt   = higgs.pt();
@@ -561,10 +563,129 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
     info_->mcVBFM    = mcVbfP4.M();
     info_->mcVBFDEta = fabs(q1.eta() - q2.eta());
     info_->mcVBFDPhi = fabs(fabs(fabs(q1.phi()-q2.phi())-TMath::Pi())-TMath::Pi());
-    
-  }
-  
+
+    //W,Z
+    bool foundw1 = false;
+    bool foundz1 = false;
+    for(size_t i = 0; i < genParticles.size(); ++ i) {
+      const GenParticle & p = genParticles[i];
+      //W
+      if(abs(p.pdgId())==24 && p.status()==3 && (!foundw1) ){ //
+	foundw1 = true;  
+	//std::cout<<p.pt()<<std::endl;
+	info_->wgenmass = p.mass();
+	info_->wgenmt   = p.mt(); 
+	info_->wgenpt   = p.pt();
+	info_->wgeneta  = p.eta();
+	info_->wgenphi  = p.phi();
+	info_->wgene    = p.energy(); 
+	for(int j=0;p.daughter(j)!=NULL;j++) {//loop on W daughter
+	  const reco::Candidate* pl = p.daughter(j);  
+	  if(abs(pl->pdgId())==11){
+	    info_->wltype  = 1;
+	    info_->wlpt    = pl->pt();
+	    info_->wleta   = pl->eta();
+	    info_->wlphi   = pl->phi();
+	    info_->wle     = pl->energy();   
+	  }
+	  else if(abs(pl->pdgId())==13){ 
+	    info_->wltype  = 2;
+	    info_->wlpt    = pl->pt();
+	    info_->wleta   = pl->eta();
+	    info_->wlphi   = pl->phi();
+	    info_->wle     = pl->energy();
+	  }
+	  else if(abs(pl->pdgId())==15){ 
+	    info_->wltype  = 3;
+	    info_->wlpt    = pl->pt();
+	    info_->wleta   = pl->eta();
+	    info_->wlphi   = pl->phi();
+	    info_->wle     = pl->energy();
+	    info_->wtauhadron = hadronicTau(pl);
+	  }
+	  else if(abs(pl->pdgId())==12 ||abs(pl->pdgId())==14 ||abs(pl->pdgId())==16){
+	    info_->wmetpt  = pl->pt();
+	    info_->wmeteta = pl->eta();
+	    info_->wmetphi = pl->phi();
+	    info_->wmete   = pl->energy();
+	  }
+	  else {}
+	}
+      }        
+      //Z
+      if(p.pdgId()==23 && p.status()==3 && (!foundz1) ){//
+	foundz1 = true;  
+	//std::cout<<p.pt()<<std::endl; 
+	info_->zgenmass = p.mass();
+	info_->zgenmt   = p.mt(); 
+	info_->zgenpt   = p.pt();
+	info_->zgeneta  = p.eta();
+	info_->zgenphi  = p.phi();
+	info_->zgene    = p.energy();
+	for(int j=0;p.daughter(j)!=NULL;j++){//loop on Z daughter
+	  const reco::Candidate* pl = p.daughter(j);  
+	  if(pl->pdgId()==11){  
+	    info_->zltype  = 1;
+	    info_->zlmpt   = pl->pt();
+	    info_->zlmeta  = pl->eta();
+	    info_->zlmphi  = pl->phi();
+	    info_->zlme    = pl->energy();   
+	  }
+	  else if(pl->pdgId()==13){  
+	    info_->zltype  = 2;
+	    info_->zlmpt   = pl->pt();
+	    info_->zlmeta  = pl->eta();
+	    info_->zlmphi  = pl->phi();
+	    info_->zlme    = pl->energy();   
+	  }
+	  else if(pl->pdgId()==15){  
+	    info_->zltype  = 3;
+	    info_->zlmpt   = pl->pt();
+	    info_->zlmeta  = pl->eta();
+	    info_->zlmphi  = pl->phi();
+	    info_->zlme    = pl->energy();   
+	  }
+	  else if(pl->pdgId()==-11){
+	    info_->zltype  = 1;
+	    info_->zlppt   = pl->pt();
+	    info_->zlpeta  = pl->eta();
+	    info_->zlpphi  = pl->phi();
+	    info_->zlpe    = pl->energy();   
+	  }
+	  else if(pl->pdgId()==-13){  
+	    info_->zltype  = 2;
+	    info_->zlppt   = pl->pt();
+	    info_->zlpeta  = pl->eta();
+	    info_->zlpphi  = pl->phi();
+	    info_->zlpe    = pl->energy();   
+	  }
+	  else if(pl->pdgId()==-15){  
+	    info_->zltype  = 3;
+	    info_->zlppt   = pl->pt();
+	    info_->zlpeta  = pl->eta();
+	    info_->zlpphi  = pl->phi();
+	    info_->zlpe    = pl->energy();   
+	  }
+	  else{}     
+	}
+      }        
+    }// end of genParticle Loop
+  }// end if (mcPYTHIA)
 }
+
+
+int InvHiggsInfoProducer::hadronicTau(const reco::Candidate* tau)
+{
+   for(unsigned int i=0; i<tau->numberOfDaughters();++i){
+   if(abs(tau->daughter(i)->pdgId())>99 || abs(tau->daughter(i)->pdgId())<10) return 1;
+   if(abs(tau->daughter(i)->pdgId())==11) return 2; 
+   if(abs(tau->daughter(i)->pdgId())==13) return 3;
+   if(abs(tau->daughter(i)->pdgId())==15||abs(tau->daughter(i)->pdgId())==24) return hadronicTau(tau->daughter(i));
+    }
+   // if tau is stable
+   return 4;   
+}
+
 
 void InvHiggsInfoProducer::doEventInfo(const edm::Event& iEvent) {
 
@@ -606,9 +727,9 @@ void InvHiggsInfoProducer::doTrigger(const edm::Event& iEvent, const edm::EventS
   info_->hltResult1 = hltResult1; 
   info_->hltResult2 = hltResult2; 
 
-  // Store HLT prescale info
-//   info_->hltPrescaleIndex=hltConfig_.prescaleSet(iEvent, iSetup);
-//   info_->hltPrescale=hltConfig_.prescaleValue(iEvent, iSetup, hltPathName_);
+  // store HLT prescale info
+  //info_->hltPrescaleIndex=hltConfig_.prescaleSet(iEvent, iSetup);
+  //info_->hltPrescale=hltConfig_.prescaleValue(iEvent, iSetup, hltPathName_);
   
 }
 

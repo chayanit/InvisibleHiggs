@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.8 2012/10/28 03:45:31 srimanob Exp $
+// $Id: InvHiggsInfo.h,v 1.9 2012/10/28 21:25:51 srimanob Exp $
 //
 //
 
@@ -158,7 +158,7 @@ class InvHiggsInfo { //: public TObject {
   Int_t nVtx;
   Double_t puWeight;
 
-  // MC info
+  // MC info -- Higgs
   Double_t mcHiggsMass;
   Double_t mcHiggsPt;
   Double_t mcHiggsEta;
@@ -181,6 +181,41 @@ class InvHiggsInfo { //: public TObject {
 
   Double_t mcVBFDEta;
   Double_t mcVBFDPhi;
+
+  // MC info -- W
+  Double_t wgenmass;
+  Double_t wgenpt;
+  Double_t wgenmt;
+  Double_t wgeneta;
+  Double_t wgenphi;
+  Double_t wgene;
+  Int_t    wltype;
+  Double_t wlpt;
+  Double_t wleta;
+  Double_t wlphi;
+  Double_t wle;
+  Int_t    wtauhadron;
+  Double_t wmetpt;
+  Double_t wmeteta;
+  Double_t wmetphi;
+  Double_t wmete;
+
+  // MC info -- Z
+  Double_t zgenmass;
+  Double_t zgenpt;
+  Double_t zgenmt;
+  Double_t zgeneta;
+  Double_t zgenphi;
+  Double_t zgene;
+  Int_t    zltype;
+  Double_t zlmpt;
+  Double_t zlmeta;
+  Double_t zlmphi;
+  Double_t zlme;
+  Double_t zlppt;
+  Double_t zlpeta;
+  Double_t zlpphi;
+  Double_t zlpe;
 
 };
 
