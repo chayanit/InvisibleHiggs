@@ -1,6 +1,0 @@
-<use name="root"/>
-<use name="roofit"/>
-<use name="roostats"/>
-<use name="InvisibleHiggs/Analysis"/>
-
-<bin name="mcAnalysis" file="mcAnalysis.cpp"/>
