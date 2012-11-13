@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.14 2012/10/28 21:25:51 srimanob Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.15 2012/11/04 03:15:12 srimanob Exp $
 //
 //
 
@@ -992,8 +992,8 @@ void InvHiggsInfoProducer::doElectrons(const std::vector<pat::Electron>& electro
     info_->ele2Phi = electrons.at(1).phi();    
     
     // leading pair mass
-//     math::XYZTLorentzVector pair = electrons.at(0).p4() + electrons.at(1).p4();
-//     info_->mEE = pair.M();
+    // math::XYZTLorentzVector pair = electrons.at(0).p4() + electrons.at(1).p4();
+    // info_->mEE = pair.M();
   }
   
 }

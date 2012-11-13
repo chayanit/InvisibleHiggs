@@ -33,7 +33,7 @@ selectMuons = cms.EDFilter(
 selectLooseMuons = cms.EDFilter(
     "PATMuonSelector",
     src = cms.InputTag("cleanPatMuons"),
-    cut = cms.string("pt>20 && isGlobalMuon && isPFMuon && abs(eta)<2.1")
+    cut = cms.string("pt>10 && (isGlobalMuon || isTrackerMuon) && isPFMuon && abs(eta)<2.1")
 )
 
 ######################

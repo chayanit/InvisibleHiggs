@@ -208,33 +208,31 @@ void ElectronIdSelector<T>::produce(edm::Event& iEvent,const edm::EventSetup& iS
     
     // -------- if cut-based ID -----------------
     if( !useMVAbasedID_ ) {
-      isTight = (pt>30.) && inAcceptance && (innerHits==0) && 
+      isTight = (pt>20.) && inAcceptance && (innerHits==0) && 
 	(isolation<0.05) && (!isConv) && 
 	((isEB && sihih<0.01 && Dphi<0.03 && Deta<0.004) || 
 	 (isEE && sihih<0.03 && Dphi<0.02 && Deta<0.005)); 
-      isLoose = (pt>20.) && inAcceptance && (innerHits<=1) && 
+      isLoose = (pt>10.) && inAcceptance && (innerHits<=1) && 
 	(isolation<0.1) && (!isConv) && 
 	((isEB && sihih<0.01 && Dphi<0.8 && Deta<0.007) || 
 	 (isEE && sihih<0.03 && Dphi<0.07 && Deta<0.005)); 
-
-      isQCD = (pt>20.) && inAcceptance && (innerHits<=1) && 
+      isQCD = (pt>10.) && inAcceptance && (innerHits<=1) && 
 	(isolation>0.1) && (!isConv) && 
 	((isEB && sihih<0.01 && Dphi<0.8 && Deta<0.007) || 
 	 (isEE && sihih<0.03 && Dphi<0.07 && Deta<0.005)); 
     } else {
     //-------- if MVA-based ID -----------------
     // WP 80 pT>20 GeV	0.913 / 0.105 	0.964 / 0.178 	0.899 / 0.150
-      isTight = (pt>30.) && inAcceptance && (!isConv) && ( 
+      isTight = (pt>20.) && inAcceptance && (!isConv) && ( 
         ( abseta <= 0.8 && mvaTrigV0 > 0.913&& pfIso03EA < 0.105) ||
         ( abseta > 0.8 && abseta <= 1.479 && mvaTrigV0 > 0.964 && pfIso03EA < 0.178) ||
         ( abseta > 1.479 && mvaTrigV0 > 0.899 && pfIso03EA < 0.150) );
     // WP 90 	0.877 / 0.426 	0.811 / 0.481 	0.707 / 0.390 
-      isLoose = (pt>20.) && inAcceptance && (!isConv) && ( 
+      isLoose = (pt>10.) && inAcceptance && (!isConv) && ( 
         ( abseta <= 0.8 && mvaNonTrigV0 > 0.877 && pfIso03EA < 0.426 ) ||
         ( abseta > 0.8 && abseta <= 1.479 && mvaNonTrigV0 > 0.811 && pfIso03EA <0.481 ) ||
         ( abseta > 1.479 && mvaNonTrigV0 > 0.707 && pfIso03EA < 0.390) );
-
-      isQCD = (pt>20.) && inAcceptance && (!isConv) && ( 
+      isQCD = (pt>10.) && inAcceptance && (!isConv) && ( 
         ( abseta <= 0.8 && mvaTrigV0 > -1. && pfIso03EA > 0.177 ) ||
         ( abseta > 0.8 && abseta <= 1.479 && mvaTrigV0 > -1. && pfIso03EA >0.180 ) ||
         ( abseta > 1.479 && mvaTrigV0 > -1. && pfIso03EA > 0.244) );
