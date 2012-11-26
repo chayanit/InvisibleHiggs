@@ -12,10 +12,11 @@ class Cuts {
 
   void addCut(std::string name, std::string cut);
 
-  TCut cut(int i);
+  TCut cut(unsigned i);
 
   TCut allCuts();
 
+  TCut nMinusOneCuts(unsigned i);
 
  private:
   
