@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.15 2012/11/04 03:15:12 srimanob Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.16 2012/11/13 13:45:04 srimanob Exp $
 //
 //
 
@@ -645,6 +645,13 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
 	    info_->zlmphi  = pl->phi();
 	    info_->zlme    = pl->energy();   
 	  }
+	  else if(pl->pdgId()==12 || pl->pdgId()==14 || pl->pdgId()==16){  
+	    info_->zltype  = 4;
+	    info_->zlmpt   = pl->pt();
+	    info_->zlmeta  = pl->eta();
+	    info_->zlmphi  = pl->phi();
+	    info_->zlme    = pl->energy();   
+	  }
 	  else if(pl->pdgId()==-11){
 	    info_->zltype  = 1;
 	    info_->zlppt   = pl->pt();
@@ -666,7 +673,14 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
 	    info_->zlpphi  = pl->phi();
 	    info_->zlpe    = pl->energy();   
 	  }
-	  else{}     
+	  else if(pl->pdgId()==-12 || pl->pdgId()==-14 || pl->pdgId()==-16){  
+	    info_->zltype  = 4;
+	    info_->zlppt   = pl->pt();
+	    info_->zlpeta  = pl->eta();
+	    info_->zlpphi  = pl->phi();
+	    info_->zlpe    = pl->energy();   
+	  }
+	  else{}
 	}
       }        
     }// end of genParticle Loop
@@ -970,11 +984,16 @@ void InvHiggsInfoProducer::doMuons(const std::vector<pat::Muon>& muons) {
     info_->mu2Pt = muons.at(1).pt();    
     info_->mu2Eta = muons.at(1).eta();    
     info_->mu2Phi = muons.at(1).phi();    
+  }
+  if (muons.size()>2) {
+    info_->mu3Pt = muons.at(2).pt();    
+    info_->mu3Eta = muons.at(2).eta();    
+    info_->mu3Phi = muons.at(2).phi();
+  }
     
     // leading pair mass
     // math::XYZTLorentzVector pair = muons.at(0).p4() + muons.at(1).p4();
     // info_->mMuMu = pair.M();
-  }
   
 }
 
@@ -989,12 +1008,17 @@ void InvHiggsInfoProducer::doElectrons(const std::vector<pat::Electron>& electro
   if (electrons.size()>1) {
     info_->ele2Pt = electrons.at(1).pt();    
     info_->ele2Eta = electrons.at(1).eta();    
-    info_->ele2Phi = electrons.at(1).phi();    
-    
+    info_->ele2Phi = electrons.at(1).phi();   
+  }
+  if (electrons.size()>2) {
+    info_->ele3Pt = electrons.at(2).pt();    
+    info_->ele3Eta = electrons.at(2).eta();    
+    info_->ele3Phi = electrons.at(2).phi();
+  }
+
     // leading pair mass
     // math::XYZTLorentzVector pair = electrons.at(0).p4() + electrons.at(1).p4();
     // info_->mEE = pair.M();
-  }
   
 }
 
@@ -1079,6 +1103,18 @@ void InvHiggsInfoProducer::doZs(const reco::CandidateView& zs, int channel) {
 	info_->zPhi     = zs[i].phi();
 	info_->zMass    = zs[i].mass();
 	info_->zChannel = channel;
+
+	const reco::Candidate *Zboson = &(zs[i]);
+	if(Zboson->numberOfDaughters() == 2){
+	  info_->zDau1Pt     = Zboson->daughter(0)->pt();
+	  info_->zDau1Eta    = Zboson->daughter(0)->eta();
+	  info_->zDau1Phi    = Zboson->daughter(0)->phi();
+	  info_->zDau1Charge = Zboson->daughter(0)->charge();
+	  info_->zDau2Pt     = Zboson->daughter(1)->pt();
+	  info_->zDau2Eta    = Zboson->daughter(1)->eta();
+	  info_->zDau2Phi    = Zboson->daughter(1)->phi();
+	  info_->zDau2Charge = Zboson->daughter(1)->charge();
+	}
       }
 
     }
@@ -1101,8 +1137,21 @@ void InvHiggsInfoProducer::doWs(const reco::CandidateView& ws, int channel) {
 	info_->wPhi     = ws[i].phi();
 	info_->wMt      = ws[i].mt();
 	info_->wChannel = channel;
-      }
 
+	const reco::Candidate *Wboson = &(ws[i]);
+	if(Wboson->daughter(0)){ 
+	  info_->wDaulPt     = Wboson->daughter(0)->pt();
+	  info_->wDaulEta    = Wboson->daughter(0)->eta();
+	  info_->wDaulPhi    = Wboson->daughter(0)->phi();
+	  info_->wDaulCharge = Wboson->daughter(0)->charge();
+	}
+	else if(Wboson->daughter(1)){
+	  info_->wDaulPt     = Wboson->daughter(1)->pt();
+	  info_->wDaulEta    = Wboson->daughter(1)->eta();
+	  info_->wDaulPhi    = Wboson->daughter(1)->phi();
+	  info_->wDaulCharge = Wboson->daughter(1)->charge();
+	}
+      }
     }
   }
   

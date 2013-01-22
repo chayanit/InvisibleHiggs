@@ -6,6 +6,9 @@
   <use name="DataFormats/METReco"/>
   <use name="DataFormats/MuonReco"/>
   <use name="DataFormats/RecoCandidate"/>
+  <use name="DataFormats/EgammaCandidates"/>
+  <use name="DataFormats/PatCandidates"/>
+  <use name="RecoEgamma/EgammaTools"/>
 
   <use name="FWCore/Framework"/>
   <use name="FWCore/MessageLogger"/>

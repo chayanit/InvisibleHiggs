@@ -7,14 +7,8 @@ import FWCore.ParameterSet.Config as cms
 # Definition bases on PhysicsTools/PatAlgos/plugins/PATObjectSelector.cc 
 
 # Tight muons
-isQCD = False
 isolationCutString = cms.string("")
-if isQCD:
-    #isolationCutString = "(isolationR03().sumPt+isolationR03().emEt+isolationR03().hadEt)/pt> 0.1"
-    isolationCutString = "(pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt> 0.12"
-else:
-    #isolationCutString = "(isolationR03().sumPt+isolationR03().emEt+isolationR03().hadEt)/pt< 0.3"
-    isolationCutString = "(pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt< 0.12"
+isolationCutString = "(pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt< 0.12"
 
 selectMuons = cms.EDFilter(
     "PATMuonSelector",
@@ -45,17 +39,13 @@ selectLooseMuons = cms.EDFilter(
 # Tight electrons
 selectElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
     src = cms.InputTag( "cleanPatElectrons" ),
-    idLabel = cms.string("tight"),
-    #useMVAbasedID   = cms.bool(True)
-    useMVAbasedID   = cms.bool(False)
+    idLabel = cms.string("tight")
 )
 
 # Loose electrons
 selectLooseElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
     src = cms.InputTag( "cleanPatElectrons" ),
-    idLabel = cms.string("loose"),
-    #useMVAbasedID   = cms.bool(True)
-    useMVAbasedID   = cms.bool(False)
+    idLabel = cms.string("loose")
 )
 
 # Photon: We are now using

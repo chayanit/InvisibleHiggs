@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.9 2012/10/28 21:25:51 srimanob Exp $
+// $Id: InvHiggsInfo.h,v 1.10 2012/11/04 03:15:11 srimanob Exp $
 //
 //
 
@@ -129,6 +129,10 @@ class InvHiggsInfo { //: public TObject {
   Double_t ele2Eta;
   Double_t ele2Phi;
 
+  Double_t ele3Pt;
+  Double_t ele3Eta;
+  Double_t ele3Phi;
+
   // Muons
   Double_t mu1Pt;
   Double_t mu1Eta;
@@ -138,6 +142,10 @@ class InvHiggsInfo { //: public TObject {
   Double_t mu2Eta;
   Double_t mu2Phi;
 
+  Double_t mu3Pt;
+  Double_t mu3Eta;
+  Double_t mu3Phi;
+
   // Ws
   Int_t nW;
   Double_t wPt;
@@ -145,6 +153,10 @@ class InvHiggsInfo { //: public TObject {
   Double_t wPhi;
   Double_t wMt;
   Double_t wChannel;
+  Double_t wDaulPt;
+  Double_t wDaulEta;
+  Double_t wDaulPhi;
+  Double_t wDaulCharge;
 
   // Zs
   Int_t nZ;
@@ -153,6 +165,14 @@ class InvHiggsInfo { //: public TObject {
   Double_t zPhi;
   Double_t zMass;
   Double_t zChannel;
+  Double_t zDau1Pt;
+  Double_t zDau1Eta;
+  Double_t zDau1Phi;
+  Double_t zDau1Charge;
+  Double_t zDau2Pt;
+  Double_t zDau2Eta;
+  Double_t zDau2Phi;
+  Double_t zDau2Charge;
 
   // PU
   Int_t nVtx;
