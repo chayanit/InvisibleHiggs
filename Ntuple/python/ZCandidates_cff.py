@@ -21,7 +21,7 @@ zToEE = cms.EDProducer("NamedCandViewShallowCloneCombiner",
     cut = cms.string('60 < mass < 120'),
     name = cms.string('zToEE'),
     roles = cms.vstring('electron1', 'electron2'),
-    decay = cms.string('selectElectrons@+ selectElectrons@-'),
+    decay = cms.string('selectLooseElectrons@+ selectLooseElectrons@-'),
     checkCharge = cms.bool(True)
 )
 

@@ -218,12 +218,12 @@ void ElectronIdSelector::produce(edm::Event& iEvent,const edm::EventSetup& iSetu
         (isolation<0.15) && (!vtxFitConversion) &&
         ((isEB && sigmaIEtaIEta<0.01 && dPhiIn<0.06 && dEtaIn<0.004 && hoe<0.120 && ooemoop<0.050 && fabs(d0vtx)<0.020 && fabs(dzvtx)<0.100) ||
          (isEE && sigmaIEtaIEta<0.03 && dPhiIn<0.03 && dEtaIn<0.007 && hoe<0.100 && ooemoop<0.050 && fabs(d0vtx)<0.020 && fabs(dzvtx)<0.100));
-    isLoose = (pt>10.) && (mHits<=1) &&
+    isLoose = (pt>20.) && (mHits<=1) &&
         (isolation<0.15) && (!vtxFitConversion) &&
         ((isEB && sigmaIEtaIEta<0.01 && dPhiIn<0.15 && dEtaIn<0.007 && hoe<0.120 && ooemoop<0.050 && fabs(d0vtx)<0.020 && fabs(dzvtx)<0.200) ||
          (isEE && sigmaIEtaIEta<0.03 && dPhiIn<0.10 && dEtaIn<0.009 && hoe<0.100 && ooemoop<0.050 && fabs(d0vtx)<0.020 && fabs(dzvtx)<0.200));
     isVeto = (pt>10.) && (mHits<=999) &&
-        (isolation<0.15) && (vtxFitConversion) &&
+        (isolation<0.15) && //(vtxFitConversion) &&
         ((isEB && sigmaIEtaIEta<0.01 && dPhiIn<0.800 && dEtaIn<0.007 && hoe<0.150 && ooemoop<999.9 && fabs(d0vtx)<0.040 && fabs(dzvtx)<0.200) ||
          (isEE && sigmaIEtaIEta<0.03 && dPhiIn<0.700 && dEtaIn<0.010 && hoe<999.9 && ooemoop<999.9 && fabs(d0vtx)<0.040 && fabs(dzvtx)<0.200));
      

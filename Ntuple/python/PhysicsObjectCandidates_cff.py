@@ -48,6 +48,12 @@ selectLooseElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
     idLabel = cms.string("loose")
 )
 
+# Veto electrons
+selectVetoElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
+    src = cms.InputTag( "cleanPatElectrons" ),
+    idLabel = cms.string("veto")
+)
+
 # Photon: We are now using
 
 # Tau: We are now using
@@ -56,4 +62,5 @@ PhysicsObjectSequence = cms.Sequence(selectMuons
                                      * selectLooseMuons
                                      * selectElectrons
                                      * selectLooseElectrons
+				     * selectVetoElectrons
                                     )

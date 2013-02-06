@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.16 2012/11/13 13:45:04 srimanob Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.17 2013/01/22 20:12:25 chayanit Exp $
 //
 //
 
@@ -1105,16 +1105,16 @@ void InvHiggsInfoProducer::doZs(const reco::CandidateView& zs, int channel) {
 	info_->zChannel = channel;
 
 	const reco::Candidate *Zboson = &(zs[i]);
-	if(Zboson->numberOfDaughters() == 2){
-	  info_->zDau1Pt     = Zboson->daughter(0)->pt();
-	  info_->zDau1Eta    = Zboson->daughter(0)->eta();
-	  info_->zDau1Phi    = Zboson->daughter(0)->phi();
-	  info_->zDau1Charge = Zboson->daughter(0)->charge();
-	  info_->zDau2Pt     = Zboson->daughter(1)->pt();
-	  info_->zDau2Eta    = Zboson->daughter(1)->eta();
-	  info_->zDau2Phi    = Zboson->daughter(1)->phi();
-	  info_->zDau2Charge = Zboson->daughter(1)->charge();
-	}
+	if(Zboson->numberOfDaughters() < 2) continue;
+	info_->zDau1Pt     = Zboson->daughter(0)->pt();
+	info_->zDau1Eta    = Zboson->daughter(0)->eta();
+	info_->zDau1Phi    = Zboson->daughter(0)->phi();
+	info_->zDau1Charge = Zboson->daughter(0)->charge();
+	info_->zDau2Pt     = Zboson->daughter(1)->pt();
+	info_->zDau2Eta    = Zboson->daughter(1)->eta();
+	info_->zDau2Phi    = Zboson->daughter(1)->phi();
+	info_->zDau2Charge = Zboson->daughter(1)->charge();
+	
       }
 
     }
@@ -1140,12 +1140,14 @@ void InvHiggsInfoProducer::doWs(const reco::CandidateView& ws, int channel) {
 
 	const reco::Candidate *Wboson = &(ws[i]);
 	if(Wboson->daughter(0)){ 
+	//std::cout<<"W boson daughter0"<<std::endl;
 	  info_->wDaulPt     = Wboson->daughter(0)->pt();
 	  info_->wDaulEta    = Wboson->daughter(0)->eta();
 	  info_->wDaulPhi    = Wboson->daughter(0)->phi();
 	  info_->wDaulCharge = Wboson->daughter(0)->charge();
 	}
 	else if(Wboson->daughter(1)){
+	//std::cout<<"W boson daughter1"<<std::endl;
 	  info_->wDaulPt     = Wboson->daughter(1)->pt();
 	  info_->wDaulEta    = Wboson->daughter(1)->eta();
 	  info_->wDaulPhi    = Wboson->daughter(1)->phi();

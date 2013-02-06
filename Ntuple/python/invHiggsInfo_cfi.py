@@ -24,7 +24,8 @@ invHiggsInfo = cms.EDAnalyzer(
     looseMuonTag     = cms.untracked.InputTag("selectLooseMuons"), #cleanPatMuons
 
     electronTag = cms.untracked.InputTag("selectElectrons"), #cleanPatElectrons
-    looseElectronTag = cms.untracked.InputTag("selectLooseElectrons"), #cleanPatElectrons
+    #looseElectronTag = cms.untracked.InputTag("selectLooseElectrons"), #cleanPatElectrons
+    looseElectronTag = cms.untracked.InputTag("selectVetoElectrons"), #cleanPatElectrons
 
     # met
     metResultsTag = cms.untracked.InputTag("TriggerResults","","PAT"),
