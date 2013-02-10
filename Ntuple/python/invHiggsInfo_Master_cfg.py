@@ -24,26 +24,33 @@ process.load('InvisibleHiggs/Ntuple/PhysicsObjectCandidates_cff')
 process.load('InvisibleHiggs/Ntuple/WCandidates_cff')
 process.load('InvisibleHiggs/Ntuple/ZCandidates_cff')
 
-# Ntuple producer
-process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
-
 # TTree output file
 process.load("CommonTools.UtilAlgos.TFileService_cfi")
 process.TFileService.fileName = cms.string('invHiggsInfo.root')
 
+# Fix PUJetID
+#process.load("CMGTools.External.pujetidsequence_cff")
+#process.puJetMva.jets = cms.InputTag("goodPatJets")
+#process.puJetId.jets = cms.InputTag("goodPatJets")
+
+# Ntuple producer
+process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
+#process.invHiggsInfo.puJetMvaTag = cms.untracked.InputTag("puJetMva", "fullDiscriminant","TREE")
+#process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMva", "fullId","TREE")
+
 # path
-process.path = cms.Path(
-    process.PhysicsObjectSequence
-    * process.WSequence
-    * process.ZSequence
-    * process.invHiggsInfo
-)
+process.p0   = cms.Path(#process.puJetIdSqeuence
+                        process.PhysicsObjectSequence
+                        * process.WSequence
+                        * process.ZSequence
+                        )
+process.path = cms.EndPath(process.invHiggsInfo)
 
 
 ### THINGS TO EDIT BELOW ###
 
 # change Global Tag
-process.GlobalTag.globaltag = 'GR_R_52_V9::All'
+process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
@@ -52,5 +59,5 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-    'file:patTuple.root'
+    'file:/localhome/srimanob/SUSY/CMSSW/MC-Production/slc5_amd64_gcc462/Higgs/invisibleHiggs/PUJetID/case-1/CMSSW_5_3_7_patch4/src/InvisibleHiggs/Ntuple/test/test/patTuple.root'
     ] );

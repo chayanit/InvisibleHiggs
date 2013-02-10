@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.17 2013/01/22 20:12:25 chayanit Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.18 2013/02/06 23:03:19 chayanit Exp $
 //
 //
 
@@ -441,8 +441,18 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // met filters
   edm::Handle<edm::TriggerResults> metFlag;
   iEvent.getByLabel(metResultsTag_, metFlag);
-  //if (!metFlag.isValid()) return;
-  doMETFilter(iEvent, iSetup, metFlag);
+  if (metFlag.isValid()){
+    doMETFilter(iEvent, iSetup, metFlag);
+  }
+  else{
+     info_->metflag0=true;
+     info_->metflag1=true;
+     info_->metflag2=true;
+     info_->metflag3=true;
+     info_->metflag4=true;
+     info_->metflag5=true;
+     info_->metflag6=true;  
+  }
 
   edm::Handle<std::vector<reco::Vertex> > vertices;
   iEvent.getByLabel(vtxTag_, vertices);

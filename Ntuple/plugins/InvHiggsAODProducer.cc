@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsAODProducer.cc,v 1.3 2012/06/07 11:13:47 jbrooke Exp $
+// $Id: InvHiggsAODProducer.cc,v 1.4 2012/06/08 13:11:14 jbrooke Exp $
 //
 //
 
@@ -365,10 +365,10 @@ void InvHiggsAODProducer::doEventInfo(const edm::Event& iEvent) {
 
   unsigned long id          = iEvent.id().event();
   unsigned long bx          = iEvent.bunchCrossing();
-  unsigned long orbit       = iEvent.orbitNumber();
+  //unsigned long orbit       = iEvent.orbitNumber();
   unsigned long lb          = iEvent.luminosityBlock();
   unsigned long run         = iEvent.id().run();
-  double time               = iEvent.time().value();
+  //double time               = iEvent.time().value();
 
   event_->id = id;
   event_->bx = bx;
