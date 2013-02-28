@@ -19,16 +19,16 @@ int main(int argc, char* argv[]) {
 
   // some variables
   double lumi = 697.;  //pb-1
-  std::string iDir("/storage/phjjb/invisibleHiggs/InvHiggsInfo_v8");
-  std::string oDir("analysis_v8");
-  std::string datasetFile("InvisibleHiggs/Ntuple/data/datasets_v8.txt");
+  std::string iDir("");
+  std::string oDir("");
+  std::string datasetFile(" ");
 
   // program options
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "Display this message")
     ("outdir,o", po::value<std::string>(), "Output directory")
-    ("indir,d", po::value<std::string>(), "Input directory")
+    ("indir,i", po::value<std::string>(), "Input directory")
     ("datasets,f", po::value<std::string>(), "Datasets file")
     ("lumi,l", po::value<double>(), "Integrated luminosity");
 
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
   }
   
   if (vm.count("outdir"))   oDir = vm["outdir"].as<std::string>();
-  if (vm.count("indir"))    iDir=vm["datadir"].as<std::string>();
+  if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
   if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
   if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
 

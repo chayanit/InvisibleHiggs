@@ -89,14 +89,6 @@ void Histogrammer::makeHistograms(std::string dataset, double weight, std::strin
   tree->Draw("abs(abs(abs(jet1Phi-jet2Phi)-TMath::Pi())-TMath::Pi())>>hjetdphi", "puWeight");
   tree->Draw("min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>>hjmdphi", "puWeight");
 
-  tree->Draw("jet1Pt>>hseljet1pt", allCutsWeighted);
-  tree->Draw("jet2Pt>>hseljet2pt", allCutsWeighted);
-  tree->Draw("abs(jet1Eta-jet2Eta)>>hseljetdeta", allCutsWeighted);
-  tree->Draw("vbfM>>hselvbfm", allCutsWeighted);
-  tree->Draw("met>>hselmet", allCutsWeighted);
-  tree->Draw("abs(abs(abs(jet1Phi-jet2Phi)-TMath::Pi())-TMath::Pi())>>hseljetdphi", allCutsWeighted);
-  tree->Draw("min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>>hseljmdphi", allCutsWeighted);
-
   ofile->cd();
 
   hjet1pt->Scale(weight);
@@ -106,13 +98,6 @@ void Histogrammer::makeHistograms(std::string dataset, double weight, std::strin
   hmet->Scale(weight);  
   hjetdphi->Scale(weight);
   hjmdphi->Scale(weight);
-  hseljet1pt->Scale(weight);
-  hseljet2pt->Scale(weight);
-  hseljetdeta->Scale(weight);
-  hselvbfm->Scale(weight);
-  hselmet->Scale(weight);  
-  hseljetdphi->Scale(weight);
-  hseljmdphi->Scale(weight);
 
   hjet1pt->Write();
   hjet2pt->Write();
@@ -121,14 +106,6 @@ void Histogrammer::makeHistograms(std::string dataset, double weight, std::strin
   hmet->Write();
   hjetdphi->Write();
   hjmdphi->Write();
-  hseljet1pt->Write();
-  hseljet2pt->Write();
-  hseljetdeta->Write();
-  hselvbfm->Write();
-  hselmet->Write();
-  hseljetdphi->Write();
-  hseljmdphi->Write();
-
 
   ifile->Close();
   ofile->Close();

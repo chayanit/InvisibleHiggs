@@ -38,34 +38,6 @@ int main(int argc, char* argv[]) {
     histogrammer.addDataset(d.name, lumi*d.sigma/d.nEvents);
   }
 
-//   histogrammer.addDataset("QCD_Pt-30to50",     lumi*6.6285328E7/6000000);
-//   histogrammer.addDataset("QCD_Pt-50to80",     lumi*8148778.0/5995944);
-//   histogrammer.addDataset("QCD_Pt-80to120",    lumi*1033680.0/5781328);
-//   histogrammer.addDataset("QCD_Pt-120to170",   lumi*156293.3/5785732);
-//   histogrammer.addDataset("QCD_Pt-170to300",   lumi*34138.15/5564398);
-//   histogrammer.addDataset("QCD_Pt-300to470",   lumi*1759.549/5577300);
-//   histogrammer.addDataset("QCD_Pt-470to600",   lumi*113.8791/3994848);
-//   histogrammer.addDataset("QCD_Pt-600to800",   lumi*26.9921/3992760);
-//   histogrammer.addDataset("QCD_Pt-800to1000",  lumi*3.550036/3998563);
-//   histogrammer.addDataset("QCD_Pt-1000to1400", lumi*0.737844/1364088);
-//   histogrammer.addDataset("QCD_Pt-1400to1800", lumi*0.03352235/1250062);
-//   histogrammer.addDataset("QCD_Pt-1800",       lumi*0.001829005/650000);
-  
-//   histogrammer.addDataset("WJetsToLNu",             lumi*30400.0/16197176);
-
-//   histogrammer.addDataset("ZJetsToNuNu_50_HT_100",  lumi*381.2/4053786);
-//   histogrammer.addDataset("ZJetsToNuNu_100_HT_200", lumi*160.3/1);
-//   histogrammer.addDataset("ZJetsToNuNu_200_HT_400", lumi*41.49/1);
-//   histogrammer.addDataset("ZJetsToNuNu_400_HT_inf", lumi*5.274/606743);
-
-//   histogrammer.addDataset("VBF_HToZZTo4Nu_M120", 10.*lumi*1.632/79675);
-//   histogrammer.addDataset("VBF_HToZZTo4Nu_M150", lumi*1.251/59408);
-//   histogrammer.addDataset("VBF_HToZZTo4Nu_M200", lumi*0.8441/80118);
-//   histogrammer.addDataset("VBF_HToZZTo4Nu_M300", lumi*0.4408/66398);
-//   histogrammer.addDataset("VBF_HToZZTo4Nu_M400", lumi*0.2543/70486);
-
-//   histogrammer.addDataset("DYJetsToLL",        lumi*2950.0/25779375);
-
   histogrammer.addDataset("MET_Run2012A", 1., dataDir);
 
   histogrammer.loop();

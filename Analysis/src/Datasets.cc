@@ -23,6 +23,8 @@ void Datasets::readFile(std::string filename) {
   std::string line;
   std::ifstream myfile(filename);
 
+  std::cout << "Reading dataset file :" << filename << std::endl;
+
   if (myfile.is_open()) {
 
     while ( myfile.good() ) {
@@ -36,11 +38,12 @@ void Datasets::readFile(std::string filename) {
 				 ""), 
 		     splitVec.end());
 
-      if (splitVec.size() >= 3) {
+      if (splitVec.size() >= 4) {
 	//std::cout << splitVec.at(0) << ":" << splitVec.at(1) << ":" << splitVec.at(2) << std::endl;
 	addDataset(splitVec.at(0), 
 		   boost::lexical_cast<int>( splitVec.at(1) ), 
-		   boost::lexical_cast<double>( splitVec.at(2) ));
+		   boost::lexical_cast<double>( splitVec.at(2) ),
+		   boost::lexical_cast<int>( splitVec.at(3) ));
       }
     }
 
@@ -52,10 +55,12 @@ void Datasets::readFile(std::string filename) {
 }
 
 
-void Datasets::addDataset(std::string name, int nevts, double sigma) {
+void Datasets::addDataset(std::string name, int nevts, double sigma, int isData) {
+  //  std::cout << name << "\t" << nevts << "\t" << sigma << "\t" << (isData>0?"Data":"MC") << std::endl;
   names_.push_back(name);
   nevts_.push_back(nevts);
   sigmas_.push_back(sigma);
+  isData_.push_back(isData>0);
 }
 
 
@@ -64,5 +69,6 @@ Dataset Datasets::getDataset(unsigned i) {
   tmp.name = names_.at(i);
   tmp.nEvents = nevts_.at(i);
   tmp.sigma = sigmas_.at(i);
+  tmp.isData = isData_.at(i);
   return tmp;
 }

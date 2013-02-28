@@ -18,6 +18,18 @@ class Cuts {
 
   TCut nMinusOneCuts(unsigned i);
 
+  // special combinations
+  TCut diMuonControlRegion();
+  TCut diMuonVetoRegion();
+
+  TCut singleMuonControlRegion();
+  TCut singleMuonVetoRegion();
+
+  TCut singleElectronControlRegion();
+  TCut singleElectronVetoRegion();
+
+  TCut qcdControlRegion();
+
  private:
   
   std::vector<std::string> names_;

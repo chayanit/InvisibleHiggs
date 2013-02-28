@@ -133,7 +133,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
   cms.SetFillColor(0);
   cms.SetBorderSize(1);
   cms.SetLineColor(0);
-  cms.AddText("CMS Preliminary 2012 - 697 pb^{-1}");
+  cms.AddText("CMS Preliminary 2012 #int L = 19.56 fb^{-1}");
   cms.Draw();
 
   // draw legend

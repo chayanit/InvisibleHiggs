@@ -9,6 +9,7 @@ struct Dataset {
   std::string name;
   int nEvents;
   double sigma;
+  bool isData;
 };
 
 
@@ -21,7 +22,10 @@ class Datasets {
 
   void readFile(std::string filename);
 
-  void addDataset(std::string name, int nevt, double sigma);
+  void addDataset(std::string name, 
+		  int nevt,
+		  double sigma,
+		  int isData);
 
   unsigned size() { return names_.size(); }
 
@@ -32,6 +36,7 @@ class Datasets {
   std::vector<std::string> names_;
   std::vector<int> nevts_;
   std::vector<double> sigmas_;
+  std::vector<bool> isData_;
 
 };
 

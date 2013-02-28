@@ -7,12 +7,12 @@ Cuts::Cuts() {
   addCut("metFilter",  "metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
   addCut("dijet",      "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7");
   addCut("sgnEtaJJ",   "(jet1Eta*jet2Eta)<0.");
-  addCut("dEtaJJ",     "abs(jet1Eta-jet2Eta)>4.2");
+  addCut("dEtaJJ",     "vbfDEta>4.2");
   addCut("Mjj",        "vbfM>1200.");
-  addCut("MET",        "met>110.");
-  addCut("dPhiJetMET", "min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>0.5");
+  addCut("MET",        "met>130.");
   addCut("EVeto",      "ele1Pt<10.");
   addCut("MuVeto",     "mu1Pt<10.");
+  addCut("dPhiJJ",     "vbfDPhi<1.0");
 
 }
 

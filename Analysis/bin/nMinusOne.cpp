@@ -19,17 +19,17 @@ namespace po = boost::program_options;
 int main(int argc, char* argv[]) {
 
   // some variables
-  double lumi = 697.;  //pb-1
-  std::string iDir("/storage/phjjb/invisibleHiggs/InvHiggsInfo_v8");
-  std::string oDir("analysis_v8");
-  std::string datasetFile("InvisibleHiggs/Ntuple/data/datasets_v8.txt");
+  double lumi = 1.;  //pb-1
+  std::string iDir("");
+  std::string oDir("");
+  std::string datasetFile("");
 
   // program options
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "Display this message")
     ("outdir,o", po::value<std::string>(), "Output directory")
-    ("indir,d", po::value<std::string>(), "Input directory")
+    ("indir,i", po::value<std::string>(), "Input directory")
     ("datasets,f", po::value<std::string>(), "Datasets file")
     ("lumi,l", po::value<double>(), "Integrated luminosity");
 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
   }
   
   if (vm.count("outdir"))   oDir = vm["outdir"].as<std::string>();
-  if (vm.count("indir"))    iDir=vm["datadir"].as<std::string>();
+  if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
   if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
   if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
 
@@ -64,11 +64,24 @@ int main(int argc, char* argv[]) {
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
+  TCut trig = puWeight * cuts.nMinusOneCuts(0);
+  TCut metFilt = puWeight * cuts.nMinusOneCuts(1);
+  TCut dijet = puWeight * cuts.nMinusOneCuts(2);
+  TCut sgnEtaJJ = puWeight * cuts.nMinusOneCuts(3);
+  TCut dEtaJJ = puWeight * cuts.nMinusOneCuts(4);
+  TCut mJJ = puWeight * cuts.nMinusOneCuts(5);
+  TCut met = puWeight * cuts.nMinusOneCuts(6);
+  TCut dPhiJM = puWeight * cuts.nMinusOneCuts(7);
+  TCut eVeto = puWeight * cuts.nMinusOneCuts(8);
+  TCut muVeto = puWeight * cuts.nMinusOneCuts(9);
+
 
   // loop over datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
 
     Dataset dataset = datasets.getDataset(i);
+
+    if (dataset.isData) continue;
 
     TFile* ifile = TFile::Open( (iDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "READ");
 
@@ -78,6 +91,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "Making histograms for " << dataset.name << std::endl;
+
     
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
 
@@ -96,35 +110,17 @@ int main(int argc, char* argv[]) {
     TH1D* hMuVeto   = new TH1D("hMuVetoNM1",   "", 50,  0.,  50.);
 
     // fill histograms
-    TCut trig = puWeight * cuts.nMinusOneCuts(0);
     int n = tree->Draw("hltResult2>>hTrigNM1", trig);
     std::cout << "   " << n << " events passing trigger" << std::endl;
 
-    TCut metFilt = puWeight * cuts.nMinusOneCuts(1);
     tree->Draw("(metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6)>>hMETFiltNM1", metFilt);
-
-    TCut dijet = puWeight * cuts.nMinusOneCuts(2);
     tree->Draw("jet2Pt>>hDijetNM1", dijet);
-
-    TCut sgnEtaJJ = puWeight * cuts.nMinusOneCuts(3);
     tree->Draw("TMath::Sign(1., jet1Eta*jet2Eta)>>hSgnEtaJJNM1", sgnEtaJJ);
-
-    TCut dEtaJJ = puWeight * cuts.nMinusOneCuts(4);
     tree->Draw("abs(jet1Eta-jet2Eta)>>hDEtaJJNM1", dEtaJJ);
-
-    TCut mJJ = puWeight * cuts.nMinusOneCuts(5);
     tree->Draw("vbfM>>hMjjNM1", mJJ);
-
-    TCut met = puWeight * cuts.nMinusOneCuts(6);
     tree->Draw("met>>hMETNM1", met);
-
-    TCut dPhiJM = puWeight * cuts.nMinusOneCuts(7);
     tree->Draw("min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>>hDPhiJMNM1", dPhiJM);
-
-    TCut eVeto = puWeight * cuts.nMinusOneCuts(8);
     tree->Draw("ele1Pt>>hEVetoNM1", eVeto);
-
-    TCut muVeto = puWeight * cuts.nMinusOneCuts(9);
     tree->Draw("mu1Pt>>hMuVetoNM1", muVeto);
 
     // write histograms
@@ -161,44 +157,56 @@ int main(int argc, char* argv[]) {
   // sum Z+jets
   std::cout << "Summing histograms for Z+Jets" << std::endl;
   std::vector<std::string> zJets;
-  zJets.push_back("ZJetsToNuNu_50_HT_100_MET");
-  zJets.push_back("ZJetsToNuNu_100_HT_200_MET");
-  zJets.push_back("ZJetsToNuNu_200_HT_400_MET");
-  zJets.push_back("ZJetsToNuNu_400_HT_inf_MET");
+  zJets.push_back("Zvv_50to100");
+  zJets.push_back("Zvv_100to200");
+  zJets.push_back("Zvv_200to400");
+  zJets.push_back("Zvv_400toinf");
   
   SumDatasets(oDir,
 	      zJets,
 	      hists,
-	      "ZJetsToLL_MET");
+	      "ZJets");
+
+  // sum W+jets datasets
+  std::cout << "Summing histograms for W+Jets" << std::endl;
+  std::vector<std::string> wJets;
+  wJets.push_back(std::string("W1Jets"));
+  wJets.push_back(std::string("W2Jets"));
+  wJets.push_back(std::string("W3Jets"));
+  wJets.push_back(std::string("W4Jets"));
+  SumDatasets(oDir,
+	      wJets,
+	      hists,
+	      "WNJets");
 
   // sum QCD
   std::cout << "Summing histograms for QCD" << std::endl;
   std::vector<std::string> qcd;
-  qcd.push_back("QCD_Pt-30to50_MET");
-  qcd.push_back("QCD_Pt-50to80_MET");
-  qcd.push_back("QCD_Pt-80to120_MET");
-  qcd.push_back("QCD_Pt-120to170_MET");
-  qcd.push_back("QCD_Pt-170to300_MET");
-  qcd.push_back("QCD_Pt-300to470_MET");
-  qcd.push_back("QCD_Pt-470to600_MET");
-  qcd.push_back("QCD_Pt-600to800_MET");
-  qcd.push_back("QCD_Pt-800to1000_MET");
-  qcd.push_back("QCD_Pt-1000to1400_MET");
-  qcd.push_back("QCD_Pt-1400to1800_MET");
-  qcd.push_back("QCD_Pt-1800_MET");
+  qcd.push_back("QCD_Pt30to50");
+  qcd.push_back("QCD_Pt50to80");
+  qcd.push_back("QCD_Pt80to120");
+  qcd.push_back("QCD_Pt120to170");
+  qcd.push_back("QCD_Pt170to300");
+  qcd.push_back("QCD_Pt300to470");
+  qcd.push_back("QCD_Pt470to600");
+  qcd.push_back("QCD_Pt600to800");
+  qcd.push_back("QCD_Pt800to1000");
+  qcd.push_back("QCD_Pt1000to1400");
+  qcd.push_back("QCD_Pt1400to1800");
+  qcd.push_back("QCD_Pt1800");
  
   SumDatasets(oDir,
 	      qcd,
 	      hists,
-	      "QCD_MET");
+	      "QCD");
 
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
-  plots.addDataset("QCD_MET",                    kBlue,   0);
-  plots.addDataset("WJetsToLNu_MET",             kGreen,  0);
-  plots.addDataset("ZJetsToLL_MET",              kOrange, 0);
-  plots.addDataset("VBF_HToZZTo4Nu_M120_NoTrig", kRed,    2);
+  plots.addDataset("QCD",          kBlue,   0);
+  plots.addDataset("WNJets",        kGreen,  0);
+  plots.addDataset("ZJets",        kOrange, 0);
+  plots.addDataset("signalM120",   kRed,    2);
 
   plots.draw("hTrigNM1", "", "");
   plots.draw("hMETFiltNM1", "", "");
