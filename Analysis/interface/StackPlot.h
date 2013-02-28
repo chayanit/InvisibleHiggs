@@ -29,6 +29,7 @@ public:
   void setYMax(float max) { yMax_ = max; }
   void setXTitle(std::string title) { xTitle_ = title; }
   void setYTitle(std::string title) { yTitle_ = title; }
+  void setLabel(std::string label) { label_ = label; }
   void setLegPos(float x1, float y1, float x2, float y2);
 
   // draw a histogram
@@ -51,6 +52,8 @@ private:
   std::string title_;
   std::string xTitle_;
   std::string yTitle_;
+
+  std::string label_;
 
   float yMin_;
   float yMax_;

@@ -22,6 +22,7 @@ StackPlot::StackPlot(std::string dir) :
   yTitle_(""),
   yMin_(0.),
   yMax_(0.),
+  label_(""),
   legX1_(0.6),
   legX2_(0.8),
   legY1_(0.6),
@@ -133,7 +134,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
   cms.SetFillColor(0);
   cms.SetBorderSize(1);
   cms.SetLineColor(0);
-  cms.AddText("CMS Preliminary 2012 #int L = 19.56 fb^{-1}");
+  cms.AddText(label_.c_str());
   cms.Draw();
 
   // draw legend

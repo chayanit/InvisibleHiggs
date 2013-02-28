@@ -70,12 +70,11 @@ int main(int argc, char* argv[]) {
   ctrl += cuts.cut(1);  // met filters
   ctrl += cuts.cut(2);  // dijets
   ctrl += cuts.cut(3);  // fwd/bkwd
-  ctrl += TCut("met>70.");
   ctrl += cuts.cut(7);  // lepton vetoes
   ctrl += cuts.cut(8);
 
-  TCut controlCut = TCut("puWeight") * ctrl;
-  std::cout << "Making plots after this cut : " << controlCut << std::endl << std::endl;
+  TCut ctrl1 = TCut("puWeight") * (ctrl+cuts.cut(5));  // Mjj
+  TCut ctrl2 = TCut("puWeight") * (ctrl+cuts.cut(6));  // MET
 
   // loop over datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
@@ -106,14 +105,14 @@ int main(int argc, char* argv[]) {
     TH1D* hmet       = new TH1D("hmet",       "", 100, 0.,  200.);
 
     // fill histograms
-    tree->Draw("jet1Pt>>hjet1pt", controlCut);
-    tree->Draw("jet2Pt>>hjet2pt", controlCut);
-    tree->Draw("jet1Eta>>hjet1eta", controlCut);
-    tree->Draw("jet2Eta>>hjet2eta", controlCut);
-    tree->Draw("vbfDEta>>hjetdeta", controlCut);
-    tree->Draw("vbfDPhi>>hjetdphi", controlCut);
-    tree->Draw("vbfM>>hmjj", controlCut);
-    tree->Draw("met>>hmet", controlCut);
+    tree->Draw("jet1Pt>>hjet1pt", ctrl2);
+    tree->Draw("jet2Pt>>hjet2pt", ctrl2);
+    tree->Draw("jet1Eta>>hjet1eta", ctrl2);
+    tree->Draw("jet2Eta>>hjet2eta", ctrl2);
+    tree->Draw("vbfDEta>>hjetdeta", ctrl2);
+    tree->Draw("vbfDPhi>>hjetdphi", ctrl2);
+    tree->Draw("vbfM>>hmjj", ctrl2);
+    tree->Draw("met>>hmet", ctrl1);
 
     // scale MC to lumi
     if (!dataset.isData) {
@@ -203,7 +202,10 @@ int main(int argc, char* argv[]) {
   SumDatasets(oDir, dibDatasets, hists, "DiBoson");
 
   // make plots
+  std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
+  plots.setLabel("CMS Preliminary 2012 #int L = 19.56 fb^{-1}");
+
   plots.addDataset("QCD",        kBlue, 0);
   plots.addDataset("WNJets",      kGreen, 0);
   plots.addDataset("ZJets",      kOrange, 0);

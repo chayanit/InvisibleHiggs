@@ -203,6 +203,8 @@ int main(int argc, char* argv[]) {
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
+  plots.setLabel("CMS Preliminary 2012 #int L = 19.56 fb^{-1}");
+
   plots.addDataset("QCD",          kBlue,   0);
   plots.addDataset("WNJets",        kGreen,  0);
   plots.addDataset("ZJets",        kOrange, 0);
