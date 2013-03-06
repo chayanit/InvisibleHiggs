@@ -14382,6 +14382,33 @@ process.patJets = cms.EDProducer("PATJetProducer",
 )
 
 
+process.patJetsNotOverlappingWithLeptonsForMEtUncertainty = cms.EDProducer("PATJetCleaner",
+    finalCut = cms.string(''),
+    src = cms.InputTag("selectedPatJets"),
+    checkOverlaps = cms.PSet(
+        electrons = cms.PSet(
+            src = cms.InputTag("cleanPatElectrons"),
+            deltaR = cms.double(0.5),
+            pairCut = cms.string(''),
+            checkRecoComponents = cms.bool(False),
+            algorithm = cms.string('byDeltaR'),
+            preselection = cms.string(''),
+            requireNoOverlaps = cms.bool(True)
+        ),
+        muons = cms.PSet(
+            src = cms.InputTag("cleanPatMuons"),
+            deltaR = cms.double(0.5),
+            pairCut = cms.string(''),
+            checkRecoComponents = cms.bool(False),
+            algorithm = cms.string('byDeltaR'),
+            preselection = cms.string(''),
+            requireNoOverlaps = cms.bool(True)
+        )
+    ),
+    preselection = cms.string('')
+)
+
+
 process.patMETs = cms.EDProducer("PATMETProducer",
     metSource = cms.InputTag("pfType1CorrectedMet"),
     userData = cms.PSet(
@@ -14537,6 +14564,367 @@ process.patMuons = cms.EDProducer("PATMuonProducer",
     isolationValues = cms.PSet(
 
     )
+)
+
+
+process.patPFJetMETtype1p2Corr = cms.EDProducer("PATPFJetMETcorrInputProducer",
+    src = cms.InputTag("selectedPatJetsForMETtype1p2Corr"),
+    type1JetPtThreshold = cms.double(10.0),
+    skipEMfractionThreshold = cms.double(0.9),
+    skipEM = cms.bool(True),
+    offsetCorrLabel = cms.string('L1FastJet'),
+    skipMuons = cms.bool(True),
+    skipMuonSelection = cms.string('isGlobalMuon | isStandAloneMuon'),
+    jetCorrLabel = cms.string('L2L3Residual')
+)
+
+
+process.patPFJetMETtype1p2CorrUnclusteredEnDown = cms.EDProducer("ShiftedMETcorrInputProducer",
+    src = cms.VInputTag(cms.InputTag("patPFJetMETtype1p2Corr","type2"), cms.InputTag("patPFJetMETtype1p2Corr","offset")),
+    uncertainty = cms.double(0.1),
+    shiftBy = cms.double(-1.0)
+)
+
+
+process.patPFJetMETtype1p2CorrUnclusteredEnUp = cms.EDProducer("ShiftedMETcorrInputProducer",
+    src = cms.VInputTag(cms.InputTag("patPFJetMETtype1p2Corr","type2"), cms.InputTag("patPFJetMETtype1p2Corr","offset")),
+    uncertainty = cms.double(0.1),
+    shiftBy = cms.double(1.0)
+)
+
+
+process.patPFJetMETtype2Corr = cms.EDProducer("PATPFJetMETcorrInputProducer",
+    src = cms.InputTag("selectedPatJetsForMETtype2Corr"),
+    type1JetPtThreshold = cms.double(10.0),
+    skipEMfractionThreshold = cms.double(0.9),
+    skipEM = cms.bool(True),
+    offsetCorrLabel = cms.string('L1FastJet'),
+    skipMuons = cms.bool(True),
+    skipMuonSelection = cms.string('isGlobalMuon | isStandAloneMuon'),
+    jetCorrLabel = cms.string('L2L3Residual')
+)
+
+
+process.patPFJetMETtype2CorrUnclusteredEnDown = cms.EDProducer("ShiftedMETcorrInputProducer",
+    src = cms.VInputTag(cms.InputTag("patPFJetMETtype2Corr","type2")),
+    uncertainty = cms.double(0.1),
+    shiftBy = cms.double(-1.0)
+)
+
+
+process.patPFJetMETtype2CorrUnclusteredEnUp = cms.EDProducer("ShiftedMETcorrInputProducer",
+    src = cms.VInputTag(cms.InputTag("patPFJetMETtype2Corr","type2")),
+    uncertainty = cms.double(0.1),
+    shiftBy = cms.double(1.0)
+)
+
+
+process.patPFMETcorrElectronEnDown = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
+    srcOriginal = cms.InputTag("cleanPatElectrons"),
+    srcShifted = cms.InputTag("shiftedPatElectronsEnDown")
+)
+
+
+process.patPFMETcorrElectronEnUp = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
+    srcOriginal = cms.InputTag("cleanPatElectrons"),
+    srcShifted = cms.InputTag("shiftedPatElectronsEnUp")
+)
+
+
+process.patPFMETcorrJetEnDown = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
+    srcOriginal = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    srcShifted = cms.InputTag("shiftedPatJetsEnDownForCorrMEt")
+)
+
+
+process.patPFMETcorrJetEnUp = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
+    srcOriginal = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    srcShifted = cms.InputTag("shiftedPatJetsEnUpForCorrMEt")
+)
+
+
+process.patPFMETcorrMuonEnDown = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
+    srcOriginal = cms.InputTag("cleanPatMuons"),
+    srcShifted = cms.InputTag("shiftedPatMuonsEnDown")
+)
+
+
+process.patPFMETcorrMuonEnUp = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
+    srcOriginal = cms.InputTag("cleanPatMuons"),
+    srcShifted = cms.InputTag("shiftedPatMuonsEnUp")
+)
+
+
+process.patPFMETtype0Corr = cms.EDProducer("Type0PFMETcorrInputProducer",
+    srcPFCandidateToVertexAssociations = cms.InputTag("pfCandidateToVertexAssociation"),
+    correction = cms.PSet(
+        formula = cms.string('-([0] + [1]*x)*(1.0 + TMath::Erf(-[2]*TMath::Power(x, [3])))'),
+        par3 = cms.double(0.909209),
+        par2 = cms.double(0.0303531),
+        par1 = cms.double(-0.703151),
+        par0 = cms.double(0.0)
+    ),
+    srcHardScatterVertex = cms.InputTag("selectedPrimaryVertexHighestPtTrackSumForPFMEtCorrType0"),
+    minDz = cms.double(0.2)
+)
+
+
+process.patPFMet = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    muonSource = cms.InputTag("muons"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetElectronEnDown = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    muonSource = cms.InputTag("muons"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrElectronEnDown")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetElectronEnUp = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrElectronEnUp")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    muonSource = cms.InputTag("muons"),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetJetEnDown = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    muonSource = cms.InputTag("muons"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetEnDown")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetJetEnUp = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetEnUp")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    muonSource = cms.InputTag("muons"),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetMuonEnDown = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    muonSource = cms.InputTag("muons"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrMuonEnDown")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetMuonEnUp = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrMuonEnUp")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    muonSource = cms.InputTag("muons"),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetUnclusteredEnDown = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("pfCandMETcorrUnclusteredEnDown"), cms.InputTag("patPFJetMETtype1p2CorrUnclusteredEnDown","type2"), cms.InputTag("patPFJetMETtype1p2CorrUnclusteredEnDown","offset"), cms.InputTag("patPFJetMETtype2CorrUnclusteredEnDown","type2")),
+    src = cms.InputTag("patPFMet"),
+    applyType1Corrections = cms.bool(True)
+)
+
+
+process.patPFMetUnclusteredEnUp = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("pfCandMETcorrUnclusteredEnUp"), cms.InputTag("patPFJetMETtype1p2CorrUnclusteredEnUp","type2"), cms.InputTag("patPFJetMETtype1p2CorrUnclusteredEnUp","offset"), cms.InputTag("patPFJetMETtype2CorrUnclusteredEnUp","type2")),
+    applyType1Corrections = cms.bool(True),
+    src = cms.InputTag("patPFMet")
 )
 
 
@@ -14707,8 +15095,107 @@ process.patTaus = cms.EDProducer("PATTauProducer",
 )
 
 
+process.patType1CorrectedPFMet = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFJetMETtype1p2Corr","type1"), cms.InputTag("patPFMETtype0Corr")),
+    src = cms.InputTag("patPFMet"),
+    applyType1Corrections = cms.bool(True)
+)
+
+
+process.patType1CorrectedPFMetElectronEnDown = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrElectronEnDown")),
+    src = cms.InputTag("patType1CorrectedPFMet"),
+    applyType1Corrections = cms.bool(True)
+)
+
+
+process.patType1CorrectedPFMetElectronEnUp = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrElectronEnUp")),
+    applyType1Corrections = cms.bool(True),
+    src = cms.InputTag("patType1CorrectedPFMet")
+)
+
+
+process.patType1CorrectedPFMetJetEnDown = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetEnDown")),
+    src = cms.InputTag("patType1CorrectedPFMet"),
+    applyType1Corrections = cms.bool(True)
+)
+
+
+process.patType1CorrectedPFMetJetEnUp = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetEnUp")),
+    applyType1Corrections = cms.bool(True),
+    src = cms.InputTag("patType1CorrectedPFMet")
+)
+
+
+process.patType1CorrectedPFMetMuonEnDown = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrMuonEnDown")),
+    src = cms.InputTag("patType1CorrectedPFMet"),
+    applyType1Corrections = cms.bool(True)
+)
+
+
+process.patType1CorrectedPFMetMuonEnUp = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrMuonEnUp")),
+    applyType1Corrections = cms.bool(True),
+    src = cms.InputTag("patType1CorrectedPFMet")
+)
+
+
+process.patType1CorrectedPFMetUnclusteredEnDown = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("pfCandMETcorrUnclusteredEnDown"), cms.InputTag("patPFJetMETtype1p2CorrUnclusteredEnDown","type2"), cms.InputTag("patPFJetMETtype1p2CorrUnclusteredEnDown","offset"), cms.InputTag("patPFJetMETtype2CorrUnclusteredEnDown","type2")),
+    src = cms.InputTag("patType1CorrectedPFMet"),
+    applyType1Corrections = cms.bool(True)
+)
+
+
+process.patType1CorrectedPFMetUnclusteredEnUp = cms.EDProducer("CorrectedPATMETProducer",
+    applyType2Corrections = cms.bool(False),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("pfCandMETcorrUnclusteredEnUp"), cms.InputTag("patPFJetMETtype1p2CorrUnclusteredEnUp","type2"), cms.InputTag("patPFJetMETtype1p2CorrUnclusteredEnUp","offset"), cms.InputTag("patPFJetMETtype2CorrUnclusteredEnUp","type2")),
+    applyType1Corrections = cms.bool(True),
+    src = cms.InputTag("patType1CorrectedPFMet")
+)
+
+
+process.patType1p2CorrectedPFMet = cms.EDProducer("CorrectedPATMETProducer",
+    src = cms.InputTag("patPFMet"),
+    applyType1Corrections = cms.bool(True),
+    type2CorrFormula = cms.string('A'),
+    srcUnclEnergySums = cms.VInputTag(cms.InputTag("patPFJetMETtype1p2Corr","type2"), cms.InputTag("patPFJetMETtype2Corr","type2"), cms.InputTag("patPFJetMETtype1p2Corr","offset"), cms.InputTag("pfCandMETcorr")),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFJetMETtype1p2Corr","type1"), cms.InputTag("patPFMETtype0Corr")),
+    applyType2Corrections = cms.bool(True),
+    type2CorrParameter = cms.PSet(
+        A = cms.double(1.4)
+    )
+)
+
+
 process.pfCandMETcorr = cms.EDProducer("PFCandMETcorrInputProducer",
     src = cms.InputTag("pfCandsNotInJet")
+)
+
+
+process.pfCandMETcorrUnclusteredEnDown = cms.EDProducer("ShiftedMETcorrInputProducer",
+    src = cms.VInputTag(cms.InputTag("pfCandMETcorr")),
+    uncertainty = cms.double(0.1),
+    shiftBy = cms.double(-1.0)
+)
+
+
+process.pfCandMETcorrUnclusteredEnUp = cms.EDProducer("ShiftedMETcorrInputProducer",
+    src = cms.VInputTag(cms.InputTag("pfCandMETcorr")),
+    uncertainty = cms.double(0.1),
+    shiftBy = cms.double(1.0)
 )
 
 
@@ -15115,6 +15602,16 @@ process.pfMETcorrType0 = cms.EDProducer("Type0PFMETcorrInputProducer",
     ),
     srcHardScatterVertex = cms.InputTag("selectedPrimaryVertexHighestPtTrackSumForPFMEtCorrType0"),
     minDz = cms.double(0.2)
+)
+
+
+process.pfMEtSysShiftCorr = cms.EDProducer("SysShiftMETcorrInputProducer",
+    srcVertices = cms.InputTag("selectedVerticesForMEtCorr"),
+    parameter = cms.PSet(
+        px = cms.string('+3.54233e-01 + 2.65299e-01*Nvtx'),
+        py = cms.string('+1.88923e-01 - 1.66425e-01*Nvtx')
+    ),
+    src = cms.InputTag("pfMet")
 )
 
 
@@ -17053,6 +17550,114 @@ process.secondaryVertexTagInfos = cms.EDProducer("SecondaryVertexProducer",
     usePVError = cms.bool(True),
     trackSort = cms.string('sip3dSig'),
     extSVCollection = cms.InputTag("secondaryVertices")
+)
+
+
+process.selectedPatJetsForMETtype1p2CorrEnDown = cms.EDProducer("ShiftedPATJetProducer",
+    addResidualJES = cms.bool(False),
+    src = cms.InputTag("selectedPatJetsForMETtype1p2Corr"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
+    shiftBy = cms.double(-1.0),
+    jetCorrUncertaintyTag = cms.string('SubTotalMC'),
+    jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
+    jetCorrLabelUpToL3 = cms.string('ak5PFL1FastL2L3')
+)
+
+
+process.selectedPatJetsForMETtype1p2CorrEnUp = cms.EDProducer("ShiftedPATJetProducer",
+    addResidualJES = cms.bool(False),
+    src = cms.InputTag("selectedPatJetsForMETtype1p2Corr"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
+    shiftBy = cms.double(1.0),
+    jetCorrUncertaintyTag = cms.string('SubTotalMC'),
+    jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
+    jetCorrLabelUpToL3 = cms.string('ak5PFL1FastL2L3')
+)
+
+
+process.shiftedPatElectronsEnDown = cms.EDProducer("ShiftedPATElectronProducer",
+    src = cms.InputTag("cleanPatElectrons"),
+    shiftBy = cms.double(-1.0),
+    binning = cms.VPSet(cms.PSet(
+        binUncertainty = cms.double(0.006),
+        binSelection = cms.string('isEB')
+    ), 
+        cms.PSet(
+            binUncertainty = cms.double(0.015),
+            binSelection = cms.string('!isEB')
+        ))
+)
+
+
+process.shiftedPatElectronsEnUp = cms.EDProducer("ShiftedPATElectronProducer",
+    src = cms.InputTag("cleanPatElectrons"),
+    shiftBy = cms.double(1.0),
+    binning = cms.VPSet(cms.PSet(
+        binUncertainty = cms.double(0.006),
+        binSelection = cms.string('isEB')
+    ), 
+        cms.PSet(
+            binUncertainty = cms.double(0.015),
+            binSelection = cms.string('!isEB')
+        ))
+)
+
+
+process.shiftedPatJetsEnDownForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
+    addResidualJES = cms.bool(False),
+    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
+    shiftBy = cms.double(-1.0),
+    jetCorrUncertaintyTag = cms.string('SubTotalMC'),
+    jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
+    jetCorrLabelUpToL3 = cms.string('ak5PFL1FastL2L3')
+)
+
+
+process.shiftedPatJetsEnDownForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
+    addResidualJES = cms.bool(True),
+    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
+    shiftBy = cms.double(-1.0),
+    jetCorrUncertaintyTag = cms.string('SubTotalMC'),
+    jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
+    jetCorrLabelUpToL3 = cms.string('ak5PFL1FastL2L3')
+)
+
+
+process.shiftedPatJetsEnUpForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
+    addResidualJES = cms.bool(False),
+    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
+    shiftBy = cms.double(1.0),
+    jetCorrUncertaintyTag = cms.string('SubTotalMC'),
+    jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
+    jetCorrLabelUpToL3 = cms.string('ak5PFL1FastL2L3')
+)
+
+
+process.shiftedPatJetsEnUpForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
+    addResidualJES = cms.bool(True),
+    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
+    shiftBy = cms.double(1.0),
+    jetCorrUncertaintyTag = cms.string('SubTotalMC'),
+    jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
+    jetCorrLabelUpToL3 = cms.string('ak5PFL1FastL2L3')
+)
+
+
+process.shiftedPatMuonsEnDown = cms.EDProducer("ShiftedPATMuonProducer",
+    src = cms.InputTag("cleanPatMuons"),
+    uncertainty = cms.double(0.002),
+    shiftBy = cms.double(-1.0)
+)
+
+
+process.shiftedPatMuonsEnUp = cms.EDProducer("ShiftedPATMuonProducer",
+    src = cms.InputTag("cleanPatMuons"),
+    uncertainty = cms.double(0.002),
+    shiftBy = cms.double(1.0)
 )
 
 
@@ -19206,6 +19811,20 @@ process.selectedPatJets = cms.EDFilter("PATJetSelector",
 )
 
 
+process.selectedPatJetsForMETtype1p2Corr = cms.EDFilter("PATJetSelector",
+    filter = cms.bool(False),
+    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    cut = cms.string('abs(eta) < 9.9')
+)
+
+
+process.selectedPatJetsForMETtype2Corr = cms.EDFilter("PATJetSelector",
+    filter = cms.bool(False),
+    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    cut = cms.string('abs(eta) > 9.9')
+)
+
+
 process.selectedPatMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuons"),
     cut = cms.string('isGlobalMuon && pt>10. && abs(eta)<2.5')
@@ -19228,6 +19847,13 @@ process.selectedPrimaryVertexHighestPtTrackSumForPFMEtCorrType0 = cms.EDFilter("
     filter = cms.bool(False),
     vertices = cms.InputTag("selectedVerticesForPFMEtCorrType0"),
     mode = cms.string('firstVertex')
+)
+
+
+process.selectedVerticesForMEtCorr = cms.EDFilter("VertexSelector",
+    filter = cms.bool(False),
+    src = cms.InputTag("offlinePrimaryVertices"),
+    cut = cms.string('isValid & ndof >= 4 & chi2 > 0 & tracksSize > 0 & abs(z) < 24 & abs(position.Rho) < 2.')
 )
 
 
@@ -19309,6 +19935,34 @@ process.out = cms.OutputModule("PoolOutputModule",
         'drop *_selectedPatJets_tagInfos_*', 
         'keep *_selectedPatJets_pfCandidates_*', 
         'drop *_selectedPatJets_caloTowers_*', 
+        'keep *_patJetsNotOverlappingWithLeptonsForMEtUncertainty_*_PAT', 
+        'keep *_shiftedPatJetsEnUpForRawMEt_*_PAT', 
+        'keep *_shiftedPatJetsEnDownForRawMEt_*_PAT', 
+        'keep *_shiftedPatJetsEnUpForCorrMEt_*_PAT', 
+        'keep *_shiftedPatJetsEnDownForCorrMEt_*_PAT', 
+        'keep *_shiftedPatElectronsEnUp_*_PAT', 
+        'keep *_shiftedPatElectronsEnDown_*_PAT', 
+        'keep *_shiftedPatMuonsEnUp_*_PAT', 
+        'keep *_shiftedPatMuonsEnDown_*_PAT', 
+        'keep *_patPFMet_*_PAT', 
+        'keep *_patType1CorrectedPFMet_*_PAT', 
+        'keep *_patType1p2CorrectedPFMet_*_PAT', 
+        'keep *_patPFMetJetEnUp_*_PAT', 
+        'keep *_patPFMetJetEnDown_*_PAT', 
+        'keep *_patType1CorrectedPFMetJetEnUp_*_PAT', 
+        'keep *_patType1CorrectedPFMetJetEnDown_*_PAT', 
+        'keep *_patPFMetUnclusteredEnUp_*_PAT', 
+        'keep *_patPFMetUnclusteredEnDown_*_PAT', 
+        'keep *_patType1CorrectedPFMetUnclusteredEnUp_*_PAT', 
+        'keep *_patType1CorrectedPFMetUnclusteredEnDown_*_PAT', 
+        'keep *_patPFMetElectronEnUp_*_PAT', 
+        'keep *_patPFMetElectronEnDown_*_PAT', 
+        'keep *_patPFMetMuonEnUp_*_PAT', 
+        'keep *_patPFMetMuonEnDown_*_PAT', 
+        'keep *_patType1CorrectedPFMetElectronEnUp_*_PAT', 
+        'keep *_patType1CorrectedPFMetElectronEnDown_*_PAT', 
+        'keep *_patType1CorrectedPFMetMuonEnUp_*_PAT', 
+        'keep *_patType1CorrectedPFMetMuonEnDown_*_PAT', 
         'keep edmTriggerResults_*_*_*', 
         'keep *_hltTriggerSummaryAOD_*_*', 
         'keep *_goodPatJets_*_*', 
@@ -19322,6 +19976,9 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 
 process.patElectronTrackIsolation = cms.Sequence(process.eleIsoDepositTk+process.eleIsoFromDepsTk)
+
+
+process.pfMEtSysShiftCorrSequence = cms.Sequence(process.selectedVerticesForMEtCorr+process.pfMEtSysShiftCorr)
 
 
 process.hpsPFTauDiscriminationByIsolationSeq = cms.Sequence(process.hpsPFTauDiscriminationByVLooseIsolation+process.hpsPFTauDiscriminationByLooseIsolation+process.hpsPFTauDiscriminationByMediumIsolation+process.hpsPFTauDiscriminationByTightIsolation)
@@ -19343,6 +20000,9 @@ process.ak5JTA = cms.Sequence(process.ak5JetTracksAssociatorAtVertex+process.ak5
 
 
 process.patElectronHcalIsolation = cms.Sequence(process.eleIsoDepositHcalFromTowers+process.eleIsoFromDepsHcalFromTowers)
+
+
+process.patJetCorrections = cms.Sequence(process.patJetCorrFactors)
 
 
 process.makePatElectrons = cms.Sequence(process.electronMatch+process.patElectrons)
@@ -19406,6 +20066,9 @@ process.countPatCandidates = cms.Sequence(process.countPatElectrons+process.coun
 
 
 process.electronPFIsolationDepositsSequencePFIso = cms.Sequence(process.elPFIsoDepositChargedPFIso+process.elPFIsoDepositChargedAllPFIso+process.elPFIsoDepositGammaPFIso+process.elPFIsoDepositNeutralPFIso+process.elPFIsoDepositPUPFIso)
+
+
+process.shiftedParticlesForMEtUncertainties = cms.Sequence(process.shiftedPatJetsEnUpForRawMEt+process.shiftedPatJetsEnDownForRawMEt+process.shiftedPatJetsEnUpForCorrMEt+process.shiftedPatJetsEnDownForCorrMEt+process.shiftedPatElectronsEnUp+process.shiftedPatElectronsEnDown+process.shiftedPatMuonsEnUp+process.shiftedPatMuonsEnDown)
 
 
 process.hpsPFTauDiscriminationByCombinedIsolationSeqDBSumPtCorr = cms.Sequence(process.hpsPFTauDiscriminationByVLooseCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr)
@@ -19480,6 +20143,12 @@ process.patPhotonTrackIsolation = cms.Sequence(process.gamIsoDepositTk+process.g
 process.pfTausBaseSequence = cms.Sequence(process.pfTausProducerSansRefs+process.pfTausProducer+process.pfTausDiscriminationByLeadingTrackFinding+process.pfTausDiscriminationByLeadingPionPtCut+process.pfTausDiscriminationByIsolation)
 
 
+process.patJetMETCorrections = cms.Sequence(process.patJetCorrections)
+
+
+process.makePatJets = cms.Sequence(process.patJetCorrections+process.patJetCharge+process.patJetPartonMatch+process.patJetGenJetMatch+process.patJetFlavourId+process.patJets)
+
+
 process.producePFMETCorrections = cms.Sequence(process.pfCandsNotInJet+process.pfJetMETcorr+process.pfCandMETcorr+process.pfchsMETcorr+process.pfType1CorrectedMet+process.pfType1p2CorrectedMet)
 
 
@@ -19490,9 +20159,6 @@ process.CSCHaloFilterRecoOrTriggerLevel = cms.Sequence(process.CSCHaloFilterTrig
 
 
 process.hiRecoGenJets = cms.Sequence(process.iterativeCone5HiGenJets+process.iterativeCone7HiGenJets+process.ak5HiGenJets+process.ak7HiGenJets+process.kt4HiGenJets+process.kt6HiGenJets+process.ak3HiGenJets+process.ak4HiGenJets)
-
-
-process.patJetCorrections = cms.Sequence(process.patJetCorrFactors)
 
 
 process.makePatMHTs = cms.Sequence(process.patMHTs)
@@ -19549,9 +20215,6 @@ process.makePatMETs = cms.Sequence(process.patMETCorrections+process.patMETs)
 process.recoTauClassicShrinkingConeSequence = cms.Sequence(process.recoTauCommonSequence+process.ak5PFJetsRecoTauPiZeros+process.produceAndDiscriminateShrinkingConePFTaus)
 
 
-process.patJetMETCorrections = cms.Sequence(process.patJetCorrections)
-
-
 process.muonPFIsolationSequence = cms.Sequence(process.muonPFIsolationDepositsSequence+process.muPFIsoValueCharged03+process.muPFIsoValueChargedAll03+process.muPFIsoValueGamma03+process.muPFIsoValueNeutral03+process.muPFIsoValueGammaHighThreshold03+process.muPFIsoValueNeutralHighThreshold03+process.muPFIsoValuePU03+process.muPFIsoValueCharged04+process.muPFIsoValueChargedAll04+process.muPFIsoValueGamma04+process.muPFIsoValueNeutral04+process.muPFIsoValueGammaHighThreshold04+process.muPFIsoValueNeutralHighThreshold04+process.muPFIsoValuePU04)
 
 
@@ -19594,13 +20257,13 @@ process.patPFCandidateIsoDepositSelection = cms.Sequence(process.pfNoPileUpIsoSe
 process.pfElectronIsolationSequence = cms.Sequence(process.electronPFIsolationDepositsSequence+process.elPFIsoValueCharged03PFId+process.elPFIsoValueChargedAll03PFId+process.elPFIsoValueGamma03PFId+process.elPFIsoValueNeutral03PFId+process.elPFIsoValuePU03PFId+process.elPFIsoValueCharged04PFId+process.elPFIsoValueChargedAll04PFId+process.elPFIsoValueGamma04PFId+process.elPFIsoValueNeutral04PFId+process.elPFIsoValuePU04PFId+process.elPFIsoValueCharged03NoPFId+process.elPFIsoValueChargedAll03NoPFId+process.elPFIsoValueGamma03NoPFId+process.elPFIsoValueNeutral03NoPFId+process.elPFIsoValuePU03NoPFId+process.elPFIsoValueCharged04NoPFId+process.elPFIsoValueChargedAll04NoPFId+process.elPFIsoValueGamma04NoPFId+process.elPFIsoValueNeutral04NoPFId+process.elPFIsoValuePU04NoPFId)
 
 
-process.makePatJets = cms.Sequence(process.patJetCorrections+process.patJetCharge+process.patJetPartonMatch+process.patJetGenJetMatch+process.patJetFlavourId+process.patJets)
-
-
 process.pfElectronSequence = cms.Sequence(process.pfAllElectrons+process.pfElectronsFromVertex+process.pfSelectedElectrons+process.pfElectronIsolationSequence+process.pfIsolatedElectrons+process.pfElectrons)
 
 
 process.pfMuonSequence = cms.Sequence(process.pfAllMuons+process.pfMuonsFromVertex+process.pfSelectedMuons+process.pfMuonIsolationSequence+process.pfIsolatedMuons+process.pfMuons)
+
+
+process.producePatPFMETCorrections = cms.Sequence(process.patPFMet+process.pfCandsNotInJet+process.selectedPatJetsForMETtype1p2Corr+process.selectedPatJetsForMETtype2Corr+process.patPFJetMETtype1p2Corr+process.patPFJetMETtype2Corr+process.type0PFMEtCorrection+process.patPFMETtype0Corr+process.pfCandMETcorr+process.patType1CorrectedPFMet+process.patType1p2CorrectedPFMet)
 
 
 process.stdMuonSequence = cms.Sequence(process.pfMuonIsolationSequence)
@@ -19621,13 +20284,16 @@ process.makePatTaus = cms.Sequence(process.patHPSPFTauDiscriminationUpdate+proce
 process.PFTau = cms.Sequence(process.recoTauCommonSequence+process.recoTauClassicHPSSequence)
 
 
+process.metUncertaintySequence = cms.Sequence(process.patJetsNotOverlappingWithLeptonsForMEtUncertainty+process.shiftedParticlesForMEtUncertainties+process.producePatPFMETCorrections+process.selectedPatJetsForMETtype1p2CorrEnUp+process.selectedPatJetsForMETtype1p2CorrEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patPFMetJetEnUp+process.patPFMetJetEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patType1CorrectedPFMetJetEnUp+process.patType1CorrectedPFMetJetEnDown+process.pfCandMETcorrUnclusteredEnUp+process.pfCandMETcorrUnclusteredEnDown+process.patPFJetMETtype1p2CorrUnclusteredEnUp+process.patPFJetMETtype1p2CorrUnclusteredEnDown+process.patPFJetMETtype2CorrUnclusteredEnUp+process.patPFJetMETtype2CorrUnclusteredEnDown+process.patPFMetUnclusteredEnUp+process.patPFMetUnclusteredEnDown+process.patType1CorrectedPFMetUnclusteredEnUp+process.patType1CorrectedPFMetUnclusteredEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patPFMetElectronEnUp+process.patPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patPFMetMuonEnUp+process.patPFMetMuonEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patType1CorrectedPFMetElectronEnUp+process.patType1CorrectedPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patType1CorrectedPFMetMuonEnUp+process.patType1CorrectedPFMetMuonEnDown)
+
+
 process.patCandidates = cms.Sequence(process.makePatElectrons+process.makePatMuons+process.makePatTaus+process.makePatPhotons+process.makePatJets+process.makePatMETs+process.patCandidateSummary)
 
 
 process.PFBRECO = cms.Sequence(process.pfNoPileUpSequence+process.pfParticleSelectionSequence+process.pfPhotonSequence+process.pfMuonSequence+process.pfNoMuon+process.pfElectronSequence+process.pfNoElectron+process.pfJetSequence+process.pfNoJet+process.pfTauSequence+process.pfNoTau+process.pfMET)
 
 
-process.patDefaultSequence = cms.Sequence(process.eleIsoSequence+process.patElectrons+process.patMuons+process.patHPSPFTauDiscriminationUpdate+process.patPFCandidateIsoDepositSelection+process.patPFTauIsolation+process.patTaus+process.patPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.patJetCharge+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates)
+process.patDefaultSequence = cms.Sequence(process.eleIsoSequence+process.patElectrons+process.patMuons+process.patHPSPFTauDiscriminationUpdate+process.patPFCandidateIsoDepositSelection+process.patPFTauIsolation+process.patTaus+process.patPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.patJetCharge+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates+process.metUncertaintySequence)
 
 
 process.p0 = cms.Path(process.HBHENoiseFilter)
@@ -22103,6 +22769,86 @@ process.noPrediscriminants = cms.PSet(
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
+)
+
+process.pfMEtSysShiftCorrParameters_2011runAplusBvsNvtx_data = cms.PSet(
+    px = cms.string('+3.64118e-01 + 2.93853e-01*Nvtx'),
+    py = cms.string('-7.17757e-01 - 3.57309e-01*Nvtx')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runAplusBvsNvtx_mc = cms.PSet(
+    px = cms.string('-4.79178e-02 + 8.62653e-04*Nvtx'),
+    py = cms.string('-4.54408e-01 - 1.89684e-01*Nvtx')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runAplusBvsSumEt_data = cms.PSet(
+    px = cms.string('-5.65217e-01 + 5.42436e-03*sumEt'),
+    py = cms.string('+4.54054e-01 - 6.73607e-03*sumEt')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runAplusBvsSumEt_mc = cms.PSet(
+    px = cms.string('-4.53909e-02 - 2.55863e-05*sumEt'),
+    py = cms.string('+1.27947e-01 - 3.62604e-03*sumEt')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runAvsNvtx_data = cms.PSet(
+    px = cms.string('+3.87339e-1 + 2.58294e-1*Nvtx'),
+    py = cms.string('-7.83502e-1 - 2.88899e-1*Nvtx')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runAvsNvtx_mc = cms.PSet(
+    px = cms.string('-1.94451e-2 - 4.38986e-3*Nvtx'),
+    py = cms.string('-4.31368e-1 - 1.90753e-1*Nvtx')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runAvsSumEt_data = cms.PSet(
+    px = cms.string('-3.365e-1 + 4.801e-3*sumEt'),
+    py = cms.string('+2.578e-1 - 6.124e-3*sumEt')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runAvsSumEt_mc = cms.PSet(
+    px = cms.string('-9.389e-2 + 1.815e-4*sumEt'),
+    py = cms.string('+1.571e-1 - 3.710e-3*sumEt')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runBvsNvtx_data = cms.PSet(
+    px = cms.string('+6.64470e-1 + 2.71292e-1*Nvtx'),
+    py = cms.string('-1.23999e0 - 3.18661e-1*Nvtx')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runBvsNvtx_mc = cms.PSet(
+    px = cms.string('-9.89706e-2 + 6.64796e-3*Nvtx'),
+    py = cms.string('-5.32495e-1 - 1.82195e-1*Nvtx')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runBvsSumEt_data = cms.PSet(
+    px = cms.string('-3.265e-1 + 5.162e-3*sumEt'),
+    py = cms.string('-1.956e-2 - 6.299e-3*sumEt')
+)
+
+process.pfMEtSysShiftCorrParameters_2011runBvsSumEt_mc = cms.PSet(
+    px = cms.string('-1.070e-1 + 9.587e-5*sumEt'),
+    py = cms.string('-1.517e-2 - 3.357e-3*sumEt')
+)
+
+process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data = cms.PSet(
+    px = cms.string('+3.54233e-01 + 2.65299e-01*Nvtx'),
+    py = cms.string('+1.88923e-01 - 1.66425e-01*Nvtx')
+)
+
+process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc = cms.PSet(
+    px = cms.string('-2.99576e-02 - 6.61932e-02*Nvtx'),
+    py = cms.string('+3.70819e-01 - 1.48617e-01*Nvtx')
+)
+
+process.pfMEtSysShiftCorrParameters_2012runAvsSumEt_data = cms.PSet(
+    px = cms.string('-7.67892e-01 + 5.76983e-03*sumEt'),
+    py = cms.string('+5.54005e-01 - 2.94046e-03*sumEt')
+)
+
+process.pfMEtSysShiftCorrParameters_2012runAvsSumEt_mc = cms.PSet(
+    px = cms.string('+1.77344e-01 - 1.34333e-03*sumEt'),
+    py = cms.string('+8.08402e-01 - 2.84264e-03*sumEt')
 )
 
 process.requireDecayMode = cms.PSet(

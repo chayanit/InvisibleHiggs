@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.18 2013/02/06 23:03:19 chayanit Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.19 2013/02/10 07:45:34 srimanob Exp $
 //
 //
 
@@ -102,6 +102,10 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 
+// JEC uncertainty
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 // Math
 #include "DataFormats/Math/interface/LorentzVector.h"
@@ -167,7 +171,8 @@ private:
 	      edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
 	      edm::Handle<edm::ValueMap<int> > puJetIdFlags,
 	      const std::vector<pat::Muon>& muons,               //Loose muons
-	      const std::vector<pat::Electron>& electrons);      //Loose electrons
+	      const std::vector<pat::Electron>& electrons,       //Loose electrons
+	      JetCorrectionUncertainty *JecUnc);
   void doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
 		  edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
 		  edm::Handle<edm::ValueMap<int> > puJetIdFlags,
@@ -459,6 +464,11 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   edm::Handle<edm::View<pat::Jet> > jets;
   iEvent.getByLabel(jetTag_, jets);
+ 
+  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+  iSetup.get<JetCorrectionsRecord>().get("AK5PF",JetCorParColl); 
+  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
 
   edm::Handle<edm::ValueMap<float> > puJetIdMVA;
   iEvent.getByLabel(puJetMvaTag_,puJetIdMVA);
@@ -499,7 +509,7 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   if (vertices.isValid()) doVertices(*vertices);
 
   // do jets before MET etc. because this defines the VBF pair
-  if (jets.isValid()) doJets(jets, puJetIdMVA, puJetIdFlag, *looseMuons, *looseElectrons);
+  if (jets.isValid()) doJets(jets, puJetIdMVA, puJetIdFlag, *looseMuons, *looseElectrons, jecUnc);
 
   if (jets.isValid()) doThirdJet(jets, puJetIdMVA, puJetIdFlag, *looseMuons, *looseElectrons);
 
@@ -580,7 +590,7 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
     for(size_t i = 0; i < genParticles.size(); ++ i) {
       const GenParticle & p = genParticles[i];
       //W
-      if(abs(p.pdgId())==24 && p.status()==3 && (!foundw1) ){ //
+      if(fabs(p.pdgId())==24 && p.status()==3 && (!foundw1) ){ //
 	foundw1 = true;  
 	//std::cout<<p.pt()<<std::endl;
 	info_->wgenmass = p.mass();
@@ -591,21 +601,21 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
 	info_->wgene    = p.energy(); 
 	for(int j=0;p.daughter(j)!=NULL;j++) {//loop on W daughter
 	  const reco::Candidate* pl = p.daughter(j);  
-	  if(abs(pl->pdgId())==11){
+	  if(fabs(pl->pdgId())==11){
 	    info_->wltype  = 1;
 	    info_->wlpt    = pl->pt();
 	    info_->wleta   = pl->eta();
 	    info_->wlphi   = pl->phi();
 	    info_->wle     = pl->energy();   
 	  }
-	  else if(abs(pl->pdgId())==13){ 
+	  else if(fabs(pl->pdgId())==13){ 
 	    info_->wltype  = 2;
 	    info_->wlpt    = pl->pt();
 	    info_->wleta   = pl->eta();
 	    info_->wlphi   = pl->phi();
 	    info_->wle     = pl->energy();
 	  }
-	  else if(abs(pl->pdgId())==15){ 
+	  else if(fabs(pl->pdgId())==15){ 
 	    info_->wltype  = 3;
 	    info_->wlpt    = pl->pt();
 	    info_->wleta   = pl->eta();
@@ -613,7 +623,7 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
 	    info_->wle     = pl->energy();
 	    info_->wtauhadron = hadronicTau(pl);
 	  }
-	  else if(abs(pl->pdgId())==12 ||abs(pl->pdgId())==14 ||abs(pl->pdgId())==16){
+	  else if(fabs(pl->pdgId())==12 ||fabs(pl->pdgId())==14 ||fabs(pl->pdgId())==16){
 	    info_->wmetpt  = pl->pt();
 	    info_->wmeteta = pl->eta();
 	    info_->wmetphi = pl->phi();
@@ -701,10 +711,10 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
 int InvHiggsInfoProducer::hadronicTau(const reco::Candidate* tau)
 {
    for(unsigned int i=0; i<tau->numberOfDaughters();++i){
-   if(abs(tau->daughter(i)->pdgId())>99 || abs(tau->daughter(i)->pdgId())<10) return 1;
-   if(abs(tau->daughter(i)->pdgId())==11) return 2; 
-   if(abs(tau->daughter(i)->pdgId())==13) return 3;
-   if(abs(tau->daughter(i)->pdgId())==15||abs(tau->daughter(i)->pdgId())==24) return hadronicTau(tau->daughter(i));
+   if(fabs(tau->daughter(i)->pdgId())>99 || fabs(tau->daughter(i)->pdgId())<10) return 1;
+   if(fabs(tau->daughter(i)->pdgId())==11) return 2; 
+   if(fabs(tau->daughter(i)->pdgId())==13) return 3;
+   if(fabs(tau->daughter(i)->pdgId())==15||fabs(tau->daughter(i)->pdgId())==24) return hadronicTau(tau->daughter(i));
     }
    // if tau is stable
    return 4;   
@@ -786,7 +796,7 @@ void InvHiggsInfoProducer::doVertices(const std::vector<reco::Vertex>&  vertices
     if (v->isValid() && 
 	!v->isFake() &&
 	v->ndof() > 4 &&
-	abs(v->z()) <= 24 &&
+	fabs(v->z()) <= 24 &&
 	v->position().rho() < 2) info_->nVtx++;
 
   }
@@ -829,7 +839,8 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 				  edm::Handle<edm::ValueMap<float> > puJetIdMVAs, 
 				  edm::Handle<edm::ValueMap<int> > puJetIdFlags,
 				  const std::vector<pat::Muon>& muons,
-				  const std::vector<pat::Electron>& electrons) {
+				  const std::vector<pat::Electron>& electrons,
+				  JetCorrectionUncertainty *JecUnc) {
 
   // VBF jets defined here
 
@@ -882,6 +893,10 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	info_->jet2PUMVA  = (*puJetIdMVAs)[jets->refAt(i)];
 	info_->jet2PUFlag = (*puJetIdFlags)[jets->refAt(i)];
 
+	JecUnc->setJetEta(jets->at(i).eta());
+	JecUnc->setJetPt(jets->at(i).pt());
+	info_->jet2unc    = JecUnc->getUncertainty(true);
+
 	foundSecond = true;
 
       }
@@ -898,7 +913,11 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	info_->jet1M      = jets->at(i).mass();
 	info_->jet1PUMVA  = (*puJetIdMVAs)[jets->refAt(i)];
 	info_->jet1PUFlag = (*puJetIdFlags)[jets->refAt(i)];
-	
+	 
+	JecUnc->setJetEta(jets->at(i).eta());
+        JecUnc->setJetPt(jets->at(i).pt());
+        info_->jet1unc    = JecUnc->getUncertainty(true);
+
 	foundFirst = true;
 	
       }
@@ -1149,15 +1168,14 @@ void InvHiggsInfoProducer::doWs(const reco::CandidateView& ws, int channel) {
 	info_->wChannel = channel;
 
 	const reco::Candidate *Wboson = &(ws[i]);
-	if(Wboson->daughter(0)){ 
-	//std::cout<<"W boson daughter0"<<std::endl;
+	//keep W's lepton information
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
 	  info_->wDaulPt     = Wboson->daughter(0)->pt();
 	  info_->wDaulEta    = Wboson->daughter(0)->eta();
 	  info_->wDaulPhi    = Wboson->daughter(0)->phi();
 	  info_->wDaulCharge = Wboson->daughter(0)->charge();
 	}
-	else if(Wboson->daughter(1)){
-	//std::cout<<"W boson daughter1"<<std::endl;
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){
 	  info_->wDaulPt     = Wboson->daughter(1)->pt();
 	  info_->wDaulEta    = Wboson->daughter(1)->eta();
 	  info_->wDaulPhi    = Wboson->daughter(1)->phi();

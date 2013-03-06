@@ -84,7 +84,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
     ###--------------------------------------------------------------
     print "-----------------------------------------------"
-    print "INVISIBLE HIGGS: Ntuple V9"
+    print "INVISIBLE HIGGS: Ntuple V10"
     print "-----------------------------------------------"
     print "RunOnData = ", iRunOnData
     if iRunOnData == True:
@@ -260,51 +260,51 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         )
 
     # Get PFMET from runMEtUncertainties
-    #from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-    #process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+    from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+    process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
-    #if iRunOnData == True:
-    #    runMEtUncertainties(process,
-    #                        electronCollection = cms.InputTag('cleanPatElectrons'),
-    #                        photonCollection = '',
-    #                        muonCollection = 'cleanPatMuons',
-    #                        tauCollection = '',
-    #                        jetCollection = cms.InputTag('selectedPatJets'),
-    #                        jetCorrLabel = 'L2L3Residual',
-    #                        doSmearJets = False,
-    #                        makeType1corrPFMEt = True,
-    #                        makeType1p2corrPFMEt = False,
-    #                        makePFMEtByMVA = False,
-    #                        makeNoPileUpPFMEt = False,
-    #                        doApplyType0corr = True,
-    #                        sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data,
-    #                        doApplySysShiftCorr = False,
-    #                        )
-    #    process.patPFJetMETtype1p2Corr.jetCorrLabel = cms.string('L2L3Residual')
-    #    process.patPFJetMETtype2Corr.jetCorrLabel = cms.string('L2L3Residual')
-    #else:
-    #    runMEtUncertainties(process,
-    #                        electronCollection = cms.InputTag('cleanPatElectrons'),
-    #                        photonCollection = '',
-    #                        muonCollection = 'cleanPatMuons',
-    #                        tauCollection = '',
-    #                        jetCollection = cms.InputTag('selectedPatJets'),
-    #                        jetCorrLabel = 'L3Absolute',
-    #                        doSmearJets = True,
-    #                        makeType1corrPFMEt = True,
-    #                        makeType1p2corrPFMEt = False,
-    #                        makePFMEtByMVA = False,
-    #                        makeNoPileUpPFMEt = False,
-    #                        doApplyType0corr = True,
-    #                        sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc,
-    #                        doApplySysShiftCorr = False,
-    #                        )
+    if iRunOnData == True:
+        runMEtUncertainties(process,
+                            electronCollection = cms.InputTag('cleanPatElectrons'),
+                            photonCollection = '',
+                            muonCollection = 'cleanPatMuons',
+                            tauCollection = '',
+                            jetCollection = cms.InputTag('selectedPatJets'),
+                            jetCorrLabel = 'L2L3Residual',
+                            doSmearJets = False,
+                            makeType1corrPFMEt = True,
+                            makeType1p2corrPFMEt = False,
+                            makePFMEtByMVA = False,
+                            makeNoPileUpPFMEt = False,
+                            doApplyType0corr = True,
+                            sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data,
+                            doApplySysShiftCorr = False,
+                            )
+        process.patPFJetMETtype1p2Corr.jetCorrLabel = cms.string('L2L3Residual')
+        process.patPFJetMETtype2Corr.jetCorrLabel = cms.string('L2L3Residual')
+    else:
+        runMEtUncertainties(process,
+                            electronCollection = cms.InputTag('cleanPatElectrons'),
+                            photonCollection = '',
+                            muonCollection = 'cleanPatMuons',
+                            tauCollection = '',
+                            jetCollection = cms.InputTag('selectedPatJets'),
+                            jetCorrLabel = 'L3Absolute',
+                            doSmearJets = True,
+                            makeType1corrPFMEt = True,
+                            makeType1p2corrPFMEt = False,
+                            makePFMEtByMVA = False,
+                            makeNoPileUpPFMEt = False,
+                            doApplyType0corr = True,
+                            sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc,
+                            doApplySysShiftCorr = False,
+                            )
 
     # Fix Type0 correction module
-    #process.patPFMETtype0Corr.correction.par3 = cms.double(0.909209)
-    #process.patPFMETtype0Corr.correction.par2 = cms.double(0.0303531)
-    #process.patPFMETtype0Corr.correction.par1 = cms.double(-0.703151)
-    #process.patPFMETtype0Corr.correction.par0 = cms.double(0.0)
+    process.patPFMETtype0Corr.correction.par3 = cms.double(0.909209)
+    process.patPFMETtype0Corr.correction.par2 = cms.double(0.0303531)
+    process.patPFMETtype0Corr.correction.par1 = cms.double(-0.703151)
+    process.patPFMETtype0Corr.correction.par0 = cms.double(0.0)
     ###--------------------------------------------------------------
 
 
