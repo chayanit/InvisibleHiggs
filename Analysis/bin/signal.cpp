@@ -19,18 +19,17 @@ namespace po = boost::program_options;
 int main(int argc, char* argv[]) {
 
   // some variables
-  int nSignalPoints=5;
   double lumi = 5000.;  //pb-1
-  std::string iDir("/storage/phjjb/invisibleHiggs/InvHiggsInfo_v8");
-  std::string oDir("analysis_v8");
-  std::string datasetFile("InvisibleHiggs/Ntuple/data/datasets_v8.txt");
+  std::string iDir("");
+  std::string oDir("");
+  std::string datasetFile("");
 
   // program options
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h",     "Display this message")
     ("outdir,o",   po::value<std::string>(), "Output directory")
-    ("indir,d",    po::value<std::string>(), "Input directory")
+    ("indir,i",    po::value<std::string>(), "Input directory")
     ("datasets,f", po::value<std::string>(), "Datasets file")
     ("lumi,l",     po::value<double>(),      "Integrated luminosity");
 
@@ -50,6 +49,7 @@ int main(int argc, char* argv[]) {
   if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
 
   // create output directory if it doesn't exist already
+  oDir += std::string("/Signal");
   boost::filesystem::path opath(oDir);
   if (!exists(opath)) {
     std::cout << "Creating output directory : " << oDir << std::endl;
@@ -68,11 +68,21 @@ int main(int argc, char* argv[]) {
   TCut puWeight("puWeight");
   TCut weightedAllCuts = puWeight * cuts.allCuts();
 
-
   // plots
-  for (int i=0; i<nSignalPoints; ++i) {
+  int nSignalPoints=0;
+  std::vector<std::string> signalNames;
+
+  for (unsigned i=0; i<datasets.size(); ++i) {
 
     Dataset dataset = datasets.getDataset(i);
+
+    std::string sigstr("signal");
+    if (dataset.name.compare(0,6,sigstr) != 0) continue;
+
+    nSignalPoints++;
+    signalNames.push_back(dataset.name);
+
+    std::cout << "Making signal histograms for " << dataset.name << std::endl;
 
     TFile* ifile = TFile::Open( (iDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "READ");
 
@@ -81,7 +91,7 @@ int main(int argc, char* argv[]) {
       continue;
     }
 
-    TFile* ofile = TFile::Open( (oDir+std::string("/")+dataset.name+std::string("_Signal.root")).c_str(), "WRITE");
+    TFile* ofile = TFile::Open( (oDir+std::string("/")+dataset.name+std::string("_Signal.root")).c_str(), "UPDATE");
     
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
 
@@ -388,7 +398,7 @@ int main(int argc, char* argv[]) {
 
   for (int i=0; i<nSignalPoints; ++i) {
 
-    Dataset dataset = datasets.getDataset(i);
+    Dataset dataset = datasets.getDataset(signalNames.at(i));
 
     TFile* ifile = TFile::Open( (iDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "READ");
 
@@ -414,7 +424,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << dataset.name << "\t" 
 	      << 100.*eff << " +/- " << 100.*effErr << "\t" 
-	      << nMCPas << " / " << nMCTot
+	      << nMCPas << " / " << nMCTot << "\t"
 	      << n << " +/- " << nErr << "\t" << std::endl;
 
     ifile->Close();

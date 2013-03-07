@@ -62,3 +62,47 @@ TCut Cuts::nMinusOneCuts(unsigned i) {
 
 
 // }
+
+TCut Cuts::qcdLoose() {
+  TCut tmp = cut(0);
+  tmp += cut(1);
+  tmp += cut(2);
+  tmp += cut(3);
+  tmp += cut(4);
+  tmp += cut(5);
+  tmp += TCut("met>70.");
+  tmp += cut(7);
+  tmp += cut(8);
+  return tmp;
+}
+
+
+TCut Cuts::qcdLooseHiDPhi() {
+  TCut tmp = qcdLoose();
+  tmp += TCut("vbfDPhi>2.6");
+  return tmp;
+}
+
+
+TCut Cuts::qcdLooseLoDPhi() {
+  TCut tmp = qcdLoose();
+  tmp += cut(9);
+  return tmp;
+}
+
+
+TCut Cuts::qcdTightHiDPhi() {
+  TCut tmp = cut(0);
+  tmp += cut(1);
+  tmp += cut(2);
+  tmp += cut(3);
+  tmp += cut(4);
+  tmp += cut(5);
+  tmp += cut(6);
+  tmp += cut(7);
+  tmp += cut(8);
+  tmp += TCut("vbfDPhi>2.6");
+  return tmp;
+}
+
+

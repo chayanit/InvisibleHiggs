@@ -72,3 +72,15 @@ Dataset Datasets::getDataset(unsigned i) {
   tmp.isData = isData_.at(i);
   return tmp;
 }
+
+Dataset Datasets::getDataset(std::string name) {
+  Dataset tmp;
+  for (unsigned i=0; i<names_.size(); ++i) {
+    tmp.name = names_.at(i);
+    tmp.nEvents = nevts_.at(i);
+    tmp.sigma = sigmas_.at(i);
+    tmp.isData = isData_.at(i);
+    if (tmp.name==name) return tmp;
+  }
+  return Dataset();
+}

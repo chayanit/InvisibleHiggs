@@ -28,7 +28,11 @@ class Cuts {
   TCut singleElectronControlRegion();
   TCut singleElectronVetoRegion();
 
-  TCut qcdControlRegion();
+  // QCD control regions
+  TCut qcdLoose();
+  TCut qcdLooseHiDPhi();
+  TCut qcdLooseLoDPhi();
+  TCut qcdTightHiDPhi();
 
  private:
   

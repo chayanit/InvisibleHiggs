@@ -31,6 +31,8 @@ class Datasets {
 
   Dataset getDataset(unsigned i);
 
+  Dataset getDataset(std::string name);
+
  private:
 
   std::vector<std::string> names_;

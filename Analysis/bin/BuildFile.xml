@@ -19,3 +19,5 @@
 <bin name="nMinusOne" file="nMinusOne.cpp"/>
 
 <bin name="signal" file="signal.cpp"/>
+
+<bin name="limits" file="limits.cpp"/>
