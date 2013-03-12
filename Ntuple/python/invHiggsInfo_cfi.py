@@ -30,6 +30,15 @@ invHiggsInfo = cms.EDAnalyzer(
     # met
     metResultsTag = cms.untracked.InputTag("TriggerResults","","PAT"),
     metTag = cms.untracked.InputTag("patMETs"),
+    # met from runMEtUncertainties
+    met_CentralTag = cms.untracked.InputTag("patType1CorrectedPFMet"),
+    met_JESupTag   = cms.untracked.InputTag("patType1CorrectedPFMetJetEnUp"),
+    met_JESdownTag = cms.untracked.InputTag("patType1CorrectedPFMetJetEnDown"),
+    met_JERupTag   = cms.untracked.InputTag("patType1CorrectedPFMetJetResUp"),
+    met_JERdownTag = cms.untracked.InputTag("patType1CorrectedPFMetJetResDown"),
+    met_UnCupTag   = cms.untracked.InputTag("patType1CorrectedPFMetUnclusteredEnUp"),
+    met_UnCdownTag = cms.untracked.InputTag("patType1CorrectedPFMetUnclusteredEnDown"),
+
     mhtTag = cms.untracked.InputTag("patMHTs"),
 
     # Z and W candidates

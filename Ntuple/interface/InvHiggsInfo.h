@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.11 2013/01/22 20:12:33 chayanit Exp $
+// $Id: InvHiggsInfo.h,v 1.12 2013/03/06 14:00:10 chayanit Exp $
 //
 //
 
@@ -75,6 +75,44 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet2PUMVA;
   Int_t    jet2PUFlag;
   Double_t jet2unc;
+  
+  // Jets shiftup re-ordering
+  Int_t    jet1Index_shiftup;
+  Double_t jet1Pt_shiftup;
+  Double_t jet1Eta_shiftup;
+  Double_t jet1Phi_shiftup;
+  Double_t jet1M_shiftup;
+  Double_t jet1PUMVA_shiftup;
+  Int_t    jet1PUFlag_shiftup;
+  Double_t jet1unc_shiftup;
+
+  Int_t    jet2Index_shiftup;
+  Double_t jet2Pt_shiftup;
+  Double_t jet2Eta_shiftup;
+  Double_t jet2Phi_shiftup;
+  Double_t jet2M_shiftup;
+  Double_t jet2PUMVA_shiftup;
+  Int_t    jet2PUFlag_shiftup;
+  Double_t jet2unc_shiftup;
+
+  // Jets shiftdown re-ordering
+  Int_t    jet1Index_shiftdown;
+  Double_t jet1Pt_shiftdown;
+  Double_t jet1Eta_shiftdown;
+  Double_t jet1Phi_shiftdown;
+  Double_t jet1M_shiftdown;
+  Double_t jet1PUMVA_shiftdown;
+  Int_t    jet1PUFlag_shiftdown;
+  Double_t jet1unc_shiftdown;
+
+  Int_t    jet2Index_shiftdown;
+  Double_t jet2Pt_shiftdown;
+  Double_t jet2Eta_shiftdown;
+  Double_t jet2Phi_shiftdown;
+  Double_t jet2M_shiftdown;
+  Double_t jet2PUMVA_shiftdown;
+  Int_t    jet2PUFlag_shiftdown;
+  Double_t jet2unc_shiftdown;
 
   // MET (need XY correction?)
   Double_t met;
@@ -92,8 +130,83 @@ class InvHiggsInfo { //: public TObject {
   Double_t metNoLooseElectron;
   Double_t metNoLooseElectronPhi;
   // 
-  //
+  // MET Uncertainty
+  Double_t metCentral;
+  Double_t metCentral_Phi;
+  Double_t metCentral_NoMuon;
+  Double_t metCentral_NoMuonPhi; 
+  Double_t metCentral_NoLooseMuon;
+  Double_t metCentral_NoLooseMuonPhi;
+  Double_t metCentral_NoElectron;
+  Double_t metCentral_NoElectronPhi;
+  Double_t metCentral_NoLooseElectron;
+  Double_t metCentral_NoLooseElectronPhi;
 
+  Double_t metJESup;
+  Double_t metJESup_Phi;
+  Double_t metJESup_NoMuon;
+  Double_t metJESup_NoMuonPhi; 
+  Double_t metJESup_NoLooseMuon;
+  Double_t metJESup_NoLooseMuonPhi;
+  Double_t metJESup_NoElectron;
+  Double_t metJESup_NoElectronPhi;
+  Double_t metJESup_NoLooseElectron;
+  Double_t metJESup_NoLooseElectronPhi;
+
+  Double_t metJESdown;
+  Double_t metJESdown_Phi;
+  Double_t metJESdown_NoMuon;
+  Double_t metJESdown_NoMuonPhi; 
+  Double_t metJESdown_NoLooseMuon;
+  Double_t metJESdown_NoLooseMuonPhi;
+  Double_t metJESdown_NoElectron;
+  Double_t metJESdown_NoElectronPhi;
+  Double_t metJESdown_NoLooseElectron;
+  Double_t metJESdown_NoLooseElectronPhi;
+
+  Double_t metJERup;
+  Double_t metJERup_Phi;
+  Double_t metJERup_NoMuon;
+  Double_t metJERup_NoMuonPhi; 
+  Double_t metJERup_NoLooseMuon;
+  Double_t metJERup_NoLooseMuonPhi;
+  Double_t metJERup_NoElectron;
+  Double_t metJERup_NoElectronPhi;
+  Double_t metJERup_NoLooseElectron;
+  Double_t metJERup_NoLooseElectronPhi;
+
+  Double_t metJERdown;
+  Double_t metJERdown_Phi;
+  Double_t metJERdown_NoMuon;
+  Double_t metJERdown_NoMuonPhi; 
+  Double_t metJERdown_NoLooseMuon;
+  Double_t metJERdown_NoLooseMuonPhi;
+  Double_t metJERdown_NoElectron;
+  Double_t metJERdown_NoElectronPhi;
+  Double_t metJERdown_NoLooseElectron;
+  Double_t metJERdown_NoLooseElectronPhi;
+
+  Double_t metUnclusteredup;
+  Double_t metUnclusteredup_Phi;
+  Double_t metUnclusteredup_NoMuon;
+  Double_t metUnclusteredup_NoMuonPhi; 
+  Double_t metUnclusteredup_NoLooseMuon;
+  Double_t metUnclusteredup_NoLooseMuonPhi;
+  Double_t metUnclusteredup_NoElectron;
+  Double_t metUnclusteredup_NoElectronPhi;
+  Double_t metUnclusteredup_NoLooseElectron;
+  Double_t metUnclusteredup_NoLooseElectronPhi;
+
+  Double_t metUnclustereddown;
+  Double_t metUnclustereddown_Phi;
+  Double_t metUnclustereddown_NoMuon;
+  Double_t metUnclustereddown_NoMuonPhi; 
+  Double_t metUnclustereddown_NoLooseMuon;
+  Double_t metUnclustereddown_NoLooseMuonPhi;
+  Double_t metUnclustereddown_NoElectron;
+  Double_t metUnclustereddown_NoElectronPhi;
+  Double_t metUnclustereddown_NoLooseElectron;
+  Double_t metUnclustereddown_NoLooseElectronPhi;
   // MHT
   Double_t mht;
   Double_t mhtPhi;
