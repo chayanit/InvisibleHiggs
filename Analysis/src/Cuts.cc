@@ -63,6 +63,96 @@ TCut Cuts::nMinusOneCuts(unsigned i) {
 
 // }
 
+// Z+jets regions
+TCut Cuts::zMuMu() {
+  TCut tmp = cut(0);
+  tmp += cut(1);
+  tmp += cut(2);
+  tmp += cut(3);
+  tmp += cut(4);
+  tmp += cut(5);
+  tmp += TCut("metNoMuon>130.");
+  tmp += cut(7);
+  tmp += TCut("mu3Pt<10.");
+  tmp += TCut("zMass>60.");
+  tmp += TCut("zMass<120.");
+  return tmp;
+}
+
+TCut Cuts::zMuMuLoDPhi() {
+  TCut tmp = zMuMu();
+  tmp += cut(9);
+  return tmp;
+}
+
+TCut Cuts::zMuMuHiDPhi() {
+  TCut tmp = zMuMu();
+  tmp += TCut("vbfDPhi>2.6");
+  return tmp;
+}
+
+
+// W+jets regions
+TCut Cuts::wMu() {
+  TCut tmp = cut(0);
+  tmp += cut(1);
+  tmp += cut(2);
+  tmp += cut(3);
+  tmp += cut(4);
+  tmp += cut(5);
+  tmp += TCut("metNoMuon>130.");
+  tmp += cut(7);
+  tmp += TCut("mu2Pt<10.");
+  tmp += TCut("wPt>60.");
+  tmp += TCut("wPt<120.");
+  return tmp;
+}
+
+TCut Cuts::wMuLoDPhi() {
+  TCut tmp = wMu();
+  tmp += cut(9);
+  return tmp;
+}
+
+TCut Cuts::wMuHiDPhi() {
+  TCut tmp = wMu();
+  tmp += TCut("vbfDPhi>2.6");
+  return tmp;
+}
+
+
+TCut Cuts::wEl() {
+  TCut tmp = cut(0);
+  tmp += cut(1);
+  tmp += cut(2);
+  tmp += cut(3);
+  tmp += cut(4);
+  tmp += cut(5);
+  tmp += TCut("metNoElectron>130.");
+  tmp += TCut("el2Pt<10.");
+  tmp += cut(8);
+  tmp += TCut("wPt>60.");
+  tmp += TCut("wPt<120.");
+  return tmp;
+}
+
+TCut Cuts::wElLoDPhi() {
+  TCut tmp = wEl();
+  tmp += cut(9);
+  return tmp;
+}
+
+TCut Cuts::wElHiDPhi() {
+  TCut tmp = wEl();
+  tmp += TCut("vbfDPhi>2.6");
+  return tmp;
+}
+
+
+
+
+// QCD regions
+
 TCut Cuts::qcdLoose() {
   TCut tmp = cut(0);
   tmp += cut(1);

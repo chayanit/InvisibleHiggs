@@ -7,8 +7,10 @@
 #include <boost/lexical_cast.hpp>
 
 
-Datasets::Datasets() {
-
+Datasets::Datasets(std::string iDir) :
+  idir_(iDir)
+{
+  
 
 }
 
@@ -84,3 +86,19 @@ Dataset Datasets::getDataset(std::string name) {
   }
   return Dataset();
 }
+
+TFile* Datasets::getTFile(std::string name) {
+
+  if (idir_.size() == 0) return 0;
+
+  TFile* ifile = TFile::Open( (idir_+std::string("/")+name+std::string(".root")).c_str(), "READ");
+    
+  if (ifile==0) {
+    std::cerr << "No file for " << name << std::endl;
+  }
+
+  return ifile;
+
+}
+
+

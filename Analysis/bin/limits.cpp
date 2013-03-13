@@ -1,13 +1,18 @@
 
+#include "InvisibleHiggs/Analysis/interface/ProgramOptions.h"
 #include "InvisibleHiggs/Analysis/interface/Cuts.h"
 #include "InvisibleHiggs/Analysis/interface/Histogrammer.h"
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
 
+#include "TStyle.h"
 #include "TTree.h"
 #include "TMath.h"
 #include "TCanvas.h"
+#include "TLegend.h"
+#include "TGraph.h"
+#include "TGraphAsymmErrors.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -16,8 +21,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "RooProfileLL.h"
-#include "RooAbsPdf.h"
 #include "RooStats/HypoTestResult.h"
 #include "RooRealVar.h"
 #include "RooPlot.h"
@@ -29,11 +32,15 @@
 #include "TStopwatch.h"
 
 #include "RooStats/ProfileLikelihoodCalculator.h"
+#include "RooStats/ProfileLikelihoodTestStat.h"
+#include "RooStats/AsymptoticCalculator.h"
+#include "RooStats/HybridCalculator.h"
 #include "RooStats/MCMCCalculator.h"
 #include "RooStats/UniformProposal.h"
 #include "RooStats/FeldmanCousins.h"
 #include "RooStats/NumberCountingPdfFactory.h"
 #include "RooStats/ConfInterval.h"
+#include "RooStats/HypoTestInverter.h"
 #include "RooStats/PointSetInterval.h"
 #include "RooStats/LikelihoodInterval.h"
 #include "RooStats/LikelihoodIntervalPlot.h"
@@ -54,46 +61,12 @@ namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
 
-  // some variables
-  double lumi = 697.;  //pb-1
-  std::string iDir("/storage/phjjb/invisibleHiggs/InvHiggsInfo_v8");
-  std::string oDir("analysis_v8");
-  std::string datasetFile("InvisibleHiggs/Ntuple/data/datasets_v8.txt");
+  ProgramOptions options(argc, argv);
 
-  // program options
-  po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Display this message")
-    ("outdir,o", po::value<std::string>(), "Output directory")
-    ("indir,i", po::value<std::string>(), "Input directory")
-    ("datasets,f", po::value<std::string>(), "Datasets file")
-    ("lumi,l", po::value<double>(), "Integrated luminosity");
+  std::string iDir = options.iDir;
+  std::string oDir = options.oDir;
+  double lumi = options.lumi;
 
-  po::variables_map vm;
-  po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
-  po::notify(vm);
-
-  // help
-  if (vm.count("help")) {
-    std::cout << desc << std::endl;
-    std::exit(1);
-  }
-  
-  if (vm.count("outdir"))   oDir = vm["outdir"].as<std::string>();
-  if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
-  if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
-  if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
-
-  // create output directory if it doesn't exist already
-  boost::filesystem::path opath(oDir);
-  if (!exists(opath)) {
-    std::cout << "Creating output directory : " << oDir << std::endl;
-    boost::filesystem::create_directory(opath);
-  }
-  else std::cout << "Writing results to " << oDir << std::endl;
-
-  std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
-  std::cout << std::endl;
 
   // read background estimates from file
   std::cout << "Backgrounds" << std::endl;
@@ -162,80 +135,241 @@ int main(int argc, char* argv[]) {
 
   // read signal efficiencies from file
   std::cout << "Signal efficiency" << std::endl;
-  double mH[10];
-  double effSignal[10];
-  double err_effSignal[10];
+  std::vector<double> mH, xsH, effSignal, err_effSignal;
 
   file.open((oDir+std::string("/signal.txt")).c_str());
   std::string line;
   getline(file, line);
 
   int i=0;
-  double m, eff, err, a,b,c,d;
-  while (file >> name >> m >> eff >> err >> a >> b >> c >> d) {
-    mH[i]        = m;
-    effSignal[i] = eff;
-    err_effSignal[i] = err;
-    std::cout << "Signal " << m << " : " << eff << " +/- " << err << std::endl;
+  double m, eff, err, a,b,c,d,x;
+  while (file >> name >> m >> eff >> err >> a >> b >> c >> d >> x) {
+    mH.push_back( m );
+    xsH.push_back( x );
+    effSignal.push_back( eff );
+    err_effSignal.push_back( err );
+    std::cout << "Signal " << m << " xs=" << x << " : " << eff << " +/- " << err << std::endl;
   }
   file.close();
 
+  
+
   std::cout << std::endl;
 
-  /// calculate expected limit
-  std::cout << "Expected limit" << std::endl;
+  /// calculate limits
   using namespace RooFit ;
   using namespace RooStats ;
 
   // model
   std::cout << "Setting up model" << std::endl;
-  RooWorkspace* w = new RooWorkspace();
 
-  // total yield
-  w->factory("n[0]");
+  // variables
+//   RooRealVar nobs("nobs","", nObs, 0, 2000);
+//   RooRealVar nbg("nbg", "", bgTot, 0, 2000);
+//   RooRealVar bg_mu("bg_mu", "", bgTot, 0, 200);
+//   RooRealVar bg_sigma("bg_sigma", "", err_bgTot, 0, 200);
+//   RooRealVar nsig("nsig", "", 0, 0, 2000);
+//   RooRealVar sig_mu("sig_mu", "", 0, 0, 100);
 
-  // BG with nuisance
-  w->factory("bg_nom[1.0]");
-  w->var("bg_nom")->setVal(bgTot);
-  //  w->var("bg_nom")->setConstant(true);
-  w->factory("bg_kappa[1.0]");
-  w->var("bg_kappa")->setVal(1.0+err_bgTot/bgTot);
-  //  w->var("bg_kappa")->setConstant(true);
-  w->factory("expr::alpha_bg('pow(bg_kappa,beta_bg)',bg_kappa,beta_bg[0,-5,5])");
-  w->factory("prod::nbg(bg_nom,alpha_bg)");
-  w->factory("Gaussian::constr_bg(beta_bg,globa_bg[0,-5,5],1)");
-  w->factory("glob_bg");
-  //  w->var("glob_bg")->setConstant(true);
+//   // pdf
+//   RooAddition mean("mean", "", RooArgList(bg_mu, sig_mu));
+//   RooPoisson pdf("pdf", "", nobs, mean);
 
-  // BG + signal
-   w->factory("nsig[0]");
-//   w->factory("sum::yield(nsig,nbg)");
-//   w->factory("Gaussian::model_core(n,yield,expr('sqrt(yield)',yield))");
+//   // dataset
+//   RooDataSet* data = new RooDataSet("Data", "Data", RooArgSet(nobs));
+//   data->add(nobs);
+//   data->Print("v");
 
-//   // nuisances
-//   w->factory("PROD::model(model_core,constr_bg)");
+  // Model
+  RooWorkspace w("w", true);
 
-//   // uniform prior for signal
-//   w->factory("Uniform::prior(nsig)");
+  // 
+  w.factory("sum:nexp(s[3,0,500],b[500,0,1000])");
 
-  std::cout << "Setting limits" << std::endl;
+  // signal
+  w.factory("Poisson:pdf(nobs[0,1000],nexp)");
 
-  // set ranges
-  w->var("n")->setRange(0,2000);
-  //  w->var("nsig")->setRange(0,2000);
+  // background
+  w.factory("Gaussian:constraint(b0[0,1000],b,sigmab[1])");
+  w.var("b0")->setVal(bgTot);
+  w.var("b0")->setConstant(true); // needed for being treated as global observables
+  w.var("sigmab")->setVal(err_bgTot);  
+  w.var("b")->setMax(bgTot+10*(err_bgTot/bgTot));
 
-//   RooArgSet obs(*(w->var("n")), "obs");
+  w.factory("PROD:model(pdf,constraint)");
 
-//   RooArgSet globalObs("global_obs");
-//   globalObs.add(*(w->var("global_bg")));
+  // data
+  RooRealVar* nobs = w.var("nobs");
+  nobs->setVal(nObs);
+
+  RooDataSet data("data","", *nobs );
+  data.add(*nobs );
+  w.import(data);
+
+  // signal+background model
+  ModelConfig sbModel("sbModel", &w);
+  sbModel.SetPdf( *w.pdf("model") );
+  sbModel.SetParametersOfInterest( *w.var("s") );
+  sbModel.SetObservables( *w.var("nobs") );
+  sbModel.SetNuisanceParameters( *w.var("b") );
+
+  sbModel.SetSnapshot(*w.var("s"));
+  sbModel.SetGlobalObservables(*w.var("b0"));
+
+  w.Print();
+
+  // for bayesian/hybrid
+  w.factory("Uniform::prior_s(s)");
+  sbModel.SetPriorPdf(*w.pdf("prior_s"));
+
+  // background only model (copy of S+B model with S=0)
+  ModelConfig * bModel = sbModel.Clone();
+  bModel->SetName("bModel");
+  w.var("s")->setVal(0);
+  bModel->SetSnapshot( *w.var("s") );
+  w.var("s")->setVal(nObs);
+
+  AsymptoticCalculator *  ac = new AsymptoticCalculator(data, *bModel, sbModel);
+  ac->SetOneSided(true);  // for one-side tests (limits)
+  AsymptoticCalculator::SetPrintLevel(-1);
+  //  ac->SetToys(1000,500);    // 1000 for null (S+B) , 50 for alt (B)
   
-//   RooArgSet poi(*(w->var("nsig")), "poi");
-
-//   RooArgSet nuis("nuis");
-//   nuis.add(*(w->var("beta_bg")));
-
-  w->var("n")->setVal(nObs);
+  HypoTestInverter calc(*ac);
   
+  // set confidence level (e.g. 95% upper limits)
+  calc.SetConfidenceLevel(0.95);
+  
+  // for CLS
+  bool useCLs = true;
+  calc.UseCLs(useCLs);
+  calc.SetVerbose(false);
+  
+  ToyMCSampler *toymcs = (ToyMCSampler*)calc.GetHypoTestCalculator()->GetTestStatSampler();
+  // for number counting (extended pdf do not need this)
+  // toymcs->SetNEventsPerToy(1);
+  
+  
+  // profile likelihood test statistics 
+  ProfileLikelihoodTestStat profll(*sbModel.GetPdf());
+  // for CLs (bounded intervals) use one-sided profile likelihood
+  if (useCLs) profll.SetOneSided(true);
+  
+  // ratio of profile likelihood - need to pass snapshot for the alt 
+  // RatioOfProfiledLikelihoodsTestStat ropl(*sbModel->GetPdf(), *bModel->GetPdf(), bModel->GetSnapshot());
+  
+  
+  // set the test statistic to use 
+  toymcs->SetTestStatistic(&profll);
+
+  int npoints = 100;  // number of points to scan
+  double poimin = 0;
+  double poimax = 10*xsH[0]*lumi*effSignal[0];  // scan up to 10 times SM production XS
+
+  
+  std::cout << "Doing a fixed scan  in interval : " << poimin << " , " << poimax << std::endl;
+  calc.SetFixedScan(npoints,poimin,poimax);
+  
+  HypoTestInverterResult * r = calc.GetInterval();
+  
+  double upperLimit = r->UpperLimit();
+  double ulError = r->UpperLimitEstimatedError();
+
+  double expLimit = r->GetExpectedUpperLimit(0);
+  double expLimitM1Sig = r->GetExpectedUpperLimit(-1);
+  double expLimitP1Sig = r->GetExpectedUpperLimit(+1);
+  double expLimitM2Sig = r->GetExpectedUpperLimit(-2);
+  double expLimitP2Sig = r->GetExpectedUpperLimit(+2);
+
+  std::cout << "Observed upper limit          : " << upperLimit << std::endl;
+  std::cout << "Expected upper limit (median) : " << expLimit << std::endl;
+  std::cout << "Expected upper limit (-1sig)  : " << expLimitM1Sig << std::endl;
+  std::cout << "Expected upper limit (+1sig)  : " << expLimitP1Sig << std::endl;
+  std::cout << "Expected upper limit (-2Sig)  : " << expLimitM2Sig << std::endl;
+  std::cout << "Expected upper limit (+2sig)  : " << expLimitP2Sig << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "Exp limit on sigma x BF (mH=120) : " << ( expLimit / (lumi * effSignal[0]) ) / xsH[0] << std::endl;
+  std::cout << std::endl;
+
+  // convert to x-section
+  double xsExp[10];
+  double xsExpM1Sig[10];
+  double xsExpP1Sig[10];
+  double xsExpM2Sig[10];
+  double xsExpP2Sig[10];
+  double xsi[10];
+
+  for (unsigned j=0; j<mH.size(); ++j) {
+    xsExp[j] = expLimit / (lumi * effSignal[j]);
+    xsExpM1Sig[j] = expLimitM1Sig / (lumi * effSignal[j]);
+    xsExpP1Sig[j] = expLimitP1Sig / (lumi * effSignal[j]);
+    xsExpM2Sig[j] = expLimitM2Sig / (lumi * effSignal[j]);
+    xsExpP2Sig[j] = expLimitP2Sig / (lumi * effSignal[j]);
+    xsi[j]  = xsH[i] / xsExp[j];
+    std::cout << mH[j] << " " << xsH[j] << " " << xsExp[j] << " " << xsi[j] << std::endl;
+  }
+
+  // plot xs limit
+  TStyle mStyle;
+  mStyle.SetOptStat(0);
+
+  TCanvas canvas;
+
+  TH1D* h = new TH1D("", "", 1, 100., 400.);
+  h->SetMaximum(3.);
+  h->SetMinimum(0.);
+  h->GetXaxis()->SetTitle("m_{H} [GeV]");
+  h->GetYaxis()->SetTitle("#sigma #times BF(H->inv)");
+  h->Draw();
+
+  TGraphAsymmErrors gXSExpLimit2Sig(mH.size(), &mH[0], &xsExp[0], 0, 0, &xsExpM2Sig[0], &xsExpP2Sig[0]);
+  gXSExpLimit2Sig.SetFillColor(kYellow);
+  gXSExpLimit2Sig.SetFillStyle(1001);
+  gXSExpLimit2Sig.SetLineColor(0);
+  gXSExpLimit2Sig.SetLineStyle(0);
+  gXSExpLimit2Sig.SetLineWidth(0);
+  gXSExpLimit2Sig.Draw("3");
+
+  TGraphAsymmErrors gXSExpLimit1Sig(mH.size(), &mH[0], &xsExp[0], 0, 0, &xsExpM1Sig[0], &xsExpP1Sig[0]);
+  gXSExpLimit1Sig.SetFillColor(kGreen);
+  gXSExpLimit1Sig.SetFillStyle(1001);
+  gXSExpLimit1Sig.SetLineColor(0);
+  gXSExpLimit1Sig.SetLineStyle(0);
+  gXSExpLimit1Sig.SetLineWidth(0);
+  gXSExpLimit1Sig.Draw("3");
+
+  TGraph gXSExpLimit(mH.size(), &mH[0], &xsExp[0]);
+  gXSExpLimit.SetLineColor(kBlack);
+  gXSExpLimit.SetLineStyle(2);
+  gXSExpLimit.Draw("L");
+
+  TGraph gXSProd(mH.size(), &mH[0], &xsH[0]);
+  gXSProd.SetLineColor(kBlue);
+  gXSProd.Draw("L");
+
+  TLegend leg(0.5, 0.7, 0.75, 0.85, "95% CL limits", "NDC");
+  leg.SetFillColor(0);
+  leg.AddEntry(&gXSExpLimit, "Expected limit", "L");
+  leg.AddEntry(&gXSExpLimit1Sig, "Expected limit (1 #sigma)", "F");
+  leg.AddEntry(&gXSExpLimit2Sig, "Expected limit (2 #sigma)", "F");
+  leg.AddEntry(&gXSProd, "#sigma_{VBF} (SM)", "L");
+  leg.Draw();
+
+  canvas.Print( (oDir+std::string("/XSLimit.pdf")).c_str() );
+  
+  // xsi plot
+  h->GetYaxis()->SetTitle("#sigma #times BF(H #rightarrow inv) / #sigma(SM)");
+  h->Draw();
+
+  TGraph gXsiLimit(mH.size(), &mH[0], &xsi[0]);
+  gXSProd.SetLineColor(kBlack);
+  gXSProd.Draw("L");
+
+  canvas.Print( (oDir+std::string("/xsiLimit.pdf")).c_str() );
+
+  // write out workspace
+  w.writeToFile( (options.oDir+std::string("/workspace.root")).c_str() );
+
   std::cout << "Done" << std::endl;
 
 }

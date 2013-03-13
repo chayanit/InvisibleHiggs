@@ -19,14 +19,17 @@ class Cuts {
   TCut nMinusOneCuts(unsigned i);
 
   // special combinations
-  TCut diMuonControlRegion();
-  TCut diMuonVetoRegion();
+  TCut zMuMu();
+  TCut zMuMuLoDPhi();
+  TCut zMuMuHiDPhi();
 
-  TCut singleMuonControlRegion();
-  TCut singleMuonVetoRegion();
+  TCut wMu();
+  TCut wMuLoDPhi();
+  TCut wMuHiDPhi();
 
-  TCut singleElectronControlRegion();
-  TCut singleElectronVetoRegion();
+  TCut wEl();
+  TCut wElLoDPhi();
+  TCut wElHiDPhi();
 
   // QCD control regions
   TCut qcdLoose();

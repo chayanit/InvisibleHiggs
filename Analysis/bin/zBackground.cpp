@@ -1,74 +1,113 @@
 
+#include "InvisibleHiggs/Analysis/interface/ProgramOptions.h"
 #include "InvisibleHiggs/Analysis/interface/Cuts.h"
 #include "InvisibleHiggs/Analysis/interface/Histogrammer.h"
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
 
-#include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
+#include "TTree.h"
 
 #include <iostream>
-
-namespace po = boost::program_options;
+#include <cmath>
 
 int main(int argc, char* argv[]) {
 
-  // some variables
-  double lumi = 697.;  //pb-1
-  std::string iDir("/storage/phjjb/invisibleHiggs/InvHiggsInfo_v8");
-  std::string oDir("analysis_v8");
-  std::string datasetFile("InvisibleHiggs/Ntuple/data/datasets_v8.txt");
+  ProgramOptions options(argc, argv);
 
-  // program options
-  po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Display this message")
-    ("outdir,o", po::value<std::string>(), "Output directory")
-    ("indir,i", po::value<std::string>(), "Input directory")
-    ("datasets,f", po::value<std::string>(), "Datasets file")
-    ("lumi,l", po::value<double>(), "Integrated luminosity");
+  double lumi = options.lumi;
 
-  po::variables_map vm;
-  po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
-  po::notify(vm);
-
-  // help
-  if (vm.count("help")) {
-    std::cout << desc << std::endl;
-    std::exit(1);
-  }
-  
-  if (vm.count("outdir"))   oDir = vm["outdir"].as<std::string>();
-  if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
-  if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
-  if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
-
-  // create output directory if it doesn't exist already
-  boost::filesystem::path opath(oDir);
-  if (!exists(opath)) {
-    std::cout << "Creating output directory : " << oDir << std::endl;
-    boost::filesystem::create_directory(opath);
-  }
-  else std::cout << "Writing results to " << oDir << std::endl;
-
-  std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
-
-  Datasets datasets;
-  datasets.readFile(datasetFile);
+  Datasets datasets(options.iDir);
+  datasets.readFile(options.datasetFile);
 
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
   TCut allCuts = puWeight * cuts.allCuts();
 
+  // estimate yields from MC
+
+  // DY jets
+  double nDYZMuMu, err_nDYZMuMu;
+  double nDYZMuMuHiDPhi, err_nDYZMuMuHiDPhi, nDYZMuMuLoDPhi, err_nDYZMuMuLoDPhi;
+  
+  std::string name("DYJetsToLL");
+  Dataset dataset = datasets.getDataset(name);
+  TFile* file = datasets.getTFile(name);
+  TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
+
+  double zMuMu = (double) tree->Draw("", cuts.zMuMu());
+  double zMuMuHiDPhi = (double) tree->Draw("", cuts.zMuMuHiDPhi());
+  double zMuMuLoDPhi = (double) tree->Draw("", cuts.zMuMuLoDPhi());
+  
+  nDYZMuMu       = zMuMu * dataset.sigma * lumi / dataset.nEvents ;
+  nDYZMuMuHiDPhi = zMuMuHiDPhi * dataset.sigma * lumi / dataset.nEvents ;
+  nDYZMuMuLoDPhi = zMuMuLoDPhi * dataset.sigma * lumi / dataset.nEvents ;
+  
+  err_nDYZMuMu       = sqrt(zMuMu) * dataset.sigma * lumi / dataset.nEvents ;
+  err_nDYZMuMuHiDPhi = sqrt(zMuMuHiDPhi) * dataset.sigma * lumi / dataset.nEvents ;    
+  err_nDYZMuMuLoDPhi = sqrt(zMuMuLoDPhi) * dataset.sigma * lumi / dataset.nEvents ;
+
+  delete tree;
+  file->Close();
+
+  std::cout << "DY       : " << nDYZMuMu << " +/- " << err_nDYZMuMu << "\t"
+	    << nDYZMuMuHiDPhi << " +/- " << err_nDYZMuMuHiDPhi << "\t"
+	    << nDYZMuMuLoDPhi << " +/- " << err_nDYZMuMuLoDPhi << std::endl;
+
+
+  // TTbar
+  double nTTbarZMuMu, err_nTTbarZMuMu;
+  double nTTbarZMuMuHiDPhi, err_nTTbarZMuMuHiDPhi, nTTbarZMuMuLoDPhi, err_nTTbarZMuMuLoDPhi;
+  
+  name = std::string("TTbar");
+  dataset = datasets.getDataset(name);
+  file = datasets.getTFile(name);
+  tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
+
+  zMuMu = (double) tree->Draw("", cuts.zMuMu());
+  zMuMuHiDPhi = (double) tree->Draw("", cuts.zMuMuHiDPhi());
+  zMuMuLoDPhi = (double) tree->Draw("", cuts.zMuMuLoDPhi());
+  
+  nTTbarZMuMu       = zMuMu * dataset.sigma * lumi / dataset.nEvents ;
+  nTTbarZMuMuHiDPhi = zMuMuHiDPhi * dataset.sigma * lumi / dataset.nEvents ;
+  nTTbarZMuMuLoDPhi = zMuMuLoDPhi * dataset.sigma * lumi / dataset.nEvents ;
+  
+  err_nTTbarZMuMu       = sqrt(zMuMu) * dataset.sigma * lumi / dataset.nEvents ;
+  err_nTTbarZMuMuHiDPhi = sqrt(zMuMuHiDPhi) * dataset.sigma * lumi / dataset.nEvents ;    
+  err_nTTbarZMuMuLoDPhi = sqrt(zMuMuLoDPhi) * dataset.sigma * lumi / dataset.nEvents ;
+
+  delete tree;
+  file->Close();
+
+  std::cout << "TTbar    : " << nTTbarZMuMu << " +/- " << err_nTTbarZMuMu << "\t"
+	    << nTTbarZMuMuHiDPhi << " +/- " << err_nTTbarZMuMuHiDPhi << "\t"
+	    << nTTbarZMuMuLoDPhi << " +/- " << err_nTTbarZMuMuLoDPhi << std::endl;
+
+
+
   // calculate efficiencies from MC
 
 
   // get numbers from data control regions
+  std::cout << "Getting counts from data" << std::endl;
 
+  file = datasets.getTFile("METABCD");
+  tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
 
+  int nDataZMuMu       = tree->Draw("", cuts.zMuMu());
+  int nDataZMuMuLoDPhi = tree->Draw("", cuts.zMuMuLoDPhi());
+  int nDataZMuMuHiDPhi = tree->Draw("", cuts.zMuMuHiDPhi());
+
+  double err_nDataZMuMu       = sqrt(nDataZMuMu);
+  double err_nDataZMuMuLoDPhi = sqrt(nDataZMuMuLoDPhi);
+  double err_nDataZMuMuHiDPhi = sqrt(nDataZMuMuHiDPhi);
+
+  std::cout << "Data     : " << nDataZMuMu << " +/- " << err_nDataZMuMu << "\t"
+	    << nDataZMuMuHiDPhi << " +/- " << err_nDataZMuMuHiDPhi << "\t"
+	    << nDataZMuMuLoDPhi << " +/- " << err_nDataZMuMuLoDPhi << std::endl;
+  std::cout << std::endl;
+  
   // produce final output
 
 
