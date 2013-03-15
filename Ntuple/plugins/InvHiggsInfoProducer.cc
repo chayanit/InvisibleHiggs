@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.20 2013/03/06 14:00:26 chayanit Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.21 2013/03/12 13:39:59 chayanit Exp $
 //
 //
 
@@ -980,13 +980,13 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
     // Check overlap between jet and (muon, electron)
     bool checkOverlap = false;
     for(unsigned iLep=0; iLep<muons.size(); iLep++){
-      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue;
+      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.5) continue;
       checkOverlap = true;
       //std::cout<<"Overlap with muons"<<std::endl;
       break;
     }
     for(unsigned iLep=0; iLep<electrons.size(); iLep++){ 
-      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue; 
+      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.5) continue; 
       checkOverlap = true;
       //std::cout<<"Overlap with electrons"<<std::endl;
       break;
@@ -1099,13 +1099,13 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
     bool checkOverlap = false;
 
     for(unsigned iLep=0; iLep<muons.size(); iLep++){
-      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue;
+      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.5) continue;
       checkOverlap = true;
       //std::cout<<"Overlap with muons"<<std::endl;
       break;
     }
     for(unsigned iLep=0; iLep<electrons.size(); iLep++){ 
-      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue; 
+      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.5) continue; 
       checkOverlap = true;
       //std::cout<<"Overlap with electrons"<<std::endl;
       break;
@@ -1178,13 +1178,13 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
     bool checkOverlap = false;
 
     for(unsigned iLep=0; iLep<muons.size(); iLep++){
-      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(j).eta(),jets->at(j).phi())>0.3) continue;
+      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(j).eta(),jets->at(j).phi())>0.5) continue;
       checkOverlap = true;
       //std::cout<<"Overlap with muons"<<std::endl;
       break;
     }
     for(unsigned iLep=0; iLep<electrons.size(); iLep++){
-      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(j).eta(),jets->at(j).phi())>0.3) continue;
+      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(j).eta(),jets->at(j).phi())>0.5) continue;
       checkOverlap = true;
       //std::cout<<"Overlap with electrons"<<std::endl;
       break;
@@ -1270,13 +1270,13 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
     // Check overlap between jet and (muon, electron) 
     bool checkOverlap = false;
     for(unsigned iLep=0; iLep<muons.size(); iLep++){
-      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue;
+      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.5) continue;
       checkOverlap = true;
       //std::cout<<"Overlap with muons"<<std::endl;
       break;
     }
     for(unsigned iLep=0; iLep<electrons.size(); iLep++){ 
-      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.3) continue; 
+      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.5) continue; 
       checkOverlap = true;
       //std::cout<<"Overlap with electrons"<<std::endl;
       break;

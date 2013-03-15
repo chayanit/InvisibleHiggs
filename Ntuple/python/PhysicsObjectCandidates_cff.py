@@ -9,6 +9,8 @@ import FWCore.ParameterSet.Config as cms
 # Tight muons
 isolationCutString = cms.string("")
 isolationCutString = "(pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt< 0.12"
+isolationCutStringLoose = cms.string("")
+isolationCutStringLoose = "(pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt< 0.20"
 
 selectMuons = cms.EDFilter(
     "PATMuonSelector",
@@ -27,7 +29,9 @@ selectMuons = cms.EDFilter(
 selectLooseMuons = cms.EDFilter(
     "PATMuonSelector",
     src = cms.InputTag("cleanPatMuons"),
-    cut = cms.string("pt>10 && (isGlobalMuon || isTrackerMuon) && isPFMuon && abs(eta)<2.1")
+    cut = cms.string("pt>10 && (isGlobalMuon || isTrackerMuon) && isPFMuon && abs(eta)<2.1"
+		     " && " + isolationCutStringLoose
+		     )	
 )
 
 ######################
