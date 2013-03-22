@@ -1,9 +1,14 @@
 
+#include "InvisibleHiggs/Analysis/interface/ProgramOptions.h"
 #include "InvisibleHiggs/Analysis/interface/Cuts.h"
 #include "InvisibleHiggs/Analysis/interface/Histogrammer.h"
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
+
+#include "TTree.h"
+#include "TMath.h"
+#include "TH1D.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -11,66 +16,208 @@
 
 #include <iostream>
 
-namespace po = boost::program_options;
-
 int main(int argc, char* argv[]) {
 
-  // some variables
-  double lumi = 697.;  //pb-1
-  std::string iDir("/storage/phjjb/invisibleHiggs/InvHiggsInfo_v8");
-  std::string oDir("analysis_v8");
-  std::string datasetFile("InvisibleHiggs/Ntuple/data/datasets_v8.txt");
+  TH1::SetDefaultSumw2();
 
-  // program options
-  po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Display this message")
-    ("outdir,o", po::value<std::string>(), "Output directory")
-    ("indir,i", po::value<std::string>(), "Input directory")
-    ("datasets,f", po::value<std::string>(), "Datasets file")
-    ("lumi,l", po::value<double>(), "Integrated luminosity");
+  ProgramOptions options(argc, argv);
 
-  po::variables_map vm;
-  po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
-  po::notify(vm);
-
-  // help
-  if (vm.count("help")) {
-    std::cout << desc << std::endl;
-    std::exit(1);
-  }
-  
-  if (vm.count("outdir"))   oDir = vm["outdir"].as<std::string>();
-  if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
-  if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
-  if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
-
-  // create output directory if it doesn't exist already
-  boost::filesystem::path opath(oDir);
-  if (!exists(opath)) {
-    std::cout << "Creating output directory : " << oDir << std::endl;
-    boost::filesystem::create_directory(opath);
-  }
-  else std::cout << "Writing results to " << oDir << std::endl;
+  double lumi = options.lumi;
 
   std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
 
-  Datasets datasets;
-  datasets.readFile(datasetFile);
+  Datasets datasets(options.iDir);
+  datasets.readFile(options.datasetFile);
 
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
-  TCut allCuts = puWeight * cuts.allCuts();
 
-  // calculate efficiencies from MC
+  TCut cutWMu_Gen_C = puWeight * (cuts.wMuGen() * cuts.wMuVBF());
+  TCut cutWMu_Gen_S = puWeight * (cuts.wMuGen() * cuts.allCutsNoDPhi());
+  TCut cutWMu_C = puWeight * (cuts.wMuVBF());
+  TCut cutWMu_S = puWeight * (cuts.allCutsNoDPhi());
+
+  TCut cutWEl_Gen_C = puWeight * (cuts.wElGen() * cuts.wElVBF());
+  TCut cutWEl_Gen_S = puWeight * (cuts.wElGen() * cuts.allCutsNoDPhi());
+  TCut cutWEl_C = puWeight * (cuts.wElVBF());
+  TCut cutWEl_S = puWeight * (cuts.allCutsNoDPhi());
+
+  // histograms
+  double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
+
+  TH1D* hWMu_MCC_DPhi = new TH1D("hWMu_MCC_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
+  TH1D* hWMu_MCS_DPhi = new TH1D("hWMu_MCS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
+  TH1D* hWMu_BGC_DPhi = new TH1D("hWMu_BGC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
+  TH1D* hWMu_BGS_DPhi = new TH1D("hWMu_BGS_DPhi", "", 3, dphiEdges);  // background MC sgnl region
+  TH1D* hWMu_DataC_DPhi = new TH1D("hWMu_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
+
+  TH1D* hWEl_MCC_DPhi = new TH1D("hWEl_MCC_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
+  TH1D* hWEl_MCS_DPhi = new TH1D("hWEl_MCS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
+  TH1D* hWEl_BGC_DPhi = new TH1D("hWEl_BGC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
+  TH1D* hWEl_BGS_DPhi = new TH1D("hWEl_BGS_DPhi", "", 3, dphiEdges);  // background MC sgnl region
+  TH1D* hWEl_DataC_DPhi = new TH1D("hWEl_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
+
+  // loop over MC datasets
+  for (unsigned i=0; i<datasets.size(); ++i) {
+
+    Dataset dataset = datasets.getDataset(i);
+    
+    // check it's  W+Jets
+    bool isWMC = false;
+    if (dataset.name == "WJets" || 
+	dataset.name == "W1Jets" || 
+	dataset.name == "W2Jets" || 
+	dataset.name == "W3Jets" || 
+	dataset.name == "W4Jets") {
+      isWMC = true;
+      std::cout << "Analysing W MC     : " << dataset.name << std::endl;
+    }
+    else if (dataset.isData) {
+      std::cout << "Analysing Data     : " << dataset.name << std::endl;
+    }
+    else {
+      std::cout << "Analysing BG MC    : " << dataset.name << std::endl;
+    }
+
+    TFile* file = datasets.getTFile(dataset.name);
+    TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
+
+    // tmp histograms
+    TH1D* hWMu_C_DPhi = new TH1D("hWMu_C_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
+    TH1D* hWMu_S_DPhi = new TH1D("hWMu_S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
+    TH1D* hWEl_C_DPhi = new TH1D("hWEl_C_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
+    TH1D* hWEl_S_DPhi = new TH1D("hWEl_S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
+
+    if (isWMC) {
+      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_Gen_C);
+      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_Gen_S);
+      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_Gen_C);
+      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_Gen_S);
+    }
+    else {
+      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
+      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_S);
+      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
+      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_S);
+    }
+
+    double weight = lumi * dataset.sigma / dataset.nEvents;
+
+    if (dataset.isData) {
+      hWMu_DataC_DPhi->Add(hWMu_C_DPhi);
+      hWEl_DataC_DPhi->Add(hWEl_C_DPhi);
+      // not looking in signal region!
+    }
+    else if (isWMC) {
+      hWMu_MCC_DPhi->Add(hWMu_C_DPhi, weight);
+      hWMu_MCS_DPhi->Add(hWMu_S_DPhi, weight);
+      hWEl_MCC_DPhi->Add(hWEl_C_DPhi, weight);
+      hWEl_MCS_DPhi->Add(hWEl_S_DPhi, weight);
+    }
+    else {
+      hWMu_BGC_DPhi->Add(hWMu_C_DPhi, weight);
+      hWMu_BGS_DPhi->Add(hWMu_S_DPhi, weight);
+      hWEl_BGC_DPhi->Add(hWEl_C_DPhi, weight);
+      hWEl_BGS_DPhi->Add(hWEl_S_DPhi, weight);
+    }
+    
+    delete hWMu_C_DPhi;
+    delete hWMu_S_DPhi;
+    delete hWEl_C_DPhi;
+    delete hWEl_S_DPhi;
+
+    delete tree;
+    file->Close();
+   
+  }
 
 
-  // get numbers from data control regions
-  
+  // create histograms with the background estimate
+  TH1D* hWMu_R_DPhi    = new TH1D("hWMu_R_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
+  TH1D* hWMu_EstC_DPhi = new TH1D("hWMu_EstS_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
+  TH1D* hWMu_EstS_DPhi = new TH1D("hWMu_EstS_DPhi", "", 3, dphiEdges); // estimated W in bkgrnd region
+
+  TH1D* hWEl_R_DPhi    = new TH1D("hWEl_R_DPhi", "", 3, dphiEdges);
+  TH1D* hWEl_EstC_DPhi = new TH1D("hWEl_EstS_DPhi", "", 3, dphiEdges);
+  TH1D* hWEl_EstS_DPhi = new TH1D("hWEl_EstS_DPhi", "", 3, dphiEdges);
+
+  hWMu_R_DPhi->Divide(hWMu_MCS_DPhi, hWMu_MCC_DPhi, 1., 1.);
+  hWMu_EstC_DPhi->Add(hWMu_DataC_DPhi, hWMu_BGC_DPhi, 1., -1.);
+  hWMu_EstS_DPhi->Multiply(hWMu_EstC_DPhi, hWMu_R_DPhi, 1., 1.);
+
+  hWEl_R_DPhi->Divide(hWMu_MCS_DPhi, hWMu_MCC_DPhi, 1., 1.);
+  hWEl_EstC_DPhi->Add(hWMu_DataC_DPhi, hWMu_BGC_DPhi, 1., -1.);
+  hWEl_EstS_DPhi->Multiply(hWMu_EstC_DPhi, hWMu_R_DPhi, 1., 1.);
+
+  std::cout << std::endl;
+  std::cout << "W->mu channel (dphi>2.6)" << std::endl;
+  std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  W+jets MC  sgnl region : " << hWMu_MCS_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  Background ctrl region : " << hWMu_BGC_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  Background sgnl region : " << hWMu_BGS_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  Data ctrl region       : " << hWMu_DataC_DPhi->GetBinContent(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  W in ctrl region       : " << hWMu_EstC_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  N_S(MC)/N_C(MC)        : " << hWMu_R_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  W in sgnl region       : " << hWMu_R_DPhi->GetBinContent(3) << std::endl;
+  std::cout << std::endl << std::endl;
+  std::cout << "W->el channel (dphi>2.6)" << std::endl;
+  std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  W+jets MC  sgnl region : " << hWEl_MCS_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  Background ctrl region : " << hWEl_BGC_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  Background sgnl region : " << hWEl_BGS_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  Data ctrl region       : " << hWEl_DataC_DPhi->GetBinContent(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  W in ctrl region       : " << hWEl_EstC_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  N_S(MC)/N_C(MC)        : " << hWEl_R_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  W in sgnl region       : " << hWEl_R_DPhi->GetBinContent(3) << std::endl;
+  std::cout << std::endl << std::endl;
+  std::cout << "W->mu channel (dphi<1.0)" << std::endl;
+  std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  W+jets MC  sgnl region : " << hWMu_MCS_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  Background ctrl region : " << hWMu_BGC_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  Background sgnl region : " << hWMu_BGS_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  Data ctrl region       : " << hWMu_DataC_DPhi->GetBinContent(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  W in ctrl region       : " << hWMu_EstC_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  N_S(MC)/N_C(MC)        : " << hWMu_R_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  W in sgnl region       : " << hWMu_R_DPhi->GetBinContent(1) << std::endl;
+  std::cout << std::endl << std::endl;
+  std::cout << "W->el channel (dphi<1.0)" << std::endl;
+  std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  W+jets MC  sgnl region : " << hWEl_MCS_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  Background ctrl region : " << hWEl_BGC_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  Background sgnl region : " << hWEl_BGS_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  Data ctrl region       : " << hWEl_DataC_DPhi->GetBinContent(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  W in ctrl region       : " << hWEl_EstC_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  N_S(MC)/N_C(MC)        : " << hWEl_R_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  W in sgnl region       : " << hWEl_R_DPhi->GetBinContent(1) << std::endl;
 
 
-  // produce final output
-  
+  // store histograms
+  // output file
+  TFile* ofile = TFile::Open( (options.oDir+std::string("/WBackground.root")).c_str(), "UPDATE");
+
+  hWMu_MCC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_MCS_DPhi->Write("",TObject::kOverwrite);
+  hWMu_BGC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_BGS_DPhi->Write("",TObject::kOverwrite);
+  hWMu_DataC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_R_DPhi->Write("",TObject::kOverwrite);
+  hWMu_EstC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_EstS_DPhi->Write("",TObject::kOverwrite);
+
+  hWEl_MCC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_MCS_DPhi->Write("",TObject::kOverwrite);
+  hWEl_BGC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_BGS_DPhi->Write("",TObject::kOverwrite);
+  hWEl_DataC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_R_DPhi->Write("",TObject::kOverwrite);
+  hWEl_EstC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_EstS_DPhi->Write("",TObject::kOverwrite);
+      
+  ofile->Close();    
 
 }

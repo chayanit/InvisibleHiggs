@@ -13,23 +13,44 @@ class Cuts {
   void addCut(std::string name, std::string cut);
 
   TCut cut(unsigned i);
+  TCut cut(std::string name);
 
   TCut allCuts();
 
   TCut nMinusOneCuts(unsigned i);
 
-  // special combinations
-  TCut zMuMu();
-  TCut zMuMuLoDPhi();
-  TCut zMuMuHiDPhi();
+  // combinations
+  TCut vbf();   // note this does not include vetoes!
 
-  TCut wMu();
-  TCut wMuLoDPhi();
-  TCut wMuHiDPhi();
+  TCut allCutsNoDPhi();
+  TCut allCutsHiDPhi();
+  TCut allCutsLoDPhi();
 
-  TCut wEl();
-  TCut wElLoDPhi();
-  TCut wElHiDPhi();
+  // cuts for MC efficiency estimation
+  TCut zMuMuGen();     // there is a generator level Z->mumu
+  TCut zMuMuGenMass(); // there is a generator level Z->mumu + mass cut
+  TCut zMuMuReco();    // there is a reco level Z->mumu
+
+  TCut wMuGen();
+  TCut wMuReco();
+
+  TCut wElGen();
+  TCut wElReco();
+
+  // z->mumu control region
+  TCut zMuMuVBF();
+  TCut zMuMuVBFHiDPhi();
+  TCut zMuMuVBFLoDPhi();
+
+  // W->mu control region
+  TCut wMuVBF();
+  TCut wMuVBFHiDPhi();
+  TCut wMuVBFLoDPhi();
+
+  // W->e control region
+  TCut wElVBF();
+  TCut wElVBFHiDPhi();
+  TCut wElVBFLoDPhi();
 
   // QCD control regions
   TCut qcdLoose();

@@ -425,7 +425,8 @@ int main(int argc, char* argv[]) {
     std::cout << dataset.name << "\t" 
 	      << 100.*eff << " +/- " << 100.*effErr << "\t" 
 	      << nMCPas << " / " << nMCTot << "\t"
-	      << n << " +/- " << nErr << "\t" << std::endl;
+	      << n << " +/- " << nErr << "\t" 
+	      << dataset.sigma << std::endl;
 
     ifile->Close();
 

@@ -6,6 +6,7 @@
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
 
+#include "TROOT.h"
 #include "TStyle.h"
 #include "TTree.h"
 #include "TMath.h"
@@ -292,34 +293,35 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
 
   // convert to x-section
-  double xsExp[10];
-  double xsExpM1Sig[10];
-  double xsExpP1Sig[10];
-  double xsExpM2Sig[10];
-  double xsExpP2Sig[10];
-  double xsi[10];
+  double xsExp[10], xsExpM1Sig[10], xsExpP1Sig[10], xsExpM2Sig[10], xsExpP2Sig[10];
+  double xsiExp[10], xsiExpM1Sig[10], xsiExpP1Sig[10], xsiExpM2Sig[10], xsiExpP2Sig[10];
 
   for (unsigned j=0; j<mH.size(); ++j) {
-    xsExp[j] = expLimit / (lumi * effSignal[j]);
-    xsExpM1Sig[j] = expLimitM1Sig / (lumi * effSignal[j]);
-    xsExpP1Sig[j] = expLimitP1Sig / (lumi * effSignal[j]);
-    xsExpM2Sig[j] = expLimitM2Sig / (lumi * effSignal[j]);
-    xsExpP2Sig[j] = expLimitP2Sig / (lumi * effSignal[j]);
-    xsi[j]  = xsH[i] / xsExp[j];
-    std::cout << mH[j] << " " << xsH[j] << " " << xsExp[j] << " " << xsi[j] << std::endl;
+    xsExp[j]       = expLimit / (lumi * effSignal[j]);
+    xsExpM1Sig[j]  = expLimitM1Sig / (lumi * effSignal[j]);
+    xsExpP1Sig[j]  = expLimitP1Sig / (lumi * effSignal[j]);
+    xsExpM2Sig[j]  = expLimitM2Sig / (lumi * effSignal[j]);
+    xsExpP2Sig[j]  = expLimitP2Sig / (lumi * effSignal[j]);
+    xsiExp[j]      = xsExp[i] / xsH[j];
+    xsiExpM1Sig[j] = xsExpM1Sig[i] / xsH[j];
+    xsiExpP1Sig[j] = xsExpP1Sig[i] / xsH[j];
+    xsiExpM2Sig[j] = xsExpM2Sig[i] / xsH[j];
+    xsiExpP2Sig[j] = xsExpP2Sig[i] / xsH[j];
+    std::cout << mH[j] << " " << xsH[j] << " " << xsExp[j] << " " << xsiExp[j] << std::endl;
   }
 
   // plot xs limit
-  TStyle mStyle;
-  mStyle.SetOptStat(0);
+  //  TStyle* style = gStyle;
+  gStyle->SetOptStat(0);
+  //  gROOT->SetStyle("Default");  
 
   TCanvas canvas;
 
-  TH1D* h = new TH1D("", "", 1, 100., 400.);
+  TH1D* h = new TH1D("", "", 1, 100., 450.);
   h->SetMaximum(3.);
   h->SetMinimum(0.);
   h->GetXaxis()->SetTitle("m_{H} [GeV]");
-  h->GetYaxis()->SetTitle("#sigma #times BF(H->inv)");
+  h->GetYaxis()->SetTitle("#sigma #times BF(H #rightarrow inv)");
   h->Draw();
 
   TGraphAsymmErrors gXSExpLimit2Sig(mH.size(), &mH[0], &xsExp[0], 0, 0, &xsExpM2Sig[0], &xsExpP2Sig[0]);
@@ -347,7 +349,7 @@ int main(int argc, char* argv[]) {
   gXSProd.SetLineColor(kBlue);
   gXSProd.Draw("L");
 
-  TLegend leg(0.5, 0.7, 0.75, 0.85, "95% CL limits", "NDC");
+  TLegend leg(0.5, 0.65, 0.75, 0.85, "95% CL limits", "NDC");
   leg.SetFillColor(0);
   leg.AddEntry(&gXSExpLimit, "Expected limit", "L");
   leg.AddEntry(&gXSExpLimit1Sig, "Expected limit (1 #sigma)", "F");
@@ -357,13 +359,36 @@ int main(int argc, char* argv[]) {
 
   canvas.Print( (oDir+std::string("/XSLimit.pdf")).c_str() );
   
-  // xsi plot
+  // xsiExp plot
   h->GetYaxis()->SetTitle("#sigma #times BF(H #rightarrow inv) / #sigma(SM)");
   h->Draw();
 
-  TGraph gXsiLimit(mH.size(), &mH[0], &xsi[0]);
-  gXSProd.SetLineColor(kBlack);
-  gXSProd.Draw("L");
+  TGraphAsymmErrors gXsiExpLimit2Sig(mH.size(), &mH[0], &xsiExp[0], 0, 0, &xsiExpM2Sig[0], &xsiExpP2Sig[0]);
+  gXsiExpLimit2Sig.SetFillColor(kYellow);
+  gXsiExpLimit2Sig.SetFillStyle(1001);
+  gXsiExpLimit2Sig.SetLineColor(0);
+  gXsiExpLimit2Sig.SetLineStyle(0);
+  gXsiExpLimit2Sig.SetLineWidth(0);
+  gXsiExpLimit2Sig.Draw("3");
+
+  TGraphAsymmErrors gXsiExpLimit1Sig(mH.size(), &mH[0], &xsiExp[0], 0, 0, &xsiExpM1Sig[0], &xsiExpP1Sig[0]);
+  gXsiExpLimit1Sig.SetFillColor(kGreen);
+  gXsiExpLimit1Sig.SetFillStyle(1001);
+  gXsiExpLimit1Sig.SetLineColor(0);
+  gXsiExpLimit1Sig.SetLineStyle(0);
+  gXsiExpLimit1Sig.SetLineWidth(0);
+  gXsiExpLimit1Sig.Draw("3");
+
+  TGraph gXsiExpLimit(mH.size(), &mH[0], &xsiExp[0]);
+  gXsiExpLimit.SetLineColor(kBlack);
+  gXsiExpLimit.SetLineStyle(2);
+  gXsiExpLimit.Draw("L");
+
+  TLine smLine(100., 1., 500., 1.);
+  smLine.SetLineColor(kBlue);
+  smLine.Draw();
+
+  leg.Draw();
 
   canvas.Print( (oDir+std::string("/xsiLimit.pdf")).c_str() );
 
