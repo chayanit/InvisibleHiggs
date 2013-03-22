@@ -64,18 +64,19 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing BG MC     : " << dataset.name << std::endl;
     }
 
+    // get file & tree
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
 
-    // tmp histograms
-    TH1D* hZ_C_DPhi = new TH1D("hZ_C_DPhi", "", 3, dphiEdges);
+    // fill tmp histograms for BG estimation
+    TH1D* hZ_C_DPhi = new TH1D("hZ_C_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
 
     tree->Draw("vbfDPhi>>hZ_C_DPhi", cutZMuMu_C);
 
-    double weight = lumi * dataset.sigma / dataset.nEvents;
+    // weight  to lumi
+    double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
 
-    std::cout << "  N ctrl (dphi>2.6) : " << weight * hZ_C_DPhi->GetBinContent(3) << std::endl;
-
+    // add to output histograms
     if (dataset.isData) {
       hZ_Data_C_DPhi->Add(hZ_C_DPhi);
     }
@@ -85,17 +86,29 @@ int main(int argc, char* argv[]) {
     else {
       hZ_BG_C_DPhi->Add(hZ_C_DPhi, weight);
     }
+
+    std::cout << "  N ctrl (dphi>2.6) : " << weight * hZ_C_DPhi->GetBinContent(3) << std::endl;
     
     delete hZ_C_DPhi;
 
+    // per-dataset control plots (just an example, add more later)
+    ofile->cd();
+
+    std::string hname = std::string("hZ_mZ_")+dataset.name;
+    TH1D* hZ_mZ = new TH1D(hname.c_str(), "", 30, 60., 120.);
+    std::string str = std::string("zMass>>")+hname;
+    tree->Draw(str.c_str(), cutZMuMu_C);
+    hZ_mZ->Scale(weight);
+    hZ_mZ->Write("",TObject::kOverwrite);
+
+    // clean up
     delete tree;
     file->Close();
    
   }
 
-
+  // numbers - calculate these from MC in this program later!
   double ratioBF = 5.626;  //  MCFM + NLO
-
   double eps_mumu = 0.290;
   double eps_s_vbf = 0.0194;
   double eps_c_vbf = 0.0315;

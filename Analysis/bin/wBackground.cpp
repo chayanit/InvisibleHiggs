@@ -127,6 +127,19 @@ int main(int argc, char* argv[]) {
     delete hWEl_C_DPhi;
     delete hWEl_S_DPhi;
 
+    // per-dataset control plots (just an example, add more later)
+    std::string hname = std::string("hWMu_WmT_")+dataset.name;
+    TH1D* hWMu_WmT = new TH1D(hname.c_str(), "", 40, 0., 120.);
+    std::string str = std::string("wMt>>")+hname;
+    tree->Draw(str.c_str(), cutWMu_C);
+    hWMu_WmT->Write("",TObject::kOverwrite);
+
+    hname = std::string("hWEl_WmT_")+dataset.name;
+    TH1D* hWEl_WmT = new TH1D(hname.c_str(), "", 40, 0., 120.);
+    str = std::string("wMt>>")+hname;
+    tree->Draw(str.c_str(), cutWEl_C);
+    hWEl_WmT->Write("",TObject::kOverwrite);
+
     delete tree;
     file->Close();
    
