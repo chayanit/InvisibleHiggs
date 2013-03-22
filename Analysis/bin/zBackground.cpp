@@ -7,227 +7,142 @@
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
 
 #include "TTree.h"
+#include "TMath.h"
+#include "TH1D.h"
+
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <iostream>
-#include <cmath>
 
 int main(int argc, char* argv[]) {
+
+  TH1::SetDefaultSumw2();
 
   ProgramOptions options(argc, argv);
 
   double lumi = options.lumi;
 
-  double rBF = 5.626;  //  MCFM + NLO
+  std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
 
+  // input datasets
   Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
+
+  // output file
+  TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "UPDATE");
 
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
-  TCut allCuts = puWeight * cuts.allCuts();
 
-  TCut cutZGen  = puWeight * cuts.zMuMuGen();
-  TCut cutZGenM  = puWeight * cuts.zMuMuGenMass();
-  TCut cutZReco = puWeight * (cuts.zMuMuReco() + cuts.zMuMuGen());
-  TCut cutVBFC  = puWeight * (cuts.zMuMuVBF() + cuts.zMuMuGen());
-  TCut cutVBFS  = puWeight * (cuts.vbf() + cuts.zMuMuGen());
+  TCut cutZMuMu_C = puWeight * cuts.zMuMuVBF();
+
+  // histograms
+  double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
+
+  TH1D* hZ_DY_C_DPhi = new TH1D("hZ_DY_C_DPhi", "", 3, dphiEdges);  // Z+jets MC ctrl region
+  TH1D* hZ_BG_C_DPhi = new TH1D("hZ_BG_C_DPhi", "", 3, dphiEdges);  // background MC ctrl region
+  TH1D* hZ_Data_C_DPhi = new TH1D("hZ_Data_C_DPhi", "", 3, dphiEdges);  // Data ctrl region
+
+  // loop over MC datasets
+  for (unsigned i=0; i<datasets.size(); ++i) {
+
+    Dataset dataset = datasets.getDataset(i);
+    
+    // check if it's DYJets
+    bool isDY = false;
+    if (dataset.name.compare(0,2,"DY")==0) {
+      isDY = true;
+      std::cout << "Analysing DY->ll MC : " << dataset.name << std::endl;
+    }
+    else if (dataset.isData) {
+      std::cout << "Analysing Data      : " << dataset.name << std::endl;
+    }
+    else {
+      std::cout << "Analysing BG MC     : " << dataset.name << std::endl;
+    }
+
+    TFile* file = datasets.getTFile(dataset.name);
+    TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
+
+    // tmp histograms
+    TH1D* hZ_C_DPhi = new TH1D("hZ_C_DPhi", "", 3, dphiEdges);
+
+    tree->Draw("vbfDPhi>>hZ_C_DPhi", cutZMuMu_C);
+
+    double weight = lumi * dataset.sigma / dataset.nEvents;
+
+    std::cout << "  N ctrl (dphi>2.6) : " << weight * hZ_C_DPhi->GetBinContent(3) << std::endl;
+
+    if (dataset.isData) {
+      hZ_Data_C_DPhi->Add(hZ_C_DPhi);
+    }
+    else if (isDY) {
+      hZ_DY_C_DPhi->Add(hZ_C_DPhi, weight);
+    }
+    else {
+      hZ_BG_C_DPhi->Add(hZ_C_DPhi, weight);
+    }
+    
+    delete hZ_C_DPhi;
+
+    delete tree;
+    file->Close();
+   
+  }
 
 
-  // DY jets
-  std::string name("DYJetsToLL");
-  Dataset dataset = datasets.getDataset(name);
-  TFile* file     = datasets.getTFile(name);
-  TTree* tree     = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
+  double ratioBF = 5.626;  //  MCFM + NLO
 
-  double nZGen        = (double) tree->Draw("", cutZGen);
-  double nDYZGen      = nZGen * dataset.sigma * lumi / dataset.nEvents;
-  double err_nDYZGen  = sqrt(nZGen) * dataset.sigma * lumi / dataset.nEvents ;
+  double eps_mumu = 0.290;
+  double eps_s_vbf = 0.0194;
+  double eps_c_vbf = 0.0315;
 
-  double nZReco       = (double) tree->Draw("", cutZReco);
-  double nDYZReco     = nZReco * dataset.sigma * lumi / dataset.nEvents;
-  double err_nDYZReco = sqrt(nZReco) * dataset.sigma * lumi / dataset.nEvents ;
-  
-  double nCVBF        = (double) tree->Draw("", cutVBFC);
-  double nDYCVBF      = nCVBF * dataset.sigma * lumi / dataset.nEvents;
-  double err_nDYCVBF  = sqrt(nCVBF) * dataset.sigma * lumi / dataset.nEvents;
+  double f = (ratioBF * eps_s_vbf) / (eps_mumu * eps_c_vbf);
 
-  double nSVBF        = (double) tree->Draw("", cutVBFS);
-  double nDYSVBF      = nSVBF * dataset.sigma * lumi / dataset.nEvents;
-  double err_nDYSVBF  = sqrt(nSVBF) * dataset.sigma * lumi / dataset.nEvents;
-
-  double nZGenM       = (double) tree->Draw("", cutZGenM);
-  double nDYZGenM     = nZGenM * dataset.sigma * lumi / dataset.nEvents;
-  double err_nDYZGenM = sqrt(nZGenM) * dataset.sigma * lumi / dataset.nEvents ;
-
-  //  double nSVBF        = (double) tree->Draw("", cutVBFS);
-
-  std::cout << "DY      : " << nDYZGen << " +/- " << err_nDYZGen << "\t" << nDYZReco << " +/- " << err_nDYZReco << std::endl;
-
-  delete tree;
-  file->Close();
-
-  // DY Jets EWK
-  name = std::string("DYJetsToLL_EWK");
-  dataset = datasets.getDataset(name);
-  file     = datasets.getTFile(name);
-  tree     = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
-
-  nZGen                  = (double) tree->Draw("", cutZGen);
-  nZReco                 = (double) tree->Draw("", cutZReco);
-
-  double nDYEwkZGen      = nZGen * dataset.sigma * lumi / dataset.nEvents;
-  double nDYEwkZReco     = nZReco * dataset.sigma * lumi / dataset.nEvents;
-  
-  double err_nDYEwkZGen  = sqrt(nZGen) * dataset.sigma * lumi / dataset.nEvents ;
-  double err_nDYEwkZReco = sqrt(nZReco) * dataset.sigma * lumi / dataset.nEvents ;
-
-  std::cout << "DY(ewk) : " << nDYEwkZGen << " +/- " << err_nDYEwkZGen << "\t" << nDYEwkZReco << " +/- " << err_nDYEwkZReco << std::endl;
-
-  delete tree;
-  file->Close();
-
-  // DY Jets ptZ-100
-  name = std::string("DYJetsToLL_PtZ-100");
-  dataset = datasets.getDataset(name);
-  file     = datasets.getTFile(name);
-  tree     = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
-
-  nZGen                  = (double) tree->Draw("", cutZGen);
-  nZReco                 = (double) tree->Draw("", cutZReco);
-
-  double nDY100ZGen      = nZGen * dataset.sigma * lumi / dataset.nEvents;
-  double nDY100ZReco     = nZReco * dataset.sigma * lumi / dataset.nEvents;
-  
-  double err_nDY100ZGen  = sqrt(nZGen) * dataset.sigma * lumi / dataset.nEvents ;
-  double err_nDY100ZReco = sqrt(nZReco) * dataset.sigma * lumi / dataset.nEvents ;
-
-  std::cout << "DY(100) : " << nDY100ZGen << " +/- " << err_nDY100ZGen << "\t" << nDY100ZReco << " +/- " << err_nDY100ZReco << std::endl;
-
-  std::cout << std::endl;
-
-  // calculate efficiencies
   std::cout << "Efficiencies" << std::endl;
+  std::cout << "  eps_mumu   : " << eps_mumu << std::endl;
+  std::cout << "  eps_s_vbf   : " << eps_s_vbf << std::endl;
+  std::cout << "  eps_c_vbf   : " << eps_c_vbf << std::endl;
+  std::cout << "  ratio       : " << eps_s_vbf/eps_c_vbf << std::endl;
+  std::cout << std::endl <<std::endl;
 
-  double epsilonMuMu = nDYZReco / nDYZGen;
-  double err_epsilonMuMu = epsilonMuMu * sqrt( pow(err_nDYZReco/nDYZReco,2) +
-					       pow(err_nDYZGen/nDYZGen,2) );
+  TH1D* hZ_Est_C_DPhi = new TH1D("hZ_Est_C_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
+  TH1D* hZ_Est_S_DPhi = new TH1D("hZ_Est_S_DPhi", "", 3, dphiEdges); // estimated W in bkgrnd region
   
-  std::cout << "epsilon_mumu  : " << epsilonMuMu << " +/- " << err_epsilonMuMu << std::endl;
-
-  double epsilonSVBF =  nDYSVBF / nDYZGenM;
-  double err_epsilonSVBF = epsilonSVBF * sqrt( pow(err_nDYSVBF/nDYSVBF,2) +
-					       pow(err_nDYZGenM/nDYZGenM,2) );
-
-  std::cout << "epsilon_S_VBF : " << epsilonSVBF << " +/- " << err_epsilonSVBF << std::endl;
-
-  double epsilonCVBF = nDYCVBF / nDYZReco;
-  double err_epsilonCVBF = epsilonCVBF * sqrt( pow(err_nDYCVBF/nDYCVBF,2) +
-					       pow(err_nDYZReco/nDYZReco,2) );
-
-  std::cout << "epsilon_C_VBF : " << epsilonCVBF << " +/- " << err_epsilonCVBF << std::endl;
+  hZ_Est_C_DPhi->Add(hZ_Data_C_DPhi, hZ_BG_C_DPhi, 1., -1.);
+  hZ_Est_S_DPhi->Add(hZ_Est_C_DPhi, f);
 
   std::cout << std::endl;
-  std::cout << "epsilon_S_VBF / epsilon_C_VBF : " << epsilonSVBF / epsilonCVBF << std::endl;
-
+  std::cout << "dphi>2.6" << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_C_DPhi->GetBinError(3) << std::endl;
   std::cout << std::endl;
-  
-  // estimate backgrounds in control region
-  std::cout << "Control region" << std::endl;
-
-  std::cout << "Dataset  : no dphi \t\tdphi>2.6 \t\tdphi<1.0" << std::endl;
-
-  // TTbar
-  name = std::string("TTbar");
-  dataset = datasets.getDataset(name);
-  file = datasets.getTFile(name);
-  tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
-
-  double zMuMu = (double) tree->Draw("", cuts.zMuMuVBF());
-  double zMuMuHiDPhi = (double) tree->Draw("", cuts.zMuMuVBFHiDPhi());
-  double zMuMuLoDPhi = (double) tree->Draw("", cuts.zMuMuVBFLoDPhi());
-  
-  double nTTbarZMuMu       = zMuMu * dataset.sigma * lumi / dataset.nEvents ;
-  double nTTbarZMuMuHiDPhi = zMuMuHiDPhi * dataset.sigma * lumi / dataset.nEvents ;
-  double nTTbarZMuMuLoDPhi = zMuMuLoDPhi * dataset.sigma * lumi / dataset.nEvents ;
-  
-  double err_nTTbarZMuMu       = sqrt(zMuMu) * dataset.sigma * lumi / dataset.nEvents ;
-  double err_nTTbarZMuMuHiDPhi = sqrt(zMuMuHiDPhi) * dataset.sigma * lumi / dataset.nEvents ;    
-  double err_nTTbarZMuMuLoDPhi = sqrt(zMuMuLoDPhi) * dataset.sigma * lumi / dataset.nEvents ;
-
-  delete tree;
-  file->Close();
-
-  std::cout << "TTbar MC : " << nTTbarZMuMu << " +/- " << err_nTTbarZMuMu << "\t"
-	    << nTTbarZMuMuHiDPhi << " +/- " << err_nTTbarZMuMuHiDPhi << "\t"
-	    << nTTbarZMuMuLoDPhi << " +/- " << err_nTTbarZMuMuLoDPhi << std::endl;
-
-  double nBGZMuMu = nTTbarZMuMu;
-  double nBGZMuMuHiDPhi = nTTbarZMuMuHiDPhi;
-  double nBGZMuMuLoDPhi = nTTbarZMuMuLoDPhi;
-
-  double err_nBGZMuMu = err_nTTbarZMuMu;
-  double err_nBGZMuMuHiDPhi = err_nTTbarZMuMuHiDPhi;
-  double err_nBGZMuMuLoDPhi = err_nTTbarZMuMuLoDPhi;
-
-
-  // get numbers from data control regions
-  file = datasets.getTFile("METABCD");
-  tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
-
-  int nDataZMuMu       = tree->Draw("", cuts.zMuMuVBF());
-  int nDataZMuMuLoDPhi = tree->Draw("", cuts.zMuMuVBFLoDPhi());
-  int nDataZMuMuHiDPhi = tree->Draw("", cuts.zMuMuVBFHiDPhi());
-
-  double err_nDataZMuMu       = sqrt(nDataZMuMu);
-  double err_nDataZMuMuLoDPhi = sqrt(nDataZMuMuLoDPhi);
-  double err_nDataZMuMuHiDPhi = sqrt(nDataZMuMuHiDPhi);
-
-  std::cout << "Data     : " << nDataZMuMu << " +/- " << err_nDataZMuMu << "\t"
-	    << nDataZMuMuHiDPhi << " +/- " << err_nDataZMuMuHiDPhi << "\t"
-	    << nDataZMuMuLoDPhi << " +/- " << err_nDataZMuMuLoDPhi << std::endl;
-
-  double nDataBGZMuMu       = nDataZMuMu - nBGZMuMu;
-  double nDataBGZMuMuHiDPhi = nDataZMuMuHiDPhi - nBGZMuMuHiDPhi;
-  double nDataBGZMuMuLoDPhi = nDataZMuMuLoDPhi - nBGZMuMuLoDPhi;
-
-  double err_nDataBGZMuMu       = sqrt( nDataZMuMu + err_nBGZMuMu );
-  double err_nDataBGZMuMuHiDPhi = sqrt( nDataZMuMuHiDPhi + err_nBGZMuMuHiDPhi );
-  double err_nDataBGZMuMuLoDPhi = sqrt( nDataZMuMuLoDPhi + err_nBGZMuMuLoDPhi );
-
-  std::cout << "Data-BG  : " << nDataBGZMuMu << " +/- " << err_nDataBGZMuMu << "\t"
-	    << nDataBGZMuMuHiDPhi << " +/- " << err_nDataBGZMuMuHiDPhi << "\t"
-	    << nDataBGZMuMuLoDPhi << " +/- " << err_nDataBGZMuMuLoDPhi << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_S_DPhi->GetBinError(3) << std::endl;
+  std::cout << std::endl << std::endl;
+  std::cout << "dphi<1.0" << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(1) << " +/- " << hZ_DY_C_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_C_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(1) << " +/- " << hZ_Data_C_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
-  
+  std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_C_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_S_DPhi->GetBinError(1) << std::endl;
+  std::cout << std::endl << std::endl;
 
-  // calculate final results
-  std::cout << "Final BG estimate" << std::endl;
-  double nEst       = (nDataZMuMu - nBGZMuMu) * rBF * epsilonSVBF / (epsilonCVBF * epsilonMuMu);
-  double nEstHiDPhi = (nDataZMuMuHiDPhi - nBGZMuMuHiDPhi) * rBF * epsilonSVBF / (epsilonCVBF * epsilonMuMu);
-  double nEstLoDPhi = (nDataZMuMuLoDPhi - nBGZMuMuLoDPhi) * rBF * epsilonSVBF / (epsilonCVBF * epsilonMuMu);
 
-  double err_nEst = nEst * sqrt ( 1/nDataZMuMu +
-				  pow(err_epsilonSVBF/epsilonSVBF, 2) +
-				  pow(err_epsilonCVBF/epsilonCVBF, 2) +
-				  pow(err_epsilonMuMu/epsilonMuMu, 2) +
-				  pow(err_nBGZMuMu/nBGZMuMu, 2) );
+  //store histograms
+  ofile->cd();
+  hZ_DY_C_DPhi->Write("",TObject::kOverwrite);
+  hZ_BG_C_DPhi->Write("",TObject::kOverwrite);
+  hZ_Data_C_DPhi->Write("",TObject::kOverwrite);
+//   hZ_R_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_C_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_S_DPhi->Write("",TObject::kOverwrite);
 
-  double err_nEstHiDPhi = nEstHiDPhi * sqrt ( 1/nDataZMuMu +
-				  pow(err_epsilonSVBF/epsilonSVBF, 2) +
-				  pow(err_epsilonCVBF/epsilonCVBF, 2) +
-				  pow(err_epsilonMuMu/epsilonMuMu, 2) +
-				  pow(err_nBGZMuMu/nBGZMuMu, 2) );
-
-  double err_nEstLoDPhi = nEstLoDPhi * sqrt ( 1/nDataZMuMu +
-				  pow(err_epsilonSVBF/epsilonSVBF, 2) +
-				  pow(err_epsilonCVBF/epsilonCVBF, 2) +
-				  pow(err_epsilonMuMu/epsilonMuMu, 2) +
-				  pow(err_nBGZMuMu/nBGZMuMu, 2) );
-
-  std::cout << "Estimate : " << nEst << " +/- " << err_nEst << "\t"
-	    << nEstHiDPhi << " +/- " << err_nEstHiDPhi << "\t"
-	    << nEstLoDPhi << " +/- " << err_nEstLoDPhi << std::endl;
-
+  ofile->Close();    
 
 }

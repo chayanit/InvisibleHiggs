@@ -139,7 +139,7 @@ TCut Cuts::zMuMuVBF() {
   TCut tmp = cut("trigger");
   tmp += cut("metFilter");
   tmp += zMuMuReco();
-  //  tmp += TCut("mu3Pt<10");
+  tmp += TCut("mu3Pt<10");
   tmp += cut("EVeto");
   tmp += vbf();
   tmp += TCut("metNoMuon>130.");
