@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.12 2013/03/06 14:00:10 chayanit Exp $
+// $Id: InvHiggsInfo.h,v 1.13 2013/03/12 13:39:59 chayanit Exp $
 //
 //
 
@@ -118,95 +118,93 @@ class InvHiggsInfo { //: public TObject {
   Double_t met;
   Double_t metPhi;
   Double_t jetMETdPhi;
-  //
   Double_t metNoMuon;
   Double_t metNoMuonPhi; 
-  Double_t metNoLooseMuon;
-  Double_t metNoLooseMuonPhi;
-  // 
-  //
   Double_t metNoElectron;
   Double_t metNoElectronPhi;
-  Double_t metNoLooseElectron;
-  Double_t metNoLooseElectronPhi;
+  Double_t metNo2Muon;
+  Double_t metNo2MuonPhi;
+  Double_t metNoWLepton;
+  Double_t metNoWLeptonPhi;
   // 
   // MET Uncertainty
   Double_t metCentral;
   Double_t metCentral_Phi;
   Double_t metCentral_NoMuon;
   Double_t metCentral_NoMuonPhi; 
-  Double_t metCentral_NoLooseMuon;
-  Double_t metCentral_NoLooseMuonPhi;
   Double_t metCentral_NoElectron;
   Double_t metCentral_NoElectronPhi;
-  Double_t metCentral_NoLooseElectron;
-  Double_t metCentral_NoLooseElectronPhi;
+  Double_t metCentral_No2Muon;
+  Double_t metCentral_No2MuonPhi;
+  Double_t metCentral_NoWLepton;
+  Double_t metCentral_NoWLeptonPhi;
 
   Double_t metJESup;
   Double_t metJESup_Phi;
   Double_t metJESup_NoMuon;
   Double_t metJESup_NoMuonPhi; 
-  Double_t metJESup_NoLooseMuon;
-  Double_t metJESup_NoLooseMuonPhi;
   Double_t metJESup_NoElectron;
   Double_t metJESup_NoElectronPhi;
-  Double_t metJESup_NoLooseElectron;
-  Double_t metJESup_NoLooseElectronPhi;
+  Double_t metJESup_No2Muon;
+  Double_t metJESup_No2MuonPhi;
+  Double_t metJESup_NoWLepton;
+  Double_t metJESup_NoWLeptonPhi;
 
   Double_t metJESdown;
   Double_t metJESdown_Phi;
   Double_t metJESdown_NoMuon;
   Double_t metJESdown_NoMuonPhi; 
-  Double_t metJESdown_NoLooseMuon;
-  Double_t metJESdown_NoLooseMuonPhi;
   Double_t metJESdown_NoElectron;
   Double_t metJESdown_NoElectronPhi;
-  Double_t metJESdown_NoLooseElectron;
-  Double_t metJESdown_NoLooseElectronPhi;
+  Double_t metJESdown_No2Muon;
+  Double_t metJESdown_No2MuonPhi;
+  Double_t metJESdown_NoWLepton;
+  Double_t metJESdown_NoWLeptonPhi;
 
   Double_t metJERup;
   Double_t metJERup_Phi;
   Double_t metJERup_NoMuon;
   Double_t metJERup_NoMuonPhi; 
-  Double_t metJERup_NoLooseMuon;
-  Double_t metJERup_NoLooseMuonPhi;
   Double_t metJERup_NoElectron;
   Double_t metJERup_NoElectronPhi;
-  Double_t metJERup_NoLooseElectron;
-  Double_t metJERup_NoLooseElectronPhi;
+  Double_t metJERup_No2Muon;
+  Double_t metJERup_No2MuonPhi;
+  Double_t metJERup_NoWLepton;
+  Double_t metJERup_NoWLeptonPhi;
 
   Double_t metJERdown;
   Double_t metJERdown_Phi;
   Double_t metJERdown_NoMuon;
   Double_t metJERdown_NoMuonPhi; 
-  Double_t metJERdown_NoLooseMuon;
-  Double_t metJERdown_NoLooseMuonPhi;
   Double_t metJERdown_NoElectron;
   Double_t metJERdown_NoElectronPhi;
-  Double_t metJERdown_NoLooseElectron;
-  Double_t metJERdown_NoLooseElectronPhi;
+  Double_t metJERdown_No2Muon;
+  Double_t metJERdown_No2MuonPhi;
+  Double_t metJERdown_NoWLepton;
+  Double_t metJERdown_NoWLeptonPhi;
 
   Double_t metUnclusteredup;
   Double_t metUnclusteredup_Phi;
   Double_t metUnclusteredup_NoMuon;
   Double_t metUnclusteredup_NoMuonPhi; 
-  Double_t metUnclusteredup_NoLooseMuon;
-  Double_t metUnclusteredup_NoLooseMuonPhi;
   Double_t metUnclusteredup_NoElectron;
   Double_t metUnclusteredup_NoElectronPhi;
-  Double_t metUnclusteredup_NoLooseElectron;
-  Double_t metUnclusteredup_NoLooseElectronPhi;
+  Double_t metUnclusteredup_No2Muon;
+  Double_t metUnclusteredup_No2MuonPhi;
+  Double_t metUnclusteredup_NoWLepton;
+  Double_t metUnclusteredup_NoWLeptonPhi;
 
   Double_t metUnclustereddown;
   Double_t metUnclustereddown_Phi;
   Double_t metUnclustereddown_NoMuon;
   Double_t metUnclustereddown_NoMuonPhi; 
-  Double_t metUnclustereddown_NoLooseMuon;
-  Double_t metUnclustereddown_NoLooseMuonPhi;
   Double_t metUnclustereddown_NoElectron;
   Double_t metUnclustereddown_NoElectronPhi;
-  Double_t metUnclustereddown_NoLooseElectron;
-  Double_t metUnclustereddown_NoLooseElectronPhi;
+  Double_t metUnclustereddown_No2Muon;
+  Double_t metUnclustereddown_No2MuonPhi;
+  Double_t metUnclustereddown_NoWLepton;
+  Double_t metUnclustereddown_NoWLeptonPhi;
+  
   // MHT
   Double_t mht;
   Double_t mhtPhi;
@@ -239,27 +237,33 @@ class InvHiggsInfo { //: public TObject {
   Double_t ele1Pt;
   Double_t ele1Eta;
   Double_t ele1Phi;
+  Double_t ele1M;
 
   Double_t ele2Pt;
   Double_t ele2Eta;
   Double_t ele2Phi;
+  Double_t ele2M;
 
   Double_t ele3Pt;
   Double_t ele3Eta;
   Double_t ele3Phi;
+  Double_t ele3M;
 
   // Muons
   Double_t mu1Pt;
   Double_t mu1Eta;
   Double_t mu1Phi;
+  Double_t mu1M;
 
   Double_t mu2Pt;
   Double_t mu2Eta;
   Double_t mu2Phi;
+  Double_t mu2M;
 
   Double_t mu3Pt;
   Double_t mu3Eta;
   Double_t mu3Phi;
+  Double_t mu3M;
 
   // Ws
   Int_t nW;
@@ -271,6 +275,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t wDaulPt;
   Double_t wDaulEta;
   Double_t wDaulPhi;
+  Double_t wDaulM;
   Double_t wDaulCharge;
 
   // Zs
@@ -283,10 +288,12 @@ class InvHiggsInfo { //: public TObject {
   Double_t zDau1Pt;
   Double_t zDau1Eta;
   Double_t zDau1Phi;
+  Double_t zDau1M;
   Double_t zDau1Charge;
   Double_t zDau2Pt;
   Double_t zDau2Eta;
   Double_t zDau2Phi;
+  Double_t zDau2M;
   Double_t zDau2Charge;
 
   // PU
@@ -318,6 +325,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t mcVBFDPhi;
 
   // MC info -- W
+  Double_t wgennj;
   Double_t wgenmass;
   Double_t wgenpt;
   Double_t wgenmt;

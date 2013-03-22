@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.21 2013/03/12 13:39:59 chayanit Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.22 2013/03/15 15:53:16 chayanit Exp $
 //
 //
 
@@ -189,44 +189,52 @@ private:
   void doElectrons(const std::vector<pat::Electron>& electrons); //Loose electrons
   void doMET(const std::vector<pat::MET>& met,
 	     const std::vector<pat::Muon>& muons,                //Tight muons
-	     const std::vector<pat::Muon>& looseMuons,           //Loose muons
 	     const std::vector<pat::Electron>& electrons,        //Tight electrons
-	     const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
+	     const reco::CandidateView& zMs,                     //Z candidate
+	     const reco::CandidateView& wMs,                     //Wmu candidate
+	     const reco::CandidateView& wEs);                    //Wel candidate
   void doMETUnc_Central(const std::vector<pat::MET>& met,
 			const std::vector<pat::Muon>& muons,                //Tight muons
-			const std::vector<pat::Muon>& looseMuons,           //Loose muons
 			const std::vector<pat::Electron>& electrons,        //Tight electrons
-			const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
+			const reco::CandidateView& zMs,                     //Z candidate
+			const reco::CandidateView& wMs,                     //Wmu candidate
+			const reco::CandidateView& wEs);                    //Wel candidate
   void doMETUnc_JESup(const std::vector<pat::MET>& met,
 		      const std::vector<pat::Muon>& muons,                //Tight muons
-		      const std::vector<pat::Muon>& looseMuons,           //Loose muons
 		      const std::vector<pat::Electron>& electrons,        //Tight electrons
-		      const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
+		      const reco::CandidateView& zMs,                     //Z candidate
+		      const reco::CandidateView& wMs,                     //Wmu candidate
+		      const reco::CandidateView& wEs);                    //Wel candidate
   void doMETUnc_JESdown(const std::vector<pat::MET>& met,
 			const std::vector<pat::Muon>& muons,                //Tight muons
-			const std::vector<pat::Muon>& looseMuons,           //Loose muons
 			const std::vector<pat::Electron>& electrons,        //Tight electrons
-			const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
+			const reco::CandidateView& zMs,                     //Z candidate
+			const reco::CandidateView& wMs,                     //Wmu candidate
+			const reco::CandidateView& wEs);                    //Wel candidate
   void doMETUnc_JERup(const std::vector<pat::MET>& met,
 		      const std::vector<pat::Muon>& muons,                //Tight muons
-		      const std::vector<pat::Muon>& looseMuons,           //Loose muons
 		      const std::vector<pat::Electron>& electrons,        //Tight electrons
-		      const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
+		      const reco::CandidateView& zMs,                     //Z candidate
+		      const reco::CandidateView& wMs,                     //Wmu candidate
+		      const reco::CandidateView& wEs);                    //Wel candidate
   void doMETUnc_JERdown(const std::vector<pat::MET>& met,
 			const std::vector<pat::Muon>& muons,                //Tight muons
-			const std::vector<pat::Muon>& looseMuons,           //Loose muons
 			const std::vector<pat::Electron>& electrons,        //Tight electrons
-			const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
+			const reco::CandidateView& zMs,                     //Z candidate
+			const reco::CandidateView& wMs,                     //Wmu candidate
+			const reco::CandidateView& wEs);                    //Wel candidate
   void doMETUnc_UnCup(const std::vector<pat::MET>& met,
 		      const std::vector<pat::Muon>& muons,                //Tight muons
-		      const std::vector<pat::Muon>& looseMuons,           //Loose muons
 		      const std::vector<pat::Electron>& electrons,        //Tight electrons
-		      const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
+		      const reco::CandidateView& zMs,                     //Z candidate
+		      const reco::CandidateView& wMs,                     //Wmu candidate
+		      const reco::CandidateView& wEs);                    //Wel candidate
   void doMETUnc_UnCdown(const std::vector<pat::MET>& met,
 			const std::vector<pat::Muon>& muons,                //Tight muons
-			const std::vector<pat::Muon>& looseMuons,           //Loose muons
 			const std::vector<pat::Electron>& electrons,        //Tight electrons
-			const std::vector<pat::Electron>& looseElectrons);  //Loose electrons
+			const reco::CandidateView& zMs,                     //Z candidate
+			const reco::CandidateView& wMs,                     //Wmu candidate
+			const reco::CandidateView& wEs);                    //Wel candidate
   void doMHT(const std::vector<pat::MHT>& mht);
   void doZs(const reco::CandidateView& zs, int channel);
   void doWs(const reco::CandidateView& ws, int channel);
@@ -617,22 +625,21 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   if (jets.isValid()) doThirdJet(jets, puJetIdMVA, puJetIdFlag, *looseMuons, *looseElectrons);
 
-  if (met.isValid()) doMET(*met, *muons, *looseMuons, *electrons, *looseElectrons);
+  if (met.isValid()) doMET(*met, *muons, *electrons, *zMus, *wMus, *wEls);
 
-  // do MET uncertainty
-  if (metCentral.isValid()) doMETUnc_Central(*metCentral, *muons, *looseMuons, *electrons, *looseElectrons);
+  if (metCentral.isValid()) doMETUnc_Central(*metCentral, *muons, *electrons, *zMus, *wMus, *wEls);
 
-  if (metJESup.isValid()) doMETUnc_JESup(*metJESup, *muons, *looseMuons, *electrons, *looseElectrons);
+  if (metJESup.isValid()) doMETUnc_JESup(*metJESup, *muons, *electrons, *zMus, *wMus, *wEls);
 
-  if (metJESdown.isValid()) doMETUnc_JESdown(*metJESdown, *muons, *looseMuons, *electrons, *looseElectrons);
+  if (metJESdown.isValid()) doMETUnc_JESdown(*metJESdown, *muons, *electrons, *zMus, *wMus, *wEls);
 
-  if (metJERup.isValid()) doMETUnc_JERup(*metJERup, *muons, *looseMuons, *electrons, *looseElectrons);
+  if (metJERup.isValid()) doMETUnc_JERup(*metJERup, *muons, *electrons, *zMus, *wMus, *wEls);
 
-  if (metJERdown.isValid()) doMETUnc_JERdown(*metJERdown, *muons, *looseMuons, *electrons, *looseElectrons);
+  if (metJERdown.isValid()) doMETUnc_JERdown(*metJERdown, *muons, *electrons, *zMus, *wMus, *wEls);
 
-  if (metUnCup.isValid()) doMETUnc_UnCup(*metUnCup, *muons, *looseMuons, *electrons, *looseElectrons);
+  if (metUnCup.isValid()) doMETUnc_UnCup(*metUnCup, *muons, *electrons, *zMus, *wMus, *wEls);
 
-  if (metUnCdown.isValid()) doMETUnc_UnCdown(*metUnCdown, *muons, *looseMuons, *electrons, *looseElectrons);
+  if (metUnCdown.isValid()) doMETUnc_UnCdown(*metUnCdown, *muons, *electrons, *zMus, *wMus, *wEls);
 
   if (mht.isValid()) doMHT(*mht);
 
@@ -709,6 +716,11 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
     for(size_t i = 0; i < genParticles.size(); ++ i) {
       const GenParticle & p = genParticles[i];
       //W
+
+      if(fabs(p.pdgId())==1 || fabs(p.pdgId())==2 || fabs(p.pdgId())==3 || fabs(p.pdgId())==4 || fabs(p.pdgId())==5 || fabs(p.pdgId())==21){  
+	if(p.status()==3) info_->wgennj++; 
+	}
+
       if(fabs(p.pdgId())==24 && p.status()==3 && (!foundw1) ){ //
 	foundw1 = true;  
 	//std::cout<<p.pt()<<std::endl;
@@ -1261,6 +1273,8 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
 				      const std::vector<pat::Electron>& electrons) 
 {
 
+  bool foundThird = false;
+
   // Find 3rd jet
   for (unsigned i=0; i<jets->size(); ++i) {
 
@@ -1288,6 +1302,7 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
     if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) ) {
 
       // store in ntuple
+      if(!foundThird){
       info_->jet3Et  = jets->at(i).pt();
       info_->jet3Eta = jets->at(i).eta();
       info_->jet3Phi = jets->at(i).phi();
@@ -1295,6 +1310,8 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
 
       // calculate Zeppenfeld variable
       info_->jet3EtaStar = jets->at(i).eta() - (tagJetEtaMin_ + tagJetEtaMax_) / 2;
+      foundThird = true;
+      }
 
       // check if it is between tag jets in eta
       if (jets->at(i).eta() > tagJetEtaMin_ &&
@@ -1305,7 +1322,7 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
 	info_->cenJetEta = jets->at(i).eta();
 	info_->cenJetPhi = jets->at(i).phi();
 	info_->cenJetM   = jets->at(i).mass();
-
+	break;
       }
 
     }
@@ -1320,17 +1337,22 @@ void InvHiggsInfoProducer::doMuons(const std::vector<pat::Muon>& muons) {
   if (muons.size()>0) {
     info_->mu1Pt = muons.at(0).pt();    
     info_->mu1Eta = muons.at(0).eta();    
-    info_->mu1Phi = muons.at(0).phi();    
+    info_->mu1Phi = muons.at(0).phi(); 
+    info_->mu1M = muons.at(0).mass();    
+
   }
   if (muons.size()>1) {
     info_->mu2Pt = muons.at(1).pt();    
     info_->mu2Eta = muons.at(1).eta();    
-    info_->mu2Phi = muons.at(1).phi();    
+    info_->mu2Phi = muons.at(1).phi(); 
+    info_->mu2M = muons.at(1).mass();    
+
   }
   if (muons.size()>2) {
     info_->mu3Pt = muons.at(2).pt();    
     info_->mu3Eta = muons.at(2).eta();    
     info_->mu3Phi = muons.at(2).phi();
+    info_->mu3M = muons.at(2).mass();    
   }
     
     // leading pair mass
@@ -1346,16 +1368,21 @@ void InvHiggsInfoProducer::doElectrons(const std::vector<pat::Electron>& electro
     info_->ele1Pt = electrons.at(0).pt();    
     info_->ele1Eta = electrons.at(0).eta();    
     info_->ele1Phi = electrons.at(0).phi();    
+    info_->ele1M = electrons.at(0).mass();    
   }
   if (electrons.size()>1) {
     info_->ele2Pt = electrons.at(1).pt();    
     info_->ele2Eta = electrons.at(1).eta();    
-    info_->ele2Phi = electrons.at(1).phi();   
+    info_->ele2Phi = electrons.at(1).phi();  
+    info_->ele2M = electrons.at(1).mass();    
+
   }
   if (electrons.size()>2) {
     info_->ele3Pt = electrons.at(2).pt();    
     info_->ele3Eta = electrons.at(2).eta();    
     info_->ele3Phi = electrons.at(2).phi();
+    info_->ele3M = electrons.at(2).mass();    
+
   }
 
     // leading pair mass
@@ -1367,9 +1394,10 @@ void InvHiggsInfoProducer::doElectrons(const std::vector<pat::Electron>& electro
 
 void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
 				 const std::vector<pat::Muon>& muons,
-				 const std::vector<pat::Muon>& looseMuons,
-				 const std::vector<pat::Electron>& electrons,
-				 const std::vector<pat::Electron>& looseElectrons) {
+				 const std::vector<pat::Electron>& electrons,    
+				 const reco::CandidateView& zMus,        
+				 const reco::CandidateView& wMus,                     
+				 const reco::CandidateView& wEls) {
 
   info_->met    = met.at(0).pt();
   info_->metPhi = met.at(0).phi();
@@ -1390,16 +1418,6 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
   }
   info_->metNoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metNoMuonPhi = TMath::ATan2(mety,metx);
-
-  //metNoLooseMuon
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
-    metx = metx + looseMuons.at(iLep).px();
-    mety = mety + looseMuons.at(iLep).py();
-  }
-  info_->metNoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metNoLooseMuonPhi = TMath::ATan2(mety,metx);
   
   //metNoElectron
   metx = met.at(0).px();
@@ -1411,28 +1429,97 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
   info_->metNoElectron = TMath::Sqrt(metx*metx + mety*mety);
   info_->metNoElectronPhi = TMath::ATan2(mety,metx);  
 
-  //metNoLooseElectron
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
-    metx = metx + looseElectrons.at(iLep).px();
-    mety = mety + looseElectrons.at(iLep).py();
-  }
-  info_->metNoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metNoLooseElectronPhi = TMath::ATan2(mety,metx);
-}
+  //metNo2Muon
+  if(zMus.size() > 0){
 
+    double zPt = 0.;
+
+    for (unsigned i=0; i < zMus.size(); ++i) {
+
+      if (zMus[i].pt() > zPt){
+	zPt  = zMus[i].pt();
+	metx = met.at(0).px() + zMus[i].px();
+	mety = met.at(0).py() + zMus[i].py();
+	info_->metNo2Muon = TMath::Sqrt(metx*metx + mety*mety);
+	info_->metNo2MuonPhi = TMath::ATan2(mety,metx);
+      }
+    }
+  }
+  
+  //metNoWLepton
+  if (wMus.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wMus.size(); ++i) {
+
+      if (wMus[i].pt() > wPt){
+	wPt  = wMus[i].pt();
+	const reco::Candidate *Wboson = &(wMus[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metNoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metNoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metNoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metNoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+
+  if (wEls.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wEls.size(); ++i) {
+
+      if (wEls[i].pt() > wPt){
+	wPt  = wEls[i].pt();
+	const reco::Candidate *Wboson = &(wEls[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metNoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metNoWLeptonPhi = TMath::ATan2(mety,metx);
+
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metNoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metNoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+}
 
 
 void InvHiggsInfoProducer::doMETUnc_Central(const std::vector<pat::MET>& met,
 					    const std::vector<pat::Muon>& muons,
-					    const std::vector<pat::Muon>& looseMuons,
-					    const std::vector<pat::Electron>& electrons,
-					    const std::vector<pat::Electron>& looseElectrons) {
+					    const std::vector<pat::Electron>& electrons,    
+					    const reco::CandidateView& zMus,        
+					    const reco::CandidateView& wMus,                     
+					    const reco::CandidateView& wEls) {
 
-  info_->metCentral     = met.at(0).pt();
+  info_->metCentral    = met.at(0).pt();
   info_->metCentral_Phi = met.at(0).phi();
-
+  
   //metNoMuon
   Double_t metx = met.at(0).px();
   Double_t mety = met.at(0).py();
@@ -1442,16 +1529,6 @@ void InvHiggsInfoProducer::doMETUnc_Central(const std::vector<pat::MET>& met,
   }
   info_->metCentral_NoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metCentral_NoMuonPhi = TMath::ATan2(mety,metx);
-
-  //metNoLooseMuon
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
-    metx = metx + looseMuons.at(iLep).px();
-    mety = mety + looseMuons.at(iLep).py();
-  }
-  info_->metCentral_NoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metCentral_NoLooseMuonPhi = TMath::ATan2(mety,metx);
   
   //metNoElectron
   metx = met.at(0).px();
@@ -1463,28 +1540,98 @@ void InvHiggsInfoProducer::doMETUnc_Central(const std::vector<pat::MET>& met,
   info_->metCentral_NoElectron = TMath::Sqrt(metx*metx + mety*mety);
   info_->metCentral_NoElectronPhi = TMath::ATan2(mety,metx);  
 
-  //metNoLooseElectron
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
-    metx = metx + looseElectrons.at(iLep).px();
-    mety = mety + looseElectrons.at(iLep).py();
+  //metNo2Muon
+  if(zMus.size() > 0){
+
+    double zPt = 0.;
+
+    for (unsigned i=0; i < zMus.size(); ++i) {
+
+      if (zMus[i].pt() > zPt){
+	zPt  = zMus[i].pt();
+	metx = met.at(0).px() + zMus[i].px();
+	mety = met.at(0).py() + zMus[i].py();
+	info_->metCentral_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+	info_->metCentral_No2MuonPhi = TMath::ATan2(mety,metx);
+      }
+    }
   }
-  info_->metCentral_NoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metCentral_NoLooseElectronPhi = TMath::ATan2(mety,metx);
+  
+  //metNoWLepton
+  if (wMus.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wMus.size(); ++i) {
+
+      if (wMus[i].pt() > wPt){
+	wPt  = wMus[i].pt();
+	const reco::Candidate *Wboson = &(wMus[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metCentral_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metCentral_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metCentral_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metCentral_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+
+  if (wEls.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wEls.size(); ++i) {
+
+      if (wEls[i].pt() > wPt){
+	wPt  = wEls[i].pt();
+	const reco::Candidate *Wboson = &(wEls[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metCentral_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metCentral_NoWLeptonPhi = TMath::ATan2(mety,metx);
+
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metCentral_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metCentral_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
 }
 
 
 
 void InvHiggsInfoProducer::doMETUnc_JESup(const std::vector<pat::MET>& met,
 					  const std::vector<pat::Muon>& muons,
-					  const std::vector<pat::Muon>& looseMuons,
-					  const std::vector<pat::Electron>& electrons,
-					  const std::vector<pat::Electron>& looseElectrons) {
+					  const std::vector<pat::Electron>& electrons,    
+					  const reco::CandidateView& zMus,        
+					  const reco::CandidateView& wMus,                     
+					  const reco::CandidateView& wEls) {
 
-  info_->metJESup     = met.at(0).pt();
+  info_->metJESup    = met.at(0).pt();
   info_->metJESup_Phi = met.at(0).phi();
-
+  
   //metNoMuon
   Double_t metx = met.at(0).px();
   Double_t mety = met.at(0).py();
@@ -1494,16 +1641,6 @@ void InvHiggsInfoProducer::doMETUnc_JESup(const std::vector<pat::MET>& met,
   }
   info_->metJESup_NoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metJESup_NoMuonPhi = TMath::ATan2(mety,metx);
-
-  //metNoLooseMuon
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
-    metx = metx + looseMuons.at(iLep).px();
-    mety = mety + looseMuons.at(iLep).py();
-  }
-  info_->metJESup_NoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metJESup_NoLooseMuonPhi = TMath::ATan2(mety,metx);
   
   //metNoElectron
   metx = met.at(0).px();
@@ -1515,27 +1652,98 @@ void InvHiggsInfoProducer::doMETUnc_JESup(const std::vector<pat::MET>& met,
   info_->metJESup_NoElectron = TMath::Sqrt(metx*metx + mety*mety);
   info_->metJESup_NoElectronPhi = TMath::ATan2(mety,metx);  
 
-  //metNoLooseElectron
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
-    metx = metx + looseElectrons.at(iLep).px();
-    mety = mety + looseElectrons.at(iLep).py();
+  //metNo2Muon
+  if(zMus.size() > 0){
+
+    double zPt = 0.;
+
+    for (unsigned i=0; i < zMus.size(); ++i) {
+
+      if (zMus[i].pt() > zPt){
+	zPt  = zMus[i].pt();
+	metx = met.at(0).px() + zMus[i].px();
+	mety = met.at(0).py() + zMus[i].py();
+	info_->metJESup_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+	info_->metJESup_No2MuonPhi = TMath::ATan2(mety,metx);
+      }
+    }
   }
-  info_->metJESup_NoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metJESup_NoLooseElectronPhi = TMath::ATan2(mety,metx);
+  
+  //metNoWLepton
+  if (wMus.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wMus.size(); ++i) {
+
+      if (wMus[i].pt() > wPt){
+	wPt  = wMus[i].pt();
+	const reco::Candidate *Wboson = &(wMus[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metJESup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJESup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metJESup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJESup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+
+  if (wEls.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wEls.size(); ++i) {
+
+      if (wEls[i].pt() > wPt){
+	wPt  = wEls[i].pt();
+	const reco::Candidate *Wboson = &(wEls[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metJESup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJESup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metJESup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJESup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
 }
+
 
 
 void InvHiggsInfoProducer::doMETUnc_JESdown(const std::vector<pat::MET>& met,
 					    const std::vector<pat::Muon>& muons,
-					    const std::vector<pat::Muon>& looseMuons,
-					    const std::vector<pat::Electron>& electrons,
-					    const std::vector<pat::Electron>& looseElectrons) {
+					    const std::vector<pat::Electron>& electrons,    
+					    const reco::CandidateView& zMus,        
+					    const reco::CandidateView& wMus,                     
+					    const reco::CandidateView& wEls) {
 
-  info_->metJESdown     = met.at(0).pt();
+  info_->metJESdown    = met.at(0).pt();
   info_->metJESdown_Phi = met.at(0).phi();
-
+  
   //metNoMuon
   Double_t metx = met.at(0).px();
   Double_t mety = met.at(0).py();
@@ -1545,16 +1753,6 @@ void InvHiggsInfoProducer::doMETUnc_JESdown(const std::vector<pat::MET>& met,
   }
   info_->metJESdown_NoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metJESdown_NoMuonPhi = TMath::ATan2(mety,metx);
-
-  //metNoLooseMuon
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
-    metx = metx + looseMuons.at(iLep).px();
-    mety = mety + looseMuons.at(iLep).py();
-  }
-  info_->metJESdown_NoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metJESdown_NoLooseMuonPhi = TMath::ATan2(mety,metx);
   
   //metNoElectron
   metx = met.at(0).px();
@@ -1566,25 +1764,95 @@ void InvHiggsInfoProducer::doMETUnc_JESdown(const std::vector<pat::MET>& met,
   info_->metJESdown_NoElectron = TMath::Sqrt(metx*metx + mety*mety);
   info_->metJESdown_NoElectronPhi = TMath::ATan2(mety,metx);  
 
-  //metNoLooseElectron
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
-    metx = metx + looseElectrons.at(iLep).px();
-    mety = mety + looseElectrons.at(iLep).py();
+  //metNo2Muon
+  if(zMus.size() > 0){
+
+    double zPt = 0.;
+
+    for (unsigned i=0; i < zMus.size(); ++i) {
+
+      if (zMus[i].pt() > zPt){
+	zPt  = zMus[i].pt();
+	metx = met.at(0).px() + zMus[i].px();
+	mety = met.at(0).py() + zMus[i].py();
+	info_->metJESdown_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+	info_->metJESdown_No2MuonPhi = TMath::ATan2(mety,metx);
+      }
+    }
   }
-  info_->metJESdown_NoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metJESdown_NoLooseElectronPhi = TMath::ATan2(mety,metx);
+  
+  //metNoWLepton
+  if (wMus.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wMus.size(); ++i) {
+
+      if (wMus[i].pt() > wPt){
+	wPt  = wMus[i].pt();
+	const reco::Candidate *Wboson = &(wMus[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metJESdown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJESdown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metJESdown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJESdown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+
+  if (wEls.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wEls.size(); ++i) {
+
+      if (wEls[i].pt() > wPt){
+	wPt  = wEls[i].pt();
+	const reco::Candidate *Wboson = &(wEls[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metJESdown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJESdown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metJESdown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJESdown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
 }
 
 
 void InvHiggsInfoProducer::doMETUnc_JERup(const std::vector<pat::MET>& met,
 					  const std::vector<pat::Muon>& muons,
-					  const std::vector<pat::Muon>& looseMuons,
-					  const std::vector<pat::Electron>& electrons,
-					  const std::vector<pat::Electron>& looseElectrons) {
+					  const std::vector<pat::Electron>& electrons,    
+					  const reco::CandidateView& zMus,        
+					  const reco::CandidateView& wMus,                     
+					  const reco::CandidateView& wEls) {
 
-  info_->metJERup     = met.at(0).pt();
+  info_->metJERup    = met.at(0).pt();
   info_->metJERup_Phi = met.at(0).phi();
 
   //metNoMuon
@@ -1596,16 +1864,6 @@ void InvHiggsInfoProducer::doMETUnc_JERup(const std::vector<pat::MET>& met,
   }
   info_->metJERup_NoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metJERup_NoMuonPhi = TMath::ATan2(mety,metx);
-
-  //metNoLooseMuon
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
-    metx = metx + looseMuons.at(iLep).px();
-    mety = mety + looseMuons.at(iLep).py();
-  }
-  info_->metJERup_NoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metJERup_NoLooseMuonPhi = TMath::ATan2(mety,metx);
   
   //metNoElectron
   metx = met.at(0).px();
@@ -1617,25 +1875,95 @@ void InvHiggsInfoProducer::doMETUnc_JERup(const std::vector<pat::MET>& met,
   info_->metJERup_NoElectron = TMath::Sqrt(metx*metx + mety*mety);
   info_->metJERup_NoElectronPhi = TMath::ATan2(mety,metx);  
 
-  //metNoLooseElectron
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
-    metx = metx + looseElectrons.at(iLep).px();
-    mety = mety + looseElectrons.at(iLep).py();
+  //metNo2Muon
+  if(zMus.size() > 0){
+
+    double zPt = 0.;
+
+    for (unsigned i=0; i < zMus.size(); ++i) {
+
+      if (zMus[i].pt() > zPt){
+	zPt  = zMus[i].pt();
+	metx = met.at(0).px() + zMus[i].px();
+	mety = met.at(0).py() + zMus[i].py();
+	info_->metJERup_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+	info_->metJERup_No2MuonPhi = TMath::ATan2(mety,metx);
+      }
+    }
   }
-  info_->metJERup_NoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metJERup_NoLooseElectronPhi = TMath::ATan2(mety,metx);
+  
+  //metNoWLepton
+  if (wMus.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wMus.size(); ++i) {
+
+      if (wMus[i].pt() > wPt){
+	wPt  = wMus[i].pt();
+	const reco::Candidate *Wboson = &(wMus[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metJERup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJERup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metJERup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJERup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+
+  if (wEls.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wEls.size(); ++i) {
+
+      if (wEls[i].pt() > wPt){
+	wPt  = wEls[i].pt();
+	const reco::Candidate *Wboson = &(wEls[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metJERup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJERup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metJERup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJERup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
 }
 
 
 void InvHiggsInfoProducer::doMETUnc_JERdown(const std::vector<pat::MET>& met,
 					    const std::vector<pat::Muon>& muons,
-					    const std::vector<pat::Muon>& looseMuons,
-					    const std::vector<pat::Electron>& electrons,
-					    const std::vector<pat::Electron>& looseElectrons) {
+					    const std::vector<pat::Electron>& electrons,    
+					    const reco::CandidateView& zMus,        
+					    const reco::CandidateView& wMus,                     
+					    const reco::CandidateView& wEls) {
 
-  info_->metJERdown     = met.at(0).pt();
+  info_->metJERdown    = met.at(0).pt();
   info_->metJERdown_Phi = met.at(0).phi();
 
   //metNoMuon
@@ -1647,16 +1975,6 @@ void InvHiggsInfoProducer::doMETUnc_JERdown(const std::vector<pat::MET>& met,
   }
   info_->metJERdown_NoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metJERdown_NoMuonPhi = TMath::ATan2(mety,metx);
-
-  //metNoLooseMuon
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
-    metx = metx + looseMuons.at(iLep).px();
-    mety = mety + looseMuons.at(iLep).py();
-  }
-  info_->metJERdown_NoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metJERdown_NoLooseMuonPhi = TMath::ATan2(mety,metx);
   
   //metNoElectron
   metx = met.at(0).px();
@@ -1668,26 +1986,97 @@ void InvHiggsInfoProducer::doMETUnc_JERdown(const std::vector<pat::MET>& met,
   info_->metJERdown_NoElectron = TMath::Sqrt(metx*metx + mety*mety);
   info_->metJERdown_NoElectronPhi = TMath::ATan2(mety,metx);  
 
-  //metNoLooseElectron
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
-    metx = metx + looseElectrons.at(iLep).px();
-    mety = mety + looseElectrons.at(iLep).py();
+  //metNo2Muon
+  if(zMus.size() > 0){
+
+    double zPt = 0.;
+
+    for (unsigned i=0; i < zMus.size(); ++i) {
+
+      if (zMus[i].pt() > zPt){
+	zPt  = zMus[i].pt();
+	metx = met.at(0).px() + zMus[i].px();
+	mety = met.at(0).py() + zMus[i].py();
+	info_->metJERdown_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+	info_->metJERdown_No2MuonPhi = TMath::ATan2(mety,metx);
+      }
+    }
   }
-  info_->metJERdown_NoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metJERdown_NoLooseElectronPhi = TMath::ATan2(mety,metx);
+  
+  //metNoWLepton
+  if (wMus.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wMus.size(); ++i) {
+
+      if (wMus[i].pt() > wPt){
+	wPt  = wMus[i].pt();
+	const reco::Candidate *Wboson = &(wMus[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metJERdown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJERdown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metJERdown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJERdown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+
+  if (wEls.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wEls.size(); ++i) {
+
+      if (wEls[i].pt() > wPt){
+	wPt  = wEls[i].pt();
+	const reco::Candidate *Wboson = &(wEls[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metJERdown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJERdown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metJERdown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metJERdown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
 }
+
 
 
 
 void InvHiggsInfoProducer::doMETUnc_UnCup(const std::vector<pat::MET>& met,
 					  const std::vector<pat::Muon>& muons,
-					  const std::vector<pat::Muon>& looseMuons,
-					  const std::vector<pat::Electron>& electrons,
-					  const std::vector<pat::Electron>& looseElectrons) {
+					  const std::vector<pat::Electron>& electrons,    
+					  const reco::CandidateView& zMus,        
+					  const reco::CandidateView& wMus,                     
+					  const reco::CandidateView& wEls) {
 
-  info_->metUnclusteredup     = met.at(0).pt();
+  info_->metUnclusteredup    = met.at(0).pt();
   info_->metUnclusteredup_Phi = met.at(0).phi();
 
   //metNoMuon
@@ -1699,16 +2088,6 @@ void InvHiggsInfoProducer::doMETUnc_UnCup(const std::vector<pat::MET>& met,
   }
   info_->metUnclusteredup_NoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metUnclusteredup_NoMuonPhi = TMath::ATan2(mety,metx);
-
-  //metNoLooseMuon
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
-    metx = metx + looseMuons.at(iLep).px();
-    mety = mety + looseMuons.at(iLep).py();
-  }
-  info_->metUnclusteredup_NoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metUnclusteredup_NoLooseMuonPhi = TMath::ATan2(mety,metx);
   
   //metNoElectron
   metx = met.at(0).px();
@@ -1720,25 +2099,95 @@ void InvHiggsInfoProducer::doMETUnc_UnCup(const std::vector<pat::MET>& met,
   info_->metUnclusteredup_NoElectron = TMath::Sqrt(metx*metx + mety*mety);
   info_->metUnclusteredup_NoElectronPhi = TMath::ATan2(mety,metx);  
 
-  //metNoLooseElectron
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
-    metx = metx + looseElectrons.at(iLep).px();
-    mety = mety + looseElectrons.at(iLep).py();
+  //metNo2Muon
+  if(zMus.size() > 0){
+
+    double zPt = 0.;
+
+    for (unsigned i=0; i < zMus.size(); ++i) {
+
+      if (zMus[i].pt() > zPt){
+	zPt  = zMus[i].pt();
+	metx = met.at(0).px() + zMus[i].px();
+	mety = met.at(0).py() + zMus[i].py();
+	info_->metUnclusteredup_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+	info_->metUnclusteredup_No2MuonPhi = TMath::ATan2(mety,metx);
+      }
+    }
   }
-  info_->metUnclusteredup_NoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metUnclusteredup_NoLooseElectronPhi = TMath::ATan2(mety,metx);
+  
+  //metNoWLepton
+  if (wMus.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wMus.size(); ++i) {
+
+      if (wMus[i].pt() > wPt){
+	wPt  = wMus[i].pt();
+	const reco::Candidate *Wboson = &(wMus[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metUnclusteredup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metUnclusteredup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metUnclusteredup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metUnclusteredup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+
+  if (wEls.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wEls.size(); ++i) {
+
+      if (wEls[i].pt() > wPt){
+	wPt  = wEls[i].pt();
+	const reco::Candidate *Wboson = &(wEls[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metUnclusteredup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metUnclusteredup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metUnclusteredup_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metUnclusteredup_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
 }
 
 
 void InvHiggsInfoProducer::doMETUnc_UnCdown(const std::vector<pat::MET>& met,
 					    const std::vector<pat::Muon>& muons,
-					    const std::vector<pat::Muon>& looseMuons,
-					    const std::vector<pat::Electron>& electrons,
-					    const std::vector<pat::Electron>& looseElectrons) {
+					    const std::vector<pat::Electron>& electrons,    
+					    const reco::CandidateView& zMus,        
+					    const reco::CandidateView& wMus,                     
+					    const reco::CandidateView& wEls) {
 
-  info_->metUnclustereddown     = met.at(0).pt();
+  info_->metUnclustereddown    = met.at(0).pt();
   info_->metUnclustereddown_Phi = met.at(0).phi();
 
   //metNoMuon
@@ -1750,16 +2199,6 @@ void InvHiggsInfoProducer::doMETUnc_UnCdown(const std::vector<pat::MET>& met,
   }
   info_->metUnclustereddown_NoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metUnclustereddown_NoMuonPhi = TMath::ATan2(mety,metx);
-
-  //metNoLooseMuon
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseMuons.size(); iLep++){
-    metx = metx + looseMuons.at(iLep).px();
-    mety = mety + looseMuons.at(iLep).py();
-  }
-  info_->metUnclustereddown_NoLooseMuon = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metUnclustereddown_NoLooseMuonPhi = TMath::ATan2(mety,metx);
   
   //metNoElectron
   metx = met.at(0).px();
@@ -1771,17 +2210,85 @@ void InvHiggsInfoProducer::doMETUnc_UnCdown(const std::vector<pat::MET>& met,
   info_->metUnclustereddown_NoElectron = TMath::Sqrt(metx*metx + mety*mety);
   info_->metUnclustereddown_NoElectronPhi = TMath::ATan2(mety,metx);  
 
-  //metNoLooseElectron
-  metx = met.at(0).px();
-  mety = met.at(0).py();
-  for(unsigned iLep=0; iLep<looseElectrons.size(); iLep++){
-    metx = metx + looseElectrons.at(iLep).px();
-    mety = mety + looseElectrons.at(iLep).py();
-  }
-  info_->metUnclustereddown_NoLooseElectron = TMath::Sqrt(metx*metx + mety*mety);
-  info_->metUnclustereddown_NoLooseElectronPhi = TMath::ATan2(mety,metx);
-}
+  //metNo2Muon
+  if(zMus.size() > 0){
 
+    double zPt = 0.;
+
+    for (unsigned i=0; i < zMus.size(); ++i) {
+
+      if (zMus[i].pt() > zPt){
+	zPt  = zMus[i].pt();
+	metx = met.at(0).px() + zMus[i].px();
+	mety = met.at(0).py() + zMus[i].py();
+	info_->metUnclustereddown_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+	info_->metUnclustereddown_No2MuonPhi = TMath::ATan2(mety,metx);
+      }
+    }
+  }
+  
+  //metNoWLepton
+  if (wMus.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wMus.size(); ++i) {
+
+      if (wMus[i].pt() > wPt){
+	wPt  = wMus[i].pt();
+	const reco::Candidate *Wboson = &(wMus[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metUnclustereddown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metUnclustereddown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metUnclustereddown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metUnclustereddown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+
+  if (wEls.size() > 0) {
+
+    double wPt = 0.;
+
+    for (unsigned i=0; i < wEls.size(); ++i) {
+
+      if (wEls[i].pt() > wPt){
+	wPt  = wEls[i].pt();
+	const reco::Candidate *Wboson = &(wEls[i]);
+
+	if(fabs(Wboson->daughter(0)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(0)->px();
+	  mety = met.at(0).py() + Wboson->daughter(0)->py();
+
+	  info_->metUnclustereddown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metUnclustereddown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+
+	}
+	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
+
+	  metx = met.at(0).px() + Wboson->daughter(1)->px();
+	  mety = met.at(0).py() + Wboson->daughter(1)->py();
+	  
+	  info_->metUnclustereddown_NoWLepton = TMath::Sqrt(metx*metx + mety*mety);
+	  info_->metUnclustereddown_NoWLeptonPhi = TMath::ATan2(mety,metx);
+	}
+      }
+    }
+  }
+}
 
 
 void InvHiggsInfoProducer::doMHT(const std::vector<pat::MHT>& mht) {
@@ -1813,10 +2320,12 @@ void InvHiggsInfoProducer::doZs(const reco::CandidateView& zs, int channel) {
 	info_->zDau1Pt     = Zboson->daughter(0)->pt();
 	info_->zDau1Eta    = Zboson->daughter(0)->eta();
 	info_->zDau1Phi    = Zboson->daughter(0)->phi();
+	info_->zDau1M      = Zboson->daughter(0)->mass();
 	info_->zDau1Charge = Zboson->daughter(0)->charge();
 	info_->zDau2Pt     = Zboson->daughter(1)->pt();
 	info_->zDau2Eta    = Zboson->daughter(1)->eta();
 	info_->zDau2Phi    = Zboson->daughter(1)->phi();
+	info_->zDau2M      = Zboson->daughter(1)->mass();
 	info_->zDau2Charge = Zboson->daughter(1)->charge();
 	
       }
@@ -1849,6 +2358,7 @@ void InvHiggsInfoProducer::doWs(const reco::CandidateView& ws, int channel) {
 	  info_->wDaulPt     = Wboson->daughter(0)->pt();
 	  info_->wDaulEta    = Wboson->daughter(0)->eta();
 	  info_->wDaulPhi    = Wboson->daughter(0)->phi();
+	  info_->wDaulM      = Wboson->daughter(0)->mass();
 	  info_->wDaulCharge = Wboson->daughter(0)->charge();
 	}
 	else if(fabs(Wboson->daughter(1)->charge()) == 1){
@@ -1856,6 +2366,7 @@ void InvHiggsInfoProducer::doWs(const reco::CandidateView& ws, int channel) {
 	  info_->wDaulPt     = Wboson->daughter(1)->pt();
 	  info_->wDaulEta    = Wboson->daughter(1)->eta();
 	  info_->wDaulPhi    = Wboson->daughter(1)->phi();
+	  info_->wDaulM      = Wboson->daughter(1)->mass();
 	  info_->wDaulCharge = Wboson->daughter(1)->charge();
 	}
       }
