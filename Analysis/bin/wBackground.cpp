@@ -29,6 +29,9 @@ int main(int argc, char* argv[]) {
   Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
 
+  // output file
+  TFile* ofile = TFile::Open( (options.oDir+std::string("/WBackground.root")).c_str(), "UPDATE");
+
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
@@ -128,6 +131,8 @@ int main(int argc, char* argv[]) {
     delete hWEl_S_DPhi;
 
     // per-dataset control plots (just an example, add more later)
+    ofile->cd();
+
     std::string hname = std::string("hWMu_WmT_")+dataset.name;
     TH1D* hWMu_WmT = new TH1D(hname.c_str(), "", 40, 0., 120.);
     std::string str = std::string("wMt>>")+hname;
@@ -210,9 +215,8 @@ int main(int argc, char* argv[]) {
 
 
   // store histograms
-  // output file
-  TFile* ofile = TFile::Open( (options.oDir+std::string("/WBackground.root")).c_str(), "UPDATE");
-
+  ofile->cd();
+    
   hWMu_MCC_DPhi->Write("",TObject::kOverwrite);
   hWMu_MCS_DPhi->Write("",TObject::kOverwrite);
   hWMu_BGC_DPhi->Write("",TObject::kOverwrite);
