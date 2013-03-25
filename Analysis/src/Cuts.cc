@@ -10,8 +10,8 @@ Cuts::Cuts() {
   addCut("dijet",      "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7");
   addCut("sgnEtaJJ",   "(jet1Eta*jet2Eta)<0.");
   addCut("dEtaJJ",     "vbfDEta>4.2");
-  addCut("Mjj",        "vbfM>1200.");
   addCut("MET",        "met>130.");
+  addCut("Mjj",        "vbfM>1200.");
   addCut("dPhiJJ",     "vbfDPhi<1.0");
 
 }
@@ -31,9 +31,9 @@ void Cuts::addCut(std::string name, std::string cut) {
 }
 
 
-TCut Cuts::cut(unsigned i) {
-  return cuts_.at(i);
-}
+// TCut Cuts::cut(unsigned i) {
+//   return cuts_.at(i);
+// }
 
 
 TCut Cuts::cut(std::string s) {
@@ -54,15 +54,26 @@ TCut Cuts::allCuts() {
 
 }
 
-TCut Cuts::nMinusOneCuts(unsigned i) {
+// TCut Cuts::nMinusOneCuts(unsigned i) {
+
+//   TCut tmp;
+//   for (unsigned j=0; j<cuts_.size(); ++j) {
+//     if (j!=i) tmp = tmp && cuts_.at(j);
+//   }
+//   return tmp;  
+
+// }
+
+TCut Cuts::nMinusOneCuts(std::string name) {
 
   TCut tmp;
   for (unsigned j=0; j<cuts_.size(); ++j) {
-    if (j!=i) tmp = tmp && cuts_.at(j);
+    if (name!=names_.at(j)) tmp = tmp && cuts_.at(j);
   }
   return tmp;  
 
 }
+
 
 // Cuts::dump(std::ostream o) {
 
@@ -81,7 +92,7 @@ TCut Cuts::vbf() {
 }
 
 TCut Cuts::allCutsNoDPhi() {
-  TCut tmp = nMinusOneCuts(9);
+  TCut tmp = nMinusOneCuts("dPhiJJ");
   return tmp;
 }
 

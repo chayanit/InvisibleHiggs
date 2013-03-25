@@ -12,12 +12,13 @@ class Cuts {
 
   void addCut(std::string name, std::string cut);
 
-  TCut cut(unsigned i);
+  //  TCut cut(unsigned i);
   TCut cut(std::string name);
 
   TCut allCuts();
 
-  TCut nMinusOneCuts(unsigned i);
+  //  TCut nMinusOneCuts(unsigned i);
+  TCut nMinusOneCuts(std::string name);
 
   // combinations
   TCut vbf();   // note this does not include vetoes!

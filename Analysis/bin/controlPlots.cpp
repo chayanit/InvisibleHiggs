@@ -66,15 +66,15 @@ int main(int argc, char* argv[]) {
   // cuts
   Cuts cuts;
   TCut ctrl("");
-  ctrl += cuts.cut(0);  // trigger
-  ctrl += cuts.cut(1);  // met filters
-  ctrl += cuts.cut(2);  // dijets
-  ctrl += cuts.cut(3);  // fwd/bkwd
-  ctrl += cuts.cut(7);  // lepton vetoes
-  ctrl += cuts.cut(8);
+  ctrl += cuts.cut("trigger");     // trigger
+  ctrl += cuts.cut("metFilter");  // met filters
+  ctrl += cuts.cut("dijet");       // dijets
+  ctrl += cuts.cut("sgnEtaJJ");   // fwd/bkwd
+  ctrl += cuts.cut("EVeto");       // lepton vetoes
+  ctrl += cuts.cut("MuVeto");
 
-  TCut ctrl1 = TCut("puWeight") * (ctrl+cuts.cut(5));  // Mjj
-  TCut ctrl2 = TCut("puWeight") * (ctrl+cuts.cut(6));  // MET
+  TCut ctrl1 = TCut("puWeight") * (ctrl+cuts.cut("Mjj"));  // Mjj
+  TCut ctrl2 = TCut("puWeight") * (ctrl+cuts.cut("MET"));  // MET
 
   // loop over datasets
   for (unsigned i=0; i<datasets.size(); ++i) {

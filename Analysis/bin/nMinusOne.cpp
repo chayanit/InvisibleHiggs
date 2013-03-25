@@ -64,16 +64,16 @@ int main(int argc, char* argv[]) {
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
-  TCut trig = puWeight * cuts.nMinusOneCuts(0);
-  TCut metFilt = puWeight * cuts.nMinusOneCuts(1);
-  TCut dijet = puWeight * cuts.nMinusOneCuts(2);
-  TCut sgnEtaJJ = puWeight * cuts.nMinusOneCuts(3);
-  TCut dEtaJJ = puWeight * cuts.nMinusOneCuts(4);
-  TCut mJJ = puWeight * cuts.nMinusOneCuts(5);
-  TCut met = puWeight * cuts.nMinusOneCuts(6);
-  TCut dPhiJM = puWeight * cuts.nMinusOneCuts(7);
-  TCut eVeto = puWeight * cuts.nMinusOneCuts(8);
-  TCut muVeto = puWeight * cuts.nMinusOneCuts(9);
+  TCut trig = puWeight * cuts.nMinusOneCuts("trigger");
+  TCut metFilt = puWeight * cuts.nMinusOneCuts("metFilter");
+  TCut eVeto = puWeight * cuts.nMinusOneCuts("EVeto");
+  TCut muVeto = puWeight * cuts.nMinusOneCuts("MuVeto");
+  TCut dijet = puWeight * cuts.nMinusOneCuts("dijet");
+  TCut sgnEtaJJ = puWeight * cuts.nMinusOneCuts("sgnEtaJJ");
+  TCut dEtaJJ = puWeight * cuts.nMinusOneCuts("dEtaJJ");
+  TCut met = puWeight * cuts.nMinusOneCuts("MET");
+  TCut mJJ = puWeight * cuts.nMinusOneCuts("Mjj");
+  TCut dPhiJM = puWeight * cuts.nMinusOneCuts("dPhiJJ");
 
 
   // loop over datasets
