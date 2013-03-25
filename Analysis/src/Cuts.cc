@@ -48,7 +48,7 @@ TCut Cuts::allCuts() {
 
   TCut tmp;
   for (std::vector<TCut>::const_iterator c=cuts_.begin(); c!=cuts_.end(); ++c) {
-    tmp = tmp && (*c);
+    tmp = tmp + (*c);
   }
   return tmp;
 

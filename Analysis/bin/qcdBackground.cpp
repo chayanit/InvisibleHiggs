@@ -1,4 +1,5 @@
 
+#include "InvisibleHiggs/Analysis/interface/ProgramOptions.h"
 #include "InvisibleHiggs/Analysis/interface/Cuts.h"
 #include "InvisibleHiggs/Analysis/interface/Histogrammer.h"
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
@@ -6,6 +7,8 @@
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
 
 #include "TTree.h"
+#include "TMath.h"
+#include "TH1D.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -14,57 +17,32 @@
 #include <iostream>
 #include <fstream>
 
-namespace po = boost::program_options;
-
 int main(int argc, char* argv[]) {
 
-  // some variables
-  double lumi = 697.;  //pb-1
-  std::string iDir("/storage/phjjb/invisibleHiggs/InvHiggsInfo_v8");
-  std::string oDir("analysis_v8");
-  std::string datasetFile("InvisibleHiggs/Ntuple/data/datasets_v8.txt");
+  TH1::SetDefaultSumw2();
 
-  // program options
-  po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Display this message")
-    ("outdir,o", po::value<std::string>(), "Output directory")
-    ("indir,i", po::value<std::string>(), "Input directory")
-    ("datasets,f", po::value<std::string>(), "Datasets file")
-    ("lumi,l", po::value<double>(), "Integrated luminosity");
+  ProgramOptions options(argc, argv);
 
-  po::variables_map vm;
-  po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
-  po::notify(vm);
-
-  // help
-  if (vm.count("help")) {
-    std::cout << desc << std::endl;
-    std::exit(1);
-  }
-  
-  if (vm.count("outdir"))   oDir = vm["outdir"].as<std::string>();
-  if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
-  if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
-  if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
-
-  // create output directory if it doesn't exist already
-  boost::filesystem::path opath(oDir);
-  if (!exists(opath)) {
-    std::cout << "Creating output directory : " << oDir << std::endl;
-    boost::filesystem::create_directory(opath);
-  }
-  else std::cout << "Writing results to " << oDir << std::endl;
+  double lumi = options.lumi;
 
   std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
 
-  Datasets datasets(iDir);
-  datasets.readFile(datasetFile);
+  // input datasets
+  Datasets datasets(options.iDir);
+  datasets.readFile(options.datasetFile);
+
+  // output file
+  TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "UPDATE");
 
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
-  TCut allCuts = puWeight * cuts.allCuts();
+
+  
+  // estimate backgrounds in control regions from MC
+  
+
+
 
   // estimate backgrounds to QCD in control regeions
   std::cout << "Estimating background to QCD control regions" << std::endl;
@@ -234,7 +212,7 @@ int main(int argc, char* argv[]) {
   ifstream ifile;
   double n, err_n;
 
-  ifile.open((oDir+std::string("/zjets.txt")).c_str());
+  ifile.open((options.oDir+std::string("/zjets.txt")).c_str());
   while (ifile >> name >> n >> err_n) {
     if (name == "QCDLooseHiDPhi") {
       nZNuNuLooseHiDPhi = n;
@@ -260,7 +238,7 @@ int main(int argc, char* argv[]) {
   double nWLNuLooseHiDPhi(0.), err_nWLNuLooseHiDPhi(0.), nWLNuLooseLoDPhi(0.), err_nWLNuLooseLoDPhi(0.);
   double nWLNuTightHiDPhi(0.), err_nWLNuTightHiDPhi(0.);
 
-  ifile.open((oDir+std::string("/wjets.txt")).c_str());
+  ifile.open((options.oDir+std::string("/wjets.txt")).c_str());
   while (ifile >> name >> n >> err_n) {
     if (name == "QCDLooseHiDPhi") {
       nWLNuLooseHiDPhi = n;
@@ -324,7 +302,7 @@ int main(int argc, char* argv[]) {
   double ratio = nEstLooseLoDPhi / nEstLooseHiDPhi;
   double err_ratio = ratio*sqrt( pow(err_nEstLooseLoDPhi/nEstLooseLoDPhi,2) + pow(err_nEstLooseHiDPhi/nEstLooseHiDPhi,2) );
 
-  std::cout << "Ratio N(dphi<1.0)/N(dphi>2.6) : " << ratio << " +\- " << err_ratio << std::endl;
+  std::cout << "Ratio N(dphi<1.0)/N(dphi>2.6) : " << ratio << " +/\- " << err_ratio << std::endl;
   std::cout << std::endl;
 
   // calculate QCD background estimate
@@ -335,7 +313,7 @@ int main(int argc, char* argv[]) {
 
   // write output file
   ofstream txtFile;
-  txtFile.open(oDir+std::string("/qcd.txt"));
+  txtFile.open(options.oDir+std::string("/qcd.txt"));
   txtFile << "Signal\t" << nEstTightLoDPhi << "\t" << err_nEstTightLoDPhi << std::endl;
   txtFile.close();
 

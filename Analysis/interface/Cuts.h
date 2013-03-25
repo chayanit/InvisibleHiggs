@@ -12,7 +12,6 @@ class Cuts {
 
   void addCut(std::string name, std::string cut);
 
-  //  TCut cut(unsigned i);
   TCut cut(std::string name);
 
   TCut allCuts();
