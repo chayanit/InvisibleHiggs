@@ -39,23 +39,24 @@ class Cuts {
 
   // z->mumu control region
   TCut zMuMuVBF();
-  TCut zMuMuVBFHiDPhi();
-  TCut zMuMuVBFLoDPhi();
+/*   TCut zMuMuVBFHiDPhi(); */
+/*   TCut zMuMuVBFLoDPhi(); */
 
   // W->mu control region
   TCut wMuVBF();
-  TCut wMuVBFHiDPhi();
-  TCut wMuVBFLoDPhi();
+/*   TCut wMuVBFHiDPhi(); */
+/*   TCut wMuVBFLoDPhi(); */
 
   // W->e control region
   TCut wElVBF();
-  TCut wElVBFHiDPhi();
-  TCut wElVBFLoDPhi();
+/*   TCut wElVBFHiDPhi(); */
+/*   TCut wElVBFLoDPhi(); */
 
   // QCD control regions
+  TCut qcdNoMET();
   TCut qcdLoose();
-  TCut qcdLooseHiDPhi();
-  TCut qcdLooseLoDPhi();
+/*   TCut qcdLooseHiDPhi(); */
+/*   TCut qcdLooseLoDPhi(); */
   TCut qcdTightHiDPhi();
 
  private:

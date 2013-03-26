@@ -4,7 +4,7 @@
 Cuts::Cuts() {
 
   addCut("trigger",    "hltResult2>0.");
-  addCut("metFilter",  "metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
+  addCut("metFilter",  "metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
   addCut("EVeto",      "ele1Pt<10.");
   addCut("MuVeto",     "mu1Pt<10.");
   addCut("dijet",      "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7");
@@ -157,17 +157,17 @@ TCut Cuts::zMuMuVBF() {
   return tmp;
 }
 
-TCut Cuts::zMuMuVBFHiDPhi() {
-  TCut tmp = zMuMuVBF();
-  tmp += TCut("vbfDPhi>2.6");
-  return tmp;
-}
+// TCut Cuts::zMuMuVBFHiDPhi() {
+//   TCut tmp = zMuMuVBF();
+//   tmp += TCut("vbfDPhi>2.6");
+//   return tmp;
+// }
 
-TCut Cuts::zMuMuVBFLoDPhi() {
-  TCut tmp = zMuMuVBF();
-  tmp += cut("dPhiJJ");
-  return tmp;
-}
+// TCut Cuts::zMuMuVBFLoDPhi() {
+//   TCut tmp = zMuMuVBF();
+//   tmp += cut("dPhiJJ");
+//   return tmp;
+// }
 
 
 
@@ -183,17 +183,17 @@ TCut Cuts::wMuVBF() {
   return tmp;
 }
 
-TCut Cuts::wMuVBFHiDPhi() {
-  TCut tmp = wMuVBF();
-  tmp += TCut("vbfDPhi>2.6");
-  return tmp;
-}
+// TCut Cuts::wMuVBFHiDPhi() {
+//   TCut tmp = wMuVBF();
+//   tmp += TCut("vbfDPhi>2.6");
+//   return tmp;
+// }
 
-TCut Cuts::wMuVBFLoDPhi() {
-  TCut tmp = wMuVBF();
-  tmp += cut("dPhiJJ");
-  return tmp;
-}
+// TCut Cuts::wMuVBFLoDPhi() {
+//   TCut tmp = wMuVBF();
+//   tmp += cut("dPhiJJ");
+//   return tmp;
+// }
 
 
 // W->mu regions
@@ -208,20 +208,30 @@ TCut Cuts::wElVBF() {
   return tmp;
 }
 
-TCut Cuts::wElVBFHiDPhi() {
-  TCut tmp = wElVBF();
-  tmp += TCut("vbfDPhi>2.6");
-  return tmp;
-}
+// TCut Cuts::wElVBFHiDPhi() {
+//   TCut tmp = wElVBF();
+//   tmp += TCut("vbfDPhi>2.6");
+//   return tmp;
+// }
 
-TCut Cuts::wElVBFLoDPhi() {
-  TCut tmp = wElVBF();
-  tmp += cut("dPhiJJ");
-  return tmp;
-}
+// TCut Cuts::wElVBFLoDPhi() {
+//   TCut tmp = wElVBF();
+//   tmp += cut("dPhiJJ");
+//   return tmp;
+// }
 
 
 // QCD regions
+TCut Cuts::qcdNoMET() {
+  TCut tmp = cut("trigger");
+  tmp += cut("metFilter");
+  tmp += cut("EVeto");
+  tmp += cut("MVeto");
+  tmp += vbf();
+  return tmp;
+}
+
+
 TCut Cuts::qcdLoose() {
   TCut tmp = cut("trigger");
   tmp += cut("metFilter");
@@ -233,18 +243,18 @@ TCut Cuts::qcdLoose() {
 }
 
 
-TCut Cuts::qcdLooseHiDPhi() {
-  TCut tmp = qcdLoose();
-  tmp += TCut("vbfDPhi>2.6");
-  return tmp;
-}
+// TCut Cuts::qcdLooseHiDPhi() {
+//   TCut tmp = qcdLoose();
+//   tmp += TCut("vbfDPhi>2.6");
+//   return tmp;
+// }
 
 
-TCut Cuts::qcdLooseLoDPhi() {
-  TCut tmp = qcdLoose();
-  tmp += cut("dPhiJJ");
-  return tmp;
-}
+// TCut Cuts::qcdLooseLoDPhi() {
+//   TCut tmp = qcdLoose();
+//   tmp += cut("dPhiJJ");
+//   return tmp;
+// }
 
 
 TCut Cuts::qcdTightHiDPhi() {

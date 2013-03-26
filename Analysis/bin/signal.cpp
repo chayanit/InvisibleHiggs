@@ -1,3 +1,4 @@
+#include "InvisibleHiggs/Analysis/interface/ProgramOptions.h"
 #include "InvisibleHiggs/Analysis/interface/Cuts.h"
 #include "InvisibleHiggs/Analysis/interface/Histogrammer.h"
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
@@ -6,6 +7,7 @@
 
 #include "TTree.h"
 #include "TMath.h"
+#include "TH1D.h"
 #include "TCanvas.h"
 
 #include <boost/program_options.hpp>
@@ -13,43 +15,19 @@
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
+#include <fstream>
 
-namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
 
-  // some variables
-  double lumi = 5000.;  //pb-1
-  std::string iDir("");
-  std::string oDir("");
-  std::string datasetFile("");
+  TH1::SetDefaultSumw2();
 
-  // program options
-  po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h",     "Display this message")
-    ("outdir,o",   po::value<std::string>(), "Output directory")
-    ("indir,i",    po::value<std::string>(), "Input directory")
-    ("datasets,f", po::value<std::string>(), "Datasets file")
-    ("lumi,l",     po::value<double>(),      "Integrated luminosity");
+  ProgramOptions options(argc, argv);
 
-  po::variables_map vm;
-  po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
-  po::notify(vm);
+  double lumi = options.lumi;
+  std::string iDir = options.iDir;
+  std::string oDir = options.oDir+std::string("/Signal");
 
-  // help
-  if (vm.count("help")) {
-    std::cout << desc << std::endl;
-    std::exit(1);
-  }
-  
-  if (vm.count("outdir"))   oDir = vm["outdir"].as<std::string>();
-  if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
-  if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
-  if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
-
-  // create output directory if it doesn't exist already
-  oDir += std::string("/Signal");
   boost::filesystem::path opath(oDir);
   if (!exists(opath)) {
     std::cout << "Creating output directory : " << oDir << std::endl;
@@ -57,11 +35,10 @@ int main(int argc, char* argv[]) {
   }
   else std::cout << "Writing results to " << oDir << std::endl;
 
-  std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
 
   // datasets
   Datasets datasets;
-  datasets.readFile(datasetFile);
+  datasets.readFile(options.datasetFile);
 
   // cuts
   Cuts cuts;
@@ -84,16 +61,10 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Making signal histograms for " << dataset.name << std::endl;
 
-    TFile* ifile = TFile::Open( (iDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "READ");
-
-    if (ifile==0) {
-      std::cerr << "No file for " << dataset.name << std::endl;
-      continue;
-    }
+    TFile* ifile = datasets.getTFile(dataset.name);
+    TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
 
     TFile* ofile = TFile::Open( (oDir+std::string("/")+dataset.name+std::string("_Signal.root")).c_str(), "UPDATE");
-    
-    TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
 
     // parton level
     TH1D* hQ1Pt   = new TH1D("hQ1Pt",   "", 50, 0., 200.);
@@ -391,47 +362,6 @@ int main(int argc, char* argv[]) {
      ifile->Close();
 
   }
-
-
-  // cuts
-  std::cout << "Dataset\t\teff(%)\t\tN\t\tpass/total(MC)" << std::endl;
-
-  for (int i=0; i<nSignalPoints; ++i) {
-
-    Dataset dataset = datasets.getDataset(signalNames.at(i));
-
-    TFile* ifile = TFile::Open( (iDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "READ");
-
-    if (ifile==0) {
-      std::cerr << "No file for " << dataset.name << std::endl;
-      continue;
-    }
-    
-    TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
-    
-    TH1D* weight = new TH1D("weight","", 1, 0., 1.);
-    tree->Draw("0.5>>weight", weightedAllCuts);
-
-    double nMCPas = weight->GetBinContent(1);
-    double nMCTot = double(dataset.nEvents);
-
-    double eff    = double(nMCPas)/dataset.nEvents;
-    double effErr = sqrt( nMCPas * (1-nMCPas/nMCTot) ) / nMCTot;  // binomial error
-
-    double n      = lumi * dataset.sigma * eff;
-    double nErr   = lumi * dataset.sigma * effErr;
-
-
-    std::cout << dataset.name << "\t" 
-	      << 100.*eff << " +/- " << 100.*effErr << "\t" 
-	      << nMCPas << " / " << nMCTot << "\t"
-	      << n << " +/- " << nErr << "\t" 
-	      << dataset.sigma << std::endl;
-
-    ifile->Close();
-
-  }
-
 
 
 }

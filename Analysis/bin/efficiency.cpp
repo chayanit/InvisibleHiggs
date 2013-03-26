@@ -26,11 +26,11 @@ int main(int argc, char* argv[]) {
   ProgramOptions options(argc, argv);
 
   double lumi = options.lumi;
-
-  std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
+  std::string iDir = options.iDir;
+  std::string oDir = options.oDir+std::string("/Signal");
 
   // input datasets
-  Datasets datasets(options.iDir);
+  Datasets datasets(iDir);
   datasets.readFile(options.datasetFile);
 
   // output file
@@ -62,13 +62,7 @@ int main(int argc, char* argv[]) {
 
     if (dataset.isData) continue;
 
-    TFile* ifile = TFile::Open( (options.iDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "READ");
-
-    if (ifile==0) {
-      std::cerr << "No file for " << dataset.name << std::endl;
-      continue;
-    }
-    
+    TFile* ifile = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
     
     // tmp histogram for counting.  Need a hist so we can use PU weight
@@ -182,12 +176,44 @@ int main(int argc, char* argv[]) {
 
   }
 
-
   effFile << std::endl << std::endl;
 
   // signal efficiencies
-  // TODO
+  std::cout << "Dataset\t\teff(%)\t\tN\t\tpass/total(MC)" << std::endl;
 
+  for (unsigned i=0; i<datasets.size(); ++i) {
+
+    Dataset dataset = datasets.getDataset(i);
+
+    std::string sigstr("signal");
+    if (dataset.name.compare(0,6,sigstr) != 0) continue;
+
+    TFile* ifile = datasets.getTFile(dataset.name);
+    TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
+    
+    TH1D* weight = new TH1D("weight","", 1, 0., 1.);
+    tree->Draw("0.5>>weight", cutDPhi);
+
+    double nMCPas = weight->GetBinContent(1);
+    double nMCTot = double(dataset.nEvents);
+
+    double eff    = double(nMCPas)/dataset.nEvents;
+    double effErr = sqrt( nMCPas * (1-nMCPas/nMCTot) ) / nMCTot;  // binomial error
+
+    double n      = lumi * dataset.sigma * eff;
+    double nErr   = lumi * dataset.sigma * effErr;
+
+
+    effFile << dataset.name << "\t" 
+	    << 100.*eff << " +/- " << 100.*effErr << "\t" 
+	    << nMCPas << " / " << nMCTot << "\t"
+	    << n << " +/- " << nErr << "\t" 
+	    << dataset.sigma << std::endl;
+    
+    ifile->Close();
+
+  } 
+  
 
   ofile->Close();
   effFile.close();

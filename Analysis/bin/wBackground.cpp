@@ -168,6 +168,10 @@ int main(int argc, char* argv[]) {
   hWEl_EstC_DPhi->Add(hWMu_DataC_DPhi, hWMu_BGC_DPhi, 1., -1.);
   hWEl_EstS_DPhi->Multiply(hWMu_EstC_DPhi, hWMu_R_DPhi, 1., 1.);
 
+  TH1D* hW_Est_S_DPhi = new TH1D("hW_Est_S_DPhi", "", 3, dphiEdges); 
+  hW_Est_S_DPhi->Add(hWMu_EstS_DPhi, hWEl_EstS_DPhi, 1., 1.);
+
+
   std::cout << std::endl;
   std::cout << "W->mu channel (dphi>2.6)" << std::endl;
   std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(3) << std::endl;
@@ -178,7 +182,7 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "  W in ctrl region       : " << hWMu_EstC_DPhi->GetBinContent(3) << std::endl;
   std::cout << "  N_S(MC)/N_C(MC)        : " << hWMu_R_DPhi->GetBinContent(3) << std::endl;
-  std::cout << "  W in sgnl region       : " << hWMu_R_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  W in sgnl region       : " << hWMu_EstS_DPhi->GetBinContent(3) << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "W->el channel (dphi>2.6)" << std::endl;
   std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(3) << std::endl;
@@ -189,7 +193,7 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "  W in ctrl region       : " << hWEl_EstC_DPhi->GetBinContent(3) << std::endl;
   std::cout << "  N_S(MC)/N_C(MC)        : " << hWEl_R_DPhi->GetBinContent(3) << std::endl;
-  std::cout << "  W in sgnl region       : " << hWEl_R_DPhi->GetBinContent(3) << std::endl;
+  std::cout << "  W in sgnl region       : " << hWEl_EstS_DPhi->GetBinContent(3) << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "W->mu channel (dphi<1.0)" << std::endl;
   std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(1) << std::endl;
@@ -200,7 +204,7 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "  W in ctrl region       : " << hWMu_EstC_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  N_S(MC)/N_C(MC)        : " << hWMu_R_DPhi->GetBinContent(1) << std::endl;
-  std::cout << "  W in sgnl region       : " << hWMu_R_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  W in sgnl region       : " << hWMu_EstS_DPhi->GetBinContent(1) << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "W->el channel (dphi<1.0)" << std::endl;
   std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(1) << std::endl;
@@ -211,7 +215,10 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "  W in ctrl region       : " << hWEl_EstC_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  N_S(MC)/N_C(MC)        : " << hWEl_R_DPhi->GetBinContent(1) << std::endl;
-  std::cout << "  W in sgnl region       : " << hWEl_R_DPhi->GetBinContent(1) << std::endl;
+  std::cout << "  W in sgnl region       : " << hWEl_EstS_DPhi->GetBinContent(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "Total W (dphi<1.0)" << std::endl;
+  std::cout << "  W in sgnl region       : " << hW_Est_S_DPhi->GetBinContent(1) << std::endl;
 
 
   // store histograms
@@ -234,6 +241,8 @@ int main(int argc, char* argv[]) {
   hWEl_R_DPhi->Write("",TObject::kOverwrite);
   hWEl_EstC_DPhi->Write("",TObject::kOverwrite);
   hWEl_EstS_DPhi->Write("",TObject::kOverwrite);
+
+  hW_Est_S_DPhi->Write("",TObject::kOverwrite);
       
   ofile->Close();    
 
