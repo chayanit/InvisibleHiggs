@@ -131,8 +131,13 @@ TCut Cuts::wMuGen() {
   return tmp;
 }
 
+TCut Cuts::wMuGen0P() {
+  TCut tmp("wltype==2");  // need to add single parton selection
+  return tmp;
+}
+
 TCut Cuts::wMuReco() {
-  TCut tmp("wChannel==1 && wMt>60. && wMt<120.");
+  TCut tmp("wChannel==1");
   return tmp;
 }
 
@@ -141,8 +146,13 @@ TCut Cuts::wElGen() {
   return tmp;
 }
 
+TCut Cuts::wElGen0P() {
+  TCut tmp("wltype==1");  // need to add single parton selection
+  return tmp;
+}
+
 TCut Cuts::wElReco() {
-  TCut tmp("wChannel==2 && wMt>60. && wMt<120.");
+  TCut tmp("wChannel==2");
   return tmp;
 }
 

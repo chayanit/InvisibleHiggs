@@ -32,9 +32,11 @@ class Cuts {
   TCut zMuMuReco();    // there is a reco level Z->mumu
 
   TCut wMuGen();
+  TCut wMuGen0P();
   TCut wMuReco();
 
   TCut wElGen();
+  TCut wElGen0P();
   TCut wElReco();
 
   // z->mumu control region
