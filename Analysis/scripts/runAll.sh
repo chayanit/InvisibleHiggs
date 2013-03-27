@@ -6,7 +6,7 @@ DATASETS=InvisibleHiggs/Analysis/data/datasets_v9.txt
 DATASETS_W=InvisibleHiggs/Analysis/data/datasets_W_v9.txt
 DATASETS_Z=InvisibleHiggs/Analysis/data/datasets_Z_v9.txt
 DATASETS_QCD=InvisibleHiggs/Analysis/data/datasets_QCD_v9.txt
-LUMI=19560
+LUMI=19576
 
 # MC numbers & plots
 echo "efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
