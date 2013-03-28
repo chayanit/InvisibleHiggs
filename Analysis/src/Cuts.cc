@@ -132,12 +132,12 @@ TCut Cuts::wMuGen() {
 }
 
 TCut Cuts::wMuGen0P() {
-  TCut tmp("wltype==2");  // need to add single parton selection
+  TCut tmp("wltype==2 && wgennj==0");  // need to add single parton selection
   return tmp;
 }
 
 TCut Cuts::wMuReco() {
-  TCut tmp("wChannel==1");
+  TCut tmp("nW>0 && wChannel==1 && wMt>40.");
   return tmp;
 }
 
@@ -147,12 +147,12 @@ TCut Cuts::wElGen() {
 }
 
 TCut Cuts::wElGen0P() {
-  TCut tmp("wltype==1");  // need to add single parton selection
+  TCut tmp("wltype==1 && wgennj==0");  // need to add single parton selection
   return tmp;
 }
 
 TCut Cuts::wElReco() {
-  TCut tmp("wChannel==2");
+  TCut tmp("nW>0 && wChannel==2 && wMt>40.");
   return tmp;
 }
 
@@ -163,7 +163,7 @@ TCut Cuts::zMuMuVBF() {
   tmp += TCut("mu3Pt<10");
   tmp += cut("EVeto");
   tmp += vbf();
-  tmp += TCut("metNoMuon>130.");
+  tmp += TCut("metNo2Muon>130.");
   return tmp;
 }
 
@@ -189,7 +189,7 @@ TCut Cuts::wMuVBF() {
   tmp += TCut("mu2Pt<10");
   tmp += cut("EVeto");
   tmp += vbf();
-  tmp += TCut("met>130.");
+  tmp += TCut("metNoWLepton>130.");
   return tmp;
 }
 
@@ -214,7 +214,7 @@ TCut Cuts::wElVBF() {
   tmp += TCut("ele2Pt<10");
   tmp += cut("MVeto");
   tmp += vbf();
-  tmp += TCut("metNoElectron>130.");
+  tmp += TCut("metNoWLepton>130.");
   return tmp;
 }
 

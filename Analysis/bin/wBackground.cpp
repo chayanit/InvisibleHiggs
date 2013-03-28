@@ -36,13 +36,17 @@ int main(int argc, char* argv[]) {
   Cuts cuts;
   TCut puWeight("puWeight");
 
-  TCut cutWMu_Gen_C = puWeight * (cuts.wMuGen() * cuts.wMuVBF());
-  TCut cutWMu_Gen_S = puWeight * (cuts.wMuGen() * cuts.allCutsNoDPhi());
+  TCut cutWMu_Gen_C = puWeight * (cuts.wMuGen() + cuts.wMuVBF());
+  TCut cutWMu_Gen0P_C = puWeight * (cuts.wMuGen0P() + cuts.wMuVBF());
+  TCut cutWMu_Gen_S = puWeight * (cuts.wMuGen() + cuts.allCutsNoDPhi());
+  TCut cutWMu_Gen0P_S = puWeight * (cuts.wMuGen0P() + cuts.allCutsNoDPhi());
   TCut cutWMu_C = puWeight * (cuts.wMuVBF());
   TCut cutWMu_S = puWeight * (cuts.allCutsNoDPhi());
 
-  TCut cutWEl_Gen_C = puWeight * (cuts.wElGen() * cuts.wElVBF());
-  TCut cutWEl_Gen_S = puWeight * (cuts.wElGen() * cuts.allCutsNoDPhi());
+  TCut cutWEl_Gen_C = puWeight * (cuts.wElGen() + cuts.wElVBF());
+  TCut cutWEl_Gen0P_C = puWeight * (cuts.wElGen0P() + cuts.wElVBF());
+  TCut cutWEl_Gen_S = puWeight * (cuts.wElGen() + cuts.allCutsNoDPhi());
+  TCut cutWEl_Gen0P_S = puWeight * (cuts.wElGen0P() + cuts.allCutsNoDPhi());
   TCut cutWEl_C = puWeight * (cuts.wElVBF());
   TCut cutWEl_S = puWeight * (cuts.allCutsNoDPhi());
 
@@ -52,13 +56,13 @@ int main(int argc, char* argv[]) {
   TH1D* hWMu_MCC_DPhi = new TH1D("hWMu_MCC_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
   TH1D* hWMu_MCS_DPhi = new TH1D("hWMu_MCS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
   TH1D* hWMu_BGC_DPhi = new TH1D("hWMu_BGC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
-  TH1D* hWMu_BGS_DPhi = new TH1D("hWMu_BGS_DPhi", "", 3, dphiEdges);  // background MC sgnl region
+  //  TH1D* hWMu_BGS_DPhi = new TH1D("hWMu_BGS_DPhi", "", 3, dphiEdges);  // background MC sgnl region
   TH1D* hWMu_DataC_DPhi = new TH1D("hWMu_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
 
   TH1D* hWEl_MCC_DPhi = new TH1D("hWEl_MCC_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
   TH1D* hWEl_MCS_DPhi = new TH1D("hWEl_MCS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
   TH1D* hWEl_BGC_DPhi = new TH1D("hWEl_BGC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
-  TH1D* hWEl_BGS_DPhi = new TH1D("hWEl_BGS_DPhi", "", 3, dphiEdges);  // background MC sgnl region
+  //  TH1D* hWEl_BGS_DPhi = new TH1D("hWEl_BGS_DPhi", "", 3, dphiEdges);  // background MC sgnl region
   TH1D* hWEl_DataC_DPhi = new TH1D("hWEl_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
 
   // loop over MC datasets
@@ -67,13 +71,17 @@ int main(int argc, char* argv[]) {
     Dataset dataset = datasets.getDataset(i);
     
     // check it's  W+Jets
-    bool isWMC = false;
-    if (dataset.name == "WJets" || 
-	dataset.name == "W1Jets" || 
-	dataset.name == "W2Jets" || 
-	dataset.name == "W3Jets" || 
-	dataset.name == "W4Jets") {
-      isWMC = true;
+    bool isWInclusive = false;
+    bool isWNJets = false;
+    if (dataset.name == "WJets") {
+      isWInclusive = true;
+      std::cout << "Analysing W MC     : " << dataset.name << std::endl;
+    }
+    else if (dataset.name == "W1Jets" || 
+	     dataset.name == "W2Jets" || 
+	     dataset.name == "W3Jets" || 
+	     dataset.name == "W4Jets") {
+      isWNJets = true;
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
     }
     else if (dataset.isData) {
@@ -92,38 +100,47 @@ int main(int argc, char* argv[]) {
     TH1D* hWEl_C_DPhi = new TH1D("hWEl_C_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
     TH1D* hWEl_S_DPhi = new TH1D("hWEl_S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
 
-    if (isWMC) {
-      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_Gen_C);
-      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_Gen_S);
-      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_Gen_C);
-      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_Gen_S);
-    }
-    else {
-      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
-      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_S);
-      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
-      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_S);
-    }
-
     double weight = lumi * dataset.sigma / dataset.nEvents;
 
-    if (dataset.isData) {
-      hWMu_DataC_DPhi->Add(hWMu_C_DPhi);
-      hWEl_DataC_DPhi->Add(hWEl_C_DPhi);
-      // not looking in signal region!
-    }
-    else if (isWMC) {
+    if (isWInclusive) {
+      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_Gen0P_C);
+      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_Gen0P_S);
+      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_Gen0P_C);
+      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_Gen0P_S);
       hWMu_MCC_DPhi->Add(hWMu_C_DPhi, weight);
       hWMu_MCS_DPhi->Add(hWMu_S_DPhi, weight);
       hWEl_MCC_DPhi->Add(hWEl_C_DPhi, weight);
       hWEl_MCS_DPhi->Add(hWEl_S_DPhi, weight);
     }
-    else {
-      hWMu_BGC_DPhi->Add(hWMu_C_DPhi, weight);
-      hWMu_BGS_DPhi->Add(hWMu_S_DPhi, weight);
-      hWEl_BGC_DPhi->Add(hWEl_C_DPhi, weight);
-      hWEl_BGS_DPhi->Add(hWEl_S_DPhi, weight);
+    else if (isWNJets) {
+      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_Gen_C);
+      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_Gen_S);
+      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_Gen_C);
+      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_Gen_S);
+      hWMu_MCC_DPhi->Add(hWMu_C_DPhi, weight);
+      hWMu_MCS_DPhi->Add(hWMu_S_DPhi, weight);
+      hWEl_MCC_DPhi->Add(hWEl_C_DPhi, weight);
+      hWEl_MCS_DPhi->Add(hWEl_S_DPhi, weight);
     }
+    else if (dataset.isData) {
+      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
+      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
+      hWMu_DataC_DPhi->Add(hWMu_C_DPhi);
+      hWEl_DataC_DPhi->Add(hWEl_C_DPhi);
+    }
+    else {  // must be a BG dataset
+      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
+      //      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_S);
+      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
+      //      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_S);
+      hWMu_BGC_DPhi->Add(hWMu_C_DPhi, weight);
+      //      hWMu_BGS_DPhi->Add(hWMu_S_DPhi, weight);
+      hWEl_BGC_DPhi->Add(hWEl_C_DPhi, weight);
+      //      hWEl_BGS_DPhi->Add(hWEl_S_DPhi, weight);
+    }
+
+    // debug output
+    std::cout << "  N ctrl region (dphi<1) : " << hWMu_C_DPhi->GetBinContent(1) << " +/- " << hWMu_C_DPhi->GetBinError(1) << std::endl;
     
     delete hWMu_C_DPhi;
     delete hWMu_S_DPhi;
@@ -153,20 +170,20 @@ int main(int argc, char* argv[]) {
 
   // create histograms with the background estimate
   TH1D* hWMu_R_DPhi    = new TH1D("hWMu_R_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
-  TH1D* hWMu_EstC_DPhi = new TH1D("hWMu_EstS_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
-  TH1D* hWMu_EstS_DPhi = new TH1D("hWMu_EstS_DPhi", "", 3, dphiEdges); // estimated W in bkgrnd region
+  TH1D* hWMu_EstC_DPhi = new TH1D("hWMu_EstC_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
+  TH1D* hWMu_EstS_DPhi = new TH1D("hWMu_EstS_DPhi", "", 3, dphiEdges); // estimated W in signal region
 
   TH1D* hWEl_R_DPhi    = new TH1D("hWEl_R_DPhi", "", 3, dphiEdges);
-  TH1D* hWEl_EstC_DPhi = new TH1D("hWEl_EstS_DPhi", "", 3, dphiEdges);
+  TH1D* hWEl_EstC_DPhi = new TH1D("hWEl_EstC_DPhi", "", 3, dphiEdges);
   TH1D* hWEl_EstS_DPhi = new TH1D("hWEl_EstS_DPhi", "", 3, dphiEdges);
 
   hWMu_R_DPhi->Divide(hWMu_MCS_DPhi, hWMu_MCC_DPhi, 1., 1.);
   hWMu_EstC_DPhi->Add(hWMu_DataC_DPhi, hWMu_BGC_DPhi, 1., -1.);
   hWMu_EstS_DPhi->Multiply(hWMu_EstC_DPhi, hWMu_R_DPhi, 1., 1.);
 
-  hWEl_R_DPhi->Divide(hWMu_MCS_DPhi, hWMu_MCC_DPhi, 1., 1.);
-  hWEl_EstC_DPhi->Add(hWMu_DataC_DPhi, hWMu_BGC_DPhi, 1., -1.);
-  hWEl_EstS_DPhi->Multiply(hWMu_EstC_DPhi, hWMu_R_DPhi, 1., 1.);
+  hWEl_R_DPhi->Divide(hWEl_MCS_DPhi, hWEl_MCC_DPhi, 1., 1.);
+  hWEl_EstC_DPhi->Add(hWEl_DataC_DPhi, hWEl_BGC_DPhi, 1., -1.);
+  hWEl_EstS_DPhi->Multiply(hWEl_EstC_DPhi, hWEl_R_DPhi, 1., 1.);
 
   TH1D* hW_Est_S_DPhi = new TH1D("hW_Est_S_DPhi", "", 3, dphiEdges); 
   hW_Est_S_DPhi->Add(hWMu_EstS_DPhi, hWEl_EstS_DPhi, 1., 1.);
@@ -177,7 +194,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(3) << std::endl;
   std::cout << "  W+jets MC  sgnl region : " << hWMu_MCS_DPhi->GetBinContent(3) << std::endl;
   std::cout << "  Background ctrl region : " << hWMu_BGC_DPhi->GetBinContent(3) << std::endl;
-  std::cout << "  Background sgnl region : " << hWMu_BGS_DPhi->GetBinContent(3) << std::endl;
+  //  std::cout << "  Background sgnl region : " << hWMu_BGS_DPhi->GetBinContent(3) << std::endl;
   std::cout << "  Data ctrl region       : " << hWMu_DataC_DPhi->GetBinContent(3) << std::endl;
   std::cout << std::endl;
   std::cout << "  W in ctrl region       : " << hWMu_EstC_DPhi->GetBinContent(3) << std::endl;
@@ -188,7 +205,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(3) << std::endl;
   std::cout << "  W+jets MC  sgnl region : " << hWEl_MCS_DPhi->GetBinContent(3) << std::endl;
   std::cout << "  Background ctrl region : " << hWEl_BGC_DPhi->GetBinContent(3) << std::endl;
-  std::cout << "  Background sgnl region : " << hWEl_BGS_DPhi->GetBinContent(3) << std::endl;
+  //  std::cout << "  Background sgnl region : " << hWEl_BGS_DPhi->GetBinContent(3) << std::endl;
   std::cout << "  Data ctrl region       : " << hWEl_DataC_DPhi->GetBinContent(3) << std::endl;
   std::cout << std::endl;
   std::cout << "  W in ctrl region       : " << hWEl_EstC_DPhi->GetBinContent(3) << std::endl;
@@ -199,7 +216,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  W+jets MC  sgnl region : " << hWMu_MCS_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  Background ctrl region : " << hWMu_BGC_DPhi->GetBinContent(1) << std::endl;
-  std::cout << "  Background sgnl region : " << hWMu_BGS_DPhi->GetBinContent(1) << std::endl;
+  //  std::cout << "  Background sgnl region : " << hWMu_BGS_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  Data ctrl region       : " << hWMu_DataC_DPhi->GetBinContent(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  W in ctrl region       : " << hWMu_EstC_DPhi->GetBinContent(1) << std::endl;
@@ -210,7 +227,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  W+jets MC  sgnl region : " << hWEl_MCS_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  Background ctrl region : " << hWEl_BGC_DPhi->GetBinContent(1) << std::endl;
-  std::cout << "  Background sgnl region : " << hWEl_BGS_DPhi->GetBinContent(1) << std::endl;
+  //  std::cout << "  Background sgnl region : " << hWEl_BGS_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  Data ctrl region       : " << hWEl_DataC_DPhi->GetBinContent(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  W in ctrl region       : " << hWEl_EstC_DPhi->GetBinContent(1) << std::endl;
@@ -227,7 +244,7 @@ int main(int argc, char* argv[]) {
   hWMu_MCC_DPhi->Write("",TObject::kOverwrite);
   hWMu_MCS_DPhi->Write("",TObject::kOverwrite);
   hWMu_BGC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_BGS_DPhi->Write("",TObject::kOverwrite);
+  //  hWMu_BGS_DPhi->Write("",TObject::kOverwrite);
   hWMu_DataC_DPhi->Write("",TObject::kOverwrite);
   hWMu_R_DPhi->Write("",TObject::kOverwrite);
   hWMu_EstC_DPhi->Write("",TObject::kOverwrite);
@@ -236,7 +253,7 @@ int main(int argc, char* argv[]) {
   hWEl_MCC_DPhi->Write("",TObject::kOverwrite);
   hWEl_MCS_DPhi->Write("",TObject::kOverwrite);
   hWEl_BGC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_BGS_DPhi->Write("",TObject::kOverwrite);
+  //  hWEl_BGS_DPhi->Write("",TObject::kOverwrite);
   hWEl_DataC_DPhi->Write("",TObject::kOverwrite);
   hWEl_R_DPhi->Write("",TObject::kOverwrite);
   hWEl_EstC_DPhi->Write("",TObject::kOverwrite);
