@@ -27,9 +27,10 @@ class Cuts {
   TCut allCutsLoDPhi();
 
   // cuts for MC efficiency estimation
-  TCut zMuMuGen();     // there is a generator level Z->mumu
-  TCut zMuMuGenMass(); // there is a generator level Z->mumu + mass cut
-  TCut zMuMuReco();    // there is a reco level Z->mumu
+  TCut zMuMuGen();   	  // there is a generator level Z->mumu
+  TCut zMuMuGenPt100();   // there is a generator level Z->mumu + pT cut
+  TCut zMuMuGenMass();    // there is a generator level Z->mumu + mass cut
+  TCut zMuMuReco();       // there is a reco level Z->mumu
 
   TCut wMuGen();
   TCut wMuGen0P();
@@ -41,6 +42,8 @@ class Cuts {
 
   // z->mumu control region
   TCut zMuMuVBF();
+  TCut zMuMuGenPt100VBF();
+  TCut HLTandMETFilters();
 /*   TCut zMuMuVBFHiDPhi(); */
 /*   TCut zMuMuVBFLoDPhi(); */
 

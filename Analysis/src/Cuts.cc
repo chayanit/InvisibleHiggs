@@ -115,6 +115,11 @@ TCut Cuts::zMuMuGen() {
   return tmp;
 }
 
+TCut Cuts::zMuMuGenPt100() {
+  TCut tmp("zltype==2 && zgenpt<100.");
+  return tmp;
+}
+
 TCut Cuts::zMuMuGenMass() {
   TCut tmp("zltype==2 && zgenmass>60. && zgenmass<120.");
   return tmp;
@@ -164,6 +169,24 @@ TCut Cuts::zMuMuVBF() {
   tmp += cut("EVeto");
   tmp += vbf();
   tmp += TCut("metNo2Muon>130.");
+  return tmp;
+}
+
+TCut Cuts::zMuMuGenPt100VBF() {
+  TCut tmp = cut("trigger");
+  tmp += cut("metFilter");
+  tmp += zMuMuGenPt100();
+  tmp += zMuMuReco();
+  tmp += TCut("mu3Pt<10");
+  tmp += cut("EVeto");
+  tmp += vbf();
+  tmp += TCut("metNo2Muon>130.");
+  return tmp;
+}
+
+TCut Cuts::HLTandMETFilters() {
+  TCut tmp = cut("trigger");
+  tmp += cut("metFilter");
   return tmp;
 }
 
