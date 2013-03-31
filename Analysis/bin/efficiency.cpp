@@ -33,28 +33,20 @@ int main(int argc, char* argv[]) {
   Datasets datasets(iDir);
   datasets.readFile(options.datasetFile);
 
+  // cuts
+  Cuts cuts;
+  unsigned nCuts = cuts.nCuts();
+  TCut puWeight("puWeight");
+
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/Efficiency.root")).c_str(), "UPDATE");
 
   // output histograms (for datasets with several components)
-  TH1D* hQCD     = new TH1D("hCutFlow_QCD", "", 7, 0., 7.);
-  TH1D* hZNuNu   = new TH1D("hCutFlow_ZNuNu", "", 7, 0., 7.);
-  TH1D* hWLNu    = new TH1D("hCutFlow_WLNu", "", 7, 0., 7.);
-  TH1D* hSingleT = new TH1D("hCutFlow_SingleT", "", 7, 0., 7.);
-  TH1D* hDiboson = new TH1D("hCutFlow_Diboson", "", 7, 0., 7.);
-
-
-  // cuts
-  Cuts cuts;
-  TCut puWeight("puWeight");
-
-  TCut cutTrg   = puWeight * (cuts.cut("trigger") + cuts.cut("metFilter"));
-  TCut cutVeto  = puWeight * (cuts.cut("trigger") + cuts.cut("metFilter") + cuts.cut("EVeto") + cuts.cut("MuVeto"));
-  TCut cutDijet = puWeight * (cuts.cut("trigger") + cuts.cut("metFilter") + cuts.cut("EVeto") + cuts.cut("MuVeto") + cuts.cut("dijet") + cuts.cut("sgnEtaJJ"));
-  TCut cutDEta  = puWeight * (cuts.cut("trigger") + cuts.cut("metFilter") + cuts.cut("EVeto") + cuts.cut("MuVeto") + cuts.cut("dijet") + cuts.cut("sgnEtaJJ") + cuts.cut("dEtaJJ"));
-  TCut cutMET   = puWeight * (cuts.cut("trigger") + cuts.cut("metFilter") + cuts.cut("EVeto") + cuts.cut("MuVeto") + cuts.cut("dijet") + cuts.cut("sgnEtaJJ") + cuts.cut("dEtaJJ") + cuts.cut("met"));
-  TCut cutMjj   = puWeight * (cuts.cut("trigger") + cuts.cut("metFilter") + cuts.cut("EVeto") + cuts.cut("MuVeto") + cuts.cut("dijet") + cuts.cut("sgnEtaJJ") + cuts.cut("dEtaJJ") + cuts.cut("met") + cuts.cut("Mjj"));
-  TCut cutDPhi  = puWeight * cuts.allCuts();
+  TH1D* hQCD     = new TH1D("hCutFlow_QCD", "", nCuts, 0., nCuts);
+  TH1D* hZNuNu   = new TH1D("hCutFlow_ZNuNu", "", nCuts, 0., nCuts);
+  TH1D* hWLNu    = new TH1D("hCutFlow_WLNu", "", nCuts, 0., nCuts);
+  TH1D* hSingleT = new TH1D("hCutFlow_SingleT", "", nCuts, 0., nCuts);
+  TH1D* hDiboson = new TH1D("hCutFlow_Diboson", "", nCuts, 0., nCuts);
 
   for (unsigned i=0; i<datasets.size(); ++i) {
 
@@ -62,57 +54,33 @@ int main(int argc, char* argv[]) {
 
     if (dataset.isData) continue;
 
+    std::cout << "Cut flow for " << dataset.name << std::endl;
+
     TFile* ifile = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
-    
+
+    //cuts
+    TCut cutDSet     = cuts.cutDataset(dataset.name);
+     
     // tmp histogram for counting.  Need a hist so we can use PU weight
-    TH1D* weight = new TH1D("weight","", 1, 0., 1.);
 
     // do cutflow
     std::string hname = std::string("hCutFlow_")+dataset.name;
-    TH1D* hCutFlow = new TH1D(hname.c_str(), "", 7, 0., 7.);
+    TH1D* hCutFlow = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
 
-    weight->SetBinContent(1, 0.);
-    weight->SetBinError(1, 0.);
-    tree->Draw("0.5>>weight", cutTrg);
-    hCutFlow->SetBinContent(1, weight->GetBinContent(1));
-    hCutFlow->SetBinError(1, weight->GetBinError(1));
+    for (unsigned c=0; c<nCuts; ++c) {
 
-    weight->SetBinContent(1, 0.);
-    weight->SetBinError(1, 0.);
-    tree->Draw("0.5>>weight", cutVeto);
-    hCutFlow->SetBinContent(2, weight->GetBinContent(1));
-    hCutFlow->SetBinError(2, weight->GetBinError(1));
+      TCut cut = puWeight * (cutDSet + cuts.cutflow(c));
 
-    weight->SetBinContent(1, 0.);
-    weight->SetBinError(1, 0.);
-    tree->Draw("0.5>>weight", cutDijet);
-    hCutFlow->SetBinContent(3, weight->GetBinContent(1));
-    hCutFlow->SetBinError(3, weight->GetBinError(1));
+      //      std::cout << cut << std::endl;
 
-    weight->SetBinContent(1, 0.);
-    weight->SetBinError(1, 0.);
-    tree->Draw("0.5>>weight", cutDEta);
-    hCutFlow->SetBinContent(4, weight->GetBinContent(1));
-    hCutFlow->SetBinError(4, weight->GetBinError(1));
+      TH1D* weight = new TH1D("weight","", 1, 0., 1.);
+      tree->Draw("0.5>>weight", cut);
 
-    weight->SetBinContent(1, 0.);
-    weight->SetBinError(1, 0.);
-    tree->Draw("0.5>>weight", cutMET);
-    hCutFlow->SetBinContent(5, weight->GetBinContent(1));
-    hCutFlow->SetBinError(5, weight->GetBinError(1));
+      hCutFlow->SetBinContent(c+1, weight->GetBinContent(1));
+      hCutFlow->SetBinError(c+1, weight->GetBinError(1));
 
-    weight->SetBinContent(1, 0.);
-    weight->SetBinError(1, 0.);
-    tree->Draw("0.5>>weight", cutMjj);
-    hCutFlow->SetBinContent(6, weight->GetBinContent(1));
-    hCutFlow->SetBinError(6, weight->GetBinError(1));
-
-    weight->SetBinContent(1, 0.);
-    weight->SetBinError(1, 0.);
-    tree->Draw("0.5>>weight", cutDPhi);
-    hCutFlow->SetBinContent(7, weight->GetBinContent(1));
-    hCutFlow->SetBinError(7, weight->GetBinError(1));
+    }
 
     hCutFlow->Scale( lumi * dataset.sigma / dataset.nEvents );
 
@@ -127,17 +95,13 @@ int main(int argc, char* argv[]) {
       hDiboson->Add(hCutFlow, 1.);
 
     ofile->cd();
-    hCutFlow->Write("",TObject::kOverwrite);
-    
-    ifile->Close();
+    hCutFlow->Write("", TObject::kOverwrite);
 
-//     delete hCutFlow;
-//     delete weight;
-//     delete tree;
-//     delete ifile;
+    ifile->Close();
 
   }
 
+  ofile->cd();
   hQCD->Write("",TObject::kOverwrite);  
   hZNuNu->Write("",TObject::kOverwrite);  
   hWLNu->Write("",TObject::kOverwrite);  
@@ -145,73 +109,63 @@ int main(int argc, char* argv[]) {
   hDiboson->Write("",TObject::kOverwrite);  
 
   // write TeX file
+  std::cout << "Writing cut flow TeX file" << std::endl;
+
   ofstream effFile;
-  effFile.open(options.oDir+std::string("/efficiency.txt"));
+  effFile.open(options.oDir+std::string("/cutflow.tex"));
 
   effFile << "Cut & N($Z\\rightarrow\\nu\\nu) & N($W\\rightarrow l\\nu) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(signal $m_H=120$~\\GeV \\\\" << std::endl;
 
-  std::vector<std::string> cutNames;
-  cutNames.push_back("Trigger");
-  cutNames.push_back("Lepton vetoes");
-  cutNames.push_back("Dijet $p_T>50$~\\GeV");
-  cutNames.push_back("$\\detajj > 4.2$");
-  cutNames.push_back("$\\met > 130$~\\GeV");
-  cutNames.push_back("$\\mjj > 1200$~\\GeV");
-  cutNames.push_back("$\\dphijj < 1.0$");
-
-  TH1D* hTTbar = (TH1D*) ofile->Get("hCutFlow_TTbar");
-  TH1D* hSignal = (TH1D*) ofile->Get("hCutFlow_signalM120");
+  TH1D* hTTbar = (TH1D*) ofile->Get("hCutFlow_TTBar");
+  TH1D* hSignal = (TH1D*) ofile->Get("hCutFlow_SignalM125_POWHEG");
 
   // cutflow table
-  for (unsigned i=1; i<8; ++i) {
+  for (unsigned i=0; i<nCuts; ++i) {
 
-    effFile << cutNames.at(i-1) << " & ";
-    effFile << "$" << hZNuNu->GetBinContent(i) << " \\pm " << hZNuNu->GetBinError(i) << "$ & ";
-    effFile << "$" << hWLNu->GetBinContent(i) << " \\pm " << hWLNu->GetBinError(i) << "$ & ";
-    effFile << "$" << hQCD->GetBinContent(i) << " \\pm " << hQCD->GetBinError(i) << "$ & ";
-    effFile << "$" << hTTbar->GetBinContent(i) << " \\pm " << hTTbar->GetBinError(i) << "$ & ";
-    effFile << "$" << hSingleT->GetBinContent(i) << " \\pm " << hSingleT->GetBinError(i) << "$ & ";
-    effFile << "$" << hDiboson->GetBinContent(i) << " \\pm " << hDiboson->GetBinError(i) << "$ & ";
-    effFile << "$" << hSignal->GetBinContent(i) << " \\pm " << hSignal->GetBinError(i) << "$ \\\\ " << std::endl;
+    effFile << cuts.cutName(i) << " & ";
+    effFile << "$" << hZNuNu->GetBinContent(i+1) << " \\pm " << hZNuNu->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hWLNu->GetBinContent(i+1) << " \\pm " << hWLNu->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hQCD->GetBinContent(i+1) << " \\pm " << hQCD->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hTTbar->GetBinContent(i+1) << " \\pm " << hTTbar->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hSingleT->GetBinContent(i+1) << " \\pm " << hSingleT->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hDiboson->GetBinContent(i+1) << " \\pm " << hDiboson->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hSignal->GetBinContent(i+1) << " \\pm " << hSignal->GetBinError(i+1) << "$ \\\\ " << std::endl;
 
   }
 
   effFile << std::endl << std::endl;
+  effFile.close();
+
 
   // signal efficiencies
-  std::cout << "Dataset\t\teff(%)\t\tN\t\tpass/total(MC)" << std::endl;
+  effFile.open(options.oDir+std::string("/signalEff.tex"));
+  effFile << "Dataset & eff(%) & N \\\\" << std::endl;
 
   for (unsigned i=0; i<datasets.size(); ++i) {
 
     Dataset dataset = datasets.getDataset(i);
 
-    std::string sigstr("signal");
-    if (dataset.name.compare(0,6,sigstr) != 0) continue;
+    if (!(dataset.name.compare(0,6,"Signal") ==0 ||
+	  dataset.name.compare(0,6,"GluGlu") == 0 )) continue;
 
-    TFile* ifile = datasets.getTFile(dataset.name);
-    TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
+    std::string hname = std::string("hCutFlow_")+dataset.name;
+    TH1D* weight = (TH1D*) ofile->Get(hname.c_str());
+
+    double n      = weight->GetBinContent(nCuts);
+    double err_n  = weight->GetBinError(nCuts);
+
+    double eff    = n / (lumi * dataset.sigma);
+    double err_eff = err_n  / (lumi *dataset.sigma);
+
+    //    double n      = lumi * dataset.sigma * eff;
+    //    double nErr   = lumi * dataset.sigma * effErr;
+
+
+    effFile << dataset.name << " & $" 
+	    << 100*eff << " \\pm " << 100*err_eff << "$ & $"
+	    << n << " \\pm " << err_n << "$ \\\\" 
+	    << std::endl;
     
-    TH1D* weight = new TH1D("weight","", 1, 0., 1.);
-    tree->Draw("0.5>>weight", cutDPhi);
-
-    double nMCPas = weight->GetBinContent(1);
-    double nMCTot = double(dataset.nEvents);
-
-    double eff    = double(nMCPas)/dataset.nEvents;
-    double effErr = sqrt( nMCPas * (1-nMCPas/nMCTot) ) / nMCTot;  // binomial error
-
-    double n      = lumi * dataset.sigma * eff;
-    double nErr   = lumi * dataset.sigma * effErr;
-
-
-    effFile << dataset.name << "\t" 
-	    << 100.*eff << " +/- " << 100.*effErr << "\t" 
-	    << nMCPas << " / " << nMCTot << "\t"
-	    << n << " +/- " << nErr << "\t" 
-	    << dataset.sigma << std::endl;
-    
-    ifile->Close();
-
   } 
   
 
