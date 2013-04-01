@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
   TH1D* hQCD     = new TH1D("hCutFlow_QCD", "", nCuts, 0., nCuts);
   TH1D* hZNuNu   = new TH1D("hCutFlow_ZNuNu", "", nCuts, 0., nCuts);
   TH1D* hWLNu    = new TH1D("hCutFlow_WLNu", "", nCuts, 0., nCuts);
-  TH1D* hSingleT = new TH1D("hCutFlow_SingleT", "", nCuts, 0., nCuts);
+  TH1D* hSingleT = new TH1D("hCutFlow_SingleTSum", "", nCuts, 0., nCuts);
   TH1D* hDiboson = new TH1D("hCutFlow_Diboson", "", nCuts, 0., nCuts);
 
   for (unsigned i=0; i<datasets.size(); ++i) {
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
     if (dataset.name.compare(0,3,"QCD")==0) hQCD->Add(hCutFlow, 1.);
     if (dataset.name.compare(0,3,"Zvv")==0) hZNuNu->Add(hCutFlow, 1.);
     if (dataset.name.compare(0,1,"W")==0) hWLNu->Add(hCutFlow, 1.);
-    if (dataset.name.compare(0,6,"SingleT")==0) hSingleT->Add(hCutFlow, 1.);
+    if (dataset.name.compare(0,7,"SingleT")==0) hSingleT->Add(hCutFlow, 1.);
     if (dataset.name.compare(0,2,"WW")==0 ||
 	dataset.name.compare(0,2,"WZ")==0 ||
 	dataset.name.compare(0,2,"ZZ")==0 )
