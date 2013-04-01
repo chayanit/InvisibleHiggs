@@ -15,6 +15,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
+#include <fstream>
 
 int main(int argc, char* argv[]) {
 
@@ -34,21 +35,9 @@ int main(int argc, char* argv[]) {
 
   // cuts
   Cuts cuts;
+  unsigned nCutsWMu = cuts.nCutsWMu();
+  unsigned nCutsWEl = cuts.nCutsWEl();
   TCut puWeight("puWeight");
-
-  TCut cutWMu_Gen_C = puWeight * (cuts.wMuGen() + cuts.wMuVBF());
-  TCut cutWMu_Gen0P_C = puWeight * (cuts.wMuGen0P() + cuts.wMuVBF());
-  TCut cutWMu_Gen_S = puWeight * (cuts.wMuGen() + cuts.allCutsNoDPhi());
-  TCut cutWMu_Gen0P_S = puWeight * (cuts.wMuGen0P() + cuts.allCutsNoDPhi());
-  TCut cutWMu_C = puWeight * (cuts.wMuVBF());
-  TCut cutWMu_S = puWeight * (cuts.allCutsNoDPhi());
-
-  TCut cutWEl_Gen_C = puWeight * (cuts.wElGen() + cuts.wElVBF());
-  TCut cutWEl_Gen0P_C = puWeight * (cuts.wElGen0P() + cuts.wElVBF());
-  TCut cutWEl_Gen_S = puWeight * (cuts.wElGen() + cuts.allCutsNoDPhi());
-  TCut cutWEl_Gen0P_S = puWeight * (cuts.wElGen0P() + cuts.allCutsNoDPhi());
-  TCut cutWEl_C = puWeight * (cuts.wElVBF());
-  TCut cutWEl_S = puWeight * (cuts.allCutsNoDPhi());
 
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
@@ -65,23 +54,35 @@ int main(int argc, char* argv[]) {
   //  TH1D* hWEl_BGS_DPhi = new TH1D("hWEl_BGS_DPhi", "", 3, dphiEdges);  // background MC sgnl region
   TH1D* hWEl_DataC_DPhi = new TH1D("hWEl_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
 
+  // cutflow histograms
+  TH1D* hDataWMu    = new TH1D("hWMu_CutFlow_Data", "", nCutsWMu, 0., nCutsWMu);
+  TH1D* hWLNuWMu    = new TH1D("hWMu_CutFlow_WToLNu", "", nCutsWMu, 0., nCutsWMu);
+  TH1D* hQCDWMu     = new TH1D("hWMu_CutFlow_QCD", "", nCutsWMu, 0., nCutsWMu);
+  TH1D* hDYWMu      = new TH1D("hWMu_CutFlow_DY", "", nCutsWMu, 0., nCutsWMu);
+  TH1D* hSingleTWMu = new TH1D("hWMu_CutFlow_SingleTSum", "", nCutsWMu, 0., nCutsWMu);
+  TH1D* hDibosonWMu = new TH1D("hWMu_CutFlow_Diboson", "", nCutsWMu, 0., nCutsWMu);
+
+  TH1D* hDataWEl    = new TH1D("hWEl_CutFlow_Data", "", nCutsWEl, 0., nCutsWEl);
+  TH1D* hWLNuWEl    = new TH1D("hWEl_CutFlow_WToLNu", "", nCutsWEl, 0., nCutsWEl);
+  TH1D* hQCDWEl     = new TH1D("hWEl_CutFlow_QCD", "", nCutsWEl, 0., nCutsWEl);
+  TH1D* hDYWEl      = new TH1D("hWEl_CutFlow_DY", "", nCutsWEl, 0., nCutsWEl);
+  TH1D* hSingleTWEl = new TH1D("hWEl_CutFlow_SingleTSum", "", nCutsWEl, 0., nCutsWEl);
+  TH1D* hDibosonWEl = new TH1D("hWEl_CutFlow_Diboson", "", nCutsWEl, 0., nCutsWEl);
+  
+
   // loop over MC datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
 
     Dataset dataset = datasets.getDataset(i);
     
     // check it's  W+Jets
-    bool isWInclusive = false;
-    bool isWNJets = false;
-    if (dataset.name == "WJets") {
-      isWInclusive = true;
-      std::cout << "Analysing W MC     : " << dataset.name << std::endl;
-    }
-    else if (dataset.name == "W1Jets" || 
-	     dataset.name == "W2Jets" || 
-	     dataset.name == "W3Jets" || 
-	     dataset.name == "W4Jets") {
-      isWNJets = true;
+    bool isWJets = false;
+    if (dataset.name == "WJets" ||
+	dataset.name == "W1Jets" || 
+	dataset.name == "W2Jets" || 
+	dataset.name == "W3Jets" || 
+	dataset.name == "W4Jets") {
+      isWJets = true;
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
     }
     else if (dataset.isData) {
@@ -90,6 +91,18 @@ int main(int argc, char* argv[]) {
     else {
       std::cout << "Analysing BG MC    : " << dataset.name << std::endl;
     }
+
+    // setup cuts
+    TCut cutD = cuts.cutDataset(dataset.name);
+    TCut cutWMu_Gen_C = puWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF());
+    TCut cutWMu_Gen_S = puWeight * (cutD + cuts.wMuGen() + cuts.allCutsNoDPhi());
+    TCut cutWMu_C = puWeight * (cutD + cuts.wMuVBF());
+    TCut cutWMu_S = puWeight * (cutD + cuts.allCutsNoDPhi());
+    
+    TCut cutWEl_Gen_C = puWeight * (cutD + cuts.wElGen() + cuts.wElVBF());
+    TCut cutWEl_Gen_S = puWeight * (cutD + cuts.wElGen() + cuts.allCutsNoDPhi());
+    TCut cutWEl_C = puWeight * (cutD + cuts.wElVBF());
+    TCut cutWEl_S = puWeight * (cutD + cuts.allCutsNoDPhi());
 
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
@@ -102,17 +115,7 @@ int main(int argc, char* argv[]) {
 
     double weight = lumi * dataset.sigma / dataset.nEvents;
 
-    if (isWInclusive) {
-      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_Gen0P_C);
-      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_Gen0P_S);
-      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_Gen0P_C);
-      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_Gen0P_S);
-      hWMu_MCC_DPhi->Add(hWMu_C_DPhi, weight);
-      hWMu_MCS_DPhi->Add(hWMu_S_DPhi, weight);
-      hWEl_MCC_DPhi->Add(hWEl_C_DPhi, weight);
-      hWEl_MCS_DPhi->Add(hWEl_S_DPhi, weight);
-    }
-    else if (isWNJets) {
+    if (isWJets) {
       tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_Gen_C);
       tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_Gen_S);
       tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_Gen_C);
@@ -162,10 +165,86 @@ int main(int argc, char* argv[]) {
     tree->Draw(str.c_str(), cutWEl_C);
     hWEl_WmT->Write("",TObject::kOverwrite);
 
+    // per-dataset cutflow hists
+    std::string hnameWMu = std::string("hWMu_CutFlow_")+dataset.name;
+    std::string hnameWEl = std::string("hWEl_CutFlow_")+dataset.name;
+    TH1D* hCutFlowWMu = new TH1D(hnameWMu.c_str(), "", nCutsWMu, 0., nCutsWMu);
+    TH1D* hCutFlowWEl = new TH1D(hnameWEl.c_str(), "", nCutsWEl, 0., nCutsWEl);
+
+    for (unsigned c=0; c<nCutsWMu; ++c) {
+
+      TCut cut = puWeight * (cutD + cuts.cutflowWMu(c));
+      TH1D* h = new TH1D("h","", 1, 0., 1.);
+      tree->Draw("0.5>>h", cut);
+
+      hCutFlowWMu->SetBinContent(c+1, h->GetBinContent(1));
+      hCutFlowWMu->SetBinError(c+1, h->GetBinError(1));
+
+      delete h;
+    }
+
+    for (unsigned c=0; c<nCutsWEl; ++c) {
+
+      TCut cut = puWeight * (cutD + cuts.cutflowWEl(c));
+      TH1D* h = new TH1D("h","", 1, 0., 1.);
+      tree->Draw("0.5>>h", cut);
+
+      hCutFlowWEl->SetBinContent(c+1, h->GetBinContent(1));
+      hCutFlowWEl->SetBinError(c+1, h->GetBinError(1));
+
+      delete h;
+    }
+
+    // sum histograms
+    if (dataset.isData) {
+      hDataWMu->Add(hCutFlowWMu, 1.);
+      hDataWEl->Add(hCutFlowWEl, 1.);
+    }
+    if (isWJets) {
+      hWLNuWMu->Add(hCutFlowWMu, weight);
+      hWLNuWEl->Add(hCutFlowWEl, weight);
+    }
+    if (dataset.name.compare(0,3,"QCD")==0) {
+      hQCDWMu->Add(hCutFlowWMu, weight);
+      hQCDWEl->Add(hCutFlowWEl, weight);
+    }
+    if (dataset.name.compare(0,2,"DY")==0) {
+      hDYWMu->Add(hCutFlowWMu, weight);
+      hDYWEl->Add(hCutFlowWEl, weight);
+    }
+    if (dataset.name.compare(0,7,"SingleT")==0) {
+      hSingleTWMu->Add(hCutFlowWMu, weight);
+      hSingleTWEl->Add(hCutFlowWEl, weight);
+    }
+    if (dataset.name.compare(0,2,"WW")==0 ||
+	dataset.name.compare(0,2,"WZ")==0 ||
+	dataset.name.compare(0,2,"ZZ")==0 ) {
+      hDibosonWMu->Add(hCutFlowWMu, weight);
+      hDibosonWEl->Add(hCutFlowWEl, weight);
+    }
+
+    hCutFlowWMu->Write("",TObject::kOverwrite);
+    hCutFlowWEl->Write("",TObject::kOverwrite);
+
     delete tree;
     file->Close();
    
   }
+
+  // write out summed cutflow histograms
+  hDataWMu->Write("",TObject::kOverwrite);  
+  hWLNuWMu->Write("",TObject::kOverwrite);  
+  hQCDWMu->Write("",TObject::kOverwrite);  
+  hDYWMu->Write("",TObject::kOverwrite);  
+  hSingleTWMu->Write("",TObject::kOverwrite);  
+  hDibosonWMu->Write("",TObject::kOverwrite);  
+
+  hDataWEl->Write("",TObject::kOverwrite);  
+  hWLNuWEl->Write("",TObject::kOverwrite);  
+  hQCDWEl->Write("",TObject::kOverwrite);  
+  hDYWEl->Write("",TObject::kOverwrite);  
+  hSingleTWEl->Write("",TObject::kOverwrite);  
+  hDibosonWEl->Write("",TObject::kOverwrite);  
 
 
   // create histograms with the background estimate
@@ -237,7 +316,6 @@ int main(int argc, char* argv[]) {
   std::cout << "Total W (dphi<1.0)" << std::endl;
   std::cout << "  W in sgnl region       : " << hW_Est_S_DPhi->GetBinContent(1) << std::endl;
 
-
   // store histograms
   ofile->cd();
     
@@ -260,7 +338,61 @@ int main(int argc, char* argv[]) {
   hWEl_EstS_DPhi->Write("",TObject::kOverwrite);
 
   hW_Est_S_DPhi->Write("",TObject::kOverwrite);
-      
+
+  // write the cutflow table
+  std::cout << "Writing cut flow TeX file" << std::endl;
+
+  ofstream effFile;
+  effFile.open(options.oDir+std::string("/cutflowWMu.tex"));
+
+  effFile << "Cut & N(data) & N($W\\rightarrow l\\nu$) & N(DY) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) \\\\" << std::endl;
+
+  TH1D* hTTbarWMu = (TH1D*) ofile->Get("hWMu_CutFlow_TTBar");
+
+  // cutflow table
+  for (unsigned i=0; i<nCutsWMu; ++i) {
+
+    effFile << cuts.cutNameWMu(i) << " & ";
+    effFile << "$" << hDataWMu->GetBinContent(i+1) << " \\pm " << hDataWMu->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hWLNuWMu->GetBinContent(i+1) << " \\pm " << hWLNuWMu->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hDYWMu->GetBinContent(i+1) << " \\pm " << hDYWMu->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hQCDWMu->GetBinContent(i+1) << " \\pm " << hQCDWMu->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hTTbarWMu->GetBinContent(i+1) << " \\pm " << hTTbarWMu->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hSingleTWMu->GetBinContent(i+1) << " \\pm " << hSingleTWMu->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hDibosonWMu->GetBinContent(i+1) << " \\pm " << hDibosonWMu->GetBinError(i+1) << "$ \\\\ ";
+    effFile << std::endl;
+
+  }
+
+  effFile << std::endl << std::endl;
+  effFile.close();
+
+  //WEl cutflow
+  effFile.open(options.oDir+std::string("/cutflowWEl.tex"));
+
+  effFile << "Cut & N(data) & N($W\\rightarrow l\\nu$) & N(DY) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) \\\\" << std::endl;
+
+  TH1D* hTTbarWEl = (TH1D*) ofile->Get("hWEl_CutFlow_TTBar");
+
+  // cutflow table
+  for (unsigned i=0; i<nCutsWEl; ++i) {
+
+    effFile << cuts.cutNameWEl(i) << " & ";
+    effFile << "$" << hDataWEl->GetBinContent(i+1) << " \\pm " << hDataWEl->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hWLNuWEl->GetBinContent(i+1) << " \\pm " << hWLNuWEl->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hDYWEl->GetBinContent(i+1) << " \\pm " << hDYWEl->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hQCDWEl->GetBinContent(i+1) << " \\pm " << hQCDWEl->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hTTbarWEl->GetBinContent(i+1) << " \\pm " << hTTbarWEl->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hSingleTWEl->GetBinContent(i+1) << " \\pm " << hSingleTWEl->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hDibosonWEl->GetBinContent(i+1) << " \\pm " << hDibosonWEl->GetBinError(i+1) << "$ \\\\ ";
+    effFile << std::endl;
+  }
+
+  effFile << std::endl << std::endl;
+  effFile.close();
+
+
+
   ofile->Close();    
 
 }

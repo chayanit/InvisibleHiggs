@@ -18,14 +18,24 @@ class Cuts {
   void addQCDCut(std::string name, std::string cut);
 
   // getters
+  unsigned nCuts() { return cuts_.size(); }
   TCut cut(std::string name);
   std::string cutName(unsigned i);
 
-  unsigned nCuts() { return cuts_.size(); }
   unsigned nZMuMuCuts() { return cutsZMuMu_.size(); }
+  TCut cutZMuMu(std::string name);
+  std::string cutNameZMuMu(unsigned i) { return namesZMuMu_.at(i); }
+
   unsigned nWMuCuts() { return cutsWMu_.size(); }
+  TCut cutWMu(std::string name);
+  std::string cutNameWMu(unsigned i) { return namesWMu_.at(i); }
+
   unsigned nWElCuts() { return cutsWEl_.size(); }
+  TCut cutWEl(std::string name);
+  std::string cutNameWEl(unsigned i) { return namesWEl_.at(i); }
+
   unsigned nQCDCuts() { return cutsQCD_.size(); }
+  std::string cutNameQCD(unsigned i) { return namesQCD_.at(i); }
 
   TCut allCuts();
 
@@ -60,16 +70,12 @@ class Cuts {
 
   // W-> mu
   TCut wMuGen();
-  TCut wMuGen0P();
-  TCut wMuReco();
   TCut wMuVBF();
   TCut cutflowWMu(unsigned i);
   unsigned nCutsWMu() { return cutsWMu_.size(); }
 
   // W-> e
   TCut wElGen();
-  TCut wElGen0P();
-  TCut wElReco();
   TCut wElVBF();
   TCut cutflowWEl(unsigned i);
   unsigned nCutsWEl() { return cutsWEl_.size(); }

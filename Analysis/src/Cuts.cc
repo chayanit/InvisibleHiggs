@@ -16,27 +16,30 @@ Cuts::Cuts() {
 
   addZMuMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
   addZMuMuCut("z",         "zChannel==1 && zMass>60. && zMass<120.");
-  addZMuMuCut("LVeto",     "ele1Pt<10. && mu3Pt<10.");
+  addZMuMuCut("lVeto",     "ele1Pt<10. && mu3Pt<10.");
   addZMuMuCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addZMuMuCut("dEtaJJ",    "vbfDEta>4.2");
-  addZMuMuCut("MET",       "met>130.");
+  addZMuMuCut("MET",       "metNo2Muon>130.");
   addZMuMuCut("Mjj",       "vbfM>1200.");
+  addZMuMuCut("dPhiJJ",     "vbfDPhi<1.0");
 
   addWMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
-  addWMuCut("wMu",       "nW>0 && wChannel==1 && wMt>40.");
+  addWMuCut("wMu",       "nW>0 && wChannel==1");
   addWMuCut("lVeto",     "ele1Pt<10. && mu2Pt<10.");
   addWMuCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addWMuCut("dEtaJJ",    "vbfDEta>4.2");
-  addWMuCut("MET",       "met>130.");
+  addWMuCut("MET",       "metNoWLepton>130.");
   addWMuCut("Mjj",       "vbfM>1200.");
+  addWMuCut("dPhiJJ",     "vbfDPhi<1.0");
 
   addWElCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
-  addWElCut("wEl",       "nW>0 && wChannel==2 && wMt>40.");
-  addWElCut("lVeto",     "ele1Pt<10. && mu2Pt<10.");
+  addWElCut("wEl",       "nW>0 && wChannel==2");
+  addWElCut("lVeto",     "ele2Pt<10. && mu1Pt<10.");
   addWElCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addWElCut("dEtaJJ",    "vbfDEta>4.2");
-  addWElCut("MET",       "met>130.");
+  addWElCut("MET",       "metNoWLepton>130.");
   addWElCut("Mjj",       "vbfM>1200.");
+  addWElCut("dPhiJJ",     "vbfDPhi<1.0");
 
 }
 
@@ -79,6 +82,30 @@ void Cuts::addWElCut(std::string name, std::string cut) {
 TCut Cuts::cut(std::string s) {
   for (unsigned i=0; i<names_.size(); ++i) {
     if (names_.at(i) == s) return cuts_.at(i);
+  }
+  return TCut();
+}
+
+
+TCut Cuts::cutZMuMu(std::string s) {
+  for (unsigned i=0; i<namesZMuMu_.size(); ++i) {
+    if (namesZMuMu_.at(i) == s) return cutsZMuMu_.at(i);
+  }
+  return TCut();
+}
+
+
+TCut Cuts::cutWMu(std::string s) {
+  for (unsigned i=0; i<namesWMu_.size(); ++i) {
+    if (namesWMu_.at(i) == s) return cutsWMu_.at(i);
+  }
+  return TCut();
+}
+
+
+TCut Cuts::cutWEl(std::string s) {
+  for (unsigned i=0; i<namesWEl_.size(); ++i) {
+    if (namesWEl_.at(i) == s) return cutsWEl_.at(i);
   }
   return TCut();
 }
@@ -220,7 +247,7 @@ TCut Cuts::zMuMuGenPt100VBF() {
 TCut Cuts::cutflowZMuMu(unsigned i) {
   TCut tmp("");
   for (unsigned j=0; j<i+1; ++j) {
-    tmp += cutsZMuMu_.at(i);
+    tmp += cutsZMuMu_.at(j);
   }
   return tmp;
 }
@@ -233,31 +260,21 @@ TCut Cuts::wMuGen() {
   return tmp;
 }
 
-TCut Cuts::wMuGen0P() {
-  TCut tmp("wltype==2 && wgennj==0");  // need to add single parton selection
-  return tmp;
-}
-
-TCut Cuts::wMuReco() {
-  TCut tmp("nW>0 && wChannel==1 && sqrt(2*wDaulPt*met*(1-wDaulPhi))>40. && sqrt(2*wDaulPt*met*(1-wDaulPhi))>120");
-  return tmp;
-}
-
 TCut Cuts::wMuVBF() {
-  TCut tmp = cut("trigger");
-  tmp += cut("metFilter");
-  tmp += wMuReco();
-  tmp += TCut("mu2Pt<10");
-  tmp += cut("EVeto");
-  tmp += vbf();
-  tmp += TCut("metNoWLepton>130.");
+  TCut tmp = cutWMu("trigger");
+  tmp += cutWMu("wMu");
+  tmp += cutWMu("lVeto");
+  tmp += cutWMu("dijet");
+  tmp += cutWMu("dEtaJJ");
+  tmp += cutWMu("MET");
+  tmp += cutWMu("Mjj");
   return tmp;
 }
 
 TCut Cuts::cutflowWMu(unsigned i) {
   TCut tmp("");
   for (unsigned j=0; j<i+1; ++j) {
-    tmp += cutsWMu_.at(i);
+    tmp += cutsWMu_.at(j);
   }
   return tmp;
 }
@@ -269,32 +286,21 @@ TCut Cuts::wElGen() {
   return tmp;
 }
 
-TCut Cuts::wElGen0P() {
-  TCut tmp("wltype==1 && wgennj==0");  // need to add single parton selection
-  return tmp;
-}
-
-TCut Cuts::wElReco() {
-  TCut tmp("nW>0 && wChannel==2 && sqrt(2*wDaulPt*met*(1-wDaulPhi))>40. && sqrt(2*wDaulPt*met*(1-wDaulPhi))>120");
-  return tmp;
-}
-
-
 TCut Cuts::wElVBF() {
-  TCut tmp = cut("trigger");
-  tmp += cut("metFilter");
-  tmp += wElReco();
-  tmp += TCut("ele2Pt<10");
-  tmp += cut("MVeto");
-  tmp += vbf();
-  tmp += TCut("metNoWLepton>130.");
+  TCut tmp = cutWEl("trigger");
+  tmp += cutWEl("wEl");
+  tmp += cutWEl("lVeto");
+  tmp += cutWEl("dijet");
+  tmp += cutWEl("dEtaJJ");
+  tmp += cutWEl("MET");
+  tmp += cutWEl("Mjj");
   return tmp;
 }
 
 TCut Cuts::cutflowWEl(unsigned i) {
   TCut tmp("");
   for (unsigned j=0; j<i+1; ++j) {
-    tmp += cutsWEl_.at(i);
+    tmp += cutsWEl_.at(j);
   }
   return tmp;
 }
