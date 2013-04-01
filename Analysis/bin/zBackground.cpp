@@ -15,6 +15,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
+#include <fstream>
 
 int main(int argc, char* argv[]) {
 
@@ -35,6 +36,8 @@ int main(int argc, char* argv[]) {
 
   // cuts
   Cuts cuts;
+  unsigned nCutsZMuMu = cuts.nCutsZMuMu();
+
   TCut puWeight("puWeight");
   TCut METNoMuon("metNoMuon>130.");	// add here later for VBF efficiency when MET>0, MET>70 (QCD estimation)
   TCut METNo2Muon("metNo2Muon>130.");
@@ -71,11 +74,20 @@ int main(int argc, char* argv[]) {
   TH1D* hZ_DY_EffVBFC_D = new TH1D("hZ_DY_EffVBFC_D", "", 1, 0., 1.);   // denominator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples
   TH1D* hZ_DY_EffVBFC_N = new TH1D("hZ_DY_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
 
+  // cutflow histograms
+  TH1D* hZ_CutFlow_Data       = new TH1D("hZ_CutFlow_Data", "", nCutsZMuMu, 0., nCutsZMuMu);
+  TH1D* hZ_CutFlow_DY         = new TH1D("hZ_CutFlow_DY", "", nCutsZMuMu, 0., nCutsZMuMu);
+  TH1D* hZ_CutFlow_SingleTSum = new TH1D("hZ_CutFlow_SingleTSum", "", nCutsZMuMu, 0., nCutsZMuMu);
+  TH1D* hZ_CutFlow_Diboson    = new TH1D("hZ_CutFlow_Diboson", "", nCutsZMuMu, 0., nCutsZMuMu);
+
+
   // loop over MC datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
 
     Dataset dataset = datasets.getDataset(i);
     
+    TCut cutD = cuts.cutDataset(dataset.name);
+
     // check if it's DYJets
     bool isDY = false;
     if (dataset.name.compare(0,2,"DY")==0) {
@@ -168,7 +180,41 @@ int main(int argc, char* argv[]) {
     // per-dataset control plots (just an example, add more later)
     ofile->cd();
 
-    std::string hname = std::string("hZ_mZ_")+dataset.name;
+    std::string hname = std::string("hZ_CutFlow_")+dataset.name;
+    TH1D* hZ_CutFlow = new TH1D(hname.c_str(), "", nCutsZMuMu, 0., nCutsZMuMu);
+
+    for (unsigned c=0; c<nCutsZMuMu; ++c) {
+
+      TCut cut = puWeight * (cutD + cuts.cutflowZMuMu(c));
+      TH1D* h = new TH1D("h","", 1, 0., 1.);
+      tree->Draw("0.5>>h", cut);
+
+      hZ_CutFlow->SetBinContent(c+1, h->GetBinContent(1));
+      hZ_CutFlow->SetBinError(c+1, h->GetBinError(1));
+
+      delete h;
+    }
+
+    // sum histograms
+    if (dataset.isData) {
+      hZ_CutFlow_Data->Add(hZ_CutFlow, 1.);
+    }
+    if (dataset.name.compare(0,2,"DY")) {
+      hZ_CutFlow_DY->Add(hZ_CutFlow, weight);
+    }
+    if (dataset.name.compare(0,7,"SingleT")==0) {
+      hZ_CutFlow_SingleTSum->Add(hZ_CutFlow, weight);
+    }
+    if (dataset.name.compare(0,2,"WW")==0 ||
+	dataset.name.compare(0,2,"WZ")==0 ||
+	dataset.name.compare(0,2,"ZZ")==0 ) {
+      hZ_CutFlow_Diboson->Add(hZ_CutFlow, weight);
+    }
+
+    hZ_CutFlow->Write("",TObject::kOverwrite);
+
+
+    hname = std::string("hZ_mZ_")+dataset.name;
     TH1D* hZ_mZ = new TH1D(hname.c_str(), "", 30, 60., 120.);
     std::string str = std::string("zMass>>")+hname;
     tree->Draw(str.c_str(), cutZMuMu_C);
@@ -261,6 +307,33 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl << std::endl;
 
 
+  // write the cutflow table
+  std::cout << "Writing cut flow TeX file" << std::endl;
+
+  ofstream effFile;
+  effFile.open(options.oDir+std::string("/cutflowZMuMu.tex"));
+
+  effFile << "Cut & N(data) & N(DY\\rightarrow\\ell\\ell) & N($t\\bar{t}$) & N(single $t$) & N(diboson) \\\\" << std::endl;
+
+  TH1D* hZ_CutFlow_TTBar = (TH1D*) ofile->Get("hZ_CutFlow_TTBar");
+
+  // cutflow table
+  for (unsigned i=0; i<nCutsZMuMu; ++i) {
+
+    effFile << cuts.cutNameZMuMu(i) << " & ";
+    effFile << "$" << hZ_CutFlow_Data->GetBinContent(i+1) << " \\pm " << hZ_CutFlow_Data->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hZ_CutFlow_DY->GetBinContent(i+1) << " \\pm " << hZ_CutFlow_DY->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hZ_CutFlow_TTBar->GetBinContent(i+1) << " \\pm " << hZ_CutFlow_TTBar->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hZ_CutFlow_SingleTSum->GetBinContent(i+1) << " \\pm " << hZ_CutFlow_SingleTSum->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hZ_CutFlow_Diboson->GetBinContent(i+1) << " \\pm " << hZ_CutFlow_Diboson->GetBinError(i+1) << "$ & ";
+    effFile << std::endl;
+
+  }
+
+  effFile << std::endl << std::endl;
+  effFile.close();
+
+
   //store histograms
   ofile->cd();
   hZ_DY_C_DPhi->Write("",TObject::kOverwrite);
@@ -281,6 +354,11 @@ int main(int argc, char* argv[]) {
   hZ_DY_EffVBFC->Write("",TObject::kOverwrite);
   hZ_DY_RatioVBF->Write("",TObject::kOverwrite);
   hZ_DY_TotalEff->Write("",TObject::kOverwrite);
+
+  hZ_CutFlow_Data->Write("",TObject::kOverwrite);
+  hZ_CutFlow_DY->Write("",TObject::kOverwrite);
+  hZ_CutFlow_SingleTSum->Write("",TObject::kOverwrite);
+  hZ_CutFlow_Diboson->Write("",TObject::kOverwrite);
 
   ofile->Close();    
 
