@@ -199,7 +199,7 @@ int main(int argc, char* argv[]) {
     if (dataset.isData) {
       hZ_CutFlow_Data->Add(hZ_CutFlow, 1.);
     }
-    if (dataset.name.compare(0,2,"DY")) {
+    if (dataset.name.compare(0,2,"DY")==0) {
       hZ_CutFlow_DY->Add(hZ_CutFlow, weight);
     }
     if (dataset.name.compare(0,7,"SingleT")==0) {
