@@ -74,12 +74,13 @@ int main(int argc, char* argv[]) {
 
       //      std::cout << cut << std::endl;
 
-      TH1D* weight = new TH1D("weight","", 1, 0., 1.);
-      tree->Draw("0.5>>weight", cut);
+      TH1D* h = new TH1D("h","", 1, 0., 1.);
+      tree->Draw("0.5>>h", cut);
 
-      hCutFlow->SetBinContent(c+1, weight->GetBinContent(1));
-      hCutFlow->SetBinError(c+1, weight->GetBinError(1));
+      hCutFlow->SetBinContent(c+1, h->GetBinContent(1));
+      hCutFlow->SetBinError(c+1, h->GetBinError(1));
 
+      delete h;
     }
 
     hCutFlow->Scale( lumi * dataset.sigma / dataset.nEvents );
