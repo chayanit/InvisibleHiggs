@@ -146,28 +146,35 @@ int main(int argc, char* argv[]) {
 
     // weight  to lumi
     double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
+    hZ_C_DPhi->Scale(weight);
+    hZ_EffVBFS_D->Scale(weight);
+    hZ_EffVBFS_N->Scale(weight);
+    hZ_EffVBFC_D->Scale(weight);
+    hZ_EffVBFC_N->Scale(weight);
+    hZ_EffMuMu_D->Scale(weight);
+    hZ_EffMuMu_N->Scale(weight);
 
-    // add to output histograms with lumi weight
+    // add to output histograms
     if (dataset.isData) {
       hZ_Data_C_DPhi->Add(hZ_C_DPhi);
     }
     else if (isDY) {
-      hZ_DY_C_DPhi->Add(hZ_C_DPhi, weight);
-      hZ_DY_EffVBFS_D->Add(hZ_EffVBFS_D, weight);
-      hZ_DY_EffVBFS_N->Add(hZ_EffVBFS_N, weight);
-      hZ_DY_EffVBFC_D->Add(hZ_EffVBFC_D, weight);
-      hZ_DY_EffVBFC_N->Add(hZ_EffVBFC_N, weight);
+      hZ_DY_C_DPhi->Add(hZ_C_DPhi);
+      hZ_DY_EffVBFS_D->Add(hZ_EffVBFS_D);
+      hZ_DY_EffVBFS_N->Add(hZ_EffVBFS_N);
+      hZ_DY_EffVBFC_D->Add(hZ_EffVBFC_D);
+      hZ_DY_EffVBFC_N->Add(hZ_EffVBFC_N);
       if (dataset.name != "DYJetsToLL_PtZ-100") {
-	hZ_DY_EffMuMu_D->Add(hZ_EffMuMu_D, weight);
-	hZ_DY_EffMuMu_N->Add(hZ_EffMuMu_N, weight);
+	hZ_DY_EffMuMu_D->Add(hZ_EffMuMu_D);
+	hZ_DY_EffMuMu_N->Add(hZ_EffMuMu_N);
       }
     }
     else {
-      hZ_BG_C_DPhi->Add(hZ_C_DPhi, weight);
+      hZ_BG_C_DPhi->Add(hZ_C_DPhi);
     }
 
-    std::cout << "  N ctrl (dphi<1.0) : " << weight * hZ_C_DPhi->GetBinContent(1) << " +/- " << weight * hZ_C_DPhi->GetBinError(1) << std::endl;	
-    std::cout << "  N ctrl (dphi>2.6) : " << weight * hZ_C_DPhi->GetBinContent(3) << " +/- " << weight * hZ_C_DPhi->GetBinError(3) << std::endl;
+    std::cout << "  N ctrl (dphi<1.0) : " << hZ_C_DPhi->GetBinContent(1) << " +/- " << hZ_C_DPhi->GetBinError(1) << std::endl;	
+    std::cout << "  N ctrl (dphi>2.6) : " << hZ_C_DPhi->GetBinContent(3) << " +/- " << hZ_C_DPhi->GetBinError(3) << std::endl;
     
     delete hZ_C_DPhi;
     delete hZ_EffMuMu_D;
@@ -195,23 +202,27 @@ int main(int argc, char* argv[]) {
       delete h;
     }
 
+    hZ_CutFlow->Scale(weight);
+
     // sum histograms
     if (dataset.isData) {
-      hZ_CutFlow_Data->Add(hZ_CutFlow, 1.);
+      hZ_CutFlow_Data->Add(hZ_CutFlow);
     }
     if (dataset.name.compare(0,2,"DY")==0) {
-      hZ_CutFlow_DY->Add(hZ_CutFlow, weight);
+      hZ_CutFlow_DY->Add(hZ_CutFlow);
     }
     if (dataset.name.compare(0,7,"SingleT")==0) {
-      hZ_CutFlow_SingleTSum->Add(hZ_CutFlow, weight);
+      hZ_CutFlow_SingleTSum->Add(hZ_CutFlow);
     }
     if (dataset.name.compare(0,2,"WW")==0 ||
 	dataset.name.compare(0,2,"WZ")==0 ||
 	dataset.name.compare(0,2,"ZZ")==0 ) {
-      hZ_CutFlow_Diboson->Add(hZ_CutFlow, weight);
+      hZ_CutFlow_Diboson->Add(hZ_CutFlow);
     }
 
     hZ_CutFlow->Write("",TObject::kOverwrite);
+
+    delete hZ_CutFlow;
 
 
     hname = std::string("hZ_mZ_")+dataset.name;
@@ -271,8 +282,8 @@ int main(int argc, char* argv[]) {
   hZ_DY_TotalEff->Divide(hZ_DY_EffMuMu);
 
   for(int ibin = 1; ibin <= hZ_Eff_S_DPhi->GetNbinsX(); ++ibin) {
-  hZ_Eff_S_DPhi->SetBinContent(ibin,hZ_DY_TotalEff->GetBinContent(1));
-  hZ_Eff_S_DPhi->SetBinError  (ibin,hZ_DY_TotalEff->GetBinError(1));
+    hZ_Eff_S_DPhi->SetBinContent(ibin,hZ_DY_TotalEff->GetBinContent(1));
+    hZ_Eff_S_DPhi->SetBinError  (ibin,hZ_DY_TotalEff->GetBinError(1));
   }
 
   std::cout << std::endl;
