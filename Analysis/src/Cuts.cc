@@ -159,7 +159,7 @@ TCut Cuts::cutflow(unsigned i) {
 TCut Cuts::cutDataset(std::string name) {
 
   TCut tmp;
-  if (name == "WJets") return TCut("wgennj==0");
+  if (name == "WJets") return tmp;//"wgennj==0");
   else if (name == "DYJetsToLL") return TCut("zgenpt<100.");
   else return tmp;
 

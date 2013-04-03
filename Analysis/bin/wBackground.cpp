@@ -38,6 +38,7 @@ int main(int argc, char* argv[]) {
   unsigned nCutsWMu = cuts.nCutsWMu();
   unsigned nCutsWEl = cuts.nCutsWEl();
   TCut puWeight("puWeight");
+  TCut wWeight("(1.0*(wgennj==0)+0.369253*(wgennj==1)+0.11401*(wgennj==2)+0.0771589*(wgennj==3)+0.03849*(wgennj==4))");
 
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
@@ -94,13 +95,13 @@ int main(int argc, char* argv[]) {
 
     // setup cuts
     TCut cutD = cuts.cutDataset(dataset.name);
-    TCut cutWMu_Gen_C = puWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF());
-    TCut cutWMu_Gen_S = puWeight * (cutD + cuts.wMuGen() + cuts.allCutsNoDPhi());
+    TCut cutWMu_Gen_C = puWeight * wWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF());
+    TCut cutWMu_Gen_S = puWeight * wWeight * (cutD + cuts.wMuGen() + cuts.allCutsNoDPhi());
     TCut cutWMu_C = puWeight * (cutD + cuts.wMuVBF());
     TCut cutWMu_S = puWeight * (cutD + cuts.allCutsNoDPhi());
     
-    TCut cutWEl_Gen_C = puWeight * (cutD + cuts.wElGen() + cuts.wElVBF());
-    TCut cutWEl_Gen_S = puWeight * (cutD + cuts.wElGen() + cuts.allCutsNoDPhi());
+    TCut cutWEl_Gen_C = puWeight * wWeight * (cutD + cuts.wElGen() + cuts.wElVBF());
+    TCut cutWEl_Gen_S = puWeight * wWeight * (cutD + cuts.wElGen() + cuts.allCutsNoDPhi());
     TCut cutWEl_C = puWeight * (cutD + cuts.wElVBF());
     TCut cutWEl_S = puWeight * (cutD + cuts.allCutsNoDPhi());
 
@@ -113,21 +114,28 @@ int main(int argc, char* argv[]) {
     TH1D* hWEl_C_DPhi = new TH1D("hWEl_C_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
     TH1D* hWEl_S_DPhi = new TH1D("hWEl_S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
 
-    double weight = lumi * dataset.sigma / dataset.nEvents;
+    // weight  to lumi
+    double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
 
     if (isWJets) {
       tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_Gen_C);
       tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_Gen_S);
       tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_Gen_C);
       tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_Gen_S);
-      hWMu_MCC_DPhi->Add(hWMu_C_DPhi, weight);
-      hWMu_MCS_DPhi->Add(hWMu_S_DPhi, weight);
-      hWEl_MCC_DPhi->Add(hWEl_C_DPhi, weight);
-      hWEl_MCS_DPhi->Add(hWEl_S_DPhi, weight);
+      hWMu_MCC_DPhi->Scale(weight);
+      hWMu_MCS_DPhi->Scale(weight);
+      hWEl_MCC_DPhi->Scale(weight);
+      hWEl_MCS_DPhi->Scale(weight);
+      hWMu_MCC_DPhi->Add(hWMu_C_DPhi);
+      hWMu_MCS_DPhi->Add(hWMu_S_DPhi);
+      hWEl_MCC_DPhi->Add(hWEl_C_DPhi);
+      hWEl_MCS_DPhi->Add(hWEl_S_DPhi);
     }
     else if (dataset.isData) {
       tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
       tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
+      hWMu_DataC_DPhi->Scale(weight);
+      hWEl_DataC_DPhi->Scale(weight);
       hWMu_DataC_DPhi->Add(hWMu_C_DPhi);
       hWEl_DataC_DPhi->Add(hWEl_C_DPhi);
     }
@@ -136,9 +144,11 @@ int main(int argc, char* argv[]) {
       //      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_S);
       tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
       //      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_S);
-      hWMu_BGC_DPhi->Add(hWMu_C_DPhi, weight);
+      hWMu_BGC_DPhi->Scale(weight);
+      hWMu_BGC_DPhi->Scale(weight);
+      hWMu_BGC_DPhi->Add(hWMu_C_DPhi);
       //      hWMu_BGS_DPhi->Add(hWMu_S_DPhi, weight);
-      hWEl_BGC_DPhi->Add(hWEl_C_DPhi, weight);
+      hWEl_BGC_DPhi->Add(hWEl_C_DPhi);
       //      hWEl_BGS_DPhi->Add(hWEl_S_DPhi, weight);
     }
 
@@ -174,6 +184,8 @@ int main(int argc, char* argv[]) {
     for (unsigned c=0; c<nCutsWMu; ++c) {
 
       TCut cut = puWeight * (cutD + cuts.cutflowWMu(c));
+      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
 
@@ -186,6 +198,8 @@ int main(int argc, char* argv[]) {
     for (unsigned c=0; c<nCutsWEl; ++c) {
 
       TCut cut = puWeight * (cutD + cuts.cutflowWEl(c));
+      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
 
@@ -195,32 +209,35 @@ int main(int argc, char* argv[]) {
       delete h;
     }
 
+    hCutFlowWMu->Scale(weight);
+    hCutFlowWEl->Scale(weight);
+
     // sum histograms
     if (dataset.isData) {
-      hDataWMu->Add(hCutFlowWMu, 1.);
-      hDataWEl->Add(hCutFlowWEl, 1.);
+      hDataWMu->Add(hCutFlowWMu);
+      hDataWEl->Add(hCutFlowWEl);
     }
     if (isWJets) {
-      hWLNuWMu->Add(hCutFlowWMu, weight);
-      hWLNuWEl->Add(hCutFlowWEl, weight);
+      hWLNuWMu->Add(hCutFlowWMu);
+      hWLNuWEl->Add(hCutFlowWEl);
     }
     if (dataset.name.compare(0,3,"QCD")==0) {
-      hQCDWMu->Add(hCutFlowWMu, weight);
-      hQCDWEl->Add(hCutFlowWEl, weight);
+      hQCDWMu->Add(hCutFlowWMu);
+      hQCDWEl->Add(hCutFlowWEl);
     }
     if (dataset.name.compare(0,2,"DY")==0) {
-      hDYWMu->Add(hCutFlowWMu, weight);
-      hDYWEl->Add(hCutFlowWEl, weight);
+      hDYWMu->Add(hCutFlowWMu);
+      hDYWEl->Add(hCutFlowWEl);
     }
     if (dataset.name.compare(0,7,"SingleT")==0) {
-      hSingleTWMu->Add(hCutFlowWMu, weight);
-      hSingleTWEl->Add(hCutFlowWEl, weight);
+      hSingleTWMu->Add(hCutFlowWMu);
+      hSingleTWEl->Add(hCutFlowWEl);
     }
     if (dataset.name.compare(0,2,"WW")==0 ||
 	dataset.name.compare(0,2,"WZ")==0 ||
 	dataset.name.compare(0,2,"ZZ")==0 ) {
-      hDibosonWMu->Add(hCutFlowWMu, weight);
-      hDibosonWEl->Add(hCutFlowWEl, weight);
+      hDibosonWMu->Add(hCutFlowWMu);
+      hDibosonWEl->Add(hCutFlowWEl);
     }
 
     hCutFlowWMu->Write("",TObject::kOverwrite);
