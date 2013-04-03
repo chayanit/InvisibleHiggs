@@ -51,6 +51,9 @@ invHiggsInfo = cms.EDAnalyzer(
     puMCFile = cms.untracked.string(""),
     puDataFile = cms.untracked.string(""),
     puMCHist = cms.untracked.string(""),
-    puDataHist = cms.untracked.string("")
+    puDataHist = cms.untracked.string(""),
+
+    # trigger MC re-weighting
+    trigCorrFile = cms.untracked.string("")
     
 )

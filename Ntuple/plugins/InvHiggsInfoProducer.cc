@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.22 2013/03/15 15:53:16 chayanit Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.23 2013/03/22 23:31:56 chayanit Exp $
 //
 //
 
@@ -167,6 +167,9 @@ private:
   void doVertices(const std::vector<reco::Vertex>& vertices);
   void doPUReweighting(const edm::Event&);
 
+  // do trigger data/MC weighting
+  void doTrigCorrWeights();
+
   // write PAT objects
   void doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	      edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
@@ -308,6 +311,14 @@ private:
   // PU re-weighting
   edm::LumiReWeighting lumiWeights_;
 
+  // trigger data/MC weights
+  TFile* fTrigCorr_;
+  TH1D*  hTrigCorrL1MET_;
+  TH1D*  hTrigCorrJet_;
+  TH1D*  hTrigCorrMET_;
+  TH1D*  hTrigCorrMjj_;
+  bool   doTrigCorr_;
+
   // VBF jets
   unsigned tagJet1Index_;
   unsigned tagJet2Index_;
@@ -396,6 +407,12 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   hltBit2_(0),
   doHltBit_(true),
   lumiWeights_(),
+  fTrigCorr_(0),
+  hTrigCorrL1MET_(0),
+  hTrigCorrJet_(0),
+  hTrigCorrMET_(0),
+  hTrigCorrMjj_(0),
+  doTrigCorr_(0),
   tagJet1Index_(-1),
   tagJet2Index_(-1),
   tagJetEtaMin_(0.),
@@ -428,6 +445,21 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   }
   else {
     edm::LogWarning("InvHiggsInfoProducer") << "No PU reweighting inputs - not going to calculate weights"<<std::endl;
+  }
+
+  // check trigger data/MC histograms exists, and add weights if they do
+  std::string trigCorrFile = iConfig.getUntrackedParameter<std::string>("trigCorrFile", "");
+
+  if (stat(trigCorrFile.c_str(), &buf) != -1) {
+    fTrigCorr_      = TFile::Open(trigCorrFile.c_str());
+    hTrigCorrL1MET_ = (TH1D*) fTrigCorr_->Get("METL1");
+    hTrigCorrJet_   = (TH1D*) fTrigCorr_->Get("JetHLT");
+    hTrigCorrMET_   = (TH1D*) fTrigCorr_->Get("METHLT");
+    hTrigCorrMjj_   = (TH1D*) fTrigCorr_->Get("MjjHLT");
+    doTrigCorr_     = true;
+  }
+  else {
+    edm::LogWarning("InvHiggsInfoProducer") << "No trigger data/MC corrections - all weights will be 1"<<std::endl;
   }
   
 }
@@ -567,6 +599,8 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   edm::Handle<pat::METCollection> met;
   iEvent.getByLabel(metTag_, met);
+
+
   //MET uncertainty
   edm::Handle<pat::METCollection> metCentral;
   iEvent.getByLabel(met_CentralTag_, metCentral);
@@ -654,6 +688,8 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   if (wMus.isValid()) doWs(*wMus, 1);
 
   if (wEls.isValid()) doWs(*wEls, 2);
+
+  if (! iEvent.eventAuxiliary().isRealData()) doTrigCorrWeights();
 
   // fill TInfo
   tree_->Fill();
@@ -962,6 +998,35 @@ void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
   }
 
   info_->puWeight = weight;
+
+}
+
+
+void InvHiggsInfoProducer::doTrigCorrWeights() {
+
+  double weight=1.;
+  if (hTrigCorrL1MET_!=0 &&
+      hTrigCorrJet_!=0 &&
+      hTrigCorrMET_!=0 &&
+      hTrigCorrMjj_!=0) {
+    
+    int bin  = hTrigCorrJet_->FindBin(info_->jet1Pt);
+    weight  *= hTrigCorrJet_->GetBinContent(bin);
+    
+    bin      = hTrigCorrJet_->FindBin(info_->jet2Pt);
+    weight  *= hTrigCorrJet_->GetBinContent(bin);
+    
+    bin      = hTrigCorrMjj_->FindBin(info_->vbfM);
+    weight  *= hTrigCorrMjj_->GetBinContent(bin);
+    
+    bin      = hTrigCorrL1MET_->FindBin(info_->met);
+    weight  *= hTrigCorrL1MET_->GetBinContent(bin);
+    
+    bin      = hTrigCorrMET_->FindBin(info_->met);
+    weight  *= hTrigCorrMET_->GetBinContent(bin);
+  }
+
+  info_->trigCorrWeight = weight;
 
 }
 

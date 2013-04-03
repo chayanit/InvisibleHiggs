@@ -221,6 +221,7 @@ InvHiggsInfo::InvHiggsInfo() :
   zDau2Charge(0.),
   nVtx(0),
   puWeight(1.),
+  trigCorrWeight(1.),
   mcHiggsMass(-10.),
   mcHiggsPt(-10.),
   mcHiggsEta(-10.),

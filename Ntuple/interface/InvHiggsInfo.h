@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.13 2013/03/12 13:39:59 chayanit Exp $
+// $Id: InvHiggsInfo.h,v 1.14 2013/03/22 23:31:56 chayanit Exp $
 //
 //
 
@@ -299,6 +299,9 @@ class InvHiggsInfo { //: public TObject {
   // PU
   Int_t nVtx;
   Double_t puWeight;
+
+  // MC corrections
+  Double_t trigCorrWeight;
 
   // MC info -- Higgs
   Double_t mcHiggsMass;
