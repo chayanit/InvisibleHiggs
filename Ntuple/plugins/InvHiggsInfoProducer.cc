@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.23 2013/03/22 23:31:56 chayanit Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.24 2013/04/03 21:08:34 jbrooke Exp $
 //
 //
 
@@ -451,6 +451,7 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   std::string trigCorrFile = iConfig.getUntrackedParameter<std::string>("trigCorrFile", "");
 
   if (stat(trigCorrFile.c_str(), &buf) != -1) {
+    std::cout << "Reading trigger corrections from " << trigCorrFile << std::endl;
     fTrigCorr_      = TFile::Open(trigCorrFile.c_str());
     hTrigCorrL1MET_ = (TH1D*) fTrigCorr_->Get("METL1");
     hTrigCorrJet_   = (TH1D*) fTrigCorr_->Get("JetHLT");
@@ -1005,10 +1006,7 @@ void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
 void InvHiggsInfoProducer::doTrigCorrWeights() {
 
   double weight=1.;
-  if (hTrigCorrL1MET_!=0 &&
-      hTrigCorrJet_!=0 &&
-      hTrigCorrMET_!=0 &&
-      hTrigCorrMjj_!=0) {
+  if (doTrigCorr_) {
     
     int bin  = hTrigCorrJet_->FindBin(info_->jet1Pt);
     weight  *= hTrigCorrJet_->GetBinContent(bin);
@@ -1024,6 +1022,9 @@ void InvHiggsInfoProducer::doTrigCorrWeights() {
     
     bin      = hTrigCorrMET_->FindBin(info_->met);
     weight  *= hTrigCorrMET_->GetBinContent(bin);
+
+    //    std::cout << "weight : " << weight << std::endl;
+
   }
 
   info_->trigCorrWeight = weight;
