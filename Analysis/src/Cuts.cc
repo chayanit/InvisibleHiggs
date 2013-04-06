@@ -311,8 +311,18 @@ TCut Cuts::qcdNoMET() {
   TCut tmp = cut("trigger");
   tmp += cut("metFilter");
   tmp += cut("EVeto");
-  tmp += cut("MVeto");
+  tmp += cut("MuVeto");
   tmp += vbf();
+  return tmp;
+}
+
+TCut Cuts::qcdLoose2() {
+  TCut tmp = cut("trigger");
+  tmp += cut("metFilter");
+  tmp += cut("EVeto");
+  tmp += cut("MuVeto");
+  tmp += vbf();
+  tmp += TCut("met>35.");
   return tmp;
 }
 
@@ -320,7 +330,7 @@ TCut Cuts::qcdLoose() {
   TCut tmp = cut("trigger");
   tmp += cut("metFilter");
   tmp += cut("EVeto");
-  tmp += cut("MVeto");
+  tmp += cut("MuVeto");
   tmp += vbf();
   tmp += TCut("met>70.");
   return tmp;
@@ -330,7 +340,7 @@ TCut Cuts::qcdTightHiDPhi() {
   TCut tmp = cut("trigger");
   tmp += cut("metFilter");
   tmp += cut("EVeto");
-  tmp += cut("MVeto");
+  tmp += cut("MuVeto");
   tmp += vbf();
   tmp += cut("met");
   tmp += TCut("vbfDPhi>2.6");
