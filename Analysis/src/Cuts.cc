@@ -166,6 +166,11 @@ TCut Cuts::cutDataset(std::string name) {
 }
 
 
+TCut Cuts::wWeight() {
+  return TCut("(1.0*(wgennj==0)+0.369253*(wgennj==1)+0.11401*(wgennj==2)+0.0771589*(wgennj==3)+0.03849*(wgennj==4))");
+}
+
+
 // combinations
 TCut Cuts::HLTandMETFilters() {
   TCut tmp = cut("trigger");

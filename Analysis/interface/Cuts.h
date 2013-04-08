@@ -48,6 +48,9 @@ class Cuts {
   // dataset-dependent cut
   TCut cutDataset(std::string name);
 
+  // special weight for W MC
+  TCut wWeight();
+
   // combinations
   TCut HLTandMETFilters();
   TCut vbf();   // note this does not include vetoes!
@@ -85,6 +88,7 @@ class Cuts {
 
   // QCD
   TCut qcdNoMET();
+  TCut qcdLoose2();
   TCut qcdLoose();
   TCut qcdLoose2();
   TCut qcdTightHiDPhi();
