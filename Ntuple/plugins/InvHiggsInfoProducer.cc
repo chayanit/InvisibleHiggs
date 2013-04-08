@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.24 2013/04/03 21:08:34 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.25 2013/04/04 12:02:41 jbrooke Exp $
 //
 //
 
@@ -1017,7 +1017,7 @@ void InvHiggsInfoProducer::doTrigCorrWeights() {
     bin      = hTrigCorrMjj_->FindBin(info_->vbfM);
     weight  *= hTrigCorrMjj_->GetBinContent(bin);
     
-    bin      = hTrigCorrL1MET_->FindBin(info_->met);
+    bin      = hTrigCorrL1MET_->FindBin(info_->metNoMuon);
     weight  *= hTrigCorrL1MET_->GetBinContent(bin);
     
     bin      = hTrigCorrMET_->FindBin(info_->met);
