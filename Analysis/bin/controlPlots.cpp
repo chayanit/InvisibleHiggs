@@ -48,9 +48,6 @@ int main(int argc, char* argv[]) {
   ctrl += cuts.cut("EVeto");       // lepton vetoes
   ctrl += cuts.cut("MuVeto");
 
-  TCut ctrl1 = TCut("puWeight") * (ctrl+cuts.cut("Mjj"));  // Mjj
-  TCut ctrl2 = TCut("puWeight") * (ctrl+cuts.cut("MET"));  // MET
-
   // loop over datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
 
@@ -72,6 +69,16 @@ int main(int argc, char* argv[]) {
     TH1D* hjetdphi   = new TH1D("hjetdphi",   "", 72,  0.,  TMath::Pi());
     TH1D* hmjj       = new TH1D("hmjj",       "", 100, 0.,  3000.);
     TH1D* hmet       = new TH1D("hmet",       "", 100, 0.,  200.);
+
+    // set up cuts
+    TCut puWeight("puWeight");
+    TCut wWeight("");
+    if (dataset.name.compare(0,1,"W")==0) {
+      wWeight = cuts.wWeight();
+    }
+
+    TCut ctrl1 = puWeight * wWeight * (ctrl+cuts.cut("Mjj"));  // Mjj
+    TCut ctrl2 = puWeight * wWeight * (ctrl+cuts.cut("MET"));  // MET
 
     // fill histograms
     tree->Draw("jet1Pt>>hjet1pt", ctrl2);
