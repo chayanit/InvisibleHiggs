@@ -44,6 +44,8 @@ int main(int argc, char* argv[]) {
 
   TCut cutZMuMu_C = puWeight * cuts.zMuMuVBF();
   TCut cutZMuMuGenPt_C = puWeight * cuts.zMuMuGenPt100VBF(); 	// For inclusive sample add ZgenpT < 100
+  TCut cutZMuMuLoose_C = puWeight * cuts.zMuMuVBFLoose();
+  TCut cutZMuMuGenPtLoose_C = puWeight * cuts.zMuMuGenPt100VBFLoose();  	// For inclusive sample add ZgenpT < 100
 	
   TCut cutEfficiencyMuMu_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen());
   TCut cutEfficiencyMuMu_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
@@ -55,8 +57,8 @@ int main(int argc, char* argv[]) {
 
   TCut cutEfficiencyVBFC_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
   TCut cutEfficiencyVBFC_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon);
-  TCut cutEfficiencyVBFC_Pt100_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGenPt100() + cuts.zMuMuReco());	// For inclusive sample add ZgenpT < 100
-  TCut cutEfficiencyVBFC_Pt100_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGenPt100() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon);
+  TCut cutEfficiencyVBFC_Pt100_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuGenPt100() + cuts.zMuMuReco());	// For inclusive sample add ZgenpT < 100
+  TCut cutEfficiencyVBFC_Pt100_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuGenPt100() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon);
 
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
@@ -165,8 +167,8 @@ int main(int argc, char* argv[]) {
       hZ_DY_EffVBFC_D->Add(hZ_EffVBFC_D);
       hZ_DY_EffVBFC_N->Add(hZ_EffVBFC_N);
       if (dataset.name != "DYJetsToLL_PtZ-100") {
-	hZ_DY_EffMuMu_D->Add(hZ_EffMuMu_D);
-	hZ_DY_EffMuMu_N->Add(hZ_EffMuMu_N);
+      hZ_DY_EffMuMu_D->Add(hZ_EffMuMu_D);
+      hZ_DY_EffMuMu_N->Add(hZ_EffMuMu_N);
       }
     }
     else {
@@ -224,11 +226,11 @@ int main(int argc, char* argv[]) {
 
     delete hZ_CutFlow;
 
-
     hname = std::string("hZ_mZ_")+dataset.name;
     TH1D* hZ_mZ = new TH1D(hname.c_str(), "", 30, 60., 120.);
     std::string str = std::string("zMass>>")+hname;
-    tree->Draw(str.c_str(), cutZMuMu_C);
+    if(dataset.name == "DYJetsToLL") 	tree->Draw(str.c_str(), cutZMuMuGenPtLoose_C);
+    else				tree->Draw(str.c_str(), cutZMuMuLoose_C);
     hZ_mZ->Scale(weight);
     hZ_mZ->Write("",TObject::kOverwrite);
 
@@ -243,17 +245,9 @@ int main(int argc, char* argv[]) {
   //double eps_mumu = 0.290;
   //double eps_s_vbf = 0.0194;
   //double eps_c_vbf = 0.0315;
-  double eps_vbf_syst = 0.008; 	//JES+MET uncertainty
-  double mu_syst = 0.025;	//Muon ID/Iso efficiency uncertainty from EWK-10-002
+  double eps_vbf_syst = 0.008; 		//JES+MET uncertainty
 
   //double f = (ratioBF * eps_s_vbf) / (eps_mumu * eps_c_vbf);
-
-  //std::cout << "Efficiencies" << std::endl;
-  //std::cout << "  eps_mumu   : " << eps_mumu << std::endl;
-  //std::cout << "  eps_s_vbf   : " << eps_s_vbf << std::endl;
-  //std::cout << "  eps_c_vbf   : " << eps_c_vbf << std::endl;
-  //std::cout << "  ratio       : " << eps_s_vbf/eps_c_vbf << std::endl;
-  //std::cout << std::endl <<std::endl;
 
   TH1D* hZ_Est_C_DPhi = new TH1D("hZ_Est_C_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
   TH1D* hZ_Est_S_DPhi = new TH1D("hZ_Est_S_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
@@ -267,7 +261,9 @@ int main(int argc, char* argv[]) {
 
   hZ_DY_EffMuMu->Add(hZ_DY_EffMuMu_N);
   hZ_DY_EffMuMu->Divide(hZ_DY_EffMuMu_D);
-
+  double mu_syst = 0.025*hZ_DY_EffMuMu->GetBinContent(1);      //2.5% Muon ID/Iso efficiency uncertainty from EWK-10-002
+  hZ_DY_EffMuMu->SetBinError(1,TMath::Sqrt(hZ_DY_EffMuMu->GetBinError(1)*hZ_DY_EffMuMu->GetBinError(1) + mu_syst*mu_syst));
+ 
   hZ_DY_EffVBFS->Add(hZ_DY_EffVBFS_N);
   hZ_DY_EffVBFS->Divide(hZ_DY_EffVBFS_D);
 

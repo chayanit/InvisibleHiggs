@@ -51,6 +51,7 @@ class Cuts {
   // combinations
   TCut HLTandMETFilters();
   TCut vbf();   // note this does not include vetoes!
+  TCut vbfloose();
 
   TCut allCutsNoDPhi();
   TCut allCutsHiDPhi();
@@ -64,7 +65,9 @@ class Cuts {
   TCut zMuMuGenMass();    // there is a generator level Z->mumu + mass cut
   TCut zMuMuReco();       // there is a reco level Z->mumu
   TCut zMuMuVBF();
+  TCut zMuMuVBFLoose();
   TCut zMuMuGenPt100VBF();
+  TCut zMuMuGenPt100VBFLoose();
   TCut cutflowZMuMu(unsigned i);
   unsigned nCutsZMuMu()  { return cutsZMuMu_.size(); }
 
@@ -83,6 +86,7 @@ class Cuts {
   // QCD
   TCut qcdNoMET();
   TCut qcdLoose();
+  TCut qcdLoose2();
   TCut qcdTightHiDPhi();
   TCut cutflowQCD(unsigned i);
   unsigned nCutsQCD() { return cutsQCD_.size(); }

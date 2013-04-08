@@ -181,6 +181,13 @@ TCut Cuts::vbf() {
   return tmp;
 }
 
+TCut Cuts::vbfloose() {
+  TCut tmp = cut("dijet");
+  tmp += cut("sgnEtaJJ");
+  tmp += cut("vbfM>1000.");
+  return tmp;
+}
+
 TCut Cuts::allCutsNoDPhi() {
   TCut tmp = nMinusOneCuts("dPhiJJ");
   return tmp;
@@ -206,7 +213,7 @@ TCut Cuts::zMuMuGen() {
 }
 
 TCut Cuts::zMuMuGenPt100() {
-  TCut tmp("zltype==2 && zgenpt<100.");
+  TCut tmp("zgenpt<100.");
   return tmp;
 }
 
@@ -243,6 +250,24 @@ TCut Cuts::zMuMuGenPt100VBF() {
   return tmp;
 }
 
+TCut Cuts::zMuMuVBFLoose() {
+  TCut tmp = cut("trigger");
+  tmp += cut("metFilter");
+  tmp += zMuMuReco();
+  tmp += vbfloose();
+  tmp += TCut("metNo2Muon>130.");
+  return tmp;
+}
+
+TCut Cuts::zMuMuGenPt100VBFLoose() {
+  TCut tmp = cut("trigger");
+  tmp += cut("metFilter");
+  tmp += zMuMuGenPt100();
+  tmp += zMuMuReco();
+  tmp += vbfloose();
+  tmp += TCut("metNo2Muon>130.");
+  return tmp;
+}
 
 TCut Cuts::cutflowZMuMu(unsigned i) {
   TCut tmp("");
