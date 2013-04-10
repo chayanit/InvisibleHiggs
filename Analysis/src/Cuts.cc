@@ -372,7 +372,7 @@ TCut Cuts::qcdTightHiDPhi() {
   tmp += cut("EVeto");
   tmp += cut("MuVeto");
   tmp += vbf();
-  tmp += cut("met");
+  tmp += cut("MET");
   tmp += TCut("vbfDPhi>2.6");
   return tmp;
 }
