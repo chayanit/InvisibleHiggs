@@ -89,7 +89,11 @@ int main(int argc, char* argv[]) {
 
     // Additional WJets corrections (so can use inclusive & exclusive samples)
     TCut wWeight("");
-    if (dataset.name.compare(0,1,"W") == 0) { 
+    if (dataset.name == "WJets" ||
+        dataset.name == "W1Jets" || 
+        dataset.name == "W2Jets" || 
+        dataset.name == "W3Jets" || 
+        dataset.name == "W4Jets") {
       wWeight =  cuts.wWeight();
     } 
 
@@ -101,7 +105,8 @@ int main(int argc, char* argv[]) {
 
     tree->Draw("(metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6)>>hMETFiltNM1", (metFilt + cutD) * otherCuts);
     tree->Draw("jet2Pt>>hDijetNM1", (dijet + cutD) * otherCuts);
-    tree->Draw("TMath::Sign(1., jet1Eta*jet2Eta)>>hSgnEtaJJNM1", (sgnEtaJJ + cutD) * otherCuts);
+    int m = tree->Draw("TMath::Sign(1., jet1Eta*jet2Eta)>>hSgnEtaJJNM1", (sgnEtaJJ + cutD) * otherCuts);
+    std::cout << m << " events in sgneta" << std::endl;
     tree->Draw("abs(jet1Eta-jet2Eta)>>hDEtaJJNM1", (dEtaJJ + cutD) * otherCuts);
     tree->Draw("vbfM>>hMjjNM1", (mJJ  + cutD) * otherCuts);
     tree->Draw("met>>hMETNM1", (met + cutD) * otherCuts);
@@ -238,7 +243,6 @@ int main(int argc, char* argv[]) {
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
   plots.setLegPos(0.69,0.67,0.98,0.97);
-  // plots.setLabel("CMS Preliminary 2012 #int L = 19.56 fb^{-1}");
 
   plots.addDataset("Diboson", kViolet-6, 0);
   plots.addDataset("DYJets", kPink-4,0);
@@ -246,12 +250,12 @@ int main(int argc, char* argv[]) {
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
   plots.addDataset("ZJets", kOrange-2, 0);
   plots.addDataset("WNJets", kBlue+1, 0);
-  plots.addDataset("SignalM120_PYTHIA", kRed, 2);
+  plots.addDataset("SignalM125_POWHEG", kRed, 2);
 
   plots.draw("hTrigNM1", "", "");
   plots.draw("hMETFiltNM1", "", "");
   plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "Entries per bin");
-  plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "Entries per bin");
+  // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "Entries per bin");
   plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "Entries per bin");
   plots.draw("hMjjNM1", "M_{jj} [GeV]", "Entries per bin");
   plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "Entries per bin");
