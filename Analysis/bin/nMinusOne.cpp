@@ -7,15 +7,13 @@
 
 #include "TTree.h"
 #include "TMath.h"
-#include "TH1D.h"
+#include "TCanvas.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
-#include <fstream>
-
 
 int main(int argc, char* argv[]) {
 
@@ -34,23 +32,23 @@ int main(int argc, char* argv[]) {
   }
   else std::cout << "Writing results to " << oDir << std::endl;
 
-
   Datasets datasets;
   datasets.readFile(options.datasetFile);
 
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
-  TCut trig = puWeight * cuts.nMinusOneCuts("trigger");
-  TCut metFilt = puWeight * cuts.nMinusOneCuts("metFilter");
-  TCut eVeto = puWeight * cuts.nMinusOneCuts("EVeto");
-  TCut muVeto = puWeight * cuts.nMinusOneCuts("MuVeto");
-  TCut dijet = puWeight * cuts.nMinusOneCuts("dijet");
-  TCut sgnEtaJJ = puWeight * cuts.nMinusOneCuts("sgnEtaJJ");
-  TCut dEtaJJ = puWeight * cuts.nMinusOneCuts("dEtaJJ");
-  TCut met = puWeight * cuts.nMinusOneCuts("MET");
-  TCut mJJ = puWeight * cuts.nMinusOneCuts("Mjj");
-  TCut dPhiJM = puWeight * cuts.nMinusOneCuts("dPhiJJ");
+  TCut trigCorr("trigCorrWeight");
+  TCut trig      = cuts.nMinusOneCuts("trigger");
+  TCut metFilt   = cuts.nMinusOneCuts("metFilter");
+  TCut eVeto     = cuts.nMinusOneCuts("EVeto");
+  TCut muVeto    = cuts.nMinusOneCuts("MuVeto");
+  TCut dijet     = cuts.nMinusOneCuts("dijet");
+  TCut sgnEtaJJ  = cuts.nMinusOneCuts("sgnEtaJJ");
+  TCut dEtaJJ    = cuts.nMinusOneCuts("dEtaJJ");
+  TCut met       = cuts.nMinusOneCuts("MET");
+  TCut mJJ       = cuts.nMinusOneCuts("Mjj");
+  TCut dPhiJJ    = cuts.nMinusOneCuts("dPhiJJ");
 
 
   // loop over datasets
@@ -60,9 +58,15 @@ int main(int argc, char* argv[]) {
 
     if (dataset.isData) continue;
 
-    std::cout << "Making histograms for " << dataset.name << " " << (dataset.isData?"data":"MC") << std::endl;
+    TFile* ifile = TFile::Open( (iDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "READ");
 
-    TFile* ifile = datasets.getTFile(dataset.name);
+    if (ifile==0) {
+      std::cerr << "No file for " << dataset.name << std::endl;
+      continue;
+    }
+
+    std::cout << "Making histograms for " << dataset.name << std::endl;
+    
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
 
     TFile* ofile = TFile::Open( (oDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "UPDATE");
@@ -70,28 +74,57 @@ int main(int argc, char* argv[]) {
     // create histograms
     TH1D* hTrig     = new TH1D("hTrigNM1",     "", 2,   0.,  2.);
     TH1D* hMETfilt  = new TH1D("hMETFiltNM1",  "", 2,   0.,  2.);
-    TH1D* hDijet    = new TH1D("hDijetNM1",    "", 100, 0.,  200.);
+    TH1D* hDijet    = new TH1D("hDijetNM1",    "", 50,  0.,  250.);
     TH1D* hSgnEtaJJ = new TH1D("hSgnEtaJJNM1", "", 2,   -1., 1.);
-    TH1D* hDEtaJJ   = new TH1D("hDEtaJJNM1",   "", 50,  0.,  10.);
-    TH1D* hMjj      = new TH1D("hMjjNM1",      "", 100, 0.,  3000.);
-    TH1D* hMET      = new TH1D("hMETNM1",      "", 100, 0.,  200.);
-    TH1D* hDPhiJM   = new TH1D("hDPhiJMNM1",   "", 50,  0.,  TMath::Pi());
+    TH1D* hDEtaJJ   = new TH1D("hDEtaJJNM1",   "", 50,  0.,  8.);
+    TH1D* hMjj      = new TH1D("hMjjNM1",      "", 50,  0.,  4000.);
+    TH1D* hMET      = new TH1D("hMETNM1",      "", 50,  0.,  500.);
+    TH1D* hDPhiJMet = new TH1D("hDPhiJMetNM1", "", 50,  0.,  TMath::Pi());
+    TH1D* hDPhiJJ   = new TH1D("hDPhiJJNM1",   "", 50,  0.,  TMath::Pi());
     TH1D* hEVeto    = new TH1D("hEVetoNM1",    "", 50,  0.,  50.);
     TH1D* hMuVeto   = new TH1D("hMuVetoNM1",   "", 50,  0.,  50.);
 
+    // Additional cuts specific to DYJetsToLL (cut on Zpt <100 to avoid double counting with the PtZ-100 sample)
+    TCut cutD = cuts.cutDataset(dataset.name);
+
+    // Additional WJets corrections (so can use inclusive & exclusive samples)
+    TCut wWeight("");
+    if (dataset.name.compare(0,1,"W") == 0) { 
+      wWeight =  cuts.wWeight();
+    } 
+
+    TCut otherCuts = puWeight * trigCorr * wWeight;
+
     // fill histograms
-    int n = tree->Draw("hltResult2>>hTrigNM1", trig);
+    int n = tree->Draw("hltResult2>>hTrigNM1", (trig + cutD) * otherCuts);
     std::cout << "   " << n << " events passing trigger" << std::endl;
 
-    tree->Draw("(metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6)>>hMETFiltNM1", metFilt);
-    tree->Draw("jet2Pt>>hDijetNM1", dijet);
-    tree->Draw("TMath::Sign(1., jet1Eta*jet2Eta)>>hSgnEtaJJNM1", sgnEtaJJ);
-    tree->Draw("abs(jet1Eta-jet2Eta)>>hDEtaJJNM1", dEtaJJ);
-    tree->Draw("vbfM>>hMjjNM1", mJJ);
-    tree->Draw("met>>hMETNM1", met);
-    tree->Draw("min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>>hDPhiJMNM1", dPhiJM);
-    tree->Draw("ele1Pt>>hEVetoNM1", eVeto);
-    tree->Draw("mu1Pt>>hMuVetoNM1", muVeto);
+    tree->Draw("(metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6)>>hMETFiltNM1", (metFilt + cutD) * otherCuts);
+    tree->Draw("jet2Pt>>hDijetNM1", (dijet + cutD) * otherCuts);
+    tree->Draw("TMath::Sign(1., jet1Eta*jet2Eta)>>hSgnEtaJJNM1", (sgnEtaJJ + cutD) * otherCuts);
+    tree->Draw("abs(jet1Eta-jet2Eta)>>hDEtaJJNM1", (dEtaJJ + cutD) * otherCuts);
+    tree->Draw("vbfM>>hMjjNM1", (mJJ  + cutD) * otherCuts);
+    tree->Draw("met>>hMETNM1", (met + cutD) * otherCuts);
+    tree->Draw("min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>>hDPhiJMetNM1", (dPhiJJ + cutD) * otherCuts);
+    tree->Draw("vbfDPhi>>hDPhiJJNM1", (dPhiJJ + cutD) * otherCuts);
+    tree->Draw("ele1Pt>>hEVetoNM1", (eVeto + cutD) * otherCuts);
+    tree->Draw("mu1Pt>>hMuVetoNM1", (muVeto + cutD) * otherCuts);
+
+    // Scale MC according to luminosity
+    if (!dataset.isData) {
+      double weight = lumi * dataset.sigma / dataset.nEvents;
+      hTrig->Scale(weight);
+      hMETfilt->Scale(weight);
+      hDijet->Scale(weight);
+      hSgnEtaJJ->Scale(weight);
+      hDEtaJJ->Scale(weight);
+      hMjj->Scale(weight);
+      hMET->Scale(weight);
+      hDPhiJMet->Scale(weight);
+      hDPhiJJ->Scale(weight);
+      hEVeto->Scale(weight);
+      hMuVeto->Scale(weight);
+    }    
 
     // write histograms
     hTrig->Write("",TObject::kOverwrite);
@@ -101,7 +134,8 @@ int main(int argc, char* argv[]) {
     hDEtaJJ->Write("",TObject::kOverwrite);
     hMjj->Write("",TObject::kOverwrite);
     hMET->Write("",TObject::kOverwrite);
-    hDPhiJM->Write("",TObject::kOverwrite);
+    hDPhiJMet->Write("",TObject::kOverwrite);
+    hDPhiJJ->Write("",TObject::kOverwrite);
     hEVeto->Write("",TObject::kOverwrite);
     hMuVeto->Write("",TObject::kOverwrite);
     
@@ -120,7 +154,8 @@ int main(int argc, char* argv[]) {
   hists.push_back("hDEtaJJNM1");
   hists.push_back("hMjjNM1");
   hists.push_back("hMETNM1");
-  hists.push_back("hDPhiJMNM1");
+  hists.push_back("hDPhiJMetNM1");
+  hists.push_back("hDPhiJJNM1");
   hists.push_back("hEVetoNM1");
   hists.push_back("hMuVetoNM1");
 
@@ -140,6 +175,7 @@ int main(int argc, char* argv[]) {
   // sum W+jets datasets
   std::cout << "Summing histograms for W+Jets" << std::endl;
   std::vector<std::string> wJets;
+  wJets.push_back(std::string("WJets"));
   wJets.push_back(std::string("W1Jets"));
   wJets.push_back(std::string("W2Jets"));
   wJets.push_back(std::string("W3Jets"));
@@ -170,24 +206,57 @@ int main(int argc, char* argv[]) {
 	      hists,
 	      "QCD");
 
+  // Sum Single t and tbar
+  std::cout << "Summing histograms for Single T and TTbar" << std::endl;
+  std::vector<std::string> singleT;
+  singleT.push_back("TTBar");
+  singleT.push_back("SingleT_t");
+  singleT.push_back("SingleT_s");
+  singleT.push_back("SingleT_tW");
+  singleT.push_back("SingleTbar_t");
+  singleT.push_back("SingleTbar_s");
+  singleT.push_back("SingleTbar_tW");
+  SumDatasets(oDir,singleT,hists,"SingleT+TTbar");
+
+  // Sum diboson
+  std::cout << "Summing histograms for Diboson" << std::endl;
+  std::vector<std::string> diboson;
+  diboson.push_back("WW");
+  diboson.push_back("WZ");
+  diboson.push_back("ZZ");
+  SumDatasets(oDir,diboson,hists,"Diboson");
+
+  //Sum DYJetsToLL
+  std::cout << "Summing histograms for DYJetsToLL" << std::endl;
+  std::vector<std::string> dyjets;
+  dyjets.push_back("DYJetsToLL");
+  dyjets.push_back("DYJetsToLL_PtZ-100");
+  dyjets.push_back("DYJetsToLL_EWK");
+  SumDatasets(oDir,dyjets,hists,"DYJets");
+
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
-  plots.setLabel("CMS Preliminary 2012 #int L = 19.56 fb^{-1}");
+  plots.setLegPos(0.69,0.67,0.98,0.97);
+  // plots.setLabel("CMS Preliminary 2012 #int L = 19.56 fb^{-1}");
 
-  plots.addDataset("QCD",          kBlue-2,   0);
-  plots.addDataset("WNJets",       kGreen-2,  0);
-  plots.addDataset("ZJets",        kOrange-2, 0);
-  plots.addDataset("signalM120",   kRed,    2);
+  plots.addDataset("Diboson", kViolet-6, 0);
+  plots.addDataset("DYJets", kPink-4,0);
+  plots.addDataset("QCD", kGreen+3, 0);
+  plots.addDataset("SingleT+TTbar", kAzure-2, 0);
+  plots.addDataset("ZJets", kOrange-2, 0);
+  plots.addDataset("WNJets", kBlue+1, 0);
+  plots.addDataset("SignalM120_PYTHIA", kRed, 2);
 
   plots.draw("hTrigNM1", "", "");
   plots.draw("hMETFiltNM1", "", "");
-  plots.draw("hDijetNM1", "", "");
-  plots.draw("hSgnEtaNM1", "", "");
-  plots.draw("hDEtaJJNM1", "", "");
-  plots.draw("hMjjNM1", "", "");
-  plots.draw("hMETNM1", "", "");
-  plots.draw("hDPhiJMNM1", "", "");
+  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "Entries per bin");
+  plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "Entries per bin");
+  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "Entries per bin");
+  plots.draw("hMjjNM1", "M_{jj} [GeV]", "Entries per bin");
+  plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "Entries per bin");
+  plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "Entries per bin");
+  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "Entries per bin");
 
   plots.setYMin(1e-1);
   plots.setYMax(1e2);
