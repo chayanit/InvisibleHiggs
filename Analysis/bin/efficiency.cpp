@@ -112,10 +112,10 @@ int main(int argc, char* argv[]) {
   // write TeX file
   std::cout << "Writing cut flow TeX file" << std::endl;
 
-  ofstream effFile;
-  effFile.open(options.oDir+std::string("/cutflow.tex"));
+  ofstream texFile;
+  texFile.open(options.oDir+std::string("/cutflow.tex"));
 
-  effFile << "Cut & N($Z\\rightarrow\\nu\\nu) & N($W\\rightarrow l\\nu) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(signal $m_H=120$~\\GeV \\\\" << std::endl;
+  texFile << "Cut & N($Z\\rightarrow\\nu\\nu) & N($W\\rightarrow l\\nu) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(signal $m_H=120$~\\GeV \\\\" << std::endl;
 
   TH1D* hTTbar = (TH1D*) ofile->Get("hCutFlow_TTBar");
   TH1D* hSignal = (TH1D*) ofile->Get("hCutFlow_SignalM125_POWHEG");
@@ -123,24 +123,24 @@ int main(int argc, char* argv[]) {
   // cutflow table
   for (unsigned i=0; i<nCuts; ++i) {
 
-    effFile << cuts.cutName(i) << " & ";
-    effFile << "$" << hZNuNu->GetBinContent(i+1) << " \\pm " << hZNuNu->GetBinError(i+1) << "$ & ";
-    effFile << "$" << hWLNu->GetBinContent(i+1) << " \\pm " << hWLNu->GetBinError(i+1) << "$ & ";
-    effFile << "$" << hQCD->GetBinContent(i+1) << " \\pm " << hQCD->GetBinError(i+1) << "$ & ";
-    effFile << "$" << hTTbar->GetBinContent(i+1) << " \\pm " << hTTbar->GetBinError(i+1) << "$ & ";
-    effFile << "$" << hSingleT->GetBinContent(i+1) << " \\pm " << hSingleT->GetBinError(i+1) << "$ & ";
-    effFile << "$" << hDiboson->GetBinContent(i+1) << " \\pm " << hDiboson->GetBinError(i+1) << "$ & ";
-    effFile << "$" << hSignal->GetBinContent(i+1) << " \\pm " << hSignal->GetBinError(i+1) << "$ \\\\ " << std::endl;
+    texFile << cuts.cutName(i) << " & ";
+    texFile << "$" << hZNuNu->GetBinContent(i+1) << " \\pm " << hZNuNu->GetBinError(i+1) << "$ & ";
+    texFile << "$" << hWLNu->GetBinContent(i+1) << " \\pm " << hWLNu->GetBinError(i+1) << "$ & ";
+    texFile << "$" << hQCD->GetBinContent(i+1) << " \\pm " << hQCD->GetBinError(i+1) << "$ & ";
+    texFile << "$" << hTTbar->GetBinContent(i+1) << " \\pm " << hTTbar->GetBinError(i+1) << "$ & ";
+    texFile << "$" << hSingleT->GetBinContent(i+1) << " \\pm " << hSingleT->GetBinError(i+1) << "$ & ";
+    texFile << "$" << hDiboson->GetBinContent(i+1) << " \\pm " << hDiboson->GetBinError(i+1) << "$ & ";
+    texFile << "$" << hSignal->GetBinContent(i+1) << " \\pm " << hSignal->GetBinError(i+1) << "$ \\\\ " << std::endl;
 
   }
 
-  effFile << std::endl << std::endl;
-  effFile.close();
+  texFile << std::endl << std::endl;
+  texFile.close();
 
 
   // signal efficiencies
-  effFile.open(options.oDir+std::string("/signalEff.tex"));
-  effFile << "Dataset & eff(%) & N \\\\" << std::endl;
+  texFile.open(options.oDir+std::string("/signalEff.tex"));
+  texFile << "Dataset & eff(%) & N \\\\" << std::endl;
 
   for (unsigned i=0; i<datasets.size(); ++i) {
 
@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
     //    double nErr   = lumi * dataset.sigma * effErr;
 
 
-    effFile << dataset.name << " & $" 
+    texFile << dataset.name << " & $" 
 	    << 100*eff << " \\pm " << 100*err_eff << "$ & $"
 	    << n << " \\pm " << err_n << "$ \\\\" 
 	    << std::endl;
@@ -171,6 +171,6 @@ int main(int argc, char* argv[]) {
   
 
   ofile->Close();
-  effFile.close();
+  texFile.close();
 
 }

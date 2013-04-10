@@ -264,7 +264,7 @@ int main(int argc, char* argv[]) {
 
   int npoints = 100;  // number of points to scan
   double poimin = 0;
-  double poimax = 10*xsH[0]*lumi*effSignal[0];  // scan up to 10 times SM production XS
+  double poimax = 5*xsH[0]*lumi*effSignal[0];  // scan up to 10 times SM production XS
 
   
   std::cout << "Doing a fixed scan  in interval : " << poimin << " , " << poimax << std::endl;
@@ -289,7 +289,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Expected upper limit (+2sig)  : " << expLimitP2Sig << std::endl;
   std::cout << std::endl;
 
-  std::cout << "Exp limit on sigma x BF (mH=120) : " << ( expLimit / (lumi * effSignal[0]) ) / xsH[0] << std::endl;
+  std::cout << "Exp limit on sigma x BF (mH=125) : " << expLimit / (lumi * effSignal[1] * xsH[1]) << std::endl;
   std::cout << std::endl;
 
   // convert to x-section
@@ -302,11 +302,11 @@ int main(int argc, char* argv[]) {
     xsExpP1Sig[j]  = expLimitP1Sig / (lumi * effSignal[j]);
     xsExpM2Sig[j]  = expLimitM2Sig / (lumi * effSignal[j]);
     xsExpP2Sig[j]  = expLimitP2Sig / (lumi * effSignal[j]);
-    xsiExp[j]      = xsExp[i] / xsH[j];
-    xsiExpM1Sig[j] = xsExpM1Sig[i] / xsH[j];
-    xsiExpP1Sig[j] = xsExpP1Sig[i] / xsH[j];
-    xsiExpM2Sig[j] = xsExpM2Sig[i] / xsH[j];
-    xsiExpP2Sig[j] = xsExpP2Sig[i] / xsH[j];
+    xsiExp[j]      = xsExp[j] / xsH[j];
+    xsiExpM1Sig[j] = xsExpM1Sig[j] / xsH[j];
+    xsiExpP1Sig[j] = xsExpP1Sig[j] / xsH[j];
+    xsiExpM2Sig[j] = xsExpM2Sig[j] / xsH[j];
+    xsiExpP2Sig[j] = xsExpP2Sig[j] / xsH[j];
     std::cout << mH[j] << " " << xsH[j] << " " << xsExp[j] << " " << xsiExp[j] << std::endl;
   }
 
