@@ -7,9 +7,13 @@
 #include "TH1D.h"
 #include "TLegend.h"
 #include "TPaveText.h"
+#include "TLegendEntry.h"
+#include "TH1.h"
+#include <TStyle.h>
+#include <TROOT.h>
 
 #include <iostream>
-
+#include <algorithm>    // std::reverse
 
 StackPlot::StackPlot(std::string dir) :
   dir_(dir),
@@ -22,11 +26,12 @@ StackPlot::StackPlot(std::string dir) :
   yTitle_(""),
   yMin_(0.),
   yMax_(0.),
-  label_(""),
+
   legX1_(0.6),
   legX2_(0.8),
   legY1_(0.6),
-  legY2_(0.8)
+  legY2_(0.8),
+  label_("")
 {
 
 }
@@ -47,6 +52,9 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
   std::cout << "Drawing " << hname << " " << std::endl;
 
   gStyle->SetOptTitle(0);
+  gStyle->SetOptStat("");
+
+  TH1::SetDefaultSumw2();
 
   TCanvas canvas;
 
@@ -57,10 +65,15 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
   TLegend leg(legX1_, legY1_, legX2_, legY2_);
   leg.SetFillColor(0);
 
-  // make the stack
   bool drawStack=false;
+
+  std::vector<TLegendEntry*> entries; // To hold legend entries, so can draw in proper order
+
   std::vector<TFile*>::iterator file = files_.begin();
-  int i=0;
+  
+  // Some method of scanning all input files and determining the min y value needed for y axis
+  int i = 0;
+  double ymin=1.0;
   for (; file!=files_.end(); ++file, ++i) {
 
     if (*file==0) {
@@ -71,27 +84,77 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
     TH1D* h = (TH1D*) (*file)->Get(hname.c_str());
 
     if (h==0) {
-      std::cout << "No histogram " << hname << std::endl;
+      std::cout << "No histogram " << hname << " in file " << labels_.at(i) << std::endl;
+      break;
+    }
+
+    double min = h->GetMinimum();
+    if ((min < ymin)&&(min>0)) ymin = min;
+  }
+
+  /////////////////////////////////
+  // make the stacked histograms //
+  /////////////////////////////////
+  i=0;
+  file = files_.begin();
+  for (; file!=files_.end(); ++file, ++i) {
+
+    if (*file==0) {
+      std::cerr << "No file for " << labels_.at(i) << std::endl;
+      continue;
+    }
+
+    TH1D* h = (TH1D*) (*file)->Get(hname.c_str());
+
+    if (h==0) {
+      std::cout << "No histogram " << hname << " in file " << labels_.at(i) << std::endl;
       break;
     }
 
     if (styles_.at(i) == 0) {
       if (h->GetEntries()==0) {
-	std::cout << "No entries in histogram " << labels_.at(i) << std::endl;
-	continue;
+      	std::cout << "No entries in histogram " << labels_.at(i) << std::endl;
+      	continue;
       }
       drawStack=true;
-      h->SetLineColor(cols_.at(i));
+      // h->SetLineColor(cols_.at(i));
+      // h->SetLineWidth(0);
+      h->SetLineColor(kBlack);
       h->SetFillColor(cols_.at(i));
+
       stack.Add(h);
-      leg.AddEntry(h, labels_.at(i).c_str(), "F");
+      TLegendEntry *legE = new TLegendEntry(h, labels_.at(i).c_str(), "F");
+      entries.push_back(legE);
+      
     }
 
   }
   
-  if (drawStack) stack.Draw("HISTE");
+  if (drawStack) {
+    stack.Draw("HIST");
 
-  // draw non-stacked histograms
+    // Some auto-axis ranging, doesn't work brilliantly, try tweaking the 5 and 0.1
+    // assumes log axes
+    stack.SetMaximum(stack.GetMaximum()*5);
+    stack.SetMinimum(ymin*0.1);
+    // If user has set axis range, use that preferentially
+    if (yMax_ > 0.) stack.SetMaximum(yMax_);
+    if (yMin_ > 0.) stack.SetMinimum(yMin_);
+    stack.Draw("HIST"); //redraw to update axes
+
+    // Make axis labels nice
+    stack.GetXaxis()->SetTitleSize(0.045);
+    stack.GetYaxis()->SetTitleSize(0.045);
+    stack.GetXaxis()->SetTitle(xTitle.c_str());
+    stack.GetYaxis()->SetTitle(yTitle.c_str());
+    stack.GetXaxis()->SetTitleOffset(0.9);
+    // stack.GetYaxis()->SetTitleOffset(1.2);    
+  }
+
+  /////////////////////////////////
+  // draw non-stacked histograms //
+  /////////////////////////////////
+  
   file = files_.begin();
   i=0;
   for (; file!=files_.end(); ++file, ++i) {
@@ -112,38 +175,72 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
     if (styles_.at(i) == 1) {
       h->SetMarkerStyle(8);
       h->SetMarkerColor(cols_.at(i));
-      leg.AddEntry(h, "Data", "P");
+      // leg.AddEntry(h, "Data", "P");
+      TLegendEntry *legE = new TLegendEntry(h, "Data", "P");
+      entries.push_back(legE);
       h->Draw("PE SAME");
     }
 
     // signal
     if (styles_.at(i) == 2) {
       h->SetLineStyle(1);
+      h->SetLineWidth(3);
       h->SetLineColor(cols_.at(i));
-      leg.AddEntry(h, labels_.at(i).c_str(), "L");
+      TLegendEntry *legE = new TLegendEntry(h, labels_.at(i).c_str(), "L");
+      entries.push_back(legE);
       h->Draw("HISTE SAME");
     }
 
   }
 
   // draw the other stuff
-  canvas.RedrawAxis();
+  canvas.RedrawAxis();  
+
+  // Draw line on plot if N-1
+  // Note, depends on hists defined in nMinusOne.cpp
+  double cutVal = 0.;
+  if (!hname.compare("hDijetNM1")) cutVal = 50.;
+  else if (!hname.compare("hDEtaJJNM1")) cutVal = 4.2;
+  else if (!hname.compare("hMjjNM1")) cutVal = 1200.;
+  else if (!hname.compare("hMETNM1")) cutVal = 130.;
+  else if (!hname.compare("hDPhiJJNM1")) cutVal = 1.0;
+
+  if (cutVal != 0) {
+    TLine *cutLine = new TLine(cutVal,0,cutVal,stack.GetMaximum()*1.5);
+    cutLine->SetLineColor(kBlack);
+    cutLine->SetLineWidth(3);
+    cutLine->SetLineStyle(7);
+    cutLine->Draw();
+  }
 
   // draw labels
-  TPaveText cms(0.1, 0.9, 0.4, 0.95, "NDC");
+  // First, CMS text in top left of plot
+  TPaveText cms(0.12, 0.72, 0.45, 0.9, "NDC");
   cms.SetFillColor(0);
-  cms.SetBorderSize(1);
+  cms.SetFillStyle(4000);
+  cms.SetBorderSize(0);
   cms.SetLineColor(0);
+  cms.SetTextAlign(12);
+  cms.AddText("CMS Preliminary 2012");
+  cms.AddText("");
+  cms.AddText("#int L = 19.6 fb^{-1}");
+  // any other text user has specified
   cms.AddText(label_.c_str());
+
   cms.Draw();
 
-  // draw legend
+  // draw legend, with entries in right order
+  std::reverse(entries.begin(),entries.end());
+  for (unsigned int n = 0;n < entries.size(); n++)
+  {
+    leg.AddEntry(entries.at(n)->GetObject(), entries.at(n)->GetLabel(), entries.at(n)->GetOption());
+  }
   leg.Draw();
 
-  std::string filename = dir_+std::string("/")+hname+std::string(".pdf");
+  std::string filename = dir_+std::string("/")+hname+std::string("_log.pdf");
   std::cout << "Writing file " << filename << std::endl;
 
-  canvas.Print( filename.c_str() );
+  canvas.Print( filename.c_str() ,"pdf");
 
 }
 
