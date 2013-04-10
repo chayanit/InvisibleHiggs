@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.26 2013/04/08 16:13:19 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.27 2013/04/10 16:37:35 chayanit Exp $
 //
 //
 
@@ -718,23 +718,38 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
   //     }
   //   }
   
-  // find Higgs and tag quarks assuming PYTHIA process 123,124
+  // find Higgs and tag quarks 
   // W,Z MC information
   if (mcPYTHIA_) {
   
+    // Find higgs
+    // POWHEG: h = 6, main partons= 7,8,9 (9 is NLO?)
+    // PYTHIA: h = 8, q1,2 = 6,7
+    int higgsIndex(6), q1Index(7), q2Index(8);
+
+    const GenParticle & p = genParticles[higgsIndex];
+
+    // Check if it's a Higgs
+    if (p.pdgId() != 25)
+    {
+      higgsIndex = 8;
+      q1Index = 6;
+      q2Index = 7;
+    }
+
     //Higgs
-    const GenParticle& higgs = genParticles[8];
+    const GenParticle& higgs = genParticles[higgsIndex];
     info_->mcHiggsMass = higgs.mass();
     info_->mcHiggsPt   = higgs.pt();
     info_->mcHiggsPhi  = higgs.phi();
     info_->mcHiggsEta  = higgs.eta();
     
-    const GenParticle& q1 = genParticles[6];
+    const GenParticle& q1 = genParticles[q1Index];
     info_->mcQ1Pt   = q1.pt();
     info_->mcQ1Eta  = q1.eta();
     info_->mcQ1Phi  = q1.phi();
     
-    const GenParticle& q2 = genParticles[7];
+    const GenParticle& q2 = genParticles[q2Index];
     info_->mcQ2Pt   = q2.pt();
     info_->mcQ2Eta  = q2.eta();
     info_->mcQ2Phi  = q2.phi();
@@ -1198,7 +1213,7 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
       // could check here that second jet  is in opposite hemisphere
       JecUnc->setJetEta(jets->at(i).eta());
       JecUnc->setJetPt(jets->at(i).pt());
-      jet_unc    = JecUnc->getUncertainty(true);
+      jet_unc = JecUnc->getUncertainty(true);
       //std::cout<<"jet_unc = "<<jet_unc<<std::endl;
 
       //check uncertainty shouldn't be higher than 1.0 (found some event has jet_unc > 1.0)
@@ -1209,29 +1224,29 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
       jetpT_shiftdown = jets->at(i).pt() - (jet_unc * jets->at(i).pt());
       
       if(jetpT_shiftup > maxpTup)
-	{
-	  maxpTup              = jetpT_shiftup;
-	  tagJet1Index_shiftup = i;
-	  tagJet1shiftup_      = jets->at(i).p4();
+    	{
+    	  maxpTup              = jetpT_shiftup;
+    	  tagJet1Index_shiftup = i;
+    	  tagJet1shiftup_      = jets->at(i).p4();
 
-	  info_->jet1Index_shiftup  = i;
-	  info_->jet1PUMVA_shiftup  = (*puJetIdMVAs)[jets->refAt(i)];
-	  info_->jet1PUFlag_shiftup = (*puJetIdFlags)[jets->refAt(i)];
-	  info_->jet1unc_shiftup    = jet_unc;
-       
-	}
+    	  info_->jet1Index_shiftup  = i;
+    	  info_->jet1PUMVA_shiftup  = (*puJetIdMVAs)[jets->refAt(i)];
+    	  info_->jet1PUFlag_shiftup = (*puJetIdFlags)[jets->refAt(i)];
+    	  info_->jet1unc_shiftup    = jet_unc;
+           
+    	}
 
       if(jetpT_shiftdown > maxpTdown)
-	{
-	  maxpTdown              = jetpT_shiftdown;
-	  tagJet1Index_shiftdown = i;
-	  tagJet1shiftdown_      = jets->at(i).p4();
+    	{
+    	  maxpTdown              = jetpT_shiftdown;
+    	  tagJet1Index_shiftdown = i;
+    	  tagJet1shiftdown_      = jets->at(i).p4();
 
-	  info_->jet1Index_shiftdown  = i;
-	  info_->jet1PUMVA_shiftdown  = (*puJetIdMVAs)[jets->refAt(i)];
-	  info_->jet1PUFlag_shiftdown = (*puJetIdFlags)[jets->refAt(i)];
-	  info_->jet1unc_shiftdown    = jet_unc;
-	}
+    	  info_->jet1Index_shiftdown  = i;
+    	  info_->jet1PUMVA_shiftdown  = (*puJetIdMVAs)[jets->refAt(i)];
+    	  info_->jet1PUFlag_shiftdown = (*puJetIdFlags)[jets->refAt(i)];
+    	  info_->jet1unc_shiftdown    = jet_unc;
+    	}
     }
   }
   math::XYZTLorentzVector tagJet1_up, tagJet1_down;
@@ -1293,29 +1308,29 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
       jetpT_shiftdown = jets->at(j).pt() - (jet_unc * jets->at(j).pt());
 
       if(jetpT_shiftup > maxpTup && j != tagJet1Index_shiftup)
-        {
-          maxpTup              = jetpT_shiftup;
-          tagJet2Index_shiftup = j;
-	  tagJet2shiftup_      = jets->at(j).p4();
+      {
+        maxpTup              = jetpT_shiftup;
+        tagJet2Index_shiftup = j;
+    	  tagJet2shiftup_      = jets->at(j).p4();
 
-	  info_->jet2Index_shiftup  = j;
-	  info_->jet2PUMVA_shiftup  = (*puJetIdMVAs)[jets->refAt(j)];
-	  info_->jet2PUFlag_shiftup = (*puJetIdFlags)[jets->refAt(j)];
-	  info_->jet2unc_shiftup    = jet_unc;
-        }
+    	  info_->jet2Index_shiftup  = j;
+    	  info_->jet2PUMVA_shiftup  = (*puJetIdMVAs)[jets->refAt(j)];
+    	  info_->jet2PUFlag_shiftup = (*puJetIdFlags)[jets->refAt(j)];
+    	  info_->jet2unc_shiftup    = jet_unc;
+      }
 
       if(jetpT_shiftdown > maxpTdown && j != tagJet1Index_shiftdown)
-        {
-          maxpTdown              = jetpT_shiftdown;
-          tagJet2Index_shiftdown = j;
-	  tagJet2shiftdown_      = jets->at(j).p4();
+      {
+        maxpTdown              = jetpT_shiftdown;
+        tagJet2Index_shiftdown = j;
+    	  tagJet2shiftdown_      = jets->at(j).p4();
 
-	  info_->jet2Index_shiftdown  = j;
-	  info_->jet2PUMVA_shiftdown  = (*puJetIdMVAs)[jets->refAt(j)];
-	  info_->jet2PUFlag_shiftdown = (*puJetIdFlags)[jets->refAt(j)];
-	  info_->jet2unc_shiftdown    = jet_unc;
+    	  info_->jet2Index_shiftdown  = j;
+    	  info_->jet2PUMVA_shiftdown  = (*puJetIdMVAs)[jets->refAt(j)];
+    	  info_->jet2PUFlag_shiftdown = (*puJetIdFlags)[jets->refAt(j)];
+    	  info_->jet2unc_shiftdown    = jet_unc;
 
-        }
+      }
     }
   }
   math::XYZTLorentzVector tagJet2_up, tagJet2_down;
@@ -1409,12 +1424,12 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
       if (jets->at(i).eta() > tagJetEtaMin_ &&
 	  jets->at(i).eta() < tagJetEtaMax_ ) {
 
-	// store in ntuple
-	info_->cenJetEt  = jets->at(i).pt();
-	info_->cenJetEta = jets->at(i).eta();
-	info_->cenJetPhi = jets->at(i).phi();
-	info_->cenJetM   = jets->at(i).mass();
-	break;
+      	// store in ntuple
+      	info_->cenJetEt  = jets->at(i).pt();
+      	info_->cenJetEta = jets->at(i).eta();
+      	info_->cenJetPhi = jets->at(i).phi();
+      	info_->cenJetM   = jets->at(i).mass();
+      	break;
       }
 
     }
@@ -1640,11 +1655,11 @@ void InvHiggsInfoProducer::doMETUnc_Central(const std::vector<pat::MET>& met,
     for (unsigned i=0; i < zMus.size(); ++i) {
 
       if (zMus[i].pt() > zPt){
-	zPt  = zMus[i].pt();
-	metx = met.at(0).px() + zMus[i].px();
-	mety = met.at(0).py() + zMus[i].py();
-	info_->metCentral_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
-	info_->metCentral_No2MuonPhi = TMath::ATan2(mety,metx);
+      	zPt  = zMus[i].pt();
+      	metx = met.at(0).px() + zMus[i].px();
+      	mety = met.at(0).py() + zMus[i].py();
+      	info_->metCentral_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+      	info_->metCentral_No2MuonPhi = TMath::ATan2(mety,metx);
       }
     }
   }
@@ -1752,11 +1767,11 @@ void InvHiggsInfoProducer::doMETUnc_JESup(const std::vector<pat::MET>& met,
     for (unsigned i=0; i < zMus.size(); ++i) {
 
       if (zMus[i].pt() > zPt){
-	zPt  = zMus[i].pt();
-	metx = met.at(0).px() + zMus[i].px();
-	mety = met.at(0).py() + zMus[i].py();
-	info_->metJESup_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
-	info_->metJESup_No2MuonPhi = TMath::ATan2(mety,metx);
+      	zPt  = zMus[i].pt();
+      	metx = met.at(0).px() + zMus[i].px();
+      	mety = met.at(0).py() + zMus[i].py();
+      	info_->metJESup_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+      	info_->metJESup_No2MuonPhi = TMath::ATan2(mety,metx);
       }
     }
   }
@@ -1864,11 +1879,11 @@ void InvHiggsInfoProducer::doMETUnc_JESdown(const std::vector<pat::MET>& met,
     for (unsigned i=0; i < zMus.size(); ++i) {
 
       if (zMus[i].pt() > zPt){
-	zPt  = zMus[i].pt();
-	metx = met.at(0).px() + zMus[i].px();
-	mety = met.at(0).py() + zMus[i].py();
-	info_->metJESdown_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
-	info_->metJESdown_No2MuonPhi = TMath::ATan2(mety,metx);
+      	zPt  = zMus[i].pt();
+      	metx = met.at(0).px() + zMus[i].px();
+      	mety = met.at(0).py() + zMus[i].py();
+      	info_->metJESdown_No2Muon = TMath::Sqrt(metx*metx + mety*mety);
+      	info_->metJESdown_No2MuonPhi = TMath::ATan2(mety,metx);
       }
     }
   }
