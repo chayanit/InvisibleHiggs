@@ -286,7 +286,7 @@ TCut Cuts::cutflowZMuMu(unsigned i) {
 
 // W -> mu
 TCut Cuts::wMuGen() {
-  TCut tmp("wltype==2");
+  TCut tmp("wltype==2 || (wltype==3 && wtauhadron==3)");
   return tmp;
 }
 
@@ -312,7 +312,7 @@ TCut Cuts::cutflowWMu(unsigned i) {
 
 // W -> e
 TCut Cuts::wElGen() {
-  TCut tmp("wltype==1");
+  TCut tmp("wltype==1 || (wltype==3 && wtauhadron==2)");
   return tmp;
 }
 

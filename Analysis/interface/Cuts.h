@@ -90,7 +90,6 @@ class Cuts {
   TCut qcdNoMET();
   TCut qcdLoose2();
   TCut qcdLoose();
-  TCut qcdLoose2();
   TCut qcdTightHiDPhi();
   TCut cutflowQCD(unsigned i);
   unsigned nCutsQCD() { return cutsQCD_.size(); }

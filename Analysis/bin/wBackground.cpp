@@ -37,6 +37,7 @@ int main(int argc, char* argv[]) {
   Cuts cuts;
   unsigned nCutsWMu = cuts.nCutsWMu();
   unsigned nCutsWEl = cuts.nCutsWEl();
+
   TCut puWeight("puWeight");
   TCut wWeight("(1.0*(wgennj==0)+0.369253*(wgennj==1)+0.11401*(wgennj==2)+0.0771589*(wgennj==3)+0.03849*(wgennj==4))");
 
@@ -95,15 +96,22 @@ int main(int argc, char* argv[]) {
 
     // setup cuts
     TCut cutD = cuts.cutDataset(dataset.name);
-    TCut cutWMu_Gen_C = puWeight * wWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF());
-    TCut cutWMu_Gen_S = puWeight * wWeight * (cutD + cuts.wMuGen() + cuts.allCutsNoDPhi());
-    TCut cutWMu_C = puWeight * (cutD + cuts.wMuVBF());
-    TCut cutWMu_S = puWeight * (cutD + cuts.allCutsNoDPhi());
-    
-    TCut cutWEl_Gen_C = puWeight * wWeight * (cutD + cuts.wElGen() + cuts.wElVBF());
-    TCut cutWEl_Gen_S = puWeight * wWeight * (cutD + cuts.wElGen() + cuts.allCutsNoDPhi());
-    TCut cutWEl_C = puWeight * (cutD + cuts.wElVBF());
-    TCut cutWEl_S = puWeight * (cutD + cuts.allCutsNoDPhi());
+
+    TCut cutWMu_C(""), cutWMu_S(""), cutWEl_C(""), cutWEl_S("");
+
+    // different cuts for W MC
+    if (isWJets) {
+      cutWMu_C = puWeight * wWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF());
+      cutWMu_S = puWeight * wWeight * (cutD + cuts.wMuGen() + cuts.allCutsNoDPhi());
+      cutWEl_C = puWeight * wWeight * (cutD + cuts.wElGen() + cuts.wElVBF());
+      cutWEl_S = puWeight * wWeight * (cutD + cuts.wElGen() + cuts.allCutsNoDPhi());
+    }
+    else {
+      cutWMu_C = puWeight * (cutD + cuts.wMuVBF());
+      cutWMu_S = puWeight * (cutD + cuts.allCutsNoDPhi());
+      cutWEl_C = puWeight * (cutD + cuts.wElVBF());
+      cutWEl_S = puWeight * (cutD + cuts.allCutsNoDPhi());
+    }
 
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
@@ -117,39 +125,28 @@ int main(int argc, char* argv[]) {
     // weight  to lumi
     double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
 
+    tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
+    tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_S);
+    tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
+    tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_S);
+    hWMu_C_DPhi->Scale(weight);
+    hWMu_S_DPhi->Scale(weight);
+    hWEl_C_DPhi->Scale(weight);
+    hWEl_S_DPhi->Scale(weight);
+    
     if (isWJets) {
-      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_Gen_C);
-      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_Gen_S);
-      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_Gen_C);
-      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_Gen_S);
-      hWMu_MCC_DPhi->Scale(weight);
-      hWMu_MCS_DPhi->Scale(weight);
-      hWEl_MCC_DPhi->Scale(weight);
-      hWEl_MCS_DPhi->Scale(weight);
       hWMu_MCC_DPhi->Add(hWMu_C_DPhi);
       hWMu_MCS_DPhi->Add(hWMu_S_DPhi);
       hWEl_MCC_DPhi->Add(hWEl_C_DPhi);
       hWEl_MCS_DPhi->Add(hWEl_S_DPhi);
     }
     else if (dataset.isData) {
-      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
-      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
-      hWMu_DataC_DPhi->Scale(weight);
-      hWEl_DataC_DPhi->Scale(weight);
       hWMu_DataC_DPhi->Add(hWMu_C_DPhi);
       hWEl_DataC_DPhi->Add(hWEl_C_DPhi);
     }
     else {  // must be a BG dataset
-      tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
-      //      tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_S);
-      tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
-      //      tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_S);
-      hWMu_BGC_DPhi->Scale(weight);
-      hWMu_BGC_DPhi->Scale(weight);
       hWMu_BGC_DPhi->Add(hWMu_C_DPhi);
-      //      hWMu_BGS_DPhi->Add(hWMu_S_DPhi, weight);
       hWEl_BGC_DPhi->Add(hWEl_C_DPhi);
-      //      hWEl_BGS_DPhi->Add(hWEl_S_DPhi, weight);
     }
 
     // debug output
