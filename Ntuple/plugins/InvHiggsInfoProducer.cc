@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.25 2013/04/04 12:02:41 jbrooke Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.26 2013/04/08 16:13:19 jbrooke Exp $
 //
 //
 
@@ -1020,7 +1020,7 @@ void InvHiggsInfoProducer::doTrigCorrWeights() {
     bin      = hTrigCorrL1MET_->FindBin(info_->metNoMuon);
     weight  *= hTrigCorrL1MET_->GetBinContent(bin);
     
-    bin      = hTrigCorrMET_->FindBin(info_->met);
+    bin      = hTrigCorrMET_->FindBin(info_->metNoMuon);
     weight  *= hTrigCorrMET_->GetBinContent(bin);
 
     //    std::cout << "weight : " << weight << std::endl;
@@ -1215,10 +1215,6 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
 	  tagJet1shiftup_      = jets->at(i).p4();
 
 	  info_->jet1Index_shiftup  = i;
-	  info_->jet1Pt_shiftup     = jets->at(i).pt();    
-	  info_->jet1Eta_shiftup    = jets->at(i).eta();    
-	  info_->jet1Phi_shiftup    = jets->at(i).phi();    
-	  info_->jet1M_shiftup      = jets->at(i).mass();
 	  info_->jet1PUMVA_shiftup  = (*puJetIdMVAs)[jets->refAt(i)];
 	  info_->jet1PUFlag_shiftup = (*puJetIdFlags)[jets->refAt(i)];
 	  info_->jet1unc_shiftup    = jet_unc;
@@ -1232,16 +1228,25 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
 	  tagJet1shiftdown_      = jets->at(i).p4();
 
 	  info_->jet1Index_shiftdown  = i;
-	  info_->jet1Pt_shiftdown     = jets->at(i).pt();    
-	  info_->jet1Eta_shiftdown    = jets->at(i).eta();    
-	  info_->jet1Phi_shiftdown    = jets->at(i).phi();    
-	  info_->jet1M_shiftdown      = jets->at(i).mass();
 	  info_->jet1PUMVA_shiftdown  = (*puJetIdMVAs)[jets->refAt(i)];
 	  info_->jet1PUFlag_shiftdown = (*puJetIdFlags)[jets->refAt(i)];
 	  info_->jet1unc_shiftdown    = jet_unc;
 	}
     }
   }
+  math::XYZTLorentzVector tagJet1_up, tagJet1_down;
+  tagJet1_up   = tagJet1shiftup_   + (info_->jet1unc_shiftup   * tagJet1shiftup_);
+  tagJet1_down = tagJet1shiftdown_ - (info_->jet1unc_shiftdown * tagJet1shiftdown_);
+
+  info_->jet1Pt_shiftup     = tagJet1_up.Pt();    
+  info_->jet1Eta_shiftup    = tagJet1_up.Eta();    
+  info_->jet1Phi_shiftup    = tagJet1_up.Phi();    
+  info_->jet1M_shiftup      = tagJet1_up.M();
+
+  info_->jet1Pt_shiftdown   = tagJet1_down.Pt();      
+  info_->jet1Eta_shiftdown  = tagJet1_down.Eta();      
+  info_->jet1Phi_shiftdown  = tagJet1_down.Phi();      
+  info_->jet1M_shiftdown    = tagJet1_down.M();    
 
   maxpTup = 0.;
   maxpTdown = 0.;
@@ -1294,10 +1299,6 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
 	  tagJet2shiftup_      = jets->at(j).p4();
 
 	  info_->jet2Index_shiftup  = j;
-	  info_->jet2Pt_shiftup     = jets->at(j).pt();    
-	  info_->jet2Eta_shiftup    = jets->at(j).eta();    
-	  info_->jet2Phi_shiftup    = jets->at(j).phi();    
-	  info_->jet2M_shiftup      = jets->at(j).mass();
 	  info_->jet2PUMVA_shiftup  = (*puJetIdMVAs)[jets->refAt(j)];
 	  info_->jet2PUFlag_shiftup = (*puJetIdFlags)[jets->refAt(j)];
 	  info_->jet2unc_shiftup    = jet_unc;
@@ -1310,10 +1311,6 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
 	  tagJet2shiftdown_      = jets->at(j).p4();
 
 	  info_->jet2Index_shiftdown  = j;
-	  info_->jet2Pt_shiftdown     = jets->at(j).pt();    
-	  info_->jet2Eta_shiftdown    = jets->at(j).eta();    
-	  info_->jet2Phi_shiftdown    = jets->at(j).phi();    
-	  info_->jet2M_shiftdown      = jets->at(j).mass();
 	  info_->jet2PUMVA_shiftdown  = (*puJetIdMVAs)[jets->refAt(j)];
 	  info_->jet2PUFlag_shiftdown = (*puJetIdFlags)[jets->refAt(j)];
 	  info_->jet2unc_shiftdown    = jet_unc;
@@ -1321,6 +1318,35 @@ void InvHiggsInfoProducer::doJetsUnc(edm::Handle<edm::View<pat::Jet> > jets,
         }
     }
   }
+  math::XYZTLorentzVector tagJet2_up, tagJet2_down;
+  tagJet2_up   = tagJet2shiftup_   + (info_->jet2unc_shiftup   * tagJet2shiftup_);
+  tagJet2_down = tagJet2shiftdown_ - (info_->jet2unc_shiftdown * tagJet2shiftdown_);
+
+  info_->jet2Pt_shiftup     = tagJet2_up.Pt();      
+  info_->jet2Eta_shiftup    = tagJet2_up.Eta();      
+  info_->jet2Phi_shiftup    = tagJet2_up.Phi();      
+  info_->jet2M_shiftup      = tagJet2_up.M();       
+  
+  info_->jet2Pt_shiftdown   = tagJet2_down.Pt(); 
+  info_->jet2Eta_shiftdown  = tagJet2_down.Eta();
+  info_->jet2Phi_shiftdown  = tagJet2_down.Phi();
+  info_->jet2M_shiftdown    = tagJet2_down.M();
+
+  math::XYZTLorentzVector vbfp4_up = tagJet1_up + tagJet2_up;
+  info_->vbfEt_shiftup   = vbfp4_up.Pt();
+  info_->vbfEta_shiftup  = vbfp4_up.Eta();
+  info_->vbfPhi_shiftup  = vbfp4_up.Phi();
+  info_->vbfM_shiftup    = vbfp4_up.M();
+  info_->vbfDEta_shiftup = fabs(tagJet1_up.Eta() - tagJet2_up.Eta());
+  info_->vbfDPhi_shiftup = fabs(fabs(fabs(tagJet1_up.Phi()-tagJet2_up.Phi())-TMath::Pi())-TMath::Pi());
+ 
+  math::XYZTLorentzVector vbfp4_down = tagJet1_down + tagJet2_down;
+  info_->vbfEt_shiftdown   = vbfp4_down.Pt();
+  info_->vbfEta_shiftdown  = vbfp4_down.Eta();
+  info_->vbfPhi_shiftdown  = vbfp4_down.Phi();
+  info_->vbfM_shiftdown    = vbfp4_down.M();
+  info_->vbfDEta_shiftdown = fabs(tagJet1_down.Eta() - tagJet2_down.Eta());
+  info_->vbfDPhi_shiftdown = fabs(fabs(fabs(tagJet1_down.Phi()-tagJet2_down.Phi())-TMath::Pi())-TMath::Pi());
 
   tagJetupEtaMin_ = std::min(tagJet1shiftup_.eta(), tagJet2shiftup_.eta());
   tagJetupEtaMax_ = std::max(tagJet1shiftup_.eta(), tagJet2shiftup_.eta());

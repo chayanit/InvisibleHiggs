@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.14 2013/03/22 23:31:56 chayanit Exp $
+// $Id: InvHiggsInfo.h,v 1.15 2013/04/03 21:08:33 jbrooke Exp $
 //
 //
 
@@ -214,9 +214,22 @@ class InvHiggsInfo { //: public TObject {
   Double_t vbfEta;
   Double_t vbfPhi;
   Double_t vbfM;
-
   Double_t vbfDEta;
   Double_t vbfDPhi;
+
+  Double_t vbfEt_shiftup;
+  Double_t vbfEta_shiftup;
+  Double_t vbfPhi_shiftup;
+  Double_t vbfM_shiftup;
+  Double_t vbfDEta_shiftup;
+  Double_t vbfDPhi_shiftup;
+
+  Double_t vbfEt_shiftdown;
+  Double_t vbfEta_shiftdown;
+  Double_t vbfPhi_shiftdown;
+  Double_t vbfM_shiftdown;
+  Double_t vbfDEta_shiftdown;
+  Double_t vbfDPhi_shiftdown;
 
   // Third jet
   Double_t jet3Et;
