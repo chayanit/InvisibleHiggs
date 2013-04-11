@@ -243,9 +243,34 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
     ###--------------------------------------------------------------
     ### Load the PU JetID sequence
-    process.load("CMGTools.External.pujetidsequence_cff")
-    process.puJetMva.jets = cms.InputTag("goodPatJets")
-    process.puJetId.jets = cms.InputTag("goodPatJets")
+    if iRunOnData == True:
+    	process.load("CMGTools.External.pujetidsequence_cff")
+    	process.puJetMva.jets = cms.InputTag("goodPatJets")
+    	process.puJetId.jets = cms.InputTag("goodPatJets")
+    else:
+        process.load("CMGTools.External.pujetidsequence_cff")
+        process.puJetMva.jets		= cms.InputTag("goodPatJets")
+        process.puJetId.jets 		= cms.InputTag("goodPatJets")
+	process.puJetMvaSmeared		= process.puJetMva.clone()
+	process.puJetIdSmeared		= process.puJetId.clone()  
+	process.puJetMvaResUp 		= process.puJetMva.clone()
+	process.puJetIdResUp 		= process.puJetId.clone()
+        process.puJetMvaResDown		= process.puJetMva.clone()
+        process.puJetIdResDown  	= process.puJetId.clone()
+        process.puJetMvaEnUp   		= process.puJetMva.clone()
+        process.puJetIdEnUp    		= process.puJetId.clone()
+        process.puJetMvaEnDown 		= process.puJetMva.clone()
+        process.puJetIdEnDown  		= process.puJetId.clone()
+        process.puJetMvaSmeared.jets    = cms.InputTag("smearedGoodPatJets")
+        process.puJetIdSmeared.jets     = cms.InputTag("smearedGoodPatJets")
+	process.puJetMvaResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
+	process.puJetIdResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
+        process.puJetMvaResDown.jets    = cms.InputTag("smearedGoodPatJetsResDown")
+        process.puJetIdResDown.jets     = cms.InputTag("smearedGoodPatJetsResDown")
+        process.puJetMvaEnUp.jets       = cms.InputTag("smearedGoodPatJetsEnUp")
+        process.puJetIdEnUp.jets        = cms.InputTag("smearedGoodPatJetsEnUp")
+        process.puJetMvaEnDown.jets     = cms.InputTag("smearedGoodPatJetsEnDown")
+        process.puJetIdEnDown.jets      = cms.InputTag("smearedGoodPatJetsEnDown")
     ###--------------------------------------------------------------
 
 
@@ -259,17 +284,20 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         cms.InputTag('pfJetMETcorr', 'type1')
         )
 
+    # Get loose ID/Iso muons and veto ID electrons
+    process.load("InvisibleHiggs.Ntuple.PhysicsObjectCandidates_cff")
+
     # Get PFMET from runMEtUncertainties
     from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
     process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
     if iRunOnData == True:
         runMEtUncertainties(process,
-                            electronCollection = cms.InputTag('cleanPatElectrons'),
+                            electronCollection = cms.InputTag('selectVetoElectrons'),
                             photonCollection = '',
-                            muonCollection = 'cleanPatMuons',
+                            muonCollection = 'selectLooseMuons',
                             tauCollection = '',
-                            jetCollection = cms.InputTag('selectedPatJets'),
+                            jetCollection = cms.InputTag('goodPatJets'),
                             jetCorrLabel = 'L2L3Residual',
                             doSmearJets = False,
                             makeType1corrPFMEt = True,
@@ -279,16 +307,17 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                             doApplyType0corr = True,
                             sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data,
                             doApplySysShiftCorr = False,
+			    addToPatDefaultSequence = False,
                             )
         process.patPFJetMETtype1p2Corr.jetCorrLabel = cms.string('L2L3Residual')
         process.patPFJetMETtype2Corr.jetCorrLabel = cms.string('L2L3Residual')
     else:
         runMEtUncertainties(process,
-                            electronCollection = cms.InputTag('cleanPatElectrons'),
+                            electronCollection = cms.InputTag('selectVetoElectrons'),
                             photonCollection = '',
-                            muonCollection = 'cleanPatMuons',
+                            muonCollection = 'selectLooseMuons',
                             tauCollection = '',
-                            jetCollection = cms.InputTag('selectedPatJets'),
+                            jetCollection = cms.InputTag('goodPatJets'),
                             jetCorrLabel = 'L3Absolute',
                             doSmearJets = True,
                             makeType1corrPFMEt = True,
@@ -298,6 +327,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                             doApplyType0corr = True,
                             sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc,
                             doApplySysShiftCorr = False,
+			    addToPatDefaultSequence = False,
                             )
 
     # Fix Type0 correction module
@@ -375,7 +405,19 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         process.pfParticleSelectionSequence *
         process.patDefaultSequence *
         process.goodPatJets *
-        process.puJetIdSqeuence
+	process.PhysicsObjectSequence *
+	process.metUncertaintySequence *
+        process.puJetIdSqeuence *
+	process.puJetMvaSmeared *
+	process.puJetIdSmeared *
+	process.puJetMvaResUp *
+        process.puJetIdResUp *
+        process.puJetMvaResDown *
+        process.puJetIdResDown *
+        process.puJetMvaEnUp *
+        process.puJetIdEnUp *
+        process.puJetMvaEnDown *
+        process.puJetIdEnDown 
         )
     ###--------------------------------------------------------------
 
@@ -389,8 +431,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         # good jets
         ,'keep *_goodPatJets_*_*'
         # PU jet ID
-        ,'keep *_puJetId_*_*'
-        ,'keep *_puJetMva_*_*'
+        ,'keep *_puJetId*_*_*'
+        ,'keep *_puJetMva*_*_*'
         # vertices
         ,'keep *_offlineBeamSpot_*_*'
         ,'keep *_offlinePrimaryVertices*_*_*'
