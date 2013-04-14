@@ -471,6 +471,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         # trigger results
         'keep edmTriggerResults_*_*_*'
         ,'keep *_hltTriggerSummaryAOD_*_*'
+        # L1
+        ,'keep *_l1extraParticles_MET_RECO'
+        ,'keep *_l1extraParticles_MHT_RECO'
         # good jets
         ,'keep *_goodPatJets_*_*'
         # PU jet ID

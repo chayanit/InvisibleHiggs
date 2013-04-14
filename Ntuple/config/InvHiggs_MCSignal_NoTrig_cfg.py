@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PAT")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/group/phys_higgs/vbfHinv/DataSample/AODSIM_WJetsToLNu.root')
+    fileNames = cms.untracked.vstring('/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/04BCEC26-AA02-E211-A81D-003048CF99BA.root')
 )
 process.PFCandAssoMap = cms.EDProducer("PFCand_AssoMap",
     ConversionsCollection = cms.InputTag("allConversions"),
@@ -21431,6 +21431,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_patType1CorrectedPFMetMuonEnDown_*_PAT', 
         'keep edmTriggerResults_*_*_*', 
         'keep *_hltTriggerSummaryAOD_*_*', 
+        'keep *_l1extraParticles_MET_RECO', 
+        'keep *_l1extraParticles_MHT_RECO', 
         'keep *_goodPatJets_*_*', 
         'keep *_puJetId*_*_*', 
         'keep *_puJetMva*_*_*', 
