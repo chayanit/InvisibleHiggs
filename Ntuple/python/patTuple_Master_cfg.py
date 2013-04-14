@@ -19,13 +19,13 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     ### GlobalTag
     if iRunOnData == True:
         if (iData.find("Jul13")==0):
-            process.GlobalTag.globaltag = "FT_53_V6_AN3::All"
+            process.GlobalTag.globaltag = "FT_53_V6C_AN3::All"
         elif (iData.find("Aug06")==0):
             process.GlobalTag.globaltag = "FT_53_V6C_AN3::All"
         elif (iData.find("Aug24")==0):
-            process.GlobalTag.globaltag = "FT_53_V10_AN3::All"
+            process.GlobalTag.globaltag = "FT53_V10A_AN3::All"
         elif (iData.find("PromptC2")==0):
-            process.GlobalTag.globaltag = "GR_P_V41_AN3::All"
+            process.GlobalTag.globaltag = "GR_P_V42_AN3::All"
         elif (iData.find("PromptD")==0):
             process.GlobalTag.globaltag = "GR_P_V42_AN3::All"
         elif (iData.find("Dec11")==0): #Run201191
