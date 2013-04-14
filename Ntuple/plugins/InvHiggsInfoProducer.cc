@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.28 2013/04/10 17:35:26 raggleto Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.29 2013/04/14 21:24:42 chayanit Exp $
 //
 //
 
@@ -42,6 +42,8 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+
+#include "L1Trigger/GlobalTriggerAnalyzer/interface/L1RetrieveL1Extra.h"
 
 #include "DataFormats/L1Trigger/interface/L1JetParticleFwd.h"
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
@@ -156,7 +158,9 @@ private:
 
   /// write trigger info
   void doTrigger(const edm::Event& iEvent, 
-		 const edm::EventSetup& iSetup);
+		 const edm::EventSetup& iSetup); 
+  void doL1Trigger(const edm::Event& iEvent, 
+		   const edm::EventSetup& iSetup);
 
   /// write met filter info
   void doMETFilter(const edm::Event& iEvent, 
@@ -215,10 +219,14 @@ private:
   edm::InputTag genEvtTag_;
   edm::InputTag genParticleTag_;
   bool mcPYTHIA_;
-
+  
+  edm::InputTag L1ExtraEtMissMET_;
+  edm::InputTag L1ExtraHtMissMHT_;
   edm::InputTag hltResultsTag_;
   std::string hltPath1Name_;
-  std::string hltPath2Name_;
+  std::string hltPath2Name_;  
+  std::string hltPath3Name_;
+  std::string hltPath4Name_;
   edm::InputTag metResultsTag_;
   edm::InputTag vtxTag_;
   edm::InputTag jetTag_;
@@ -248,7 +256,9 @@ private:
   // HLT config helper
   HLTConfigProvider hltConfig_;
   unsigned hltBit1_;
-  unsigned hltBit2_;
+  unsigned hltBit2_; 
+  unsigned hltBit3_;
+  unsigned hltBit4_;
   bool doHltBit_;
 
   // PU re-weighting
@@ -283,11 +293,15 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   genParticleTag_(iConfig.getUntrackedParameter<edm::InputTag>("genParticleTag", edm::InputTag("genParticles","","SIM"))),
   mcPYTHIA_(iConfig.getUntrackedParameter<bool>("mcPYTHIA",true)),
 
-  // Trigger
+  // Trigger 
+  L1ExtraEtMissMET_(iConfig.getUntrackedParameter<edm::InputTag>("L1ExtraEtMissMET",edm::InputTag("l1extraParticles","MET"))), 
+  L1ExtraHtMissMHT_(iConfig.getUntrackedParameter<edm::InputTag>("L1ExtraEtMissMHT",edm::InputTag("l1extraParticles","MHT"))),
   hltResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("hltResultsTag",edm::InputTag("TriggerResults","","HLT"))),
   hltPath1Name_(iConfig.getUntrackedParameter<std::string>("hltPath1Name",std::string("HLT_v1"))),
   hltPath2Name_(iConfig.getUntrackedParameter<std::string>("hltPath2Name",std::string("HLT_v1"))),
-
+  hltPath3Name_(iConfig.getUntrackedParameter<std::string>("hltPath3Name",std::string("HLT_v1"))),
+  hltPath4Name_(iConfig.getUntrackedParameter<std::string>("hltPath4Name",std::string("HLT_v1"))),
+  
   // MET filters
   metResultsTag_(iConfig.getUntrackedParameter<edm::InputTag>("metResultsTag",edm::InputTag("TriggerResults","","PAT"))),
 
@@ -402,44 +416,66 @@ void InvHiggsInfoProducer::beginRun(edm::Run const & iRun, edm::EventSetup const
 
   // HLT setup
   bool changed;
-  hltConfig_.init(iRun, iSetup, hltResultsTag_.process(), changed);
-  
+  hltConfig_.init(iRun, iSetup, hltResultsTag_.process(), changed);  
+
   // HLT Path -- No BPTX
   try{
     hltBit1_=(hltConfig_.triggerNames()).size();  // default setting -- trigger not found
-    hltBit2_=(hltConfig_.triggerNames()).size();  // default setting -- trigger not found
-    for (uint i=0;i<(hltConfig_.triggerNames()).size();++i) // loop over trigger names
-      {
-	std::string trigName=hltConfig_.triggerName(i);
-
-	if (hltPath1Name_.size()>0 &&
-	    trigName.find(hltPath1Name_)!= std::string::npos)
-	  {
-	    hltBit1_ = hltConfig_.triggerIndex(trigName);
-	  }
-	if (hltPath2Name_.size()>0 &&
-	    trigName.find(hltPath2Name_)!= std::string::npos)
-	  {
-	    hltBit2_ = hltConfig_.triggerIndex(trigName);
-	  }
+    hltBit2_=(hltConfig_.triggerNames()).size();  // default setting -- trigger not found 
+    hltBit3_=(hltConfig_.triggerNames()).size();  // default setting -- trigger not found
+    hltBit4_=(hltConfig_.triggerNames()).size();  // default setting -- trigger not found
+    for (uint i=0;i<(hltConfig_.triggerNames()).size();++i){ // loop over trigger names
+      std::string trigName=hltConfig_.triggerName(i);
+      if (hltPath1Name_.size()>0 &&
+	  trigName.find(hltPath1Name_)!= std::string::npos){
+	hltBit1_ = hltConfig_.triggerIndex(trigName);
       }
-    if (hltBit1_==(hltConfig_.triggerNames()).size())
-      {
-	edm::LogWarning("InvHiggsInfoProducer") << "Could not find an HLT path matching "<<hltPath1Name_<<std::endl;
+      if (hltPath2Name_.size()>0 &&
+	  trigName.find(hltPath2Name_)!= std::string::npos){
+	hltBit2_ = hltConfig_.triggerIndex(trigName);
       }
-    if (hltBit2_==(hltConfig_.triggerNames()).size())
-      {
-	edm::LogWarning("InvHiggsInfoProducer") << "Could not find an HLT path matching "<<hltPath2Name_<<std::endl;
+      if (hltPath3Name_.size()>0 &&
+	  trigName.find(hltPath3Name_)!= std::string::npos){
+	hltBit3_ = hltConfig_.triggerIndex(trigName);
       }
-    else
+      if (hltPath4Name_.size()>0 &&
+	  trigName.find(hltPath4Name_)!= std::string::npos){
+	hltBit4_ = hltConfig_.triggerIndex(trigName);
+      }
+    }
+    
+    if (hltBit1_==(hltConfig_.triggerNames()).size()){
+      edm::LogWarning("InvHiggsInfoProducer") << "Could not find an HLT path matching "<<hltPath1Name_<<std::endl;
+    }
+    else{
       edm::LogInfo("InvHiggsInfoProducer") << hltPath1Name_ << " index is " << hltBit1_ << std::endl;
-      edm::LogInfo("InvHiggsInfoProducer") << hltPath2Name_ << " index is " << hltBit2_ << std::endl;
+    }
+    
+    if (hltBit2_==(hltConfig_.triggerNames()).size()){
+      edm::LogWarning("InvHiggsInfoProducer") << "Could not find an HLT path matching "<<hltPath2Name_<<std::endl;
+    }
+    else{
+      edm::LogInfo("InvHiggsInfoProducer") << hltPath2Name_ << " index is " << hltBit2_ << std::endl; 
+    }
+    
+    if (hltBit3_==(hltConfig_.triggerNames()).size()){
+      edm::LogWarning("InvHiggsInfoProducer") << "Could not find an HLT path matching "<<hltPath3Name_<<std::endl;
+    }
+    else{
+      edm::LogInfo("InvHiggsInfoProducer") << hltPath3Name_ << " index is " << hltBit3_ << std::endl; 
+    }
+    
+    if (hltBit4_==(hltConfig_.triggerNames()).size()){
+      edm::LogWarning("InvHiggsInfoProducer") << "Could not find an HLT path matching "<<hltPath4Name_<<std::endl;
+    }
+    else{
+      edm::LogInfo("InvHiggsInfoProducer") << hltPath4Name_ << " index is " << hltBit4_ << std::endl;
+    }
   } // end of try loop
   catch (cms::Exception e) {
     edm::LogWarning("InvHiggsInfoProducer") << "Exception while trying to find HLT bit numbers" << std::endl;
     edm::LogWarning("InvHiggsInfoProducer") << e << std::endl;
   }
-
 }
 
 
@@ -474,6 +510,7 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
  
   // event & trigger info
   doEventInfo(iEvent);
+  doL1Trigger(iEvent, iSetup);
   doTrigger(iEvent, iSetup);
 
   // met filters
@@ -791,31 +828,87 @@ void InvHiggsInfoProducer::doEventInfo(const edm::Event& iEvent) {
   info_->run = run;
 
 }
+
+
+void InvHiggsInfoProducer::doL1Trigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) { 
+  
+  //ET-MET
+  const l1extra::L1EtMissParticleCollection* l1ExtraETM;
+  edm::Handle<l1extra::L1EtMissParticleCollection> colL1ExtraETM;
+  iEvent.getByLabel(L1ExtraEtMissMET_, colL1ExtraETM);
+  if(colL1ExtraETM.isValid()){
+    l1ExtraETM = colL1ExtraETM.product();
+    //std::cout<< " MET = " << (l1ExtraETM->begin()->etMiss()) << " GeV"<<std::endl;
+    //std::cout<< " ET  = " << (l1ExtraETM->begin()->etTotal()) << " GeV"<<std::endl;
+    info_->l1ET    = l1ExtraETM->begin()->etTotal(); 
+    info_->l1MET   = l1ExtraETM->begin()->etMiss();
+    info_->l1ETPhi = l1ExtraETM->begin()->phi();
+  }
+  else {
+    LogDebug("L1RetrieveL1Extra")
+      << "\n l1extra::L1EtMissParticleCollection with input tag \n  "
+      << L1ExtraEtMissMET_ << "\n not found in the event.\n"
+      << "\n Return pointer 0 and false validity tag."
+      << std::endl;
+    //info_->l1ET    = -99.; 
+    //info_->l1MET   = -99.;
+    //info_->l1ETPhi = -99.;
+  }
+  
+  //HT-MHT
+  const l1extra::L1EtMissParticleCollection* l1ExtraHT;
+  edm::Handle<l1extra::L1EtMissParticleCollection> collL1ExtraHT;
+  iEvent.getByLabel(L1ExtraHtMissMHT_, collL1ExtraHT);
+  if (collL1ExtraHT.isValid()) {
+    l1ExtraHT = collL1ExtraHT.product();
+    //std::cout<< " MHT = " << (l1ExtraHT->begin()->etMiss()) << " GeV"<<std::endl;
+    //std::cout<< " HT  = " << (l1ExtraHT->begin()->etTotal()) << " GeV"<<std::endl;
+    info_->l1HT    = l1ExtraHT->begin()->etTotal();
+    info_->l1MHT   = l1ExtraHT->begin()->etMiss();
+    info_->l1HTPhi = l1ExtraHT->begin()->phi();
+  } 
+  else {
+    LogDebug("L1RetrieveL1Extra")
+      << "\n l1extra::L1EtMissParticleCollection with input tag \n  "
+      << L1ExtraHtMissMHT_ << "\n not found in the event.\n"
+      << "\n Return pointer 0 and false validity tag."
+      << std::endl;
+    //info_->l1HT    = -99.;
+    //info_->l1MHT   = -99.;
+    //info_->l1HTPhi = -99.;
+  }
+}  
   
 
-void InvHiggsInfoProducer::doTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void InvHiggsInfoProducer::doTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {  
 
   bool hltResult1(false);
-  bool hltResult2(false);
-
+  bool hltResult2(false);  
+  bool hltResult3(false);
+  bool hltResult4(false);
+  
   // get HLT results
   edm::Handle<edm::TriggerResults> HLTR;
   iEvent.getByLabel(hltResultsTag_, HLTR);
-
+  
   if (HLTR.isValid()) {
     // triggerIndex must be less than the size of HLTR or you get a CMSException: _M_range_check
     if (doHltBit_ && hltBit1_ < HLTR->size()) hltResult1 = HLTR->accept(hltBit1_);
     if (doHltBit_ && hltBit2_ < HLTR->size()) hltResult2 = HLTR->accept(hltBit2_);
+    if (doHltBit_ && hltBit3_ < HLTR->size()) hltResult3 = HLTR->accept(hltBit3_);
+    if (doHltBit_ && hltBit4_ < HLTR->size()) hltResult4 = HLTR->accept(hltBit4_);
   }
   else {
     if (doHltBit_) edm::LogWarning("MissingProduct") << "HLT information not found.  Branch will not be filled" << std::endl;
     doHltBit_ = false;
   }
-
+  
   // store bits
   info_->hltResult1 = hltResult1; 
   info_->hltResult2 = hltResult2; 
-
+  info_->hltResult3 = hltResult3; 
+  info_->hltResult4 = hltResult4; 
+  
   // store HLT prescale info
   //info_->hltPrescaleIndex=hltConfig_.prescaleSet(iEvent, iSetup);
   //info_->hltPrescale=hltConfig_.prescaleValue(iEvent, iSetup, hltPathName_);

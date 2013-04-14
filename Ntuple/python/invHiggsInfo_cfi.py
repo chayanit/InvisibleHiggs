@@ -9,10 +9,14 @@ invHiggsInfo = cms.EDAnalyzer(
     mcPYTHIA       = cms.untracked.bool(True),
 
     # trigger
+    L1ExtraEtMissMET = cms.untracked.InputTag("l1extraParticles","MET"),
+    L1ExtraEtMissMHT = cms.untracked.InputTag("l1extraParticles","MHT"),
     hltResultsTag = cms.untracked.InputTag("TriggerResults","","HLT"),
     hltPath1Name  = cms.untracked.string("HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v"),
     hltPath2Name  = cms.untracked.string("HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v"),
-
+    hltPath3Name  = cms.untracked.string("HLT_DiJet35_MJJ700_AllJets_DEta3p5_VBF_v"),
+    hltPath4Name  = cms.untracked.string("HLT_DiJet30_MJJ700_AllJets_DEta3p5_VBF_v"),
+    
     # jets 
     jetTag      = cms.untracked.InputTag("goodPatJets"),
     puJetMvaTag = cms.untracked.InputTag("puJetMva", "fullDiscriminant"),

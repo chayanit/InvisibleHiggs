@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.16 2013/04/10 16:37:35 chayanit Exp $
+// $Id: InvHiggsInfo.h,v 1.17 2013/04/14 21:24:41 chayanit Exp $
 //
 //
 
@@ -45,9 +45,17 @@ class InvHiggsInfo { //: public TObject {
 
   // trigger
   bool l1Result;
+  double l1ET;
+  double l1MET;
+  double l1ETPhi;
+  double l1HT;
+  double l1MHT;
+  double l1HTPhi;
   bool hltResult1;
   bool hltResult2;
-
+  bool hltResult3;
+  bool hltResult4;
+  
   // MET filters
   bool metflag0;
   bool metflag1;
