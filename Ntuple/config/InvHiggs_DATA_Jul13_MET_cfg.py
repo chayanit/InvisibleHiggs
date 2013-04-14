@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PAT")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/04BCEC26-AA02-E211-A81D-003048CF99BA.root')
+    fileNames = cms.untracked.vstring('/store/group/phys_higgs/vbfHinv/DataSample/AODSIM_WJetsToLNu.root')
 )
 process.PFCandAssoMap = cms.EDProducer("PFCand_AssoMap",
     ConversionsCollection = cms.InputTag("allConversions"),
@@ -8751,6 +8751,33 @@ process.gk7GenJetsNoNu = cms.EDProducer("FastjetJetProducer",
 )
 
 
+process.goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty = cms.EDProducer("PATJetCleaner",
+    finalCut = cms.string(''),
+    src = cms.InputTag("goodPatJets"),
+    checkOverlaps = cms.PSet(
+        electrons = cms.PSet(
+            src = cms.InputTag("selectVetoElectrons"),
+            deltaR = cms.double(0.5),
+            pairCut = cms.string(''),
+            checkRecoComponents = cms.bool(False),
+            algorithm = cms.string('byDeltaR'),
+            preselection = cms.string(''),
+            requireNoOverlaps = cms.bool(True)
+        ),
+        muons = cms.PSet(
+            src = cms.InputTag("selectLooseMuons"),
+            deltaR = cms.double(0.5),
+            pairCut = cms.string(''),
+            checkRecoComponents = cms.bool(False),
+            algorithm = cms.string('byDeltaR'),
+            preselection = cms.string(''),
+            requireNoOverlaps = cms.bool(True)
+        )
+    ),
+    preselection = cms.string('')
+)
+
+
 process.hiGenParticlesForJets = cms.EDProducer("InputGenJetsParticleSelector",
     src = cms.InputTag("hiGenParticles"),
     ignoreParticleIDs = cms.vuint32(1000022, 1000012, 1000014, 1000016, 2000012, 
@@ -14382,33 +14409,6 @@ process.patJets = cms.EDProducer("PATJetProducer",
 )
 
 
-process.patJetsNotOverlappingWithLeptonsForMEtUncertainty = cms.EDProducer("PATJetCleaner",
-    finalCut = cms.string(''),
-    src = cms.InputTag("selectedPatJets"),
-    checkOverlaps = cms.PSet(
-        electrons = cms.PSet(
-            src = cms.InputTag("cleanPatElectrons"),
-            deltaR = cms.double(0.5),
-            pairCut = cms.string(''),
-            checkRecoComponents = cms.bool(False),
-            algorithm = cms.string('byDeltaR'),
-            preselection = cms.string(''),
-            requireNoOverlaps = cms.bool(True)
-        ),
-        muons = cms.PSet(
-            src = cms.InputTag("cleanPatMuons"),
-            deltaR = cms.double(0.5),
-            pairCut = cms.string(''),
-            checkRecoComponents = cms.bool(False),
-            algorithm = cms.string('byDeltaR'),
-            preselection = cms.string(''),
-            requireNoOverlaps = cms.bool(True)
-        )
-    ),
-    preselection = cms.string('')
-)
-
-
 process.patMETs = cms.EDProducer("PATMETProducer",
     metSource = cms.InputTag("pfType1CorrectedMet"),
     userData = cms.PSet(
@@ -14620,38 +14620,38 @@ process.patPFJetMETtype2CorrUnclusteredEnUp = cms.EDProducer("ShiftedMETcorrInpu
 
 
 process.patPFMETcorrElectronEnDown = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("cleanPatElectrons"),
-    srcShifted = cms.InputTag("shiftedPatElectronsEnDown")
+    srcOriginal = cms.InputTag("selectVetoElectrons"),
+    srcShifted = cms.InputTag("shiftedSelectVetoElectronsEnDown")
 )
 
 
 process.patPFMETcorrElectronEnUp = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("cleanPatElectrons"),
-    srcShifted = cms.InputTag("shiftedPatElectronsEnUp")
+    srcOriginal = cms.InputTag("selectVetoElectrons"),
+    srcShifted = cms.InputTag("shiftedSelectVetoElectronsEnUp")
 )
 
 
 process.patPFMETcorrJetEnDown = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
-    srcShifted = cms.InputTag("shiftedPatJetsEnDownForCorrMEt")
+    srcOriginal = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    srcShifted = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt")
 )
 
 
 process.patPFMETcorrJetEnUp = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
-    srcShifted = cms.InputTag("shiftedPatJetsEnUpForCorrMEt")
+    srcOriginal = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    srcShifted = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
 )
 
 
 process.patPFMETcorrMuonEnDown = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("cleanPatMuons"),
-    srcShifted = cms.InputTag("shiftedPatMuonsEnDown")
+    srcOriginal = cms.InputTag("selectLooseMuons"),
+    srcShifted = cms.InputTag("shiftedSelectLooseMuonsEnDown")
 )
 
 
 process.patPFMETcorrMuonEnUp = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("cleanPatMuons"),
-    srcShifted = cms.InputTag("shiftedPatMuonsEnUp")
+    srcOriginal = cms.InputTag("selectLooseMuons"),
+    srcShifted = cms.InputTag("shiftedSelectLooseMuonsEnUp")
 )
 
 
@@ -17553,6 +17553,24 @@ process.secondaryVertexTagInfos = cms.EDProducer("SecondaryVertexProducer",
 )
 
 
+process.selectElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
+    idLabel = cms.string('tight'),
+    src = cms.InputTag("cleanPatElectrons")
+)
+
+
+process.selectLooseElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
+    idLabel = cms.string('loose'),
+    src = cms.InputTag("cleanPatElectrons")
+)
+
+
+process.selectVetoElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
+    idLabel = cms.string('veto'),
+    src = cms.InputTag("cleanPatElectrons")
+)
+
+
 process.selectedPatJetsForMETtype1p2CorrEnDown = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(False),
     src = cms.InputTag("selectedPatJetsForMETtype1p2Corr"),
@@ -17575,37 +17593,9 @@ process.selectedPatJetsForMETtype1p2CorrEnUp = cms.EDProducer("ShiftedPATJetProd
 )
 
 
-process.shiftedPatElectronsEnDown = cms.EDProducer("ShiftedPATElectronProducer",
-    src = cms.InputTag("cleanPatElectrons"),
-    shiftBy = cms.double(-1.0),
-    binning = cms.VPSet(cms.PSet(
-        binUncertainty = cms.double(0.006),
-        binSelection = cms.string('isEB')
-    ), 
-        cms.PSet(
-            binUncertainty = cms.double(0.015),
-            binSelection = cms.string('!isEB')
-        ))
-)
-
-
-process.shiftedPatElectronsEnUp = cms.EDProducer("ShiftedPATElectronProducer",
-    src = cms.InputTag("cleanPatElectrons"),
-    shiftBy = cms.double(1.0),
-    binning = cms.VPSet(cms.PSet(
-        binUncertainty = cms.double(0.006),
-        binSelection = cms.string('isEB')
-    ), 
-        cms.PSet(
-            binUncertainty = cms.double(0.015),
-            binSelection = cms.string('!isEB')
-        ))
-)
-
-
-process.shiftedPatJetsEnDownForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
+process.shiftedGoodPatJetsEnDownForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(False),
-    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(-1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
@@ -17614,9 +17604,9 @@ process.shiftedPatJetsEnDownForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
 )
 
 
-process.shiftedPatJetsEnDownForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
+process.shiftedGoodPatJetsEnDownForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(True),
-    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(-1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
@@ -17625,9 +17615,9 @@ process.shiftedPatJetsEnDownForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
 )
 
 
-process.shiftedPatJetsEnUpForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
+process.shiftedGoodPatJetsEnUpForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(False),
-    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
@@ -17636,9 +17626,9 @@ process.shiftedPatJetsEnUpForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
 )
 
 
-process.shiftedPatJetsEnUpForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
+process.shiftedGoodPatJetsEnUpForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(True),
-    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Fall12_V7_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
@@ -17647,17 +17637,45 @@ process.shiftedPatJetsEnUpForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
 )
 
 
-process.shiftedPatMuonsEnDown = cms.EDProducer("ShiftedPATMuonProducer",
-    src = cms.InputTag("cleanPatMuons"),
+process.shiftedSelectLooseMuonsEnDown = cms.EDProducer("ShiftedPATMuonProducer",
+    src = cms.InputTag("selectLooseMuons"),
     uncertainty = cms.double(0.002),
     shiftBy = cms.double(-1.0)
 )
 
 
-process.shiftedPatMuonsEnUp = cms.EDProducer("ShiftedPATMuonProducer",
-    src = cms.InputTag("cleanPatMuons"),
+process.shiftedSelectLooseMuonsEnUp = cms.EDProducer("ShiftedPATMuonProducer",
+    src = cms.InputTag("selectLooseMuons"),
     uncertainty = cms.double(0.002),
     shiftBy = cms.double(1.0)
+)
+
+
+process.shiftedSelectVetoElectronsEnDown = cms.EDProducer("ShiftedPATElectronProducer",
+    src = cms.InputTag("selectVetoElectrons"),
+    shiftBy = cms.double(-1.0),
+    binning = cms.VPSet(cms.PSet(
+        binUncertainty = cms.double(0.006),
+        binSelection = cms.string('isEB')
+    ), 
+        cms.PSet(
+            binUncertainty = cms.double(0.015),
+            binSelection = cms.string('!isEB')
+        ))
+)
+
+
+process.shiftedSelectVetoElectronsEnUp = cms.EDProducer("ShiftedPATElectronProducer",
+    src = cms.InputTag("selectVetoElectrons"),
+    shiftBy = cms.double(1.0),
+    binning = cms.VPSet(cms.PSet(
+        binUncertainty = cms.double(0.006),
+        binSelection = cms.string('isEB')
+    ), 
+        cms.PSet(
+            binUncertainty = cms.double(0.015),
+            binSelection = cms.string('!isEB')
+        ))
 )
 
 
@@ -19587,6 +19605,17 @@ process.hcalLaserEventFilter = cms.EDFilter("HcalLaserEventFilter",
 )
 
 
+process.hcallasereventfilter2012 = cms.EDFilter("HcalLaserEventFilter2012",
+    forceFilterTrue = cms.untracked.bool(False),
+    verbose = cms.untracked.bool(False),
+    eventFileName = cms.string('HCALLaser2012AllDatasets.txt.gz'),
+    WriteBadToFile = cms.untracked.bool(False),
+    prefix = cms.untracked.string(''),
+    maxrun = cms.untracked.int32(-1),
+    minrun = cms.untracked.int32(-1)
+)
+
+
 process.hltHighLevel = cms.EDFilter("HLTHighLevel",
     eventSetupPathsKey = cms.string(''),
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
@@ -19594,6 +19623,90 @@ process.hltHighLevel = cms.EDFilter("HLTHighLevel",
         'HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*'),
     throw = cms.bool(False),
     andOr = cms.bool(True)
+)
+
+
+process.logErrorTooManyClusters = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    modulesToIgnore = cms.vstring('SeedGeneratorFromRegionHitsEDProducer:regionalCosmicTrackerSeeds', 
+        'PhotonConversionTrajectorySeedProducerFromSingleLeg:photonConvTrajSeedFromSingleLeg'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    categoriesToWatch = cms.vstring('TooManyClusters')
+)
+
+
+process.logErrorTooManySeeds = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    modulesToIgnore = cms.vstring('SeedGeneratorFromRegionHitsEDProducer:regionalCosmicTrackerSeeds'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    categoriesToWatch = cms.vstring('TooManySeeds')
+)
+
+
+process.logErrorTooManySeedsDefault = cms.EDFilter("LogErrorEventFilter",
+    categoriesToWatch = cms.vstring('TooManySeeds'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxErrorFractionInRun = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    src = cms.InputTag("logErrorHarvester")
+)
+
+
+process.logErrorTooManySeedsMainIterations = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    categoriesToWatch = cms.vstring('TooManySeeds'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    modulesToWatch = cms.vstring('CkfTrackCandidateMaker:initialStepTrackCandidate', 
+        'CkfTrackCandidateMaker:pixelPairTrackCandidate')
+)
+
+
+process.logErrorTooManyTripletsPairs = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    modulesToIgnore = cms.vstring('SeedGeneratorFromRegionHitsEDProducer:regionalCosmicTrackerSeeds', 
+        'PhotonConversionTrajectorySeedProducerFromSingleLeg:photonConvTrajSeedFromSingleLeg'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    categoriesToWatch = cms.vstring('TooManyTriplets', 
+        'TooManyPairs', 
+        'PixelTripletHLTGenerator')
+)
+
+
+process.logErrorTooManyTripletsPairsMainIterations = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    categoriesToWatch = cms.vstring('TooManyTriplets', 
+        'TooManyPairs', 
+        'PixelTripletHLTGenerator'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    modulesToWatch = cms.vstring('SeedGeneratorFromRegionHitsEDProducer:initialStepSeeds', 
+        'SeedGeneratorFromRegionHitsEDProducer:pixelPairStepSeeds')
+)
+
+
+process.manystripclus53X = cms.EDFilter("ByClusterSummaryMultiplicityPairEventFilter",
+    cut = cms.string('( mult2 > 20000+7*mult1)'),
+    multiplicityConfig = cms.PSet(
+        secondMultiplicityConfig = cms.PSet(
+            clusterSummaryCollection = cms.InputTag("clusterSummaryProducer"),
+            subDetVariable = cms.string('cHits'),
+            subDetEnum = cms.int32(0)
+        ),
+        firstMultiplicityConfig = cms.PSet(
+            clusterSummaryCollection = cms.InputTag("clusterSummaryProducer"),
+            subDetVariable = cms.string('pHits'),
+            subDetEnum = cms.int32(5)
+        )
+    )
 )
 
 
@@ -19799,6 +19912,18 @@ process.recoTauPileUpVertices = cms.EDFilter("RecoTauPileUpVertexSelector",
 )
 
 
+process.selectLooseMuons = cms.EDFilter("PATMuonSelector",
+    src = cms.InputTag("cleanPatMuons"),
+    cut = cms.string('pt>10 && (isGlobalMuon || isTrackerMuon) && isPFMuon && abs(eta)<2.1 && (pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt< 0.20')
+)
+
+
+process.selectMuons = cms.EDFilter("PATMuonSelector",
+    src = cms.InputTag("cleanPatMuons"),
+    cut = cms.string('pt>20 && isGlobalMuon && isPFMuon && abs(eta)<2.1 && globalTrack().normalizedChi2<10 && globalTrack().hitPattern().numberOfValidMuonHits>0 && globalTrack().hitPattern().numberOfValidPixelHits>0 && numberOfMatchedStations>1 && globalTrack().hitPattern().trackerLayersWithMeasurement>5 && (pfIsolationR04().sumChargedHadronPt+max(0.,pfIsolationR04().sumNeutralHadronEt+pfIsolationR04().sumPhotonEt-0.5*pfIsolationR04().sumPUPt))/pt< 0.12')
+)
+
+
 process.selectedPatElectrons = cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("patElectrons"),
     cut = cms.string('pt>10. && abs(eta)<2.5')
@@ -19813,14 +19938,14 @@ process.selectedPatJets = cms.EDFilter("PATJetSelector",
 
 process.selectedPatJetsForMETtype1p2Corr = cms.EDFilter("PATJetSelector",
     filter = cms.bool(False),
-    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     cut = cms.string('abs(eta) < 9.9')
 )
 
 
 process.selectedPatJetsForMETtype2Corr = cms.EDFilter("PATJetSelector",
     filter = cms.bool(False),
-    src = cms.InputTag("patJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     cut = cms.string('abs(eta) > 9.9')
 )
 
@@ -19875,6 +20000,35 @@ process.tauGenJetsSelectorAllHadrons = cms.EDFilter("TauGenJetDecayModeSelector"
         'threeProng1Pi0', 
         'threeProngOther', 
         'rare')
+)
+
+
+process.tobtecfakesfilter = cms.EDFilter("TobTecFakesFilter",
+    phiWindow = cms.double(0.7),
+    ratioAllCut = cms.double(-1.0),
+    maxEta = cms.double(1.6),
+    minEta = cms.double(0.9),
+    filter = cms.bool(True),
+    trackCollection = cms.InputTag("generalTracks"),
+    ratioJetCut = cms.double(3.0),
+    absJetCut = cms.double(20.0)
+)
+
+
+process.toomanystripclus53X = cms.EDFilter("ByClusterSummaryMultiplicityPairEventFilter",
+    cut = cms.string('(mult2>50000) && ( mult2 > 20000+7*mult1)'),
+    multiplicityConfig = cms.PSet(
+        secondMultiplicityConfig = cms.PSet(
+            clusterSummaryCollection = cms.InputTag("clusterSummaryProducer"),
+            subDetVariable = cms.string('cHits'),
+            subDetEnum = cms.int32(0)
+        ),
+        firstMultiplicityConfig = cms.PSet(
+            clusterSummaryCollection = cms.InputTag("clusterSummaryProducer"),
+            subDetVariable = cms.string('pHits'),
+            subDetEnum = cms.int32(5)
+        )
+    )
 )
 
 
@@ -19935,15 +20089,15 @@ process.out = cms.OutputModule("PoolOutputModule",
         'drop *_selectedPatJets_tagInfos_*', 
         'keep *_selectedPatJets_pfCandidates_*', 
         'drop *_selectedPatJets_caloTowers_*', 
-        'keep *_patJetsNotOverlappingWithLeptonsForMEtUncertainty_*_PAT', 
-        'keep *_shiftedPatJetsEnUpForRawMEt_*_PAT', 
-        'keep *_shiftedPatJetsEnDownForRawMEt_*_PAT', 
-        'keep *_shiftedPatJetsEnUpForCorrMEt_*_PAT', 
-        'keep *_shiftedPatJetsEnDownForCorrMEt_*_PAT', 
-        'keep *_shiftedPatElectronsEnUp_*_PAT', 
-        'keep *_shiftedPatElectronsEnDown_*_PAT', 
-        'keep *_shiftedPatMuonsEnUp_*_PAT', 
-        'keep *_shiftedPatMuonsEnDown_*_PAT', 
+        'keep *_goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty_*_PAT', 
+        'keep *_shiftedGoodPatJetsEnUpForRawMEt_*_PAT', 
+        'keep *_shiftedGoodPatJetsEnDownForRawMEt_*_PAT', 
+        'keep *_shiftedGoodPatJetsEnUpForCorrMEt_*_PAT', 
+        'keep *_shiftedGoodPatJetsEnDownForCorrMEt_*_PAT', 
+        'keep *_shiftedSelectVetoElectronsEnUp_*_PAT', 
+        'keep *_shiftedSelectVetoElectronsEnDown_*_PAT', 
+        'keep *_shiftedSelectLooseMuonsEnUp_*_PAT', 
+        'keep *_shiftedSelectLooseMuonsEnDown_*_PAT', 
         'keep *_patPFMet_*_PAT', 
         'keep *_patType1CorrectedPFMet_*_PAT', 
         'keep *_patType1p2CorrectedPFMet_*_PAT', 
@@ -19966,8 +20120,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep edmTriggerResults_*_*_*', 
         'keep *_hltTriggerSummaryAOD_*_*', 
         'keep *_goodPatJets_*_*', 
-        'keep *_puJetId_*_*', 
-        'keep *_puJetMva_*_*', 
+        'keep *_puJetId*_*_*', 
+        'keep *_puJetMva*_*_*', 
         'keep *_offlineBeamSpot_*_*', 
         'keep *_offlinePrimaryVertices*_*_*', 
         'keep *_goodOfflinePrimaryVertices*_*_*', 
@@ -20014,6 +20168,9 @@ process.photonPFIsolationDepositsSequence = cms.Sequence(process.phPFIsoDepositC
 process.makePatPhotons = cms.Sequence(process.photonMatch+process.patPhotons)
 
 
+process.hcallLaserEvent2012Filter = cms.Sequence(process.hcallasereventfilter2012)
+
+
 process.recoTauCommonSequence = cms.Sequence(process.ak5PFJetTracksAssociatorAtVertex+process.recoTauAK5PFJets08Region+process.recoTauPileUpVertices+process.pfRecoTauTagInfoProducer)
 
 
@@ -20024,6 +20181,9 @@ process.puJetIdSqeuenceChs = cms.Sequence(process.puJetIdChs+process.puJetMvaChs
 
 
 process.cleanPatCandidates = cms.Sequence(process.cleanPatMuons+process.cleanPatElectrons+process.cleanPatPhotons+process.cleanPatTaus+process.cleanPatJets+process.cleanPatCandidateSummary)
+
+
+process.PhysicsObjectSequence = cms.Sequence(process.selectMuons+process.selectLooseMuons+process.selectElectrons+process.selectLooseElectrons+process.selectVetoElectrons)
 
 
 process.hpsPFTauDiscriminationByMVAIsolationSeq = cms.Sequence(process.kt6PFJetsForRhoComputationVoronoi+process.hpsPFTauDiscriminationByIsolationMVAraw+process.hpsPFTauDiscriminationByLooseIsolationMVA+process.hpsPFTauDiscriminationByMediumIsolationMVA+process.hpsPFTauDiscriminationByTightIsolationMVA+process.hpsPFTauDiscriminationByIsolationMVA2raw+process.hpsPFTauDiscriminationByLooseIsolationMVA2+process.hpsPFTauDiscriminationByMediumIsolationMVA2+process.hpsPFTauDiscriminationByTightIsolationMVA2)
@@ -20068,7 +20228,7 @@ process.countPatCandidates = cms.Sequence(process.countPatElectrons+process.coun
 process.electronPFIsolationDepositsSequencePFIso = cms.Sequence(process.elPFIsoDepositChargedPFIso+process.elPFIsoDepositChargedAllPFIso+process.elPFIsoDepositGammaPFIso+process.elPFIsoDepositNeutralPFIso+process.elPFIsoDepositPUPFIso)
 
 
-process.shiftedParticlesForMEtUncertainties = cms.Sequence(process.shiftedPatJetsEnUpForRawMEt+process.shiftedPatJetsEnDownForRawMEt+process.shiftedPatJetsEnUpForCorrMEt+process.shiftedPatJetsEnDownForCorrMEt+process.shiftedPatElectronsEnUp+process.shiftedPatElectronsEnDown+process.shiftedPatMuonsEnUp+process.shiftedPatMuonsEnDown)
+process.shiftedParticlesForMEtUncertainties = cms.Sequence(process.shiftedGoodPatJetsEnUpForRawMEt+process.shiftedGoodPatJetsEnDownForRawMEt+process.shiftedGoodPatJetsEnUpForCorrMEt+process.shiftedGoodPatJetsEnDownForCorrMEt+process.shiftedSelectVetoElectronsEnUp+process.shiftedSelectVetoElectronsEnDown+process.shiftedSelectLooseMuonsEnUp+process.shiftedSelectLooseMuonsEnDown)
 
 
 process.hpsPFTauDiscriminationByCombinedIsolationSeqDBSumPtCorr = cms.Sequence(process.hpsPFTauDiscriminationByVLooseCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr)
@@ -20111,6 +20271,9 @@ process.hpsPFTauDiscriminationByCombinedIsolationSeqDBSumPtCorr3Hits = cms.Seque
 
 
 process.patPFTauIsolation = cms.Sequence(process.tauIsoDepositPFCandidates+process.tauIsoDepositPFChargedHadrons+process.tauIsoDepositPFNeutralHadrons+process.tauIsoDepositPFGammas)
+
+
+process.trkPOGFilters = cms.Sequence(~process.manystripclus53X+~process.toomanystripclus53X+~process.logErrorTooManyClusters)
 
 
 process.produceAndDiscriminateFixedConePFTaus = cms.Sequence(process.fixedConePFTauProducer+process.fixedConePFTauDiscriminationByLeadingTrackFinding+process.fixedConePFTauDiscriminationByLeadingTrackPtCut+process.fixedConePFTauDiscriminationByLeadingPionPtCut+process.fixedConePFTauDiscriminationByIsolation+process.fixedConePFTauDiscriminationByTrackIsolation+process.fixedConePFTauDiscriminationByECALIsolation+process.fixedConePFTauDiscriminationByIsolationUsingLeadingPion+process.fixedConePFTauDiscriminationByTrackIsolationUsingLeadingPion+process.fixedConePFTauDiscriminationByECALIsolationUsingLeadingPion+process.fixedConePFTauDiscriminationAgainstElectron+process.fixedConePFTauDiscriminationAgainstMuon)
@@ -20284,7 +20447,7 @@ process.makePatTaus = cms.Sequence(process.patHPSPFTauDiscriminationUpdate+proce
 process.PFTau = cms.Sequence(process.recoTauCommonSequence+process.recoTauClassicHPSSequence)
 
 
-process.metUncertaintySequence = cms.Sequence(process.patJetsNotOverlappingWithLeptonsForMEtUncertainty+process.shiftedParticlesForMEtUncertainties+process.producePatPFMETCorrections+process.selectedPatJetsForMETtype1p2CorrEnUp+process.selectedPatJetsForMETtype1p2CorrEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patPFMetJetEnUp+process.patPFMetJetEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patType1CorrectedPFMetJetEnUp+process.patType1CorrectedPFMetJetEnDown+process.pfCandMETcorrUnclusteredEnUp+process.pfCandMETcorrUnclusteredEnDown+process.patPFJetMETtype1p2CorrUnclusteredEnUp+process.patPFJetMETtype1p2CorrUnclusteredEnDown+process.patPFJetMETtype2CorrUnclusteredEnUp+process.patPFJetMETtype2CorrUnclusteredEnDown+process.patPFMetUnclusteredEnUp+process.patPFMetUnclusteredEnDown+process.patType1CorrectedPFMetUnclusteredEnUp+process.patType1CorrectedPFMetUnclusteredEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patPFMetElectronEnUp+process.patPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patPFMetMuonEnUp+process.patPFMetMuonEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patType1CorrectedPFMetElectronEnUp+process.patType1CorrectedPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patType1CorrectedPFMetMuonEnUp+process.patType1CorrectedPFMetMuonEnDown)
+process.metUncertaintySequence = cms.Sequence(process.goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty+process.shiftedParticlesForMEtUncertainties+process.producePatPFMETCorrections+process.selectedPatJetsForMETtype1p2CorrEnUp+process.selectedPatJetsForMETtype1p2CorrEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patPFMetJetEnUp+process.patPFMetJetEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patType1CorrectedPFMetJetEnUp+process.patType1CorrectedPFMetJetEnDown+process.pfCandMETcorrUnclusteredEnUp+process.pfCandMETcorrUnclusteredEnDown+process.patPFJetMETtype1p2CorrUnclusteredEnUp+process.patPFJetMETtype1p2CorrUnclusteredEnDown+process.patPFJetMETtype2CorrUnclusteredEnUp+process.patPFJetMETtype2CorrUnclusteredEnDown+process.patPFMetUnclusteredEnUp+process.patPFMetUnclusteredEnDown+process.patType1CorrectedPFMetUnclusteredEnUp+process.patType1CorrectedPFMetUnclusteredEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patPFMetElectronEnUp+process.patPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patPFMetMuonEnUp+process.patPFMetMuonEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patType1CorrectedPFMetElectronEnUp+process.patType1CorrectedPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patType1CorrectedPFMetMuonEnUp+process.patType1CorrectedPFMetMuonEnDown)
 
 
 process.patCandidates = cms.Sequence(process.makePatElectrons+process.makePatMuons+process.makePatTaus+process.makePatPhotons+process.makePatJets+process.makePatMETs+process.patCandidateSummary)
@@ -20293,7 +20456,7 @@ process.patCandidates = cms.Sequence(process.makePatElectrons+process.makePatMuo
 process.PFBRECO = cms.Sequence(process.pfNoPileUpSequence+process.pfParticleSelectionSequence+process.pfPhotonSequence+process.pfMuonSequence+process.pfNoMuon+process.pfElectronSequence+process.pfNoElectron+process.pfJetSequence+process.pfNoJet+process.pfTauSequence+process.pfNoTau+process.pfMET)
 
 
-process.patDefaultSequence = cms.Sequence(process.eleIsoSequence+process.patElectrons+process.patMuons+process.patHPSPFTauDiscriminationUpdate+process.patPFCandidateIsoDepositSelection+process.patPFTauIsolation+process.patTaus+process.patPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.patJetCharge+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates+process.metUncertaintySequence)
+process.patDefaultSequence = cms.Sequence(process.eleIsoSequence+process.patElectrons+process.patMuons+process.patHPSPFTauDiscriminationUpdate+process.patPFCandidateIsoDepositSelection+process.patPFTauIsolation+process.patTaus+process.patPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.patJetCharge+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates)
 
 
 process.p0 = cms.Path(process.HBHENoiseFilter)
@@ -20317,7 +20480,13 @@ process.p5 = cms.Path(process.ecalLaserCorrFilter)
 process.p6 = cms.Path(process.goodVertices+process.trackingFailureFilter)
 
 
-process.p = cms.Path(process.hltHighLevel+process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.patDefaultSequence+process.goodPatJets+process.puJetIdSqeuence)
+process.p7 = cms.Path(process.trkPOGFilters)
+
+
+process.p8 = cms.Path(process.hcallLaserEvent2012Filter)
+
+
+process.p = cms.Path(process.hltHighLevel+process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.patDefaultSequence+process.goodPatJets+process.PhysicsObjectSequence+process.metUncertaintySequence+process.puJetIdSqeuence)
 
 
 process.outpath = cms.EndPath(process.out)
@@ -21958,7 +22127,7 @@ process.GlobalTag = cms.ESSource("PoolDBESSource",
     BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService'),
     toGet = cms.VPSet(),
     connect = cms.string('frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'),
-    globaltag = cms.string('FT_53_V6_AN3::All')
+    globaltag = cms.string('FT_53_V6C_AN3::All')
 )
 
 

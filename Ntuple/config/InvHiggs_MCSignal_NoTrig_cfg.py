@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PAT")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/04BCEC26-AA02-E211-A81D-003048CF99BA.root')
+    fileNames = cms.untracked.vstring('/store/group/phys_higgs/vbfHinv/DataSample/AODSIM_WJetsToLNu.root')
 )
 process.PFCandAssoMap = cms.EDProducer("PFCand_AssoMap",
     ConversionsCollection = cms.InputTag("allConversions"),
@@ -20914,12 +20914,107 @@ process.hcalLaserEventFilter = cms.EDFilter("HcalLaserEventFilter",
 )
 
 
+process.hcallasereventfilter2012 = cms.EDFilter("HcalLaserEventFilter2012",
+    forceFilterTrue = cms.untracked.bool(False),
+    verbose = cms.untracked.bool(False),
+    eventFileName = cms.string('HCALLaser2012AllDatasets.txt.gz'),
+    WriteBadToFile = cms.untracked.bool(False),
+    prefix = cms.untracked.string(''),
+    maxrun = cms.untracked.int32(-1),
+    minrun = cms.untracked.int32(-1)
+)
+
+
 process.hltHighLevel = cms.EDFilter("HLTHighLevel",
     eventSetupPathsKey = cms.string(''),
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
     HLTPaths = cms.vstring('*'),
     throw = cms.bool(False),
     andOr = cms.bool(True)
+)
+
+
+process.logErrorTooManyClusters = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    modulesToIgnore = cms.vstring('SeedGeneratorFromRegionHitsEDProducer:regionalCosmicTrackerSeeds', 
+        'PhotonConversionTrajectorySeedProducerFromSingleLeg:photonConvTrajSeedFromSingleLeg'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    categoriesToWatch = cms.vstring('TooManyClusters')
+)
+
+
+process.logErrorTooManySeeds = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    modulesToIgnore = cms.vstring('SeedGeneratorFromRegionHitsEDProducer:regionalCosmicTrackerSeeds'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    categoriesToWatch = cms.vstring('TooManySeeds')
+)
+
+
+process.logErrorTooManySeedsDefault = cms.EDFilter("LogErrorEventFilter",
+    categoriesToWatch = cms.vstring('TooManySeeds'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxErrorFractionInRun = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    src = cms.InputTag("logErrorHarvester")
+)
+
+
+process.logErrorTooManySeedsMainIterations = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    categoriesToWatch = cms.vstring('TooManySeeds'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    modulesToWatch = cms.vstring('CkfTrackCandidateMaker:initialStepTrackCandidate', 
+        'CkfTrackCandidateMaker:pixelPairTrackCandidate')
+)
+
+
+process.logErrorTooManyTripletsPairs = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    modulesToIgnore = cms.vstring('SeedGeneratorFromRegionHitsEDProducer:regionalCosmicTrackerSeeds', 
+        'PhotonConversionTrajectorySeedProducerFromSingleLeg:photonConvTrajSeedFromSingleLeg'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    categoriesToWatch = cms.vstring('TooManyTriplets', 
+        'TooManyPairs', 
+        'PixelTripletHLTGenerator')
+)
+
+
+process.logErrorTooManyTripletsPairsMainIterations = cms.EDFilter("LogErrorEventFilter",
+    src = cms.InputTag("logErrorHarvester"),
+    maxErrorFractionInRun = cms.double(1.0),
+    categoriesToWatch = cms.vstring('TooManyTriplets', 
+        'TooManyPairs', 
+        'PixelTripletHLTGenerator'),
+    maxErrorFractionInLumi = cms.double(1.0),
+    maxSavedEventsPerLumiAndError = cms.uint32(100000),
+    modulesToWatch = cms.vstring('SeedGeneratorFromRegionHitsEDProducer:initialStepSeeds', 
+        'SeedGeneratorFromRegionHitsEDProducer:pixelPairStepSeeds')
+)
+
+
+process.manystripclus53X = cms.EDFilter("ByClusterSummaryMultiplicityPairEventFilter",
+    cut = cms.string('( mult2 > 20000+7*mult1)'),
+    multiplicityConfig = cms.PSet(
+        secondMultiplicityConfig = cms.PSet(
+            clusterSummaryCollection = cms.InputTag("clusterSummaryProducer"),
+            subDetVariable = cms.string('cHits'),
+            subDetEnum = cms.int32(0)
+        ),
+        firstMultiplicityConfig = cms.PSet(
+            clusterSummaryCollection = cms.InputTag("clusterSummaryProducer"),
+            subDetVariable = cms.string('pHits'),
+            subDetEnum = cms.int32(5)
+        )
+    )
 )
 
 
@@ -21216,6 +21311,35 @@ process.tauGenJetsSelectorAllHadrons = cms.EDFilter("TauGenJetDecayModeSelector"
 )
 
 
+process.tobtecfakesfilter = cms.EDFilter("TobTecFakesFilter",
+    phiWindow = cms.double(0.7),
+    ratioAllCut = cms.double(-1.0),
+    maxEta = cms.double(1.6),
+    minEta = cms.double(0.9),
+    filter = cms.bool(True),
+    trackCollection = cms.InputTag("generalTracks"),
+    ratioJetCut = cms.double(3.0),
+    absJetCut = cms.double(20.0)
+)
+
+
+process.toomanystripclus53X = cms.EDFilter("ByClusterSummaryMultiplicityPairEventFilter",
+    cut = cms.string('(mult2>50000) && ( mult2 > 20000+7*mult1)'),
+    multiplicityConfig = cms.PSet(
+        secondMultiplicityConfig = cms.PSet(
+            clusterSummaryCollection = cms.InputTag("clusterSummaryProducer"),
+            subDetVariable = cms.string('cHits'),
+            subDetEnum = cms.int32(0)
+        ),
+        firstMultiplicityConfig = cms.PSet(
+            clusterSummaryCollection = cms.InputTag("clusterSummaryProducer"),
+            subDetVariable = cms.string('pHits'),
+            subDetEnum = cms.int32(5)
+        )
+    )
+)
+
+
 process.trackingFailureFilter = cms.EDFilter("TrackingFailureFilter",
     JetSource = cms.InputTag("ak5PFJets"),
     MinSumPtOverHT = cms.double(0.1),
@@ -21361,6 +21485,9 @@ process.photonPFIsolationDepositsSequence = cms.Sequence(process.phPFIsoDepositC
 process.makePatPhotons = cms.Sequence(process.photonMatch+process.patPhotons)
 
 
+process.hcallLaserEvent2012Filter = cms.Sequence(process.hcallasereventfilter2012)
+
+
 process.recoTauCommonSequence = cms.Sequence(process.ak5PFJetTracksAssociatorAtVertex+process.recoTauAK5PFJets08Region+process.recoTauPileUpVertices+process.pfRecoTauTagInfoProducer)
 
 
@@ -21464,6 +21591,9 @@ process.hpsPFTauDiscriminationByCombinedIsolationSeqDBSumPtCorr3Hits = cms.Seque
 
 
 process.patPFTauIsolation = cms.Sequence(process.tauIsoDepositPFCandidates+process.tauIsoDepositPFChargedHadrons+process.tauIsoDepositPFNeutralHadrons+process.tauIsoDepositPFGammas)
+
+
+process.trkPOGFilters = cms.Sequence(~process.manystripclus53X+~process.toomanystripclus53X+~process.logErrorTooManyClusters)
 
 
 process.produceAndDiscriminateFixedConePFTaus = cms.Sequence(process.fixedConePFTauProducer+process.fixedConePFTauDiscriminationByLeadingTrackFinding+process.fixedConePFTauDiscriminationByLeadingTrackPtCut+process.fixedConePFTauDiscriminationByLeadingPionPtCut+process.fixedConePFTauDiscriminationByIsolation+process.fixedConePFTauDiscriminationByTrackIsolation+process.fixedConePFTauDiscriminationByECALIsolation+process.fixedConePFTauDiscriminationByIsolationUsingLeadingPion+process.fixedConePFTauDiscriminationByTrackIsolationUsingLeadingPion+process.fixedConePFTauDiscriminationByECALIsolationUsingLeadingPion+process.fixedConePFTauDiscriminationAgainstElectron+process.fixedConePFTauDiscriminationAgainstMuon)
@@ -21668,6 +21798,12 @@ process.p5 = cms.Path(process.ecalLaserCorrFilter)
 
 
 process.p6 = cms.Path(process.goodVertices+process.trackingFailureFilter)
+
+
+process.p7 = cms.Path(process.trkPOGFilters)
+
+
+process.p8 = cms.Path(process.hcallLaserEvent2012Filter)
 
 
 process.p = cms.Path(process.hltHighLevel+process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.patDefaultSequence+process.goodPatJets+process.PhysicsObjectSequence+process.metUncertaintySequence+process.puJetIdSqeuence+process.puJetIdSmeared+process.puJetMvaSmeared+process.puJetIdResUp+process.puJetMvaResUp+process.puJetIdResDown+process.puJetMvaResDown+process.puJetIdEnUp+process.puJetMvaEnUp+process.puJetIdEnDown+process.puJetMvaEnDown)
