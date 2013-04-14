@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.15 2013/04/03 21:08:33 jbrooke Exp $
+// $Id: InvHiggsInfo.h,v 1.16 2013/04/10 16:37:35 chayanit Exp $
 //
 //
 
@@ -75,44 +75,6 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet2PUMVA;
   Int_t    jet2PUFlag;
   Double_t jet2unc;
-  
-  // Jets shiftup re-ordering
-  Int_t    jet1Index_shiftup;
-  Double_t jet1Pt_shiftup;
-  Double_t jet1Eta_shiftup;
-  Double_t jet1Phi_shiftup;
-  Double_t jet1M_shiftup;
-  Double_t jet1PUMVA_shiftup;
-  Int_t    jet1PUFlag_shiftup;
-  Double_t jet1unc_shiftup;
-
-  Int_t    jet2Index_shiftup;
-  Double_t jet2Pt_shiftup;
-  Double_t jet2Eta_shiftup;
-  Double_t jet2Phi_shiftup;
-  Double_t jet2M_shiftup;
-  Double_t jet2PUMVA_shiftup;
-  Int_t    jet2PUFlag_shiftup;
-  Double_t jet2unc_shiftup;
-
-  // Jets shiftdown re-ordering
-  Int_t    jet1Index_shiftdown;
-  Double_t jet1Pt_shiftdown;
-  Double_t jet1Eta_shiftdown;
-  Double_t jet1Phi_shiftdown;
-  Double_t jet1M_shiftdown;
-  Double_t jet1PUMVA_shiftdown;
-  Int_t    jet1PUFlag_shiftdown;
-  Double_t jet1unc_shiftdown;
-
-  Int_t    jet2Index_shiftdown;
-  Double_t jet2Pt_shiftdown;
-  Double_t jet2Eta_shiftdown;
-  Double_t jet2Phi_shiftdown;
-  Double_t jet2M_shiftdown;
-  Double_t jet2PUMVA_shiftdown;
-  Int_t    jet2PUFlag_shiftdown;
-  Double_t jet2unc_shiftdown;
 
   // MET (need XY correction?)
   Double_t met;
@@ -126,85 +88,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t metNo2MuonPhi;
   Double_t metNoWLepton;
   Double_t metNoWLeptonPhi;
-  // 
-  // MET Uncertainty
-  Double_t metCentral;
-  Double_t metCentral_Phi;
-  Double_t metCentral_NoMuon;
-  Double_t metCentral_NoMuonPhi; 
-  Double_t metCentral_NoElectron;
-  Double_t metCentral_NoElectronPhi;
-  Double_t metCentral_No2Muon;
-  Double_t metCentral_No2MuonPhi;
-  Double_t metCentral_NoWLepton;
-  Double_t metCentral_NoWLeptonPhi;
 
-  Double_t metJESup;
-  Double_t metJESup_Phi;
-  Double_t metJESup_NoMuon;
-  Double_t metJESup_NoMuonPhi; 
-  Double_t metJESup_NoElectron;
-  Double_t metJESup_NoElectronPhi;
-  Double_t metJESup_No2Muon;
-  Double_t metJESup_No2MuonPhi;
-  Double_t metJESup_NoWLepton;
-  Double_t metJESup_NoWLeptonPhi;
-
-  Double_t metJESdown;
-  Double_t metJESdown_Phi;
-  Double_t metJESdown_NoMuon;
-  Double_t metJESdown_NoMuonPhi; 
-  Double_t metJESdown_NoElectron;
-  Double_t metJESdown_NoElectronPhi;
-  Double_t metJESdown_No2Muon;
-  Double_t metJESdown_No2MuonPhi;
-  Double_t metJESdown_NoWLepton;
-  Double_t metJESdown_NoWLeptonPhi;
-
-  Double_t metJERup;
-  Double_t metJERup_Phi;
-  Double_t metJERup_NoMuon;
-  Double_t metJERup_NoMuonPhi; 
-  Double_t metJERup_NoElectron;
-  Double_t metJERup_NoElectronPhi;
-  Double_t metJERup_No2Muon;
-  Double_t metJERup_No2MuonPhi;
-  Double_t metJERup_NoWLepton;
-  Double_t metJERup_NoWLeptonPhi;
-
-  Double_t metJERdown;
-  Double_t metJERdown_Phi;
-  Double_t metJERdown_NoMuon;
-  Double_t metJERdown_NoMuonPhi; 
-  Double_t metJERdown_NoElectron;
-  Double_t metJERdown_NoElectronPhi;
-  Double_t metJERdown_No2Muon;
-  Double_t metJERdown_No2MuonPhi;
-  Double_t metJERdown_NoWLepton;
-  Double_t metJERdown_NoWLeptonPhi;
-
-  Double_t metUnclusteredup;
-  Double_t metUnclusteredup_Phi;
-  Double_t metUnclusteredup_NoMuon;
-  Double_t metUnclusteredup_NoMuonPhi; 
-  Double_t metUnclusteredup_NoElectron;
-  Double_t metUnclusteredup_NoElectronPhi;
-  Double_t metUnclusteredup_No2Muon;
-  Double_t metUnclusteredup_No2MuonPhi;
-  Double_t metUnclusteredup_NoWLepton;
-  Double_t metUnclusteredup_NoWLeptonPhi;
-
-  Double_t metUnclustereddown;
-  Double_t metUnclustereddown_Phi;
-  Double_t metUnclustereddown_NoMuon;
-  Double_t metUnclustereddown_NoMuonPhi; 
-  Double_t metUnclustereddown_NoElectron;
-  Double_t metUnclustereddown_NoElectronPhi;
-  Double_t metUnclustereddown_No2Muon;
-  Double_t metUnclustereddown_No2MuonPhi;
-  Double_t metUnclustereddown_NoWLepton;
-  Double_t metUnclustereddown_NoWLeptonPhi;
-  
   // MHT
   Double_t mht;
   Double_t mhtPhi;
@@ -216,20 +100,6 @@ class InvHiggsInfo { //: public TObject {
   Double_t vbfM;
   Double_t vbfDEta;
   Double_t vbfDPhi;
-
-  Double_t vbfEt_shiftup;
-  Double_t vbfEta_shiftup;
-  Double_t vbfPhi_shiftup;
-  Double_t vbfM_shiftup;
-  Double_t vbfDEta_shiftup;
-  Double_t vbfDPhi_shiftup;
-
-  Double_t vbfEt_shiftdown;
-  Double_t vbfEta_shiftdown;
-  Double_t vbfPhi_shiftdown;
-  Double_t vbfM_shiftdown;
-  Double_t vbfDEta_shiftdown;
-  Double_t vbfDPhi_shiftdown;
 
   // Third jet
   Double_t jet3Et;

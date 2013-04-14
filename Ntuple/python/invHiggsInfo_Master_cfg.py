@@ -30,8 +30,8 @@ process.TFileService.fileName = cms.string('invHiggsInfo.root')
 
 # Fix PUJetID
 #process.load("CMGTools.External.pujetidsequence_cff")
-#process.puJetMva.jets = cms.InputTag("goodPatJets")
-#process.puJetId.jets = cms.InputTag("goodPatJets")
+#process.puJetMva.jets = cms.InputTag("smearedGoodPatJetsResUp")
+#process.puJetId.jets  = cms.InputTag("smearedGoodPatJetsResUp")
 
 # Ntuple producer
 process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
@@ -39,7 +39,7 @@ process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
 #process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMva", "fullId","TREE")
 
 # path
-process.p0   = cms.Path(#process.puJetIdSqeuence
+process.p0   = cms.Path(#process.puJetIdSqeuence *
                         process.PhysicsObjectSequence
                         * process.WSequence
                         * process.ZSequence

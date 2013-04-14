@@ -274,13 +274,13 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         process.puJetMvaResDown.jetids  = cms.InputTag("puJetIdResDown")
         process.puJetMvaResDown.jets    = cms.InputTag("smearedGoodPatJetsResDown")
 
-        process.puJetIdEnUp.jets        = cms.InputTag("shiftedPatJetsEnUpForCorrMEt ")
+        process.puJetIdEnUp.jets        = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
         process.puJetMvaEnUp.jetids     = cms.InputTag("puJetIdEnUp")
-        process.puJetMvaEnUp.jets       = cms.InputTag("shiftedPatJetsEnUpForCorrMEt ")
+        process.puJetMvaEnUp.jets       = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
 
-        process.puJetIdEnDown.jets      = cms.InputTag("shiftedPatJetsEnDownForCorrMEt")
+        process.puJetIdEnDown.jets      = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt")
         process.puJetMvaEnDown.jetids   = cms.InputTag("puJetIdEnDown")
-        process.puJetMvaEnDown.jets     = cms.InputTag("shiftedPatJetsEnDownForCorrMEt")
+        process.puJetMvaEnDown.jets     = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt")
     ###--------------------------------------------------------------
 
 
@@ -395,40 +395,66 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.p5 = cms.Path( process.ecalLaserCorrFilter )
     process.p6 = cms.Path( process.goodVertices * process.trackingFailureFilter )
 
-    process.p = cms.Path(    
-        # Trigger filter
-        process.hltHighLevel *
+    if iRunOnData == True:
+    	process.p = cms.Path(    
+        	# Trigger filter
+        	process.hltHighLevel *
         
-        # Basic filters
-        process.noscraping *
-        process.primaryVertexFilter *
+        	# Basic filters
+        	process.noscraping *
+        	process.primaryVertexFilter *
+        	
+        	# MET filters (Move to be flags)
         
-        # MET filters (Move to be flags)
+        	# MET Correction
+        	process.type0PFMEtCorrection *
         
-        # MET Correction
-        process.type0PFMEtCorrection *
+        	# Tau
+        	process.recoTauClassicHPSSequence *
         
-        # Tau
-        process.recoTauClassicHPSSequence *
-        
-        # Generate PAT
-        process.pfParticleSelectionSequence *
-        process.patDefaultSequence *
-        process.goodPatJets *
-	process.PhysicsObjectSequence *
-	process.metUncertaintySequence *
-        process.puJetIdSqeuence *
-	process.puJetIdSmeared *
-	process.puJetMvaSmeared *
-        process.puJetIdResUp *
-	process.puJetMvaResUp *
-        process.puJetIdResDown *
-        process.puJetMvaResDown *
-        process.puJetIdEnUp *
-        process.puJetMvaEnUp *
-        process.puJetIdEnDown *
-        process.puJetMvaEnDown
-        )
+        	# Generate PAT
+        	process.pfParticleSelectionSequence *
+        	process.patDefaultSequence *
+        	process.goodPatJets *
+		process.PhysicsObjectSequence *
+		process.metUncertaintySequence *
+        	process.puJetIdSqeuence
+		)
+    else:
+        process.p = cms.Path(
+                # Trigger filter
+                process.hltHighLevel *
+
+                # Basic filters
+                process.noscraping *
+                process.primaryVertexFilter *
+
+                # MET filters (Move to be flags)
+
+                # MET Correction
+                process.type0PFMEtCorrection *
+
+                # Tau
+                process.recoTauClassicHPSSequence *
+
+                # Generate PAT
+                process.pfParticleSelectionSequence *
+                process.patDefaultSequence *
+                process.goodPatJets *
+                process.PhysicsObjectSequence *
+                process.metUncertaintySequence *
+                process.puJetIdSqeuence *
+		process.puJetIdSmeared *
+		process.puJetMvaSmeared *
+        	process.puJetIdResUp *
+		process.puJetMvaResUp *
+         	process.puJetIdResDown *
+        	process.puJetMvaResDown *
+        	process.puJetIdEnUp *
+        	process.puJetMvaEnUp *
+        	process.puJetIdEnDown *
+        	process.puJetMvaEnDown
+        	)
     ###--------------------------------------------------------------
 
 
