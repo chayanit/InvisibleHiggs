@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.17 2013/04/14 21:24:41 chayanit Exp $
+// $Id: InvHiggsInfo.h,v 1.18 2013/04/14 21:38:46 srimanob Exp $
 //
 //
 
@@ -64,6 +64,8 @@ class InvHiggsInfo { //: public TObject {
   bool metflag4;
   bool metflag5;
   bool metflag6;
+  bool metflag7;
+  bool metflag8;
 
   // Jets
   Int_t    jet1Index;

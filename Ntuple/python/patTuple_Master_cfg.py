@@ -133,6 +133,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     
     # The HCAL laser filter
     process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
+    process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cff")
+    process.hcallasereventfilter2012.eventFileName = cms.string('HCALLaser2012AllDatasets.txt.gz')
     
     # The ECAL dead cell trigger primitive filter
     process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
@@ -153,6 +155,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
     # The tracking failure filter
     process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
+
+    # The tracking POG filters
+    process.load('RecoMET.METFilters.trackingPOGFilters_cff')
     ###--------------------------------------------------------------
 
 
@@ -394,6 +399,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.p4 = cms.Path( process.eeBadScFilter )
     process.p5 = cms.Path( process.ecalLaserCorrFilter )
     process.p6 = cms.Path( process.goodVertices * process.trackingFailureFilter )
+    process.p7 = cms.Path( process.trkPOGFilters )
+    process.p8 = cms.Path( process.hcallLaserEvent2012Filter )
 
     if iRunOnData == True:
     	process.p = cms.Path(    
