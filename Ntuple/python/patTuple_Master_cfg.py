@@ -261,16 +261,26 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         process.puJetIdEnUp    		= process.puJetId.clone()
         process.puJetMvaEnDown 		= process.puJetMva.clone()
         process.puJetIdEnDown  		= process.puJetId.clone()
-        process.puJetMvaSmeared.jets    = cms.InputTag("smearedGoodPatJets")
+
         process.puJetIdSmeared.jets     = cms.InputTag("smearedGoodPatJets")
-	process.puJetMvaResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
+        process.puJetMvaSmeared.jetids  = cms.InputTag("puJetIdSmeared")
+        process.puJetMvaSmeared.jets    = cms.InputTag("smearedGoodPatJets")
+
 	process.puJetIdResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
-        process.puJetMvaResDown.jets    = cms.InputTag("smearedGoodPatJetsResDown")
+	process.puJetMvaResUp.jetids 	= cms.InputTag("puJetIdResUp")
+	process.puJetMvaResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
+
         process.puJetIdResDown.jets     = cms.InputTag("smearedGoodPatJetsResDown")
-        process.puJetMvaEnUp.jets       = cms.InputTag("smearedGoodPatJetsEnUp")
-        process.puJetIdEnUp.jets        = cms.InputTag("smearedGoodPatJetsEnUp")
-        process.puJetMvaEnDown.jets     = cms.InputTag("smearedGoodPatJetsEnDown")
-        process.puJetIdEnDown.jets      = cms.InputTag("smearedGoodPatJetsEnDown")
+        process.puJetMvaResDown.jetids  = cms.InputTag("puJetIdResDown")
+        process.puJetMvaResDown.jets    = cms.InputTag("smearedGoodPatJetsResDown")
+
+        process.puJetIdEnUp.jets        = cms.InputTag("shiftedPatJetsEnUpForCorrMEt ")
+        process.puJetMvaEnUp.jetids     = cms.InputTag("puJetIdEnUp")
+        process.puJetMvaEnUp.jets       = cms.InputTag("shiftedPatJetsEnUpForCorrMEt ")
+
+        process.puJetIdEnDown.jets      = cms.InputTag("shiftedPatJetsEnDownForCorrMEt")
+        process.puJetMvaEnDown.jetids   = cms.InputTag("puJetIdEnDown")
+        process.puJetMvaEnDown.jets     = cms.InputTag("shiftedPatJetsEnDownForCorrMEt")
     ###--------------------------------------------------------------
 
 
@@ -408,16 +418,16 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 	process.PhysicsObjectSequence *
 	process.metUncertaintySequence *
         process.puJetIdSqeuence *
-	process.puJetMvaSmeared *
 	process.puJetIdSmeared *
-	process.puJetMvaResUp *
+	process.puJetMvaSmeared *
         process.puJetIdResUp *
-        process.puJetMvaResDown *
+	process.puJetMvaResUp *
         process.puJetIdResDown *
-        process.puJetMvaEnUp *
+        process.puJetMvaResDown *
         process.puJetIdEnUp *
-        process.puJetMvaEnDown *
-        process.puJetIdEnDown 
+        process.puJetMvaEnUp *
+        process.puJetIdEnDown *
+        process.puJetMvaEnDown
         )
     ###--------------------------------------------------------------
 
