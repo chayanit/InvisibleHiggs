@@ -15,7 +15,7 @@ process.TFileService.fileName = cms.string('invHiggsInfo_Data.root')
 ### THINGS TO EDIT BELOW ###
 
 # change Global Tag
-process.GlobalTag.globaltag = 'FT_53_V10_AN3::All'
+process.GlobalTag.globaltag = 'FT53_V10A_AN3::All'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
