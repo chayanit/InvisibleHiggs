@@ -1,12 +1,15 @@
 #!/bin/sh
 
-IDIR=/storage/phjjb/invisibleHiggs/InvHiggsInfo_v9
-ODIR=InvHiggsInfo_v9
-DATASETS=InvisibleHiggs/Analysis/data/datasets_v9.txt
-DATASETS_W=InvisibleHiggs/Analysis/data/datasets_W_v9.txt
-DATASETS_Z=InvisibleHiggs/Analysis/data/datasets_Z_v9.txt
-DATASETS_QCD=InvisibleHiggs/Analysis/data/datasets_QCD_v9.txt
+VER=v10
 LUMI=19576
+
+IDIR=/storage/phjjb/invisibleHiggs/InvHiggsInfo_$VER
+ODIR=InvHiggsInfo_$VER
+
+DATASETS=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_$VER.txt
+DATASETS_W=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_W_$VER.txt
+DATASETS_Z=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_Z_$VER.txt
+DATASETS_QCD=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_QCD_$VER.txt
 
 # MC numbers & plots
 echo "efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
@@ -28,6 +31,9 @@ zBackground -i $IDIR -o $ODIR -f $DATASETS_Z -l $LUMI
 
 echo "qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI"
 qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI
+
+echo "summary -o $ODIR $LUMI"
+summary -o $ODIR -l $LUMI
 
 # set limits
 echo "limits -o $ODIR $LUMI"

@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 
   double lumi = options.lumi;
   std::string iDir = options.iDir;
-  std::string oDir = options.oDir+std::string("/Signal");
+  std::string oDir = options.oDir;
 
   // input datasets
   Datasets datasets(iDir);
@@ -36,7 +36,6 @@ int main(int argc, char* argv[]) {
   // cuts
   Cuts cuts;
   unsigned nCuts = cuts.nCuts();
-  TCut puWeight("puWeight");
 
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/Efficiency.root")).c_str(), "UPDATE");
@@ -45,6 +44,9 @@ int main(int argc, char* argv[]) {
   TH1D* hQCD     = new TH1D("hCutFlow_QCD", "", nCuts, 0., nCuts);
   TH1D* hZNuNu   = new TH1D("hCutFlow_ZNuNu", "", nCuts, 0., nCuts);
   TH1D* hWLNu    = new TH1D("hCutFlow_WLNu", "", nCuts, 0., nCuts);
+  TH1D* hWMuNu   = new TH1D("hCutFlow_WMuNu", "", nCuts, 0., nCuts);
+  TH1D* hWElNu   = new TH1D("hCutFlow_WElNu", "", nCuts, 0., nCuts);
+  TH1D* hWTauNu  = new TH1D("hCutFlow_WTauNu", "", nCuts, 0., nCuts);
   TH1D* hSingleT = new TH1D("hCutFlow_SingleTSum", "", nCuts, 0., nCuts);
   TH1D* hDiboson = new TH1D("hCutFlow_Diboson", "", nCuts, 0., nCuts);
 
@@ -61,39 +63,76 @@ int main(int argc, char* argv[]) {
 
     //cuts
     TCut cutDSet     = cuts.cutDataset(dataset.name);
+    TCut puWeight("puWeight");
+    TCut wWeight("");
+    if (dataset.name.compare(0,1,"W")) wWeight = cuts.wWeight();
      
     // tmp histogram for counting.  Need a hist so we can use PU weight
 
     // do cutflow
     std::string hname = std::string("hCutFlow_")+dataset.name;
     TH1D* hCutFlow = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
+    hname = std::string("hCutFlowMu_")+dataset.name;
+    TH1D* hCutFlowMu = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
+    hname = std::string("hCutFlowEl_")+dataset.name;
+    TH1D* hCutFlowEl = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
+    hname = std::string("hCutFlowTau_")+dataset.name;
+    TH1D* hCutFlowTau = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
 
     for (unsigned c=0; c<nCuts; ++c) {
 
-      TCut cut = puWeight * (cutDSet + cuts.cutflow(c));
+      TCut cut = puWeight * wWeight * (cutDSet + cuts.cutflow(c));
+      TCut cutMu = puWeight * wWeight * (cutDSet + cuts.wMuGen() + cuts.cutflow(c));
+      TCut cutEl = puWeight * wWeight * (cutDSet + cuts.wElGen() + cuts.cutflow(c));
+      TCut cutTau = puWeight * wWeight * (cutDSet + cuts.wTauGen() + cuts.cutflow(c));
 
       //      std::cout << cut << std::endl;
 
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
-
       hCutFlow->SetBinContent(c+1, h->GetBinContent(1));
       hCutFlow->SetBinError(c+1, h->GetBinError(1));
 
+      TH1D* hMu = new TH1D("hMu","", 1, 0., 1.);
+      tree->Draw("0.5>>hMu", cutMu);
+      hCutFlowMu->SetBinContent(c+1, hMu->GetBinContent(1));
+      hCutFlowMu->SetBinError(c+1, hMu->GetBinError(1));
+
+      TH1D* hEl = new TH1D("hEl","", 1, 0., 1.);
+      tree->Draw("0.5>>hEl", cutEl);
+      hCutFlowEl->SetBinContent(c+1, hEl->GetBinContent(1));
+      hCutFlowEl->SetBinError(c+1, hEl->GetBinError(1));
+
+      TH1D* hTau = new TH1D("hTau","", 1, 0., 1.);
+      tree->Draw("0.5>>hTau", cutTau);
+      hCutFlowTau->SetBinContent(c+1, hTau->GetBinContent(1));
+      hCutFlowTau->SetBinError(c+1, hTau->GetBinError(1));
+
       delete h;
+      delete hMu;
+      delete hEl;
+      delete hTau;
     }
 
     hCutFlow->Scale( lumi * dataset.sigma / dataset.nEvents );
+    hCutFlowMu->Scale( lumi * dataset.sigma / dataset.nEvents );
+    hCutFlowEl->Scale( lumi * dataset.sigma / dataset.nEvents );
+    hCutFlowTau->Scale( lumi * dataset.sigma / dataset.nEvents );
 
     // sum binned datasets
-    if (dataset.name.compare(0,3,"QCD")==0) hQCD->Add(hCutFlow, 1.);
-    if (dataset.name.compare(0,3,"Zvv")==0) hZNuNu->Add(hCutFlow, 1.);
-    if (dataset.name.compare(0,1,"W")==0) hWLNu->Add(hCutFlow, 1.);
-    if (dataset.name.compare(0,7,"SingleT")==0) hSingleT->Add(hCutFlow, 1.);
+    if (dataset.name.compare(0,3,"QCD")==0) hQCD->Add(hCutFlow);
+    if (dataset.name.compare(0,3,"Zvv")==0) hZNuNu->Add(hCutFlow);
+    if (dataset.name.compare(0,1,"W")==0) {
+      hWLNu->Add(hCutFlow);
+      hWMuNu->Add(hCutFlowMu);
+      hWElNu->Add(hCutFlowEl);
+      hWTauNu->Add(hCutFlowTau);
+    }
+    if (dataset.name.compare(0,7,"SingleT")==0) hSingleT->Add(hCutFlow);
     if (dataset.name.compare(0,2,"WW")==0 ||
 	dataset.name.compare(0,2,"WZ")==0 ||
 	dataset.name.compare(0,2,"ZZ")==0 )
-      hDiboson->Add(hCutFlow, 1.);
+      hDiboson->Add(hCutFlow);
 
     ofile->cd();
     hCutFlow->Write("", TObject::kOverwrite);
@@ -106,6 +145,9 @@ int main(int argc, char* argv[]) {
   hQCD->Write("",TObject::kOverwrite);  
   hZNuNu->Write("",TObject::kOverwrite);  
   hWLNu->Write("",TObject::kOverwrite);  
+  hWMuNu->Write("",TObject::kOverwrite);  
+  hWElNu->Write("",TObject::kOverwrite);  
+  hWTauNu->Write("",TObject::kOverwrite);  
   hSingleT->Write("",TObject::kOverwrite);  
   hDiboson->Write("",TObject::kOverwrite);  
 

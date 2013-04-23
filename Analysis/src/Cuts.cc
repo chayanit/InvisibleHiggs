@@ -178,6 +178,12 @@ TCut Cuts::HLTandMETFilters() {
   return tmp;
 }
 
+TCut Cuts::leptonVeto() {
+  TCut tmp = cut("EVeto");
+  tmp += cut("MuVEto");
+  return tmp;
+}
+
 TCut Cuts::vbf() {
   TCut tmp = cut("dijet");
   tmp += cut("sgnEtaJJ");
@@ -217,11 +223,6 @@ TCut Cuts::zMuMuGen() {
   return tmp;
 }
 
-TCut Cuts::zMuMuGenPt100() {
-  TCut tmp("zgenpt<100.");
-  return tmp;
-}
-
 TCut Cuts::zMuMuGenMass() {
   TCut tmp("zltype==2 && zgenmass>60. && zgenmass<120.");
   return tmp;
@@ -239,35 +240,12 @@ TCut Cuts::zMuMuVBF() {
   tmp += TCut("mu3Pt<10");
   tmp += cut("EVeto");
   tmp += vbf();
-  tmp += TCut("metNo2Muon>130.");
-  return tmp;
-}
-
-TCut Cuts::zMuMuGenPt100VBF() {
-  TCut tmp = cut("trigger");
-  tmp += cut("metFilter");
-  tmp += zMuMuGenPt100();
-  tmp += zMuMuReco();
-  tmp += TCut("mu3Pt<10");
-  tmp += cut("EVeto");
-  tmp += vbf();
-  tmp += TCut("metNo2Muon>130.");
   return tmp;
 }
 
 TCut Cuts::zMuMuVBFLoose() {
   TCut tmp = cut("trigger");
   tmp += cut("metFilter");
-  tmp += zMuMuReco();
-  tmp += vbfloose();
-  tmp += TCut("metNo2Muon>130.");
-  return tmp;
-}
-
-TCut Cuts::zMuMuGenPt100VBFLoose() {
-  TCut tmp = cut("trigger");
-  tmp += cut("metFilter");
-  tmp += zMuMuGenPt100();
   tmp += zMuMuReco();
   tmp += vbfloose();
   tmp += TCut("metNo2Muon>130.");
@@ -296,7 +274,6 @@ TCut Cuts::wMuVBF() {
   tmp += cutWMu("lVeto");
   tmp += cutWMu("dijet");
   tmp += cutWMu("dEtaJJ");
-  tmp += cutWMu("MET");
   tmp += cutWMu("Mjj");
   return tmp;
 }
@@ -322,7 +299,6 @@ TCut Cuts::wElVBF() {
   tmp += cutWEl("lVeto");
   tmp += cutWEl("dijet");
   tmp += cutWEl("dEtaJJ");
-  tmp += cutWEl("MET");
   tmp += cutWEl("Mjj");
   return tmp;
 }
@@ -334,6 +310,14 @@ TCut Cuts::cutflowWEl(unsigned i) {
   }
   return tmp;
 }
+
+
+// W -> tau
+TCut Cuts::wTauGen() {
+  TCut tmp("wltype==3 && wtauhadron==1");
+  return tmp;
+}
+
 
 
 // QCD regions

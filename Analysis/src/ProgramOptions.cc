@@ -5,7 +5,12 @@
 #include <boost/algorithm/string.hpp>
 
 
-ProgramOptions::ProgramOptions(int argc, char* argv[]) {
+ProgramOptions::ProgramOptions(int argc, char* argv[]) :
+  iDir(""),
+  oDir(""),
+  datasetFile(""),
+  lumi(0.)
+ {
 
   namespace po = boost::program_options;
 

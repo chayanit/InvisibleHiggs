@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
   datasets.readFile(options.datasetFile);
 
   // output file
-  TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "UPDATE");
+  TFile* ofile = TFile::Open( (options.oDir+std::string("/QCDBackground.root")).c_str(), "UPDATE");
 
   // cuts
   Cuts cuts;
