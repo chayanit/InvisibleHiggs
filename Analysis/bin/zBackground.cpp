@@ -32,42 +32,19 @@ int main(int argc, char* argv[]) {
   datasets.readFile(options.datasetFile);
 
   // output file
-  TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "UPDATE");
+  TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "RECREATE");
 
   // cuts
   Cuts cuts;
   unsigned nCutsZMuMu = cuts.nCutsZMuMu();
 
   TCut puWeight("puWeight");
-<<<<<<< zBackground.cpp
   TCut METNoMuon130("metNoMuon>130.");	// add here later for VBF efficiency when MET>0, MET>70 (QCD estimation)
   TCut METNoMuon70("metNoMuon>70.");	
   TCut METNoMuon35("metNoMuon>35.");	
   TCut METNo2Muon130("metNo2Muon>130.");
   TCut METNo2Muon70("metNo2Muon>70.");
   TCut METNo2Muon35("metNo2Muon>35.");
-=======
-  TCut METNoMuon("metNoMuon>130.");	// add here later for VBF efficiency when MET>0, MET>70 (QCD estimation)
-  TCut METNo2Muon("metNo2Muon>130.");
-
-  TCut cutZMuMu_C = puWeight * cuts.zMuMuVBF();
-  TCut cutZMuMuGenPt_C = puWeight * cuts.zMuMuGenPt100VBF(); 	// For inclusive sample add ZgenpT < 100
-  TCut cutZMuMuLoose_C = puWeight * cuts.zMuMuVBFLoose();
-  TCut cutZMuMuGenPtLoose_C = puWeight * cuts.zMuMuGenPt100VBFLoose();  	// For inclusive sample add ZgenpT < 100
-	
-  TCut cutEfficiencyMuMu_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen());
-  TCut cutEfficiencyMuMu_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
-
-  TCut cutEfficiencyVBFS_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGenMass());
-  TCut cutEfficiencyVBFS_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon);
-  TCut cutEfficiencyVBFS_Pt100_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGenPt100() + cuts.zMuMuGenMass());	// For inclusive sample add ZgenpT < 100
-  TCut cutEfficiencyVBFS_Pt100_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGenPt100() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon);
-
-  TCut cutEfficiencyVBFC_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
-  TCut cutEfficiencyVBFC_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon);
-  TCut cutEfficiencyVBFC_Pt100_D = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuGenPt100() + cuts.zMuMuReco());	// For inclusive sample add ZgenpT < 100
-  TCut cutEfficiencyVBFC_Pt100_N = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuGenPt100() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon);
->>>>>>> 1.11
 
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
@@ -320,22 +297,13 @@ int main(int argc, char* argv[]) {
 
     delete hZ_CutFlow;
 
-<<<<<<< zBackground.cpp
-
     // control plots
     TCut cutPlots = puWeight * cuts.zMuMuVBF();
 
-=======
->>>>>>> 1.11
     hname = std::string("hZ_mZ_")+dataset.name;
     TH1D* hZ_mZ = new TH1D(hname.c_str(), "", 30, 60., 120.);
     std::string str = std::string("zMass>>")+hname;
-<<<<<<< zBackground.cpp
     tree->Draw(str.c_str(), cutPlots);
-=======
-    if(dataset.name == "DYJetsToLL") 	tree->Draw(str.c_str(), cutZMuMuGenPtLoose_C);
-    else				tree->Draw(str.c_str(), cutZMuMuLoose_C);
->>>>>>> 1.11
     hZ_mZ->Scale(weight);
     hZ_mZ->Write("",TObject::kOverwrite);
 
@@ -395,15 +363,15 @@ int main(int argc, char* argv[]) {
 
 
   // MET>0
-  TH1D* hZ_Est_NoMETC_DPhi = new TH1D("hZ_Est_C_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
-  TH1D* hZ_Est_NoMETS_DPhi = new TH1D("hZ_Est_S_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
-  TH1D* hZ_Eff_NoMETS_DPhi = new TH1D("hZ_Eff_S_DPhi", "", 3, dphiEdges);
+  TH1D* hZ_Est_NoMETC_DPhi = new TH1D("hZ_Est_NoMETC_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
+  TH1D* hZ_Est_NoMETS_DPhi = new TH1D("hZ_Est_NoMETS_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
+  TH1D* hZ_Eff_NoMETS_DPhi = new TH1D("hZ_Eff_NoMETS_DPhi", "", 3, dphiEdges);
 
-  TH1D* hZ_DY_NoMET_EffMuMu = new TH1D("hZ_DY_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
-  TH1D* hZ_DY_NoMET_EffVBFS = new TH1D("hZ_DY_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
-  TH1D* hZ_DY_NoMET_EffVBFC = new TH1D("hZ_DY_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
-  TH1D* hZ_DY_NoMET_RatioVBF = new TH1D("hZ_DY_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
-  TH1D* hZ_DY_NoMET_TotalEff = new TH1D("hZ_DY_TotalEff", "", 1, 0., 1.); 
+  TH1D* hZ_DY_NoMET_EffMuMu = new TH1D("hZ_DY_NoMET_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
+  TH1D* hZ_DY_NoMET_EffVBFS = new TH1D("hZ_DY_NoMET_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
+  TH1D* hZ_DY_NoMET_EffVBFC = new TH1D("hZ_DY_NoMET_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
+  TH1D* hZ_DY_NoMET_RatioVBF = new TH1D("hZ_DY_NoMET_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
+  TH1D* hZ_DY_NoMET_TotalEff = new TH1D("hZ_DY_NoMET_TotalEff", "", 1, 0., 1.); 
 
   hZ_DY_NoMET_EffVBFS->Add(hZ_DY_NoMET_EffVBFS_N);
   hZ_DY_NoMET_EffVBFS->Divide(hZ_DY_EffVBFS_D);
@@ -429,15 +397,15 @@ int main(int argc, char* argv[]) {
 
 
   // MET>35
-  TH1D* hZ_Est_Loose2C_DPhi = new TH1D("hZ_Est_C_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
-  TH1D* hZ_Est_Loose2S_DPhi = new TH1D("hZ_Est_S_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
-  TH1D* hZ_Eff_Loose2S_DPhi = new TH1D("hZ_Eff_S_DPhi", "", 3, dphiEdges);
+  TH1D* hZ_Est_Loose2C_DPhi = new TH1D("hZ_Est_Loose2C_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
+  TH1D* hZ_Est_Loose2S_DPhi = new TH1D("hZ_Est_Loose2S_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
+  TH1D* hZ_Eff_Loose2S_DPhi = new TH1D("hZ_Eff_Loose2S_DPhi", "", 3, dphiEdges);
 
-  TH1D* hZ_DY_Loose2_EffMuMu = new TH1D("hZ_DY_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
-  TH1D* hZ_DY_Loose2_EffVBFS = new TH1D("hZ_DY_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
-  TH1D* hZ_DY_Loose2_EffVBFC = new TH1D("hZ_DY_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
-  TH1D* hZ_DY_Loose2_RatioVBF = new TH1D("hZ_DY_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
-  TH1D* hZ_DY_Loose2_TotalEff = new TH1D("hZ_DY_TotalEff", "", 1, 0., 1.); 
+  TH1D* hZ_DY_Loose2_EffMuMu = new TH1D("hZ_DY_Loose2_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
+  TH1D* hZ_DY_Loose2_EffVBFS = new TH1D("hZ_DY_Loose2_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
+  TH1D* hZ_DY_Loose2_EffVBFC = new TH1D("hZ_DY_Loose2_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
+  TH1D* hZ_DY_Loose2_RatioVBF = new TH1D("hZ_DY_Loose2_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
+  TH1D* hZ_DY_Loose2_TotalEff = new TH1D("hZ_DY_Loose2_TotalEff", "", 1, 0., 1.); 
 
   hZ_DY_Loose2_EffVBFS->Add(hZ_DY_Loose2_EffVBFS_N);
   hZ_DY_Loose2_EffVBFS->Divide(hZ_DY_EffVBFS_D);
@@ -462,15 +430,15 @@ int main(int argc, char* argv[]) {
   hZ_Est_Loose2S_DPhi->Multiply(hZ_Eff_Loose2S_DPhi);
 
   // MET>70
-  TH1D* hZ_Est_LooseC_DPhi = new TH1D("hZ_Est_C_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
-  TH1D* hZ_Est_LooseS_DPhi = new TH1D("hZ_Est_S_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
-  TH1D* hZ_Eff_LooseS_DPhi = new TH1D("hZ_Eff_S_DPhi", "", 3, dphiEdges);
+  TH1D* hZ_Est_LooseC_DPhi = new TH1D("hZ_Est_LooseC_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
+  TH1D* hZ_Est_LooseS_DPhi = new TH1D("hZ_Est_LooseS_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
+  TH1D* hZ_Eff_LooseS_DPhi = new TH1D("hZ_Eff_LooseS_DPhi", "", 3, dphiEdges);
 
-  TH1D* hZ_DY_Loose_EffMuMu = new TH1D("hZ_DY_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
-  TH1D* hZ_DY_Loose_EffVBFS = new TH1D("hZ_DY_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
-  TH1D* hZ_DY_Loose_EffVBFC = new TH1D("hZ_DY_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
-  TH1D* hZ_DY_Loose_RatioVBF = new TH1D("hZ_DY_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
-  TH1D* hZ_DY_Loose_TotalEff = new TH1D("hZ_DY_TotalEff", "", 1, 0., 1.); 
+  TH1D* hZ_DY_Loose_EffMuMu = new TH1D("hZ_DY_Loose_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
+  TH1D* hZ_DY_Loose_EffVBFS = new TH1D("hZ_DY_Loose_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
+  TH1D* hZ_DY_Loose_EffVBFC = new TH1D("hZ_DY_Loose_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
+  TH1D* hZ_DY_Loose_RatioVBF = new TH1D("hZ_DY_Loose_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
+  TH1D* hZ_DY_Loose_TotalEff = new TH1D("hZ_DY_Loose_TotalEff", "", 1, 0., 1.); 
 
   hZ_DY_Loose_EffVBFS->Add(hZ_DY_Loose_EffVBFS_N);
   hZ_DY_Loose_EffVBFS->Divide(hZ_DY_EffVBFS_D);
@@ -557,7 +525,6 @@ int main(int argc, char* argv[]) {
   hZ_DY_C_DPhi->Write("",TObject::kOverwrite);
   hZ_BG_C_DPhi->Write("",TObject::kOverwrite);
   hZ_Data_C_DPhi->Write("",TObject::kOverwrite);
-//   hZ_R_DPhi->Write("",TObject::kOverwrite);
   hZ_Est_C_DPhi->Write("",TObject::kOverwrite);
   hZ_Est_S_DPhi->Write("",TObject::kOverwrite);
   hZ_Eff_S_DPhi->Write("",TObject::kOverwrite);
@@ -572,6 +539,25 @@ int main(int argc, char* argv[]) {
   hZ_DY_EffVBFC->Write("",TObject::kOverwrite);
   hZ_DY_RatioVBF->Write("",TObject::kOverwrite);
   hZ_DY_TotalEff->Write("",TObject::kOverwrite);
+
+  hZ_DY_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hZ_BG_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hZ_Data_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
+
+  hZ_DY_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hZ_BG_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hZ_Data_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
+
+  hZ_DY_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hZ_BG_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hZ_Data_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
+
 
   hZ_CutFlow_Data->Write("",TObject::kOverwrite);
   hZ_CutFlow_DY->Write("",TObject::kOverwrite);

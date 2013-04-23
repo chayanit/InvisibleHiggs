@@ -16,11 +16,15 @@ echo "efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
 efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI
 
 echo "nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI
+echo "Not working yet!"
+echo ""
+#nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI
 
 # MC vs data
 echo "controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI
+echo "Not working yet !"
+echo ""
+#controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI
 
 # BG estimates
 echo "wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI"

@@ -188,9 +188,9 @@ int main(int argc, char* argv[]) {
   // get data-driven background estimates
   std::cout << "Reading Z backgrounds from : " << options.oDir+std::string("/ZBackground.root") << std::endl;
   TFile* zfile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "READ");
-  TH1D* hQCD_Z_NoMET_DPhi  = new TH1D("hQCD_Z_NoMET_DPhi", "", 3, dphiEdges);
-  TH1D* hQCD_Z_Loose2_DPhi = new TH1D("hQCD_Z_Loose2_DPhi", "", 3, dphiEdges);
-  TH1D* hQCD_Z_Loose_DPhi  = new TH1D("hQCD_Z_Loose_DPhi", "", 3, dphiEdges);
+  TH1D* hQCD_Z_NoMET_DPhi  = (TH1D*) zfile->Get("hZ_Est_NoMETS_DPhi");
+  TH1D* hQCD_Z_Loose2_DPhi = (TH1D*) zfile->Get("hZ_Est_Loose2S_DPhi");
+  TH1D* hQCD_Z_Loose_DPhi  = (TH1D*) zfile->Get("hZ_Est_LooseS_DPhi");
   TH1D* hQCD_Z_Tight_DPhi  = (TH1D*) zfile->Get("hZ_Est_S_DPhi");
 
   if (hQCD_Z_Tight_DPhi == 0) {
@@ -209,9 +209,9 @@ int main(int argc, char* argv[]) {
   
   std::cout << "Reading W backgrounds from : " << options.oDir+std::string("/WBackground.root") << std::endl;
   TFile* wfile = TFile::Open( (options.oDir+std::string("/WBackground.root")).c_str(), "READ");
-  TH1D* hQCD_W_NoMET_DPhi  = new TH1D("hQCD_W_NoMET_DPhi", "", 3, dphiEdges);
-  TH1D* hQCD_W_Loose2_DPhi = new TH1D("hQCD_W_Loose2_DPhi", "", 3, dphiEdges);
-  TH1D* hQCD_W_Loose_DPhi  = new TH1D("hQCD_W_Loose_DPhi", "", 3, dphiEdges);
+  TH1D* hQCD_W_NoMET_DPhi  = (TH1D*) wfile->Get("hW_Est_NoMETS_DPhi");
+  TH1D* hQCD_W_Loose2_DPhi = (TH1D*) wfile->Get("hW_Est_Loose2S_DPhi");
+  TH1D* hQCD_W_Loose_DPhi  = (TH1D*) wfile->Get("hW_Est_LooseS_DPhi");
   TH1D* hQCD_W_Tight_DPhi  = (TH1D*) wfile->Get("hW_Est_S_DPhi");
 
   if (hQCD_W_Tight_DPhi == 0) {
@@ -259,9 +259,9 @@ int main(int argc, char* argv[]) {
   double rLoose      = hQCD_Est_Loose_DPhi->GetBinContent(1) / hQCD_Est_Loose_DPhi->GetBinContent(3);
   double err_rLoose  = rLoose * sqrt(pow(hQCD_Est_Loose_DPhi->GetBinError(1)/hQCD_Est_Loose_DPhi->GetBinContent(1),2) + pow(hQCD_Est_Loose_DPhi->GetBinError(3)/hQCD_Est_Loose_DPhi->GetBinContent(3),2));
   
-  // hardcode value to be used in final estimation - FOR NOW !
-  double rTight = 0.034;
-  double err_rTight = 0.001;
+  // linear extrapolation using MET>0 and MET>70 bins
+  double rTight = (130. * (rLoose - rNoMET)/70.) + rNoMET;
+  double err_rTight = rTight * sqrt(pow(err_rNoMET/rNoMET,2) + pow(err_rLoose/rLoose,2));
 
   // predict signal
   double nQCD_Est_S_HiDPhi = rTight * hQCD_Est_S_DPhi->GetBinContent(3);

@@ -248,20 +248,20 @@ int main(int argc, char* argv[]) {
       hWEl_MCC_DPhi->Add(hWEl_C_DPhi);
       hWEl_MCS_DPhi->Add(hWEl_S_DPhi);
 
-      hWMu_MC_NoMETC_DPhi->Add(hWMu_C_DPhi);
-      hWMu_MC_NoMETS_DPhi->Add(hWMu_S_DPhi);
-      hWEl_MC_NoMETC_DPhi->Add(hWEl_C_DPhi);
-      hWEl_MC_NoMETS_DPhi->Add(hWEl_S_DPhi);
+      hWMu_MC_NoMETC_DPhi->Add(hWMu_NoMETC_DPhi);
+      hWMu_MC_NoMETS_DPhi->Add(hWMu_NoMETS_DPhi);
+      hWEl_MC_NoMETC_DPhi->Add(hWEl_NoMETC_DPhi);
+      hWEl_MC_NoMETS_DPhi->Add(hWEl_NoMETS_DPhi);
 
-      hWMu_MC_LooseC_DPhi->Add(hWMu_C_DPhi);
-      hWMu_MC_LooseS_DPhi->Add(hWMu_S_DPhi);
-      hWEl_MC_LooseC_DPhi->Add(hWEl_C_DPhi);
-      hWEl_MC_LooseS_DPhi->Add(hWEl_S_DPhi);
+      hWMu_MC_LooseC_DPhi->Add(hWMu_LooseC_DPhi);
+      hWMu_MC_LooseS_DPhi->Add(hWMu_LooseS_DPhi);
+      hWEl_MC_LooseC_DPhi->Add(hWEl_LooseC_DPhi);
+      hWEl_MC_LooseS_DPhi->Add(hWEl_LooseS_DPhi);
 
-      hWMu_MC_Loose2C_DPhi->Add(hWMu_C_DPhi);
-      hWMu_MC_Loose2S_DPhi->Add(hWMu_S_DPhi);
-      hWEl_MC_Loose2C_DPhi->Add(hWEl_C_DPhi);
-      hWEl_MC_Loose2S_DPhi->Add(hWEl_S_DPhi);
+      hWMu_MC_Loose2C_DPhi->Add(hWMu_Loose2C_DPhi);
+      hWMu_MC_Loose2S_DPhi->Add(hWMu_Loose2S_DPhi);
+      hWEl_MC_Loose2C_DPhi->Add(hWEl_Loose2C_DPhi);
+      hWEl_MC_Loose2S_DPhi->Add(hWEl_Loose2S_DPhi);
     }
     else if (dataset.isData) {
       hWMu_DataC_DPhi->Add(hWMu_C_DPhi);
