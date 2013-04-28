@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
   unsigned nCutsZMuMu = cuts.nCutsZMuMu();
 
   TCut puWeight("puWeight");
-  TCut METNoMuon130("metNoMuon>130.");	// add here later for VBF efficiency when MET>0, MET>70 (QCD estimation)
+  TCut METNoMuon130("metNoMuon>130.");	// add here later for VBF efficiency when MET>35, MET>70 (QCD estimation)
   TCut METNoMuon70("metNoMuon>70.");	
   TCut METNoMuon35("metNoMuon>35.");	
   TCut METNo2Muon130("metNo2Muon>130.");
@@ -64,28 +64,28 @@ int main(int argc, char* argv[]) {
   TH1D* hZ_DY_EffVBFC_N = new TH1D("hZ_DY_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
 
   // MET > 70
-  TH1D* hZ_DY_LooseC_DPhi = new TH1D("hZ_DY_C_DPhi", "", 3, dphiEdges);  // Z+jets MC ctrl region
-  TH1D* hZ_BG_LooseC_DPhi = new TH1D("hZ_BG_C_DPhi", "", 3, dphiEdges);  // background MC ctrl region
-  TH1D* hZ_Data_LooseC_DPhi = new TH1D("hZ_Data_C_DPhi", "", 3, dphiEdges);  // Data ctrl region
+  TH1D* hZ_DY_LooseC_DPhi = new TH1D("hZ_DY_LooseC_DPhi", "", 3, dphiEdges);  // Z+jets MC ctrl region
+  TH1D* hZ_BG_LooseC_DPhi = new TH1D("hZ_BG_LooseC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
+  TH1D* hZ_Data_LooseC_DPhi = new TH1D("hZ_Data_LooseC_DPhi", "", 3, dphiEdges);  // Data ctrl region
 
-  TH1D* hZ_DY_Loose_EffVBFS_N = new TH1D("hZ_DY_EffVBFS_N", "", 1, 0., 1.);   // numerator of VBF(S) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples  
-  TH1D* hZ_DY_Loose_EffVBFC_N = new TH1D("hZ_DY_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
+  TH1D* hZ_DY_Loose_EffVBFS_N = new TH1D("hZ_DY_Loose_EffVBFS_N", "", 1, 0., 1.);   // numerator of VBF(S) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples  
+  TH1D* hZ_DY_Loose_EffVBFC_N = new TH1D("hZ_DY_Loose_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
 
   // MET > 35
-  TH1D* hZ_DY_Loose2C_DPhi = new TH1D("hZ_DY_C_DPhi", "", 3, dphiEdges);  // Z+jets MC ctrl region
-  TH1D* hZ_BG_Loose2C_DPhi = new TH1D("hZ_BG_C_DPhi", "", 3, dphiEdges);  // background MC ctrl region
-  TH1D* hZ_Data_Loose2C_DPhi = new TH1D("hZ_Data_C_DPhi", "", 3, dphiEdges);  // Data ctrl region
-
-  TH1D* hZ_DY_Loose2_EffVBFS_N = new TH1D("hZ_DY_EffVBFS_N", "", 1, 0., 1.);   // numerator of VBF(S) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
-   TH1D* hZ_DY_Loose2_EffVBFC_N = new TH1D("hZ_DY_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
+  TH1D* hZ_DY_Loose2C_DPhi = new TH1D("hZ_DY_Loose2C_DPhi", "", 3, dphiEdges);  // Z+jets MC ctrl region
+  TH1D* hZ_BG_Loose2C_DPhi = new TH1D("hZ_BG_Loose2C_DPhi", "", 3, dphiEdges);  // background MC ctrl region
+  TH1D* hZ_Data_Loose2C_DPhi = new TH1D("hZ_Data_Loose2C_DPhi", "", 3, dphiEdges);  // Data ctrl region
+ 
+  TH1D* hZ_DY_Loose2_EffVBFS_N = new TH1D("hZ_DY_Loose2_EffVBFS_N", "", 1, 0., 1.);   // numerator of VBF(S) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
+  TH1D* hZ_DY_Loose2_EffVBFC_N = new TH1D("hZ_DY_Loose2_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
 
   // MET > 0
-  TH1D* hZ_DY_NoMETC_DPhi = new TH1D("hZ_DY_C_DPhi", "", 3, dphiEdges);  // Z+jets MC ctrl region
-  TH1D* hZ_BG_NoMETC_DPhi = new TH1D("hZ_BG_C_DPhi", "", 3, dphiEdges);  // background MC ctrl region
-  TH1D* hZ_Data_NoMETC_DPhi = new TH1D("hZ_Data_C_DPhi", "", 3, dphiEdges);  // Data ctrl region
+  TH1D* hZ_DY_NoMETC_DPhi = new TH1D("hZ_DY_NoMETC_DPhi", "", 3, dphiEdges);  // Z+jets MC ctrl region
+  TH1D* hZ_BG_NoMETC_DPhi = new TH1D("hZ_BG_NoMETC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
+  TH1D* hZ_Data_NoMETC_DPhi = new TH1D("hZ_Data_NoMETC_DPhi", "", 3, dphiEdges);  // Data ctrl region
 
-  TH1D* hZ_DY_NoMET_EffVBFS_N = new TH1D("hZ_DY_EffVBFS_N", "", 1, 0., 1.);   // numerator of VBF(S) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
-   TH1D* hZ_DY_NoMET_EffVBFC_N = new TH1D("hZ_DY_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
+  TH1D* hZ_DY_NoMET_EffVBFS_N = new TH1D("hZ_DY_NoMET_EffVBFS_N", "", 1, 0., 1.);   // numerator of VBF(S) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
+  TH1D* hZ_DY_NoMET_EffVBFC_N = new TH1D("hZ_DY_NoMET_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
 
   // cutflow histograms
   TH1D* hZ_CutFlow_Data       = new TH1D("hZ_CutFlow_Data", "", nCutsZMuMu, 0., nCutsZMuMu);
@@ -124,13 +124,13 @@ int main(int argc, char* argv[]) {
     TCut cutZMuMu_C70  = puWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon70);
     TCut cutZMuMu_C130 = puWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon130);
     
-    TCut cutEfficiencyMuMu_D    = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen());
-    TCut cutEfficiencyMuMu_N    = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
+    TCut cutEfficiencyMuMu_D    = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen());
+    TCut cutEfficiencyMuMu_N    = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
     
     TCut cutEfficiencyVBFS_D    = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass());
     TCut cutEfficiencyVBFS_N0   = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf());
-    TCut cutEfficiencyVBFS_N35  = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130);
-    TCut cutEfficiencyVBFS_N70  = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130);
+    TCut cutEfficiencyVBFS_N35  = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon35);
+    TCut cutEfficiencyVBFS_N70  = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon70);
     TCut cutEfficiencyVBFS_N130 = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130);
     
     TCut cutEfficiencyVBFC_D    = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
@@ -165,8 +165,10 @@ int main(int argc, char* argv[]) {
       tree->Draw("vbfDPhi>>hZ_C35_DPhi",  cutZMuMu_C35);
       tree->Draw("vbfDPhi>>hZ_C70_DPhi",  cutZMuMu_C70);
       tree->Draw("vbfDPhi>>hZ_C130_DPhi", cutZMuMu_C130);
+      if (dataset.name != "DYJetsToLL_PtZ-100") {
       tree->Draw("0.5>>hZ_EffMuMu_D",     cutEfficiencyMuMu_D);		
-      tree->Draw("0.5>>hZ_EffMuMu_N",     cutEfficiencyMuMu_N);		
+      tree->Draw("0.5>>hZ_EffMuMu_N",     cutEfficiencyMuMu_N);	
+      }	
       tree->Draw("0.5>>hZ_EffVBFS_D",     cutEfficiencyVBFS_D);
       tree->Draw("0.5>>hZ_EffVBFS_N0",    cutEfficiencyVBFS_N0);
       tree->Draw("0.5>>hZ_EffVBFS_N35",   cutEfficiencyVBFS_N35);
@@ -367,10 +369,9 @@ int main(int argc, char* argv[]) {
   TH1D* hZ_Est_NoMETS_DPhi = new TH1D("hZ_Est_NoMETS_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
   TH1D* hZ_Eff_NoMETS_DPhi = new TH1D("hZ_Eff_NoMETS_DPhi", "", 3, dphiEdges);
 
-  TH1D* hZ_DY_NoMET_EffMuMu = new TH1D("hZ_DY_NoMET_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
-  TH1D* hZ_DY_NoMET_EffVBFS = new TH1D("hZ_DY_NoMET_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
-  TH1D* hZ_DY_NoMET_EffVBFC = new TH1D("hZ_DY_NoMET_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
-  TH1D* hZ_DY_NoMET_RatioVBF = new TH1D("hZ_DY_NoMET_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
+  TH1D* hZ_DY_NoMET_EffVBFS = new TH1D("hZ_DY_NoMET_EffVBFS", "", 1, 0., 1.);  	 // epsilon_s_vbf
+  TH1D* hZ_DY_NoMET_EffVBFC = new TH1D("hZ_DY_NoMET_EffVBFC", "", 1, 0., 1.);    // epsilon_c_vbf
+  TH1D* hZ_DY_NoMET_RatioVBF = new TH1D("hZ_DY_NoMET_RatioVBF", "", 1, 0., 1.);	 // epsilon_s_vbf/epsilon_c_vbf
   TH1D* hZ_DY_NoMET_TotalEff = new TH1D("hZ_DY_NoMET_TotalEff", "", 1, 0., 1.); 
 
   hZ_DY_NoMET_EffVBFS->Add(hZ_DY_NoMET_EffVBFS_N);
@@ -401,7 +402,6 @@ int main(int argc, char* argv[]) {
   TH1D* hZ_Est_Loose2S_DPhi = new TH1D("hZ_Est_Loose2S_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
   TH1D* hZ_Eff_Loose2S_DPhi = new TH1D("hZ_Eff_Loose2S_DPhi", "", 3, dphiEdges);
 
-  TH1D* hZ_DY_Loose2_EffMuMu = new TH1D("hZ_DY_Loose2_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
   TH1D* hZ_DY_Loose2_EffVBFS = new TH1D("hZ_DY_Loose2_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
   TH1D* hZ_DY_Loose2_EffVBFC = new TH1D("hZ_DY_Loose2_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
   TH1D* hZ_DY_Loose2_RatioVBF = new TH1D("hZ_DY_Loose2_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
@@ -434,7 +434,6 @@ int main(int argc, char* argv[]) {
   TH1D* hZ_Est_LooseS_DPhi = new TH1D("hZ_Est_LooseS_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
   TH1D* hZ_Eff_LooseS_DPhi = new TH1D("hZ_Eff_LooseS_DPhi", "", 3, dphiEdges);
 
-  TH1D* hZ_DY_Loose_EffMuMu = new TH1D("hZ_DY_Loose_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
   TH1D* hZ_DY_Loose_EffVBFS = new TH1D("hZ_DY_Loose_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
   TH1D* hZ_DY_Loose_EffVBFC = new TH1D("hZ_DY_Loose_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
   TH1D* hZ_DY_Loose_RatioVBF = new TH1D("hZ_DY_Loose_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
@@ -467,6 +466,7 @@ int main(int argc, char* argv[]) {
   // print out
 
   std::cout << std::endl;
+  std::cout << "##################################### MET > 130 #####################################" << std::endl;
   std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
   std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
   std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
@@ -490,8 +490,93 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_C_DPhi->GetBinError(1) << std::endl;
   std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_S_DPhi->GetBinError(1) << std::endl;
+  std::cout << "#####################################################################################" << std::endl;
   std::cout << std::endl << std::endl;
 
+  std::cout << std::endl;
+  std::cout << "###################################### MET > 0 ######################################" << std::endl;
+  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
+  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_NoMET_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_NoMET_EffVBFS->GetBinError(1) << std::endl;
+  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_NoMET_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_NoMET_EffVBFC->GetBinError(1) << std::endl;
+  std::cout << "  ratio_vbf by histogram : " << hZ_DY_NoMET_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_NoMET_RatioVBF->GetBinError(1) << std::endl;
+  std::cout << "  total eff by histogram : " << hZ_DY_NoMET_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_NoMET_TotalEff->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+
+  std::cout << std::endl;
+  std::cout << "dphi>2.6" << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_NoMETC_DPhi->GetBinContent(3) << " +/- " << hZ_DY_NoMETC_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_NoMETC_DPhi->GetBinContent(3) << " +/- " << hZ_BG_NoMETC_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_NoMETC_DPhi->GetBinContent(3) << " +/- " << hZ_Data_NoMETC_DPhi->GetBinError(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_NoMETC_DPhi->GetBinContent(3) << " +/- " << hZ_Est_NoMETC_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_NoMETS_DPhi->GetBinContent(3) << " +/- " << hZ_Est_NoMETS_DPhi->GetBinError(3) << std::endl;
+  std::cout << std::endl << std::endl;
+  std::cout << "dphi<1.0" << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_NoMETC_DPhi->GetBinContent(1) << " +/- " << hZ_DY_NoMETC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_NoMETC_DPhi->GetBinContent(1) << " +/- " << hZ_BG_NoMETC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_NoMETC_DPhi->GetBinContent(1) << " +/- " << hZ_Data_NoMETC_DPhi->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_NoMETC_DPhi->GetBinContent(1) << " +/- " << hZ_Est_NoMETC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_NoMETS_DPhi->GetBinContent(1) << " +/- " << hZ_Est_NoMETS_DPhi->GetBinError(1) << std::endl;
+  std::cout << "#####################################################################################" << std::endl;
+  std::cout << std::endl << std::endl;
+
+
+  std::cout << std::endl;
+  std::cout << "##################################### MET > 35 ######################################" << std::endl;
+  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
+  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_Loose2_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_Loose2_EffVBFS->GetBinError(1) << std::endl;
+  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_Loose2_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_Loose2_EffVBFC->GetBinError(1) << std::endl;
+  std::cout << "  ratio_vbf by histogram : " << hZ_DY_Loose2_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_Loose2_RatioVBF->GetBinError(1) << std::endl;
+  std::cout << "  total eff by histogram : " << hZ_DY_Loose2_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_Loose2_TotalEff->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+
+  std::cout << std::endl;
+  std::cout << "dphi>2.6" << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_Loose2C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_Loose2C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_Loose2C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_Loose2C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_Loose2C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_Loose2C_DPhi->GetBinError(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_Loose2C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_Loose2C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_Loose2S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_Loose2S_DPhi->GetBinError(3) << std::endl;
+  std::cout << std::endl << std::endl;
+  std::cout << "dphi<1.0" << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_Loose2C_DPhi->GetBinContent(1) << " +/- " << hZ_DY_Loose2C_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_Loose2C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_Loose2C_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_Loose2C_DPhi->GetBinContent(1) << " +/- " << hZ_Data_Loose2C_DPhi->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_Loose2C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_Loose2C_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_Loose2S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_Loose2S_DPhi->GetBinError(1) << std::endl;
+  std::cout << "#####################################################################################" << std::endl;
+  std::cout << std::endl << std::endl;
+
+  std::cout << std::endl;
+  std::cout << "##################################### MET > 70 ######################################" << std::endl;
+  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
+  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_Loose_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_Loose_EffVBFS->GetBinError(1) << std::endl;
+  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_Loose_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_Loose_EffVBFC->GetBinError(1) << std::endl;
+  std::cout << "  ratio_vbf by histogram : " << hZ_DY_Loose_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_Loose_RatioVBF->GetBinError(1) << std::endl;
+  std::cout << "  total eff by histogram : " << hZ_DY_Loose_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_Loose_TotalEff->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+
+  std::cout << std::endl;
+  std::cout << "dphi>2.6" << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_LooseC_DPhi->GetBinContent(3) << " +/- " << hZ_DY_LooseC_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_LooseC_DPhi->GetBinContent(3) << " +/- " << hZ_BG_LooseC_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_LooseC_DPhi->GetBinContent(3) << " +/- " << hZ_Data_LooseC_DPhi->GetBinError(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_LooseC_DPhi->GetBinContent(3) << " +/- " << hZ_Est_LooseC_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_LooseS_DPhi->GetBinContent(3) << " +/- " << hZ_Est_LooseS_DPhi->GetBinError(3) << std::endl;
+  std::cout << std::endl << std::endl;
+  std::cout << "dphi<1.0" << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_LooseC_DPhi->GetBinContent(1) << " +/- " << hZ_DY_LooseC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_LooseC_DPhi->GetBinContent(1) << " +/- " << hZ_BG_LooseC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_LooseC_DPhi->GetBinContent(1) << " +/- " << hZ_Data_LooseC_DPhi->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_LooseC_DPhi->GetBinContent(1) << " +/- " << hZ_Est_LooseC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_LooseS_DPhi->GetBinContent(1) << " +/- " << hZ_Est_LooseS_DPhi->GetBinError(1) << std::endl;
+  std::cout << "#####################################################################################" << std::endl;
+  std::cout << std::endl << std::endl;
 
   // write the cutflow table
   std::cout << "Writing cut flow TeX file" << std::endl;
@@ -557,7 +642,6 @@ int main(int argc, char* argv[]) {
   hZ_Data_LooseC_DPhi->Write("",TObject::kOverwrite);
   hZ_Est_LooseC_DPhi->Write("",TObject::kOverwrite);
   hZ_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
-
 
   hZ_CutFlow_Data->Write("",TObject::kOverwrite);
   hZ_CutFlow_DY->Write("",TObject::kOverwrite);
