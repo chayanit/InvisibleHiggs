@@ -322,7 +322,8 @@ int main(int argc, char* argv[]) {
     for (unsigned c=0; c<nCutsWMu; ++c) {
 
       TCut cut = puWeight * (cutD + cuts.cutflowWMu(c));
-      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+//      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+      if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
 
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
@@ -336,7 +337,8 @@ int main(int argc, char* argv[]) {
     for (unsigned c=0; c<nCutsWEl; ++c) {
 
       TCut cut = puWeight * (cutD + cuts.cutflowWEl(c));
-      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+//      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+      if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
 
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
