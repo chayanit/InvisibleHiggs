@@ -30,7 +30,7 @@ Cuts::Cuts() {
   addWMuCut("dEtaJJ",    "vbfDEta>4.2");
   addWMuCut("MET",       "metNoWLepton>130.");
   addWMuCut("Mjj",       "vbfM>1200.");
-  addWMuCut("dPhiJJ",     "vbfDPhi<1.0");
+  addWMuCut("dPhiJJ",    "vbfDPhi<1.0");
 
   addWElCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
   addWElCut("wEl",       "nW>0 && wChannel==2");
@@ -39,7 +39,7 @@ Cuts::Cuts() {
   addWElCut("dEtaJJ",    "vbfDEta>4.2");
   addWElCut("MET",       "metNoWLepton>130.");
   addWElCut("Mjj",       "vbfM>1200.");
-  addWElCut("dPhiJJ",     "vbfDPhi<1.0");
+  addWElCut("dPhiJJ",    "vbfDPhi<1.0");
 
 }
 
