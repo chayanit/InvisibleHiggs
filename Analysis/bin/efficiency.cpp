@@ -65,7 +65,14 @@ int main(int argc, char* argv[]) {
     TCut cutDSet     = cuts.cutDataset(dataset.name);
     TCut puWeight("puWeight");
     TCut wWeight("");
-    if (dataset.name.compare(0,1,"W")) wWeight = cuts.wWeight();
+    if (dataset.name=="WJets" ||
+	dataset.name=="W1Jets" ||
+	dataset.name=="W2Jets" ||
+	dataset.name=="W3Jets" ||
+	dataset.name=="W4Jets") {
+      wWeight = cuts.wWeight();
+      std::cout << "W MC weight : " << wWeight << std::endl; 
+    }
      
     // tmp histogram for counting.  Need a hist so we can use PU weight
 
