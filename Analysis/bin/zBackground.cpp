@@ -39,6 +39,9 @@ int main(int argc, char* argv[]) {
   unsigned nCutsZMuMu = cuts.nCutsZMuMu();
 
   TCut puWeight("puWeight");
+  TCut trigCorrWeight("trigCorrWeight");
+  //TCut trigCorrWeight("1.");
+  TCut HLT("hltResult2>0.");
   TCut METNoMuon130("metNoMuon>130.");	// add here later for VBF efficiency when MET>35, MET>70 (QCD estimation)
   TCut METNoMuon70("metNoMuon>70.");	
   TCut METNoMuon35("metNoMuon>35.");	
@@ -119,27 +122,26 @@ int main(int argc, char* argv[]) {
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
 
     // set up cuts
-    TCut cutZMuMu_C0   = puWeight * (cutD + cuts.zMuMuVBF());
-    TCut cutZMuMu_C35  = puWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon35);
-    TCut cutZMuMu_C70  = puWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon70);
-    TCut cutZMuMu_C130 = puWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon130);
+    TCut cutZMuMu_C0   = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBF());
+    TCut cutZMuMu_C35  = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon35);
+    TCut cutZMuMu_C70  = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon70);
+    TCut cutZMuMu_C130 = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon130);
     
-    TCut cutEfficiencyMuMu_D    = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen());
-    TCut cutEfficiencyMuMu_N    = puWeight * (cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
+    TCut cutEfficiencyMuMu_D    = puWeight * (cutD + cuts.zMuMuGen());
+    TCut cutEfficiencyMuMu_N    = puWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
+ 
+    TCut cutEfficiencyVBFS_D    = puWeight * (cutD + cuts.zMuMuGenMass());
+    TCut cutEfficiencyVBFS_N0   = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf());
+    TCut cutEfficiencyVBFS_N35  = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon35);
+    TCut cutEfficiencyVBFS_N70  = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon70);
+    TCut cutEfficiencyVBFS_N130 = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130);
     
-    TCut cutEfficiencyVBFS_D    = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass());
-    TCut cutEfficiencyVBFS_N0   = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf());
-    TCut cutEfficiencyVBFS_N35  = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon35);
-    TCut cutEfficiencyVBFS_N70  = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon70);
-    TCut cutEfficiencyVBFS_N130 = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130);
+    TCut cutEfficiencyVBFC_D    = puWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
+    TCut cutEfficiencyVBFC_N0   = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf());
+    TCut cutEfficiencyVBFC_N35  = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon35);
+    TCut cutEfficiencyVBFC_N70  = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon70);
+    TCut cutEfficiencyVBFC_N130 = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon130);
     
-    TCut cutEfficiencyVBFC_D    = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco());
-    TCut cutEfficiencyVBFC_N0   = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf());
-    TCut cutEfficiencyVBFC_N35  = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon35);
-    TCut cutEfficiencyVBFC_N70  = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon70);
-    TCut cutEfficiencyVBFC_N130 = puWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon130);
-    
-
     // fill tmp histograms for BG estimation
     TH1D* hZ_C0_DPhi   = new TH1D("hZ_C0_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
     TH1D* hZ_C35_DPhi  = new TH1D("hZ_C35_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
@@ -165,10 +167,8 @@ int main(int argc, char* argv[]) {
       tree->Draw("vbfDPhi>>hZ_C35_DPhi",  cutZMuMu_C35);
       tree->Draw("vbfDPhi>>hZ_C70_DPhi",  cutZMuMu_C70);
       tree->Draw("vbfDPhi>>hZ_C130_DPhi", cutZMuMu_C130);
-      if (dataset.name != "DYJetsToLL_PtZ-100") {
       tree->Draw("0.5>>hZ_EffMuMu_D",     cutEfficiencyMuMu_D);		
       tree->Draw("0.5>>hZ_EffMuMu_N",     cutEfficiencyMuMu_N);	
-      }	
       tree->Draw("0.5>>hZ_EffVBFS_D",     cutEfficiencyVBFS_D);
       tree->Draw("0.5>>hZ_EffVBFS_N0",    cutEfficiencyVBFS_N0);
       tree->Draw("0.5>>hZ_EffVBFS_N35",   cutEfficiencyVBFS_N35);
@@ -228,10 +228,8 @@ int main(int argc, char* argv[]) {
       hZ_DY_Loose2_EffVBFC_N->Add(hZ_EffVBFC_N35);
       hZ_DY_Loose_EffVBFC_N->Add(hZ_EffVBFC_N70);
       hZ_DY_EffVBFC_N->Add(hZ_EffVBFC_N130);
-      if (dataset.name != "DYJetsToLL_PtZ-100") {
       hZ_DY_EffMuMu_D->Add(hZ_EffMuMu_D);
       hZ_DY_EffMuMu_N->Add(hZ_EffMuMu_N);
-      }
     }
     else {
       hZ_BG_NoMETC_DPhi->Add(hZ_C0_DPhi);
@@ -321,8 +319,6 @@ int main(int argc, char* argv[]) {
   //double eps_mumu = 0.290;
   //double eps_s_vbf = 0.0194;
   //double eps_c_vbf = 0.0315;
-  double eps_vbf_syst = 0.008; 		//JES+MET uncertainty
-
   //double f = (ratioBF * eps_s_vbf) / (eps_mumu * eps_c_vbf);
 
   TH1D* hZ_Est_C_DPhi = new TH1D("hZ_Est_C_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
@@ -348,7 +344,7 @@ int main(int argc, char* argv[]) {
 
   hZ_DY_RatioVBF->Add(hZ_DY_EffVBFS);
   hZ_DY_RatioVBF->Divide(hZ_DY_EffVBFC);
-  hZ_DY_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_RatioVBF->GetBinError(1)*hZ_DY_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
+  //hZ_DY_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_RatioVBF->GetBinError(1)*hZ_DY_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
 
   hZ_DY_TotalEff->Add(hZ_DY_RatioVBF);
   hZ_DY_TotalEff->Divide(hZ_DY_EffMuMu);
@@ -382,7 +378,7 @@ int main(int argc, char* argv[]) {
 
   hZ_DY_NoMET_RatioVBF->Add(hZ_DY_NoMET_EffVBFS);
   hZ_DY_NoMET_RatioVBF->Divide(hZ_DY_NoMET_EffVBFC);
-  hZ_DY_NoMET_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_NoMET_RatioVBF->GetBinError(1)*hZ_DY_NoMET_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
+  //hZ_DY_NoMET_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_NoMET_RatioVBF->GetBinError(1)*hZ_DY_NoMET_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
 
   hZ_DY_NoMET_TotalEff->Add(hZ_DY_NoMET_RatioVBF);
   hZ_DY_NoMET_TotalEff->Divide(hZ_DY_EffMuMu);
@@ -415,7 +411,7 @@ int main(int argc, char* argv[]) {
 
   hZ_DY_Loose2_RatioVBF->Add(hZ_DY_Loose2_EffVBFS);
   hZ_DY_Loose2_RatioVBF->Divide(hZ_DY_Loose2_EffVBFC);
-  hZ_DY_Loose2_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_Loose2_RatioVBF->GetBinError(1)*hZ_DY_Loose2_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
+  //hZ_DY_Loose2_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_Loose2_RatioVBF->GetBinError(1)*hZ_DY_Loose2_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
 
   hZ_DY_Loose2_TotalEff->Add(hZ_DY_Loose2_RatioVBF);
   hZ_DY_Loose2_TotalEff->Divide(hZ_DY_EffMuMu);
@@ -447,7 +443,7 @@ int main(int argc, char* argv[]) {
 
   hZ_DY_Loose_RatioVBF->Add(hZ_DY_Loose_EffVBFS);
   hZ_DY_Loose_RatioVBF->Divide(hZ_DY_Loose_EffVBFC);
-  hZ_DY_Loose_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_Loose_RatioVBF->GetBinError(1)*hZ_DY_Loose_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
+  //hZ_DY_Loose_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_Loose_RatioVBF->GetBinError(1)*hZ_DY_Loose_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
 
   hZ_DY_Loose_TotalEff->Add(hZ_DY_Loose_RatioVBF);
   hZ_DY_Loose_TotalEff->Divide(hZ_DY_EffMuMu);
@@ -470,29 +466,29 @@ int main(int argc, char* argv[]) {
   std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
   std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
   std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
-  std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << std::endl;
+  std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << "(stat.) + " << 0.01039 * hZ_DY_RatioVBF->GetBinContent(1) << ", - " << 0.0136 * hZ_DY_RatioVBF->GetBinContent(1) << "(syst.)" << std::endl;
   std::cout << "  total eff by histogram : " << hZ_DY_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_TotalEff->GetBinError(1) << std::endl;
   std::cout << std::endl;
 
   std::cout << std::endl;
   std::cout << "dphi>2.6" << std::endl;
   std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_C_DPhi->GetBinError(3) << "(stat.) + " << 0.035 * hZ_BG_C_DPhi->GetBinContent(3) << ", - " << 0.0 * hZ_BG_C_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
   std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_C_DPhi->GetBinError(3) << std::endl;
   std::cout << std::endl;
   std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_S_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_S_DPhi->GetBinError(3) << "(stat.) + " << 0.0104 * hZ_Est_S_DPhi->GetBinContent(3) << ", - " << 0.0161 * hZ_Est_S_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
   std::cout << std::endl << std::endl;
   std::cout << "dphi<1.0" << std::endl;
   std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(1) << " +/- " << hZ_DY_C_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_C_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(1) << " +/- " << hZ_Data_C_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_C_DPhi->GetBinError(1) << "(stat.) + " << 0.174 * hZ_BG_C_DPhi->GetBinContent(1) << ", - " << 0.09 * hZ_BG_C_DPhi->GetBinContent(1) << "(syst.)" << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(1) << " +/- " << std::endl;
   std::cout << std::endl;
   std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_C_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_S_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_S_DPhi->GetBinError(1) << "(stat.) + " << 0.0169 * hZ_Est_S_DPhi->GetBinContent(1) << ", - " << 0.0311 * hZ_Est_S_DPhi->GetBinContent(1) << "(syst.)" << std::endl;
   std::cout << "#####################################################################################" << std::endl;
   std::cout << std::endl << std::endl;
-
+  /*
   std::cout << std::endl;
   std::cout << "###################################### MET > 0 ######################################" << std::endl;
   std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
@@ -577,7 +573,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Z in sgnl region       : " << hZ_Est_LooseS_DPhi->GetBinContent(1) << " +/- " << hZ_Est_LooseS_DPhi->GetBinError(1) << std::endl;
   std::cout << "#####################################################################################" << std::endl;
   std::cout << std::endl << std::endl;
-
+  */
   // write the cutflow table
   std::cout << "Writing cut flow TeX file" << std::endl;
 
