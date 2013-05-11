@@ -160,7 +160,7 @@ TCut Cuts::cutDataset(std::string name) {
 
   TCut tmp;
   if (name == "WJets") return tmp;//"wgennj==0");
-  else if (name == "DYJetsToLL") return TCut("zgenpt<100.");
+  else if (name == "DYJetsToLL" || name == "DYJetsToLL_NoTrig") return TCut("zgenpt<100.");
   else return tmp;
 
 }
