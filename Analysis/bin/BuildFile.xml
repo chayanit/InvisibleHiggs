@@ -20,6 +20,8 @@
 
 <bin name="qcdBackground" file="qcdBackground.cpp"/>
 
+<bin name="qcdBackground2" file="qcdBackground2.cpp"/>
+
 <bin name="summary" file="summary.cpp"/>
 
 <bin name="limits" file="limits.cpp"/>
