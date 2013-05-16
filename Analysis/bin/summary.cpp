@@ -101,6 +101,23 @@ int main(int argc, char* argv[]) {
 			     pow(errBG_SingleT,2) +
 			     pow(errBG_Diboson,2));
 
+  double nBG_W = (nBG_WMu + 
+		  nBG_WEl);
+
+  double errBG_W = sqrt( pow(errBG_WMu,2) + 
+			 pow(errBG_WEl,2));
+
+  double nBG_Other = (nBG_TTBar + 
+		      nBG_WTauHad + 
+		      nBG_SingleT + 
+		      nBG_Diboson);
+
+  double errBG_Other =  sqrt( pow(errBG_TTBar,2) +
+			      pow(errBG_WTauHad,2) + 
+			      pow(errBG_SingleT,2) + 
+			      pow(errBG_Diboson,2));
+  
+
   // write background summary table
   std::cout << "Writing BG summary TeX file" << std::endl;
 
@@ -121,6 +138,29 @@ int main(int argc, char* argv[]) {
   texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << " << \\pm " << errBG_Total << "$}  \\\\" << std::endl;
 
   texFile.close();
+
+  // write limit card file
+  std::cout << "Writing limit card file" << std::endl;
+
+  ofstream txtFile;
+  txtFile.open(options.oDir+std::string("/summary.txt"));
+
+  txtFile << "Background \t  N \t err" << std::endl;
+  txtFile << "Z\t" <<  nBG_Z << "\t" << errBG_Z << std::endl;
+  txtFile << "W\t" <<  nBG_W << "\t" << errBG_W << std::endl;
+  txtFile << "QCD\t" <<  nBG_QCD << "\t" << errBG_QCD << std::endl;
+  txtFile << "Other\t" <<  nBG_Other << "\t" << errBG_Other << std::endl;
+  txtFile << std::endl;
+
+  txtFile.close();
+
+
+  // write combine tool card file
+  std::cout << "Writing combine tool card file" << std::endl;
+
+  txtFile.open(options.oDir+std::string("/combine.txt"));
+
+  txtFile.close();
 
 
   // clean up

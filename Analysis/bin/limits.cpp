@@ -74,47 +74,41 @@ int main(int argc, char* argv[]) {
   double bgZjets(0.), err_bgZjets(0.);
   double bgWjets(0.), err_bgWjets(0.);
   double bgQCD(0.), err_bgQCD(0.);
+  double bgOther(0.), err_bgOther(0.);
 
   ifstream file;
   double n, err_n;
   std::string name;
 
-  file.open((oDir+std::string("/zjets.txt").c_str()));
+  file.open((oDir+std::string("/summary.txt").c_str()));
   while (file >> name >> n >> err_n) {
-    if (name == "Signal") {
+    if (name == "Z") {
       bgZjets = n;
       err_bgZjets = err_n;
+    }
+    if (name == "W") {
+      bgWjets = n;
+      err_bgWjets = err_n;
+    }
+    if (name == "QCD") {
+      bgQCD = n;
+      err_bgQCD = err_n;
+    }
+    if (name == "Other") {
+      bgOther = n;
+      err_bgOther = err_n;
     }
   }
   file.close();
 
   std::cout << "Z+jets  : " << bgZjets << " +/- " << err_bgZjets << std::endl;
-
-  file.open((oDir+std::string("/wjets.txt")).c_str());
-  while (file >> name >> n >> err_n) {
-    if (name == "Signal") {
-      bgWjets = n;
-      err_bgWjets = err_n;
-    }
-  }
-  file.close();
-
   std::cout << "W+jets  : " << bgWjets << " +/- " << err_bgWjets << std::endl;
-
-  file.open((oDir+std::string("/qcd.txt")).c_str());
-  while (file >> name >> n >> err_n) {
-    if (name == "Signal") {
-      bgQCD = n;
-      err_bgQCD = err_n;
-    }
-  }
-  file.close();
-
   std::cout << "QCD     : " << bgQCD << " +/- " << err_bgQCD << std::endl;
+  std::cout << "Other   : " << bgOther << " +/- " << err_bgOther << std::endl;
 
   // total BG
-  double bgTot     = bgZjets + bgWjets + bgQCD;
-  double err_bgTot = sqrt( pow(err_bgZjets, 2) + pow(err_bgWjets, 2) + pow(err_bgQCD, 2) );
+  double bgTot     = bgZjets + bgWjets + bgQCD + bgOther;
+  double err_bgTot = sqrt( pow(err_bgZjets, 2) + pow(err_bgWjets, 2) + pow(err_bgQCD, 2) + pow(err_bgOther, 2) );
 
   std::cout << "Total   : " << bgTot << " +/- " << err_bgTot << std::endl;
   std::cout << std::endl;

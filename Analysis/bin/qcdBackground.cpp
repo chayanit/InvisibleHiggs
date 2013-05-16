@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
   datasets.readFile(options.datasetFile);
 
   // output file
-  TFile* ofile = TFile::Open( (options.oDir+std::string("/QCDBackground.root")).c_str(), "UPDATE");
+  TFile* ofile = TFile::Open( (options.oDir+std::string("/QCDBackground.root")).c_str(), "RECREATE");
 
   // cuts
   Cuts cuts;
@@ -41,6 +41,11 @@ int main(int argc, char* argv[]) {
   TCut cutQCDLoose = puWeight * cuts.qcdLoose();
   TCut cutQCDTightHiDPhi = puWeight * cuts.qcdTightHiDPhi();
 
+  TCut cutWQCDNoMET = puWeight * cuts.wWeight() * (cuts.wTauGen() + cuts.qcdNoMET());
+  TCut cutWQCDLoose2 = puWeight * cuts.wWeight() * (cuts.wTauGen() + cuts.qcdLoose2());
+  TCut cutWQCDLoose = puWeight * cuts.wWeight() * (cuts.wTauGen() + cuts.qcdLoose());
+  TCut cutWQCDTightHiDPhi = puWeight * cuts.wWeight() * (cuts.wTauGen() + cuts.qcdTightHiDPhi());
+  
   std::cout << cutQCDTightHiDPhi << std::endl;
 
   // histograms
@@ -50,6 +55,11 @@ int main(int argc, char* argv[]) {
   TH1D* hQCD_BG_Loose2_DPhi = new TH1D("hQCD_BG_Loose2_DPhi", "", 3, dphiEdges);  // BG in Loose region
   TH1D* hQCD_BG_Loose_DPhi = new TH1D("hQCD_BG_Loose_DPhi", "", 3, dphiEdges);  // BG in Loose region
   TH1D* hQCD_BG_Tight_DPhi = new TH1D("hQCD_BG_Tight_DPhi", "", 3, dphiEdges);  // BG in tight region
+
+  TH1D* hQCD_WTau_NoMET_DPhi = new TH1D("hQCD_WTau_NoMET_DPhi", "", 3, dphiEdges);  // BG in NoMET region
+  TH1D* hQCD_WTau_Loose2_DPhi = new TH1D("hQCD_WTau_Loose2_DPhi", "", 3, dphiEdges);  // BG in Loose region
+  TH1D* hQCD_WTau_Loose_DPhi = new TH1D("hQCD_WTau_Loose_DPhi", "", 3, dphiEdges);  // BG in Loose region
+  TH1D* hQCD_WTau_Tight_DPhi = new TH1D("hQCD_WTau_Tight_DPhi", "", 3, dphiEdges);  // BG in tight region
 
   TH1D* hQCD_TTBar_NoMET_DPhi = new TH1D("hQCD_TTBar_NoMET_DPhi", "", 3, dphiEdges);  // BG in NoMET region
   TH1D* hQCD_TTBar_Loose2_DPhi = new TH1D("hQCD_TTBar_Loose2_DPhi", "", 3, dphiEdges);  // BG in Loose region
@@ -99,10 +109,22 @@ int main(int argc, char* argv[]) {
     TH1D* hQCD_Loose_DPhi = new TH1D("hQCD_Loose_DPhi", "", 3, dphiEdges);  // 
     TH1D* hQCD_Tight_DPhi = new TH1D("hQCD_Tight_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
 
-    tree->Draw("vbfDPhi>>hQCD_NoMET_DPhi", cutQCDNoMET);
-    tree->Draw("vbfDPhi>>hQCD_Loose2_DPhi", cutQCDLoose2);
-    tree->Draw("vbfDPhi>>hQCD_Loose_DPhi", cutQCDLoose);
-    tree->Draw("vbfDPhi>>hQCD_Tight_DPhi", cutQCDTightHiDPhi);
+    if (dataset.name=="WJets" ||
+	dataset.name=="W1Jets" ||
+	dataset.name=="W2Jets" ||
+	dataset.name=="W3Jets" ||
+	dataset.name=="W4Jets") {
+      tree->Draw("vbfDPhi>>hQCD_NoMET_DPhi", cutWQCDNoMET);
+      tree->Draw("vbfDPhi>>hQCD_Loose2_DPhi", cutWQCDLoose2);
+      tree->Draw("vbfDPhi>>hQCD_Loose_DPhi", cutWQCDLoose);
+      tree->Draw("vbfDPhi>>hQCD_Tight_DPhi", cutWQCDTightHiDPhi);
+    }
+    else {
+      tree->Draw("vbfDPhi>>hQCD_NoMET_DPhi", cutQCDNoMET);
+      tree->Draw("vbfDPhi>>hQCD_Loose2_DPhi", cutQCDLoose2);
+      tree->Draw("vbfDPhi>>hQCD_Loose_DPhi", cutQCDLoose);
+      tree->Draw("vbfDPhi>>hQCD_Tight_DPhi", cutQCDTightHiDPhi);
+    }
 
     // weight  to lumi
     double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
@@ -124,6 +146,17 @@ int main(int argc, char* argv[]) {
       hQCD_BG_Loose2_DPhi->Add(hQCD_Loose2_DPhi);
       hQCD_BG_Loose_DPhi->Add(hQCD_Loose_DPhi);
       hQCD_BG_Tight_DPhi->Add(hQCD_Tight_DPhi);
+    }
+
+    if (dataset.name=="WJets" ||
+	dataset.name=="W1Jets" ||
+	dataset.name=="W2Jets" ||
+	dataset.name=="W3Jets" ||
+	dataset.name=="W4Jets" ) {
+      hQCD_WTau_NoMET_DPhi->Add(hQCD_NoMET_DPhi);
+      hQCD_WTau_Loose2_DPhi->Add(hQCD_Loose2_DPhi);
+      hQCD_WTau_Loose_DPhi->Add(hQCD_Loose_DPhi);
+      hQCD_WTau_Tight_DPhi->Add(hQCD_Tight_DPhi);
     }
 
     if (dataset.name=="TTBar") {
@@ -279,6 +312,7 @@ int main(int argc, char* argv[]) {
   std::cout << "   N Z (data)      : " << hQCD_Z_NoMET_DPhi->GetBinContent(3) << " +/- " << hQCD_Z_NoMET_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N W (data)      : " << hQCD_W_NoMET_DPhi->GetBinContent(3) << " +/- " << hQCD_W_NoMET_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N BG (MC)       : " << hQCD_BG_NoMET_DPhi->GetBinContent(3) << " +/- " << hQCD_BG_NoMET_DPhi->GetBinError(3) << std::endl;
+  std::cout << "   N WTau (MC)     : " << hQCD_WTau_NoMET_DPhi->GetBinContent(3) << " +/- " << hQCD_WTau_NoMET_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N TTbar (MC)    : " << hQCD_TTBar_NoMET_DPhi->GetBinContent(3) << " +/- " << hQCD_TTBar_NoMET_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N SingleT (MC)  : " << hQCD_SingleTSum_NoMET_DPhi->GetBinContent(3) << " +/- " << hQCD_SingleTSum_NoMET_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N DY (MC)       : " << hQCD_DY_NoMET_DPhi->GetBinContent(3) << " +/- " << hQCD_DY_NoMET_DPhi->GetBinError(3) << std::endl;
@@ -290,6 +324,7 @@ int main(int argc, char* argv[]) {
   std::cout << "   N Z (data)      : " << hQCD_Z_NoMET_DPhi->GetBinContent(1) << " +/- " << hQCD_Z_NoMET_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N W (data)      : " << hQCD_W_NoMET_DPhi->GetBinContent(1) << " +/- " << hQCD_W_NoMET_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N BG (MC)       : " << hQCD_BG_NoMET_DPhi->GetBinContent(1) << " +/- " << hQCD_BG_NoMET_DPhi->GetBinError(1) << std::endl;
+  std::cout << "   N WTau (MC)     : " << hQCD_WTau_NoMET_DPhi->GetBinContent(1) << " +/- " << hQCD_WTau_NoMET_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N TTbar (MC)    : " << hQCD_TTBar_NoMET_DPhi->GetBinContent(1) << " +/- " << hQCD_TTBar_NoMET_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N SingleT (MC)  : " << hQCD_SingleTSum_NoMET_DPhi->GetBinContent(1) << " +/- " << hQCD_SingleTSum_NoMET_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N DY (MC)       : " << hQCD_DY_NoMET_DPhi->GetBinContent(1) << " +/- " << hQCD_DY_NoMET_DPhi->GetBinError(1) << std::endl;
@@ -301,6 +336,7 @@ int main(int argc, char* argv[]) {
   std::cout << "   N Z (data)      : " << hQCD_Z_Loose2_DPhi->GetBinContent(3) << " +/- " << hQCD_Z_Loose2_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N W (data)      : " << hQCD_W_Loose2_DPhi->GetBinContent(3) << " +/- " << hQCD_W_Loose2_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N BG (MC)       : " << hQCD_BG_Loose2_DPhi->GetBinContent(3) << " +/- " << hQCD_BG_Loose2_DPhi->GetBinError(3) << std::endl;
+  std::cout << "   N WTau (MC)     : " << hQCD_WTau_Loose2_DPhi->GetBinContent(3) << " +/- " << hQCD_WTau_Loose2_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N TTbar (MC)    : " << hQCD_TTBar_Loose2_DPhi->GetBinContent(3) << " +/- " << hQCD_TTBar_Loose2_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N SingleT (MC)  : " << hQCD_SingleTSum_Loose2_DPhi->GetBinContent(3) << " +/- " << hQCD_SingleTSum_Loose2_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N DY (MC)       : " << hQCD_DY_Loose2_DPhi->GetBinContent(3) << " +/- " << hQCD_DY_Loose2_DPhi->GetBinError(3) << std::endl;
@@ -312,6 +348,7 @@ int main(int argc, char* argv[]) {
   std::cout << "   N Z (data)      : " << hQCD_Z_Loose2_DPhi->GetBinContent(1) << " +/- " << hQCD_Z_Loose2_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N W (data)      : " << hQCD_W_Loose2_DPhi->GetBinContent(1) << " +/- " << hQCD_W_Loose2_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N BG (MC)       : " << hQCD_BG_Loose2_DPhi->GetBinContent(1) << " +/- " << hQCD_BG_Loose2_DPhi->GetBinError(1) << std::endl;
+  std::cout << "   N WTau (MC)     : " << hQCD_WTau_Loose2_DPhi->GetBinContent(1) << " +/- " << hQCD_WTau_Loose2_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N TTbar (MC)    : " << hQCD_TTBar_Loose2_DPhi->GetBinContent(1) << " +/- " << hQCD_TTBar_Loose2_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N SingleT (MC)  : " << hQCD_SingleTSum_Loose2_DPhi->GetBinContent(1) << " +/- " << hQCD_SingleTSum_Loose2_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N DY (MC)       : " << hQCD_DY_Loose2_DPhi->GetBinContent(1) << " +/- " << hQCD_DY_Loose2_DPhi->GetBinError(1) << std::endl;
@@ -323,6 +360,7 @@ int main(int argc, char* argv[]) {
   std::cout << "   N Z (data)      : " << hQCD_Z_Loose_DPhi->GetBinContent(3) << " +/- " << hQCD_Z_Loose_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N W (data)      : " << hQCD_W_Loose_DPhi->GetBinContent(3) << " +/- " << hQCD_W_Loose_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N BG (MC)       : " << hQCD_BG_Loose_DPhi->GetBinContent(3) << " +/- " << hQCD_BG_Loose_DPhi->GetBinError(3) << std::endl;
+  std::cout << "   N WTau (MC)     : " << hQCD_WTau_Loose_DPhi->GetBinContent(3) << " +/- " << hQCD_WTau_Loose_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N TTbar (MC)    : " << hQCD_TTBar_Loose_DPhi->GetBinContent(3) << " +/- " << hQCD_TTBar_Loose_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N SingleT (MC)  : " << hQCD_SingleTSum_Loose_DPhi->GetBinContent(3) << " +/- " << hQCD_SingleTSum_Loose_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N DY (MC)       : " << hQCD_DY_Loose_DPhi->GetBinContent(3) << " +/- " << hQCD_DY_Loose_DPhi->GetBinError(3) << std::endl;
@@ -334,6 +372,7 @@ int main(int argc, char* argv[]) {
   std::cout << "   N Z (data)      : " << hQCD_Z_Loose_DPhi->GetBinContent(1) << " +/- " << hQCD_Z_Loose_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N W (data)      : " << hQCD_W_Loose_DPhi->GetBinContent(1) << " +/- " << hQCD_W_Loose_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N BG (MC)       : " << hQCD_BG_Loose_DPhi->GetBinContent(1) << " +/- " << hQCD_BG_Loose_DPhi->GetBinError(1) << std::endl;
+  std::cout << "   N WTau (MC)     : " << hQCD_WTau_Loose_DPhi->GetBinContent(1) << " +/- " << hQCD_WTau_Loose_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N TTbar (MC)    : " << hQCD_TTBar_Loose_DPhi->GetBinContent(1) << " +/- " << hQCD_TTBar_Loose_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N SingleT (MC)  : " << hQCD_SingleTSum_Loose_DPhi->GetBinContent(1) << " +/- " << hQCD_SingleTSum_Loose_DPhi->GetBinError(1) << std::endl;
   std::cout << "   N DY (MC)       : " << hQCD_DY_Loose_DPhi->GetBinContent(1) << " +/- " << hQCD_DY_Loose_DPhi->GetBinError(1) << std::endl;
@@ -354,6 +393,11 @@ int main(int argc, char* argv[]) {
   std::cout << "   N Z (data)  : " << hQCD_Z_Tight_DPhi->GetBinContent(3) << " +/- " << hQCD_Z_Tight_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N W (data)  : " << hQCD_W_Tight_DPhi->GetBinContent(3) << " +/- " << hQCD_W_Tight_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N BG (MC)   : " << hQCD_BG_Tight_DPhi->GetBinContent(3) << " +/- " << hQCD_BG_Tight_DPhi->GetBinError(3) << std::endl;
+  std::cout << "   N WTau (MC)     : " << hQCD_WTau_Tight_DPhi->GetBinContent(3) << " +/- " << hQCD_WTau_Tight_DPhi->GetBinError(3) << std::endl;
+  std::cout << "   N TTbar (MC)    : " << hQCD_TTBar_Tight_DPhi->GetBinContent(3) << " +/- " << hQCD_TTBar_Tight_DPhi->GetBinError(3) << std::endl;
+  std::cout << "   N SingleT (MC)  : " << hQCD_SingleTSum_Tight_DPhi->GetBinContent(3) << " +/- " << hQCD_SingleTSum_Tight_DPhi->GetBinError(3) << std::endl;
+  std::cout << "   N DY (MC)       : " << hQCD_DY_Tight_DPhi->GetBinContent(3) << " +/- " << hQCD_DY_Tight_DPhi->GetBinError(3) << std::endl;
+  std::cout << "   N Diboson (MC)  : " << hQCD_Diboson_Tight_DPhi->GetBinContent(3) << " +/- " << hQCD_Diboson_Tight_DPhi->GetBinError(3) << std::endl;
   std::cout << "   N QCD (est) : " << hQCD_Est_S_DPhi->GetBinContent(3) << " +/- " << hQCD_Est_S_DPhi->GetBinError(3) << std::endl;
   std::cout << std::endl;
   std::cout << "Signal region (MET>130, dphi<1.0)" << std::endl;

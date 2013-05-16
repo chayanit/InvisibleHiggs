@@ -1,11 +1,15 @@
 #!/bin/sh
 
-VER=v10
+VER=v11
 LUMI=19576
 
-IDIR=/storage/phjjb/invisibleHiggs/InvHiggsInfo_$VER
+IDIR=/storage/phjjb/invisibleHiggs/InvHiggsInfo_$VER/Central
 ODIR=InvHiggsInfo_$VER
 
+echo "Deleting and recreating $ODIR"
+if [ -d "$ODIR" ]; then
+    rm -r $ODIR
+fi
 mkdir $ODIR
 
 DATASETS=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_$VER.txt

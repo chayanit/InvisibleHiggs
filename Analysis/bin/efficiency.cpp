@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
   unsigned nCuts = cuts.nCuts();
 
   // output file
-  TFile* ofile = TFile::Open( (options.oDir+std::string("/Efficiency.root")).c_str(), "UPDATE");
+  TFile* ofile = TFile::Open( (options.oDir+std::string("/Efficiency.root")).c_str(), "RECREATE");
 
   // output histograms (for datasets with several components)
   TH1D* hQCD     = new TH1D("hCutFlow_QCD", "", nCuts, 0., nCuts);
