@@ -45,9 +45,17 @@ qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground.
 echo "summary -o $ODIR $LUMI"
 summary -o $ODIR -l $LUMI > $ODIR/summary.log
 
-# set limits
+# homegrown limits
 echo "limits -o $ODIR $LUMI"
 limits -o $ODIR -l $LUMI > $ODIR/limits.log
+
+# combine tool limits
+echo "combine -M Asymptotic $ODIR/card.txt"
+combine -M Asymptotic $ODIR/card.txt
+
+echo "combine -M HybridNew --rule CLs --testStat LEP $ODIR/card.txt"
+combine -M HybridNew --rule CLs --testStat LEP $ODIR/card.txt
+
 
 # tar everything up
 echo "tar -zcvf $ODIR.tgz $ODIR/"

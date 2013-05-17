@@ -37,8 +37,6 @@ int main(int argc, char* argv[]) {
 
   TFile* ofile = TFile::Open((oDir+std::string("/example.root")).c_str(), "RECREATE");
 
-  // now do something
-
   // get data driven background info
   std::cout << "Get data driven backgrounds" << std::endl;
   TFile* zFile = TFile::Open((oDir+std::string("/ZBackground.root")).c_str(), "READ");
@@ -117,6 +115,8 @@ int main(int argc, char* argv[]) {
 			      pow(errBG_SingleT,2) + 
 			      pow(errBG_Diboson,2));
   
+  // get number of observed events
+  int nObs = 0;
 
   // write background summary table
   std::cout << "Writing BG summary TeX file" << std::endl;
@@ -136,6 +136,7 @@ int main(int argc, char* argv[]) {
   texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << errBG_Diboson<< "$ \\\\" << std::endl;
   texFile << "\\hline" << std::endl;
   texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << " << \\pm " << errBG_Total << "$}  \\\\" << std::endl;
+  texFile << "Observed & \\multicolumn{2}{c|}{$" << nObs << "$}  \\\\" << std::endl;
 
   texFile.close();
 
@@ -150,15 +151,49 @@ int main(int argc, char* argv[]) {
   txtFile << "W\t" <<  nBG_W << "\t" << errBG_W << std::endl;
   txtFile << "QCD\t" <<  nBG_QCD << "\t" << errBG_QCD << std::endl;
   txtFile << "Other\t" <<  nBG_Other << "\t" << errBG_Other << std::endl;
+  txtFile << "Observed\t" <<  nObs << std::endl;
   txtFile << std::endl;
 
   txtFile.close();
 
 
+  // calculate factors for combine tool
+  TFile* sigFile = TFile::Open((oDir+std::string("/Efficiency.root")).c_str(), "READ");
+  TH1D* sigCutFlow = (TH1D*) sigFile->Get("hCutFlow_SignalM125_POWHEG");
+  double nSig = sigCutFlow->GetBinContent(10);
+
+  TH1D* zCtrl = (TH1D*) zFile->Get("hZ_Data_C_DPhi");
+  int nCtrlZ = zCtrl->GetBinContent(1);
+
+  double fZ = nBG_Z / nCtrlZ;
+  double fW = 1 + (errBG_W / nBG_W);
+  double fQCD = 1 + (errBG_QCD / nBG_QCD);
+
   // write combine tool card file
   std::cout << "Writing combine tool card file" << std::endl;
 
-  txtFile.open(options.oDir+std::string("/combine.txt"));
+  txtFile.open(options.oDir+std::string("/card.txt"));
+
+  txtFile << "# Invisible Higgs analysis for mH=125 GeV" << std::endl;
+  txtFile << "imax 1" << std::endl;
+  txtFile << "jmax 4  number of backgrounds" << std::endl;
+  txtFile << "kmax 6  number of nuisance parameters (sources of systematical uncertainties)" << std::endl;
+  txtFile << "------------" << std::endl;
+  txtFile << "# we have just one channel, in which we observe 0 events" << std::endl;
+  txtFile << "bin 1" << std::endl;
+  txtFile << "observation " << nObs << std::endl;
+  txtFile << "------------" << std::endl;
+  txtFile << "bin               1 \t 1 \t 1 \t 1 \t 1" << std::endl;
+  txtFile << "process          ggH \t zJets \t wJets \t qcd \t others" << std::endl;
+  txtFile << "process           0 \t 1 \t 2 \t 3 \t 4 " << std::endl;
+  txtFile << "rate            " << nSig << "\t" << nBG_Z << "\t" << nBG_W << "\t" << nBG_QCD << "\t" << nBG_Other << std::endl;
+  txtFile << "------------" << std::endl;
+  txtFile << "lumi      lnN    1.04   -     -     -   1.04   lumi affects both signal and w->tau. lnN = lognormal" << std::endl;
+  txtFile << "xs_ggH    lnN    1.10   -     -     -    -      gg->H cross section + signal efficiency" << std::endl;
+  txtFile << "Z_norm    gmN " << nCtrlZ << "  -   " << fZ << "   -     -     -      " << std::endl;
+  txtFile << "W_norm    lnN     -     -   " << fW << "   -     -      " << std::endl;
+  txtFile << "qcd_norm  lnN     -     -     -   " << fQCD << "   -      " << std::endl;
+  txtFile << "bg_others lnN     -     -     -    -     1.10   10% placeholder" << std::endl;
 
   txtFile.close();
 

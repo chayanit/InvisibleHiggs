@@ -17,6 +17,7 @@
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/assign.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
@@ -75,12 +76,16 @@ int main(int argc, char* argv[]) {
   double bgWjets(0.), err_bgWjets(0.);
   double bgQCD(0.), err_bgQCD(0.);
   double bgOther(0.), err_bgOther(0.);
+  double nObs(0.);
 
   ifstream file;
-  double n, err_n;
+  double n(0.), err_n(0.);
   std::string name;
 
-  file.open((oDir+std::string("/summary.txt").c_str()));
+  file.open((oDir+std::string("/summary.txt")).c_str());
+  std::string line;
+  getline(file, line);
+
   while (file >> name >> n >> err_n) {
     if (name == "Z") {
       bgZjets = n;
@@ -98,6 +103,9 @@ int main(int argc, char* argv[]) {
       bgOther = n;
       err_bgOther = err_n;
     }
+    if (name == "Observed") {
+      nObs = n;
+    }
   }
   file.close();
 
@@ -110,45 +118,46 @@ int main(int argc, char* argv[]) {
   double bgTot     = bgZjets + bgWjets + bgQCD + bgOther;
   double err_bgTot = sqrt( pow(err_bgZjets, 2) + pow(err_bgWjets, 2) + pow(err_bgQCD, 2) + pow(err_bgOther, 2) );
 
+  if (nObs==0.) nObs=(int) bgTot;
+
   std::cout << "Total   : " << bgTot << " +/- " << err_bgTot << std::endl;
   std::cout << std::endl;
-
-  // observed
-  std::cout << "Observed" << std::endl;
-  int nObs = int(bgTot);
-
-//   file.open((oDir+std::string("/obs.txt")).c_str());
-//   while (file >> name >> n) {
-//     if (name == "Signal") {
-//       nObs = n;
-//     }
-//   }
-//   file.close();
 
   std::cout << "Obs     : " << nObs << std::endl;
   std::cout << std::endl;
 
-  // read signal efficiencies from file
+  // read signal efficiencies from cut flow histograms
   std::cout << "Signal efficiency" << std::endl;
+ std:;cout << std::endl;
+
   std::vector<double> mH, xsH, effSignal, err_effSignal;
 
-  file.open((oDir+std::string("/signal.txt")).c_str());
-  std::string line;
-  getline(file, line);
+  /// MASSES AND CROSS-SECTIONS HARDCODED HERE !!!
+  static const double mArr[] = {110., 125., 150., 200., 300., 400.};
+  mH.assign(mArr, mArr+6);
 
-  int i=0;
-  double m, eff, err, a,b,c,d,x;
-  while (file >> name >> m >> eff >> err >> a >> b >> c >> d >> x) {
-    mH.push_back( m );
-    xsH.push_back( x );
-    effSignal.push_back( eff );
-    err_effSignal.push_back( err );
-    std::cout << "Signal " << m << " xs=" << x << " : " << eff << " +/- " << err << std::endl;
+  static const double xsArr[] = {1.809, 1.649, 1.280, 0.8685, 0.4408, 0.2543};
+  xsH.assign(xsArr, xsArr+6);
+
+  TFile* sigFile = TFile::Open( (oDir+"/Efficiency.root").c_str() , "READ");
+
+  std::cout << "mass\txs\teff\terr" << std::endl;
+
+  for (unsigned i=0; i<mH.size(); ++i) {
+    std::string name("hCutFlow_SignalM");
+    stringstream ss;
+    ss << (int) mH.at(i);
+    name += ss.str();
+    name += std::string("_POWHEG");
+    TH1D* h = (TH1D*) sigFile->Get(name.c_str());
+    double n = h->GetBinContent(10);
+    double err = h->GetBinError(10);
+    std::cout << n << "\t" << err << std::endl;
+    effSignal.push_back (n / (lumi * xsH.at(i)) );
+    err_effSignal.push_back (err / (lumi * xsH.at(i)) );
+    std::cout << mH.at(i) << "\t" << xsH.at(i) << "\t" << effSignal.at(i) << "\t" << err_effSignal.at(i) << std::endl;
   }
-  file.close();
-
   
-
   std::cout << std::endl;
 
   /// calculate limits
