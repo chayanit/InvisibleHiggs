@@ -152,7 +152,6 @@ int main(int argc, char* argv[]) {
     TH1D* h = (TH1D*) sigFile->Get(name.c_str());
     double n = h->GetBinContent(10);
     double err = h->GetBinError(10);
-    std::cout << n << "\t" << err << std::endl;
     effSignal.push_back (n / (lumi * xsH.at(i)) );
     err_effSignal.push_back (err / (lumi * xsH.at(i)) );
     std::cout << mH.at(i) << "\t" << xsH.at(i) << "\t" << effSignal.at(i) << "\t" << err_effSignal.at(i) << std::endl;

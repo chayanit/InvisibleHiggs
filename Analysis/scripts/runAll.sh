@@ -54,7 +54,9 @@ echo "combine -M Asymptotic $ODIR/card.txt"
 combine -M Asymptotic $ODIR/card.txt
 
 echo "combine -M HybridNew --rule CLs --testStat LEP $ODIR/card.txt"
-combine -M HybridNew --rule CLs --testStat LEP $ODIR/card.txt
+echo "Not running this now because it takes forever!"
+echo "Do it by hand if you need to"
+#combine -M HybridNew --rule CLs --testStat LEP $ODIR/card.txt
 
 
 # tar everything up
