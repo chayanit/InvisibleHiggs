@@ -266,7 +266,11 @@ int main(int argc, char* argv[]) {
 
     for (unsigned c=0; c<nCutsZMuMu; ++c) {
 
-      TCut cut = puWeight * (cutD + cuts.cutflowZMuMu(c));
+      TCut cut;
+
+      if(c == nCutsZMuMu-1) cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowZMuMu(c));
+      else cut = puWeight * (cutD + cuts.cutflowZMuMu(c));
+
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
 
