@@ -22,10 +22,10 @@ int main(int argc, char* argv[]) {
   ProgramOptions options(argc, argv);
 
   double lumi = options.lumi;
-  std::string iDir = options.iDir;
-  std::string oDir = options.oDir+std::string("/NMinusOne");
+  std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
 
-  Datasets datasets;
+
+  Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
 
   // cuts
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     if (dataset.isData) continue;
 
-    TFile* ifile = TFile::Open( (iDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "READ");
+    TFile* ifile = datasets.getTFile(dataset.name);
 
     if (ifile==0) {
       std::cerr << "No file for " << dataset.name << std::endl;
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
 
-    TFile* ofile = TFile::Open( (oDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
+    TFile* ofile = TFile::Open( (options.oDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
     // create histograms
     TH1D* hTrig     = new TH1D("hTrigNM1",     "", 2,   0.,  2.);
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     int n = tree->Draw("hltResult2>>hTrigNM1", (trig + cutD) * otherCuts);
     std::cout << "   " << n << " events passing trigger" << std::endl;
 
-    tree->Draw("(metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6)>>hMETFiltNM1", (metFilt + cutD) * otherCuts);
+    tree->Draw("(metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8)>>hMETFiltNM1", (metFilt + cutD) * otherCuts);
     tree->Draw("jet2Pt>>hDijetNM1", (dijet + cutD) * otherCuts);
     tree->Draw("TMath::Sign(1., jet1Eta*jet2Eta)>>hSgnEtaJJNM1", (sgnEtaJJ + cutD) * otherCuts);
     tree->Draw("abs(jet1Eta-jet2Eta)>>hDEtaJJNM1", (dEtaJJ + cutD) * otherCuts);
@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
   zJets.push_back("Zvv_200to400");
   zJets.push_back("Zvv_400toinf");
   
-  SumDatasets(oDir,
+  SumDatasets(options.oDir,
 	      zJets,
 	      hists,
 	      "ZJets");
@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
   wJets.push_back(std::string("W2Jets"));
   wJets.push_back(std::string("W3Jets"));
   wJets.push_back(std::string("W4Jets"));
-  SumDatasets(oDir,
+  SumDatasets(options.oDir,
 	      wJets,
 	      hists,
 	      "WNJets");
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
   qcd.push_back("QCD_Pt1400to1800");
   qcd.push_back("QCD_Pt1800");
  
-  SumDatasets(oDir,
+  SumDatasets(options.oDir,
 	      qcd,
 	      hists,
 	      "QCD");
@@ -222,7 +222,7 @@ int main(int argc, char* argv[]) {
   singleT.push_back("SingleTbar_t");
   singleT.push_back("SingleTbar_s");
   singleT.push_back("SingleTbar_tW");
-  SumDatasets(oDir,singleT,hists,"SingleT+TTbar");
+  SumDatasets(options.oDir,singleT,hists,"SingleT+TTbar");
 
   // Sum diboson
   std::cout << "Summing histograms for Diboson" << std::endl;
@@ -230,7 +230,7 @@ int main(int argc, char* argv[]) {
   diboson.push_back("WW");
   diboson.push_back("WZ");
   diboson.push_back("ZZ");
-  SumDatasets(oDir,diboson,hists,"Diboson");
+  SumDatasets(options.oDir,diboson,hists,"Diboson");
 
   //Sum DYJetsToLL
   std::cout << "Summing histograms for DYJetsToLL" << std::endl;
@@ -238,11 +238,11 @@ int main(int argc, char* argv[]) {
   dyjets.push_back("DYJetsToLL");
   dyjets.push_back("DYJetsToLL_PtZ-100");
   dyjets.push_back("DYJetsToLL_EWK");
-  SumDatasets(oDir,dyjets,hists,"DYJets");
+  SumDatasets(options.oDir,dyjets,hists,"DYJets");
 
   // make plots
   std::cout << "Making plots" << std::endl;
-  StackPlot plots(oDir);
+  StackPlot plots(options.oDir);
   plots.setLegPos(0.69,0.67,0.98,0.97);
 
   plots.addDataset("Diboson", kViolet-6, 0);
