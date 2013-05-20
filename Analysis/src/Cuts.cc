@@ -4,7 +4,7 @@
 Cuts::Cuts() {
 
   addCut("trigger",    "hltResult2>0.");
-  addCut("metFilter",  "metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
+  addCut("metFilter",  "metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
   addCut("EVeto",      "ele1Pt<10.");
   addCut("MuVeto",     "mu1Pt<10.");
   addCut("dijet",      "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7");
@@ -14,7 +14,7 @@ Cuts::Cuts() {
   addCut("Mjj",        "vbfM>1200.");
   addCut("dPhiJJ",     "vbfDPhi<1.0");
 
-  addZMuMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
+  addZMuMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
   addZMuMuCut("z",         "zChannel==1 && zMass>60. && zMass<120.");
   addZMuMuCut("lVeto",     "ele1Pt<10. && mu3Pt<10.");
   addZMuMuCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
@@ -23,7 +23,7 @@ Cuts::Cuts() {
   addZMuMuCut("Mjj",       "vbfM>1200.");
   addZMuMuCut("dPhiJJ",     "vbfDPhi<1.0");
 
-  addWMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
+  addWMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
   addWMuCut("wMu",       "nW>0 && wChannel==1");
   addWMuCut("lVeto",     "ele1Pt<10. && mu2Pt<10.");
   addWMuCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
@@ -32,7 +32,7 @@ Cuts::Cuts() {
   addWMuCut("Mjj",       "vbfM>1200.");
   addWMuCut("dPhiJJ",    "vbfDPhi<1.0");
 
-  addWElCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6");
+  addWElCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
   addWElCut("wEl",       "nW>0 && wChannel==2");
   addWElCut("lVeto",     "ele2Pt<10. && mu1Pt<10.");
   addWElCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
