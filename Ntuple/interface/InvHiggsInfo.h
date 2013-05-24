@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.18 2013/04/14 21:38:46 srimanob Exp $
+// $Id: InvHiggsInfo.h,v 1.19 2013/04/14 22:15:22 srimanob Exp $
 //
 //
 
@@ -111,6 +111,9 @@ class InvHiggsInfo { //: public TObject {
   Double_t vbfDEta;
   Double_t vbfDPhi;
 
+  // a jet with pT > 20 with |eta|<2.4 (ie in tracker) 
+  Int_t numTrackerJet3;
+
   // Third jet
   Double_t jet3Et;
   Double_t jet3Eta;
@@ -125,6 +128,7 @@ class InvHiggsInfo { //: public TObject {
   Double_t cenJetEta;
   Double_t cenJetPhi;
   Double_t cenJetM;
+  Double_t cenJetEtaStar;
 
   // Electrons
   Double_t ele1Pt;

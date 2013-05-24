@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.30 2013/04/14 21:38:45 srimanob Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.31 2013/04/14 22:15:23 srimanob Exp $
 //
 //
 
@@ -1120,8 +1120,8 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
     }
   }
 
-  std::cout<<"tagJet1Index = "<<tagJet1Index_<<std::endl;
-  std::cout<<"tagJet2Index = "<<tagJet2Index_<<std::endl;
+  // std::cout<<"tagJet1Index = "<<tagJet1Index_<<std::endl;
+  // std::cout<<"tagJet2Index = "<<tagJet2Index_<<std::endl;
 
   tagJetEtaMin_ = std::min(tagJet1_.eta(), tagJet2_.eta());
   tagJetEtaMax_ = std::max(tagJet1_.eta(), tagJet2_.eta());
@@ -1145,6 +1145,7 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
 {
 
   bool foundThird = false;
+  bool foundCenJet = false;
 
   // Find 3rd jet
   for (unsigned i=0; i<jets->size(); ++i) {
@@ -1172,28 +1173,35 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
     int puflag = (*puJetIdFlags)[jets->refAt(i)];
     if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) ) {
 
+      // Count number of jets in tracker with pt>20
+      if ( jets->at(i).pt()>20. && abs(jets->at(i).eta()) < 2.4 )
+        info_->numTrackerJet3 += 1;
+      
       // store in ntuple
       if(!foundThird){
-      info_->jet3Et  = jets->at(i).pt();
-      info_->jet3Eta = jets->at(i).eta();
-      info_->jet3Phi = jets->at(i).phi();
-      info_->jet3M   = jets->at(i).mass();
+        info_->jet3Et  = jets->at(i).pt();
+        info_->jet3Eta = jets->at(i).eta();
+        info_->jet3Phi = jets->at(i).phi();
+        info_->jet3M   = jets->at(i).mass();
 
-      // calculate Zeppenfeld variable
-      info_->jet3EtaStar = jets->at(i).eta() - (tagJetEtaMin_ + tagJetEtaMax_) / 2;
-      foundThird = true;
+        // calculate Zeppenfeld variable
+        info_->jet3EtaStar = jets->at(i).eta() - (tagJetEtaMin_ + tagJetEtaMax_) / 2.;
+        foundThird = true;
       }
 
       // check if it is between tag jets in eta
-      if (jets->at(i).eta() > tagJetEtaMin_ &&
-	  jets->at(i).eta() < tagJetEtaMax_ ) {
+      if (!foundCenJet && jets->at(i).eta() > tagJetEtaMin_ && jets->at(i).eta() < tagJetEtaMax_ ) {
 
       	// store in ntuple
       	info_->cenJetEt  = jets->at(i).pt();
       	info_->cenJetEta = jets->at(i).eta();
       	info_->cenJetPhi = jets->at(i).phi();
       	info_->cenJetM   = jets->at(i).mass();
-      	break;
+
+        // calculate zeppenfeld variable
+        info_->cenJetEtaStar = jets->at(i).eta() - (tagJetEtaMin_ + tagJetEtaMax_) / 2.;
+        // jets are ordered by pt, so can stop after we found the first one in the collection
+        foundCenJet = true;
       }
 
     }
