@@ -5,9 +5,9 @@
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
 
+// #include "TROOT.h"
 #include "TTree.h"
 #include "TMath.h"
-#include "TCanvas.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -22,8 +22,16 @@ int main(int argc, char* argv[]) {
   ProgramOptions options(argc, argv);
 
   double lumi = options.lumi;
+  std::string oDir = options.oDir+std::string("/NMinusOne");
+
   std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
 
+  boost::filesystem::path opath(oDir);
+  if (!exists(opath)) {
+    std::cout << "Creating output directory : " << oDir << std::endl;
+    boost::filesystem::create_directory(opath);
+  }
+  else std::cout << "Writing results to " << oDir << std::endl;
 
   Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
@@ -60,8 +68,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Making histograms for " << dataset.name << std::endl;
     
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
-
-    TFile* ofile = TFile::Open( (options.oDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
+    TFile* ofile = TFile::Open( (oDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
     // create histograms
     TH1D* hTrig     = new TH1D("hTrigNM1",     "", 2,   0.,  2.);
@@ -75,8 +82,8 @@ int main(int argc, char* argv[]) {
     TH1D* hDPhiJJ   = new TH1D("hDPhiJJNM1",   "", 50,  0.,  TMath::Pi());
     TH1D* hEVeto    = new TH1D("hEVetoNM1",    "", 50,  0.,  50.);
     TH1D* hMuVeto   = new TH1D("hMuVetoNM1",   "", 50,  0.,  50.);
-    TH1D* hCenEt        = new TH1D("hCenEtNM1",  "", 50,  0.,  150.);
-    TH1D* hCenEta       = new TH1D("hCenEtaNM1", "", 50, -5., 5.);
+    TH1D* hCenEt    = new TH1D("hCenEtNM1",    "", 50,  0.,  150.); 
+    TH1D* hCenEta   = new TH1D("hCenEtaNM1",   "", 50, -5.,  5.);
 
     // Additional cuts specific to DYJetsToLL (cut on Zpt <100 to avoid double counting with the PtZ-100 sample)
     TCut cutD = cuts.cutDataset(dataset.name);
@@ -129,6 +136,7 @@ int main(int argc, char* argv[]) {
     }    
 
     // write histograms
+
     hTrig->Write("",TObject::kOverwrite);
     hMETfilt->Write("",TObject::kOverwrite);
     hDijet->Write("",TObject::kOverwrite);
@@ -173,10 +181,7 @@ int main(int argc, char* argv[]) {
   zJets.push_back("Zvv_200to400");
   zJets.push_back("Zvv_400toinf");
   
-  SumDatasets(options.oDir,
-	      zJets,
-	      hists,
-	      "ZJets");
+  SumDatasets(oDir, zJets, hists, "ZJets");
 
   // sum W+jets datasets
   std::cout << "Summing histograms for W+Jets" << std::endl;
@@ -186,10 +191,7 @@ int main(int argc, char* argv[]) {
   wJets.push_back(std::string("W2Jets"));
   wJets.push_back(std::string("W3Jets"));
   wJets.push_back(std::string("W4Jets"));
-  SumDatasets(options.oDir,
-	      wJets,
-	      hists,
-	      "WNJets");
+  SumDatasets(oDir, wJets, hists, "WNJets");
 
   // sum QCD
   std::cout << "Summing histograms for QCD" << std::endl;
@@ -207,10 +209,7 @@ int main(int argc, char* argv[]) {
   qcd.push_back("QCD_Pt1400to1800");
   qcd.push_back("QCD_Pt1800");
  
-  SumDatasets(options.oDir,
-	      qcd,
-	      hists,
-	      "QCD");
+  SumDatasets(oDir, qcd, hists, "QCD");
 
   // Sum Single t and tbar
   std::cout << "Summing histograms for Single T and TTbar" << std::endl;
@@ -222,7 +221,7 @@ int main(int argc, char* argv[]) {
   singleT.push_back("SingleTbar_t");
   singleT.push_back("SingleTbar_s");
   singleT.push_back("SingleTbar_tW");
-  SumDatasets(options.oDir,singleT,hists,"SingleT+TTbar");
+  SumDatasets(oDir, singleT, hists, "SingleT+TTbar");
 
   // Sum diboson
   std::cout << "Summing histograms for Diboson" << std::endl;
@@ -230,7 +229,7 @@ int main(int argc, char* argv[]) {
   diboson.push_back("WW");
   diboson.push_back("WZ");
   diboson.push_back("ZZ");
-  SumDatasets(options.oDir,diboson,hists,"Diboson");
+  SumDatasets(oDir, diboson, hists, "Diboson");
 
   //Sum DYJetsToLL
   std::cout << "Summing histograms for DYJetsToLL" << std::endl;
@@ -238,12 +237,12 @@ int main(int argc, char* argv[]) {
   dyjets.push_back("DYJetsToLL");
   dyjets.push_back("DYJetsToLL_PtZ-100");
   dyjets.push_back("DYJetsToLL_EWK");
-  SumDatasets(options.oDir,dyjets,hists,"DYJets");
+  SumDatasets(oDir, dyjets, hists, "DYJets");
 
   // make plots
   std::cout << "Making plots" << std::endl;
-  StackPlot plots(options.oDir);
-  plots.setLegPos(0.69,0.67,0.98,0.97);
+  StackPlot plots(oDir);
+  plots.setLegPos(0.69,0.72,0.98,0.97);
 
   plots.addDataset("Diboson", kViolet-6, 0);
   plots.addDataset("DYJets", kPink-4,0);
@@ -255,19 +254,19 @@ int main(int argc, char* argv[]) {
 
   plots.draw("hTrigNM1", "", "");
   plots.draw("hMETFiltNM1", "", "");
-  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "Entries per bin");
-  // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "Entries per bin");
-  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "Entries per bin");
-  plots.draw("hMjjNM1", "M_{jj} [GeV]", "Entries per bin");
-  plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "Entries per bin");
-  plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "Entries per bin");
-  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "Entries per bin");
-  plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "Entries per bin");
-  plots.draw("hCenEtaNM1", "Central Jet #eta", "Entries per bin");
+  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "N_{events}");
+  // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "N_{events}");
+  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "N_{events}");
+  plots.draw("hMjjNM1", "M_{jj} [GeV]", "N_{events}");
+  plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "N_{events}");
+  plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}");
+  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "N_{events}");
+  plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "N_{events}");
+  plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}");
 
   plots.setYMin(1e-1);
   plots.setYMax(1e2);
-  plots.draw("hEVetoNM1", "E_{T} [GeV]", "N_{evt}");
-  plots.draw("hMuVetoNM1", "p_{T} [GeV]", "N_{evt}");
+  plots.draw("hEVetoNM1", "E_{T} [GeV]", "N_{events}");
+  plots.draw("hMuVetoNM1", "p_{T} [GeV]", "N_{events}");
 
 }
