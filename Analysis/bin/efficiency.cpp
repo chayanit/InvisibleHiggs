@@ -48,6 +48,7 @@ int main(int argc, char* argv[]) {
   TH1D* hWElNu   = new TH1D("hCutFlow_WElNu", "", nCuts, 0., nCuts);
   TH1D* hWTauNu  = new TH1D("hCutFlow_WTauNu", "", nCuts, 0., nCuts);
   TH1D* hSingleT = new TH1D("hCutFlow_SingleTSum", "", nCuts, 0., nCuts);
+  TH1D* hDYLL	 = new TH1D("hCutFlow_DYLL", "", nCuts, 0., nCuts);
   TH1D* hDiboson = new TH1D("hCutFlow_Diboson", "", nCuts, 0., nCuts);
 
   for (unsigned i=0; i<datasets.size(); ++i) {
@@ -62,8 +63,10 @@ int main(int argc, char* argv[]) {
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
 
     //cuts
-    TCut cutDSet     = cuts.cutDataset(dataset.name);
+    TCut cutD     = cuts.cutDataset(dataset.name);
     TCut puWeight("puWeight");
+    TCut trigCorrWeight("trigCorrWeight");
+    //TCut trigCorrWeight("1.");
     TCut wWeight("");
     if (dataset.name=="WJets" ||
 	dataset.name=="W1Jets" ||
@@ -88,11 +91,20 @@ int main(int argc, char* argv[]) {
 
     for (unsigned c=0; c<nCuts; ++c) {
 
-      TCut cut = puWeight * wWeight * (cutDSet + cuts.cutflow(c));
-      TCut cutMu = puWeight * wWeight * (cutDSet + cuts.wMuGen() + cuts.cutflow(c));
-      TCut cutEl = puWeight * wWeight * (cutDSet + cuts.wElGen() + cuts.cutflow(c));
-      TCut cutTau = puWeight * wWeight * (cutDSet + cuts.wTauGen() + cuts.cutflow(c));
+      TCut cut, cutMu, cutEl, cutTau;
 
+      if(c == nCuts-1) {
+      	cut    = puWeight * trigCorrWeight * wWeight * (cutD + cuts.cutflow(c));
+      	cutMu  = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cuts.cutflow(c));
+      	cutEl  = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.cutflow(c));
+      	cutTau = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wTauGen() + cuts.cutflow(c));
+      }
+      else {
+        cut    = puWeight * wWeight * (cutD + cuts.cutflow(c));
+        cutMu  = puWeight * wWeight * (cutD + cuts.wMuGen() + cuts.cutflow(c));
+        cutEl  = puWeight * wWeight * (cutD + cuts.wElGen() + cuts.cutflow(c));
+        cutTau = puWeight * wWeight * (cutD + cuts.wTauGen() + cuts.cutflow(c));
+      }
       //      std::cout << cut << std::endl;
 
       TH1D* h = new TH1D("h","", 1, 0., 1.);
@@ -114,7 +126,7 @@ int main(int argc, char* argv[]) {
       tree->Draw("0.5>>hTau", cutTau);
       hCutFlowTau->SetBinContent(c+1, hTau->GetBinContent(1));
       hCutFlowTau->SetBinError(c+1, hTau->GetBinError(1));
-
+ 
       delete h;
       delete hMu;
       delete hEl;
@@ -125,11 +137,17 @@ int main(int argc, char* argv[]) {
     hCutFlowMu->Scale( lumi * dataset.sigma / dataset.nEvents );
     hCutFlowEl->Scale( lumi * dataset.sigma / dataset.nEvents );
     hCutFlowTau->Scale( lumi * dataset.sigma / dataset.nEvents );
+ 
+    std::cout << "  N (dphi<1.0) : " << hCutFlow->GetBinContent(nCuts) << " +/- " << hCutFlow->GetBinError(nCuts) << std::endl;
 
     // sum binned datasets
     if (dataset.name.compare(0,3,"QCD")==0) hQCD->Add(hCutFlow);
     if (dataset.name.compare(0,3,"Zvv")==0) hZNuNu->Add(hCutFlow);
-    if (dataset.name.compare(0,1,"W")==0) {
+    if (dataset.name=="WJets" ||
+        dataset.name=="W1Jets" ||
+        dataset.name=="W2Jets" ||
+        dataset.name=="W3Jets" ||
+        dataset.name=="W4Jets") {
       hWLNu->Add(hCutFlow);
       hWMuNu->Add(hCutFlowMu);
       hWElNu->Add(hCutFlowEl);
@@ -140,6 +158,7 @@ int main(int argc, char* argv[]) {
 	dataset.name.compare(0,2,"WZ")==0 ||
 	dataset.name.compare(0,2,"ZZ")==0 )
       hDiboson->Add(hCutFlow);
+    if (dataset.name.compare(0,2,"DY")==0) hDYLL->Add(hCutFlow);
 
     ofile->cd();
     hCutFlow->Write("", TObject::kOverwrite);
@@ -156,7 +175,8 @@ int main(int argc, char* argv[]) {
   hWElNu->Write("",TObject::kOverwrite);  
   hWTauNu->Write("",TObject::kOverwrite);  
   hSingleT->Write("",TObject::kOverwrite);  
-  hDiboson->Write("",TObject::kOverwrite);  
+  hDiboson->Write("",TObject::kOverwrite);
+  hDYLL->Write("",TObject::kOverwrite);  
 
   // write TeX file
   std::cout << "Writing cut flow TeX file" << std::endl;
@@ -164,7 +184,7 @@ int main(int argc, char* argv[]) {
   ofstream texFile;
   texFile.open(options.oDir+std::string("/cutflow.tex"));
 
-  texFile << "Cut & N($Z\\rightarrow\\nu\\nu) & N($W\\rightarrow l\\nu) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(signal $m_H=120$~\\GeV \\\\" << std::endl;
+  texFile << "Cut & N($Z\\rightarrow\\nu\\nu) & N($W\\rightarrow l\\nu) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV \\\\" << std::endl;
 
   TH1D* hTTbar = (TH1D*) ofile->Get("hCutFlow_TTBar");
   TH1D* hSignal = (TH1D*) ofile->Get("hCutFlow_SignalM125_POWHEG");
@@ -179,8 +199,9 @@ int main(int argc, char* argv[]) {
     texFile << "$" << hTTbar->GetBinContent(i+1) << " \\pm " << hTTbar->GetBinError(i+1) << "$ & ";
     texFile << "$" << hSingleT->GetBinContent(i+1) << " \\pm " << hSingleT->GetBinError(i+1) << "$ & ";
     texFile << "$" << hDiboson->GetBinContent(i+1) << " \\pm " << hDiboson->GetBinError(i+1) << "$ & ";
+    texFile << "$" << hDYLL->GetBinContent(i+1) << " \\pm " << hDYLL->GetBinError(i+1) << "$ & ";
     texFile << "$" << hSignal->GetBinContent(i+1) << " \\pm " << hSignal->GetBinError(i+1) << "$ \\\\ " << std::endl;
-
+ 
   }
 
   texFile << std::endl << std::endl;
