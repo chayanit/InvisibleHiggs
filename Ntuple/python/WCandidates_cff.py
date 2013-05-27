@@ -5,8 +5,8 @@ import FWCore.ParameterSet.Config as cms
 # W->Mu Nu
 ## Note: the 'mt()' method doesn't compute the transverse mass correctly, so we have to do it by hand.
 wToMuNu = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("selectMuons patMETsPF"),    
-    cut = cms.string('daughter(1).pt >20 && sqrt(2*daughter(0).pt*daughter(1).pt*(1-cos(daughter(0).phi-daughter(1).phi)))>0'),
+    decay = cms.string("selectMuons patMETs"),    
+    cut = cms.string('sqrt(2*daughter(0).pt*daughter(1).pt*(1-cos(daughter(0).phi-daughter(1).phi)))>0'),
     checkCharge = cms.bool(False),
 )
 
@@ -18,8 +18,8 @@ bestWMuNu = cms.EDFilter("LargestPtCandViewSelector",
 # W->Electron Nu
 ## Note: the 'mt()' method doesn't compute the transverse mass correctly, so we have to do it by hand.
 wToENu = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("selectElectrons patMETsPF"),
-    cut = cms.string('daughter(1).pt >20 && sqrt(2*daughter(0).pt*daughter(1).pt*(1-cos(daughter(0).phi-daughter(1).phi)))>0'),
+    decay = cms.string("selectElectrons patMETs"),
+    cut = cms.string('sqrt(2*daughter(0).pt*daughter(1).pt*(1-cos(daughter(0).phi-daughter(1).phi)))>0'),
     checkCharge = cms.bool(False),
 )
 

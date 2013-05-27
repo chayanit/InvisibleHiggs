@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.31 2013/04/14 22:15:23 srimanob Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.32 2013/05/24 13:29:03 raggleto Exp $
 //
 //
 
@@ -1032,6 +1032,10 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
   tagJetEtaMin_ = 0.;
   tagJetEtaMax_ = 0.;
 
+  // To calculate normalized variable of leading two jets
+  double sumJet1 = 0.;
+  double sumJet2 = 0.;
+
   for (unsigned i=0; i<jets->size(); ++i) {
 
     // Check overlap between jet and (muon, electron)
@@ -1116,12 +1120,49 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	  JecUnc->setJetEta(jets->at(j).eta());
 	  JecUnc->setJetPt(jets->at(j).pt());
 	  info_->jet2unc    = JecUnc->getUncertainty(true);
-      }
+      }      
     }
   }
 
   // std::cout<<"tagJet1Index = "<<tagJet1Index_<<std::endl;
   // std::cout<<"tagJet2Index = "<<tagJet2Index_<<std::endl;
+
+  // Loop jets collection to calculate normalized variable
+  for (unsigned k=0; k<jets->size(); ++k) {
+
+    // Check overlap between jet and (muon, electron)
+    bool checkOverlap = false;
+
+    for(unsigned iLep=0; iLep<muons.size(); iLep++){
+      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(k).eta(),jets->at(k).phi())>0.5) continue;
+      checkOverlap = true;
+      //std::cout<<"Overlap with muons"<<std::endl;
+      break;
+    }
+    for(unsigned iLep=0; iLep<electrons.size(); iLep++){
+      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(k).eta(),jets->at(k).phi())>0.5) continue;
+      checkOverlap = true;
+      //std::cout<<"Overlap with electrons"<<std::endl;
+      break;
+    }
+    if(checkOverlap) continue;
+
+    // check jet is associated with PV
+    int puflag = (*puJetIdFlags)[jets->refAt(k)];
+    if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) ) {
+ 
+    if(k != tagJet1Index_) sumJet1 += std::pow((info_->jet1Pt*TMath::Cos(info_->jet1Phi) * jets->at(k).py()) - (info_->jet1Pt*TMath::Sin(info_->jet1Phi) * jets->at(k).px()),2);
+    if(k != tagJet2Index_) sumJet2 += std::pow((info_->jet2Pt*TMath::Cos(info_->jet2Phi) * jets->at(k).py()) - (info_->jet2Pt*TMath::Sin(info_->jet2Phi) * jets->at(k).px()),2);
+
+    }
+  }
+
+  // check there are jets in the event
+  if(info_->jet1Pt != -10.) info_->jet1DeltaT = 0.1 * TMath::Sqrt(sumJet1)/info_->jet1Pt;
+  if(info_->jet2Pt != -10.) info_->jet2DeltaT = 0.1 * TMath::Sqrt(sumJet2)/info_->jet2Pt;
+ 
+  //std::cout<<"jet1DeltaT = "<<info_->jet2DeltaT<<std::endl;
+  //std::cout<<"jet2DeltaT = "<<info_->jet2DeltaT<<std::endl;
 
   tagJetEtaMin_ = std::min(tagJet1_.eta(), tagJet2_.eta());
   tagJetEtaMax_ = std::max(tagJet1_.eta(), tagJet2_.eta());
@@ -1285,8 +1326,11 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
   // delta phi between MET and nearest tag jet
   double jmdphi1 = fabs(fabs(fabs(met.at(0).phi()-tagJet1_.phi())-TMath::Pi())-TMath::Pi());
   double jmdphi2 = fabs(fabs(fabs(met.at(0).phi()-tagJet2_.phi())-TMath::Pi())-TMath::Pi());
-  
-  info_->jetMETdPhi = std::min(jmdphi1, jmdphi2);
+
+  info_->jmDPhi     = std::min(jmdphi1, jmdphi2);
+  info_->jmDPhiN1   = jmdphi1/TMath::ATan2(info_->jet1DeltaT,info_->met);
+  info_->jmDPhiN2   = jmdphi2/TMath::ATan2(info_->jet2DeltaT,info_->met);
+  info_->jmDPhiNMin = std::min(info_->jmDPhiN1,info_->jmDPhiN2);
   
   //metNoMuon
   Double_t metx = met.at(0).px();
@@ -1297,7 +1341,7 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
   }
   info_->metNoMuon = TMath::Sqrt(metx*metx + mety*mety);
   info_->metNoMuonPhi = TMath::ATan2(mety,metx);
-  
+ 
   //metNoElectron
   metx = met.at(0).px();
   mety = met.at(0).py();
@@ -1321,6 +1365,14 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
 	mety = met.at(0).py() + zMus[i].py();
 	info_->metNo2Muon = TMath::Sqrt(metx*metx + mety*mety);
 	info_->metNo2MuonPhi = TMath::ATan2(mety,metx);
+
+	jmdphi1 = fabs(fabs(fabs(info_->metNo2MuonPhi-tagJet1_.phi())-TMath::Pi())-TMath::Pi());
+	jmdphi2 = fabs(fabs(fabs(info_->metNo2MuonPhi-tagJet2_.phi())-TMath::Pi())-TMath::Pi());
+
+	info_->jmNo2MuonDPhi  	 = std::min(jmdphi1, jmdphi2);
+	info_->jmNo2MuonDPhiN1   = jmdphi1/TMath::ATan2(info_->jet1DeltaT,info_->metNo2Muon);
+	info_->jmNo2MuonDPhiN2   = jmdphi2/TMath::ATan2(info_->jet2DeltaT,info_->metNo2Muon);
+	info_->jmNo2MuonDPhiNMin = std::min(info_->jmDPhiN1,info_->jmDPhiN2);
       }
     }
   }
@@ -1343,6 +1395,14 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
 
 	  info_->metNoWLepton = TMath::Sqrt(metx*metx + mety*mety);
 	  info_->metNoWLeptonPhi = TMath::ATan2(mety,metx);
+ 
+          jmdphi1 = fabs(fabs(fabs(info_->metNoWLeptonPhi-tagJet1_.phi())-TMath::Pi())-TMath::Pi());
+          jmdphi2 = fabs(fabs(fabs(info_->metNoWLeptonPhi-tagJet2_.phi())-TMath::Pi())-TMath::Pi());
+
+          info_->jmNoWLeptonDPhi     = std::min(jmdphi1, jmdphi2);
+          info_->jmNoWLeptonDPhiN1   = jmdphi1/TMath::ATan2(info_->jet1DeltaT,info_->metNoWLepton);
+          info_->jmNoWLeptonDPhiN2   = jmdphi2/TMath::ATan2(info_->jet2DeltaT,info_->metNoWLepton);
+          info_->jmNoWLeptonDPhiNMin = std::min(info_->jmDPhiN1,info_->jmDPhiN2);	
 	}
 	else if(fabs(Wboson->daughter(1)->charge()) == 1){ 
 
@@ -1351,6 +1411,14 @@ void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
 	  
 	  info_->metNoWLepton = TMath::Sqrt(metx*metx + mety*mety);
 	  info_->metNoWLeptonPhi = TMath::ATan2(mety,metx);
+
+          jmdphi1 = fabs(fabs(fabs(info_->metNoWLeptonPhi-tagJet1_.phi())-TMath::Pi())-TMath::Pi());
+          jmdphi2 = fabs(fabs(fabs(info_->metNoWLeptonPhi-tagJet2_.phi())-TMath::Pi())-TMath::Pi());
+
+          info_->jmNoWLeptonDPhi     = std::min(jmdphi1, jmdphi2);
+          info_->jmNoWLeptonDPhiN1   = jmdphi1/TMath::ATan2(info_->jet1DeltaT,info_->metNoWLepton);
+          info_->jmNoWLeptonDPhiN2   = jmdphi2/TMath::ATan2(info_->jet2DeltaT,info_->metNoWLepton);
+          info_->jmNoWLeptonDPhiNMin = std::min(info_->jmDPhiN1,info_->jmDPhiN2);
 	}
       }
     }
@@ -1445,7 +1513,7 @@ void InvHiggsInfoProducer::doWs(const reco::CandidateView& ws, int channel) {
 	info_->wPt      = ws[i].pt();
 	info_->wEta     = ws[i].eta();
 	info_->wPhi     = ws[i].phi();
-	info_->wMt      = ws[i].mt();
+	//info_->wMt      = ws[i].mt();
 	info_->wChannel = channel;
 
 	const reco::Candidate *Wboson = &(ws[i]);
@@ -1459,13 +1527,13 @@ void InvHiggsInfoProducer::doWs(const reco::CandidateView& ws, int channel) {
 	  info_->wDaulCharge = Wboson->daughter(0)->charge();
 	}
 	else if(fabs(Wboson->daughter(1)->charge()) == 1){
-	  //std::cout<<"Charge W's daughter = "<<fabs(Wboson->daughter(1)->charge())<<std::endl;
 	  info_->wDaulPt     = Wboson->daughter(1)->pt();
 	  info_->wDaulEta    = Wboson->daughter(1)->eta();
 	  info_->wDaulPhi    = Wboson->daughter(1)->phi();
 	  info_->wDaulM      = Wboson->daughter(1)->mass();
 	  info_->wDaulCharge = Wboson->daughter(1)->charge();
 	}
+        info_->wMt = sqrt(2 * Wboson->daughter(0)->pt()*Wboson->daughter(1)->pt() * (1 - cos(Wboson->daughter(0)->phi() - Wboson->daughter(1)->phi())));
       }
     }
   }

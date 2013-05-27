@@ -160,11 +160,11 @@ void ElectronIdSelector::produce(edm::Event& iEvent,const edm::EventSetup& iSetu
     const pat::Electron& ele = electrons->at(iElec);
 
     // -------- Make sure that the electron is within acceptance ------
-    bool isEB = ele.isEB();
-    bool isEE = ele.isEE();
+    float eta = ele.superCluster()->eta();
+    bool isEB = ele.isEB() && fabs(eta) < 1.442;
+    bool isEE = ele.isEE() && fabs(eta) > 1.566 && fabs(eta) < 2.5;
     //bool inAcceptance = (isEB || isEE) && (ele.ecalDrivenSeed()==1);
     float pt  = ele.pt();
-    float eta = ele.superCluster()->eta();
  
     // -------- Compute Detector isolation ------
     const double PI = 4.0*atan(1.0);

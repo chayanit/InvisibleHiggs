@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.19 2013/04/14 22:15:22 srimanob Exp $
+// $Id: InvHiggsInfo.h,v 1.20 2013/05/24 13:29:03 raggleto Exp $
 //
 //
 
@@ -76,7 +76,8 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet1PUMVA;
   Int_t    jet1PUFlag;
   Double_t jet1unc;
-
+  Double_t jet1DeltaT;
+ 
   Int_t    jet2Index;
   Double_t jet2Pt;
   Double_t jet2Eta;
@@ -85,19 +86,31 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet2PUMVA;
   Int_t    jet2PUFlag;
   Double_t jet2unc;
+  Double_t jet2DeltaT;
 
   // MET (need XY correction?)
   Double_t met;
   Double_t metPhi;
-  Double_t jetMETdPhi;
+  Double_t jmDPhi;
+  Double_t jmDPhiN1;
+  Double_t jmDPhiN2;
+  Double_t jmDPhiNMin;
   Double_t metNoMuon;
   Double_t metNoMuonPhi; 
   Double_t metNoElectron;
   Double_t metNoElectronPhi;
   Double_t metNo2Muon;
   Double_t metNo2MuonPhi;
+  Double_t jmNo2MuonDPhi;
+  Double_t jmNo2MuonDPhiN1;
+  Double_t jmNo2MuonDPhiN2;
+  Double_t jmNo2MuonDPhiNMin;
   Double_t metNoWLepton;
   Double_t metNoWLeptonPhi;
+  Double_t jmNoWLeptonDPhi;
+  Double_t jmNoWLeptonDPhiN1;
+  Double_t jmNoWLeptonDPhiN2;
+  Double_t jmNoWLeptonDPhiNMin;
 
   // MHT
   Double_t mht;
