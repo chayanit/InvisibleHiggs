@@ -276,7 +276,7 @@ int main(int argc, char* argv[]) {
   plots.draw("hMjjNM1", "M_{jj} [GeV]", "N_{events}");
   plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "N_{events}");
   plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}");
-  plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}");
+  plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}");
   plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "N_{events}");
   plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "N_{events}");
   plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}");
@@ -288,6 +288,6 @@ int main(int argc, char* argv[]) {
 
   // plots.setYMin(1e-2);
   plots.draw("hDPhiJMetNormNM1", "#Delta #phi_{N}^{min}", "N_{events}");
-  plots.draw("hDPhiJMetNormNM1NoDPhiJJ", "#Delta #phi_{N}^{min}", "N_{events}");
+  plots.draw("hDPhiJMetNormNM1NoDPhiJJ", "#Delta #phi_{N}^{min}, no #Delta #phi_{jj} cut", "N_{events}");
 
 }
