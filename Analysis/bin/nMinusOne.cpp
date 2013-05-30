@@ -71,19 +71,22 @@ int main(int argc, char* argv[]) {
     TFile* ofile = TFile::Open( (oDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
     // create histograms
-    TH1D* hTrig     = new TH1D("hTrigNM1",     "", 2,   0.,  2.);
-    TH1D* hMETfilt  = new TH1D("hMETFiltNM1",  "", 2,   0.,  2.);
-    TH1D* hDijet    = new TH1D("hDijetNM1",    "", 50,  0.,  250.);
-    TH1D* hSgnEtaJJ = new TH1D("hSgnEtaJJNM1", "", 2,   -1., 1.);
-    TH1D* hDEtaJJ   = new TH1D("hDEtaJJNM1",   "", 50,  0.,  8.);
-    TH1D* hMjj      = new TH1D("hMjjNM1",      "", 50,  0.,  4000.);
-    TH1D* hMET      = new TH1D("hMETNM1",      "", 50,  0.,  500.);
-    TH1D* hDPhiJMet = new TH1D("hDPhiJMetNM1", "", 50,  0.,  TMath::Pi());
-    TH1D* hDPhiJJ   = new TH1D("hDPhiJJNM1",   "", 50,  0.,  TMath::Pi());
-    TH1D* hEVeto    = new TH1D("hEVetoNM1",    "", 50,  0.,  50.);
-    TH1D* hMuVeto   = new TH1D("hMuVetoNM1",   "", 50,  0.,  50.);
-    TH1D* hCenEt    = new TH1D("hCenEtNM1",    "", 50,  0.,  150.); 
-    TH1D* hCenEta   = new TH1D("hCenEtaNM1",   "", 50, -5.,  5.);
+    TH1D* hTrig                 = new TH1D("hTrigNM1",                   "", 2,   0.,  2.);
+    TH1D* hMETfilt              = new TH1D("hMETFiltNM1",                "", 2,   0.,  2.);
+    TH1D* hDijet                = new TH1D("hDijetNM1",                  "", 50,  0.,  250.);
+    TH1D* hSgnEtaJJ             = new TH1D("hSgnEtaJJNM1",               "", 2,   -1., 1.);
+    TH1D* hDEtaJJ               = new TH1D("hDEtaJJNM1",                 "", 50,  0.,  8.);
+    TH1D* hMjj                  = new TH1D("hMjjNM1",                    "", 50,  0.,  4000.);
+    TH1D* hMET                  = new TH1D("hMETNM1",                    "", 50,  0.,  500.);
+    TH1D* hDPhiJMet             = new TH1D("hDPhiJMetNM1",               "", 50,  0.,  TMath::Pi());
+    TH1D* hDPhiJMetNoDPhiJJ     = new TH1D("hDPhiJMetNM1NoDPhiJJ",       "", 50,  0.,  TMath::Pi());
+    TH1D* hDPhiJMetNorm         = new TH1D("hDPhiJMetNormNM1",           "", 50,  0.,  200);
+    TH1D* hDPhiJMetNormNoDPhiJJ = new TH1D("hDPhiJMetNormNM1NoDPhiJJ",   "", 50,  0.,  200);
+    TH1D* hDPhiJJ               = new TH1D("hDPhiJJNM1",                 "", 50,  0.,  TMath::Pi());
+    TH1D* hEVeto                = new TH1D("hEVetoNM1",                  "", 50,  0.,  50.);
+    TH1D* hMuVeto               = new TH1D("hMuVetoNM1",                 "", 50,  0.,  50.);
+    TH1D* hCenEt                = new TH1D("hCenEtNM1",                  "", 50,  0.,  150.); 
+    TH1D* hCenEta               = new TH1D("hCenEtaNM1",                 "", 50, -5.,  5.);
 
     // Additional cuts specific to DYJetsToLL (cut on Zpt <100 to avoid double counting with the PtZ-100 sample)
     TCut cutD = cuts.cutDataset(dataset.name);
@@ -110,7 +113,11 @@ int main(int argc, char* argv[]) {
     tree->Draw("abs(jet1Eta-jet2Eta)>>hDEtaJJNM1", (dEtaJJ + cutD) * otherCuts);
     tree->Draw("vbfM>>hMjjNM1", (mJJ  + cutD) * otherCuts);
     tree->Draw("met>>hMETNM1", (met + cutD) * otherCuts);
-    tree->Draw("min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>>hDPhiJMetNM1", (cuts.allCuts() + cutD) * otherCuts);
+    // tree->Draw("min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>>hDPhiJMetNM1", (cuts.allCuts() + cutD) * otherCuts);
+    tree->Draw("jmDPhi>>hDPhiJMetNM1", (cuts.allCuts() + cutD) * otherCuts);
+    tree->Draw("jmDPhi>>hDPhiJMetNM1NoDPhiJJ", (dPhiJJ + cutD) * otherCuts);
+    tree->Draw("jmDPhiNMin>>hDPhiJMetNormNM1", (cuts.allCuts() + cutD) * otherCuts);
+    tree->Draw("jmDPhiNMin>>hDPhiJMetNormNM1NoDPhiJJ", (dPhiJJ + cutD) * otherCuts);
     tree->Draw("vbfDPhi>>hDPhiJJNM1", (dPhiJJ + cutD) * otherCuts);
     tree->Draw("ele1Pt>>hEVetoNM1", (eVeto + cutD) * otherCuts);
     tree->Draw("mu1Pt>>hMuVetoNM1", (muVeto + cutD) * otherCuts);
@@ -128,6 +135,9 @@ int main(int argc, char* argv[]) {
       hMjj->Scale(weight);
       hMET->Scale(weight);
       hDPhiJMet->Scale(weight);
+      hDPhiJMetNoDPhiJJ->Scale(weight);
+      hDPhiJMetNorm->Scale(weight);
+      hDPhiJMetNormNoDPhiJJ->Scale(weight);
       hDPhiJJ->Scale(weight);
       hEVeto->Scale(weight);
       hMuVeto->Scale(weight);
@@ -145,6 +155,9 @@ int main(int argc, char* argv[]) {
     hMjj->Write("",TObject::kOverwrite);
     hMET->Write("",TObject::kOverwrite);
     hDPhiJMet->Write("",TObject::kOverwrite);
+    hDPhiJMetNoDPhiJJ->Write("",TObject::kOverwrite);
+    hDPhiJMetNorm->Write("",TObject::kOverwrite);
+    hDPhiJMetNormNoDPhiJJ->Write("",TObject::kOverwrite);
     hDPhiJJ->Write("",TObject::kOverwrite);
     hEVeto->Write("",TObject::kOverwrite);
     hMuVeto->Write("",TObject::kOverwrite);
@@ -167,6 +180,9 @@ int main(int argc, char* argv[]) {
   hists.push_back("hMjjNM1");
   hists.push_back("hMETNM1");
   hists.push_back("hDPhiJMetNM1");
+  hists.push_back("hDPhiJMetNM1NoDPhiJJ");
+  hists.push_back("hDPhiJMetNormNM1");
+  hists.push_back("hDPhiJMetNormNM1NoDPhiJJ");
   hists.push_back("hDPhiJJNM1");
   hists.push_back("hEVetoNM1");
   hists.push_back("hMuVetoNM1");
@@ -246,8 +262,8 @@ int main(int argc, char* argv[]) {
 
   plots.addDataset("Diboson", kViolet-6, 0);
   plots.addDataset("DYJets", kPink-4,0);
-  plots.addDataset("QCD", kGreen+3, 0);
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
+  plots.addDataset("QCD", kGreen+3, 0);
   plots.addDataset("ZJets", kOrange-2, 0);
   plots.addDataset("WNJets", kBlue+1, 0);
   plots.addDataset("SignalM125_POWHEG", kRed, 2);
@@ -260,13 +276,18 @@ int main(int argc, char* argv[]) {
   plots.draw("hMjjNM1", "M_{jj} [GeV]", "N_{events}");
   plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "N_{events}");
   plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}");
+  plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}");
   plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "N_{events}");
   plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "N_{events}");
   plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}");
 
   plots.setYMin(1e-1);
-  plots.setYMax(1e2);
+  // plots.setYMax(1e2);
   plots.draw("hEVetoNM1", "E_{T} [GeV]", "N_{events}");
   plots.draw("hMuVetoNM1", "p_{T} [GeV]", "N_{events}");
+
+  // plots.setYMin(1e-2);
+  plots.draw("hDPhiJMetNormNM1", "#Delta #phi_{N}^{min}", "N_{events}");
+  plots.draw("hDPhiJMetNormNM1NoDPhiJJ", "#Delta #phi_{N}^{min}", "N_{events}");
 
 }
