@@ -346,10 +346,10 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                             )
 
     # Fix Type0 correction module
-    process.patPFMETtype0Corr.correction.par3 = cms.double(0.909209)
-    process.patPFMETtype0Corr.correction.par2 = cms.double(0.0303531)
-    process.patPFMETtype0Corr.correction.par1 = cms.double(-0.703151)
-    process.patPFMETtype0Corr.correction.par0 = cms.double(0.0)
+    #process.patPFMETtype0Corr.correction.par3 = cms.double(0.909209)
+    #process.patPFMETtype0Corr.correction.par2 = cms.double(0.0303531)
+    #process.patPFMETtype0Corr.correction.par1 = cms.double(-0.703151)
+    #process.patPFMETtype0Corr.correction.par0 = cms.double(0.0)
     ###--------------------------------------------------------------
 
 
