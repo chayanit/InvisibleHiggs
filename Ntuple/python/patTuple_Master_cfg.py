@@ -18,22 +18,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     ###--------------------------------------------------------------
     ### GlobalTag
     if iRunOnData == True:
-        if (iData.find("Jul13")==0):
-            process.GlobalTag.globaltag = "FT_53_V6C_AN3::All"
-        elif (iData.find("Aug06")==0):
-            process.GlobalTag.globaltag = "FT_53_V6C_AN3::All"
-        elif (iData.find("Aug24")==0):
-            process.GlobalTag.globaltag = "FT53_V10A_AN3::All"
-        elif (iData.find("PromptC2")==0):
-            process.GlobalTag.globaltag = "GR_P_V42_AN3::All"
-        elif (iData.find("PromptD")==0):
-            process.GlobalTag.globaltag = "GR_P_V42_AN3::All"
-        elif (iData.find("Dec11")==0): #Run201191
-            process.GlobalTag.globaltag = "FT_P_V42C_AN3::All"
-        else:
-            process.GlobalTag.globaltag = "GR_P_V42_AN3::All"
+        process.GlobalTag.globaltag = "FT_53_V21_AN4::All"
     else:
-        process.GlobalTag.globaltag = "START53_V7G::All"
+        process.GlobalTag.globaltag = "START53_V22::All"
     ###--------------------------------------------------------------
 
     
@@ -61,7 +48,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.hltHighLevel.andOr = cms.bool(True)   # True = OR, False = AND
     if (iHLTFilter.find("MET")==0):
         process.hltHighLevel.HLTPaths = cms.vstring(
-            "HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
+            #"HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
             "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
             )
     elif (iHLTFilter.find("SingleMu")==0):
@@ -76,7 +63,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         process.hltHighLevel.HLTPaths = cms.vstring("*")
     else:
         process.hltHighLevel.HLTPaths = cms.vstring(
-            "HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
+            #"HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
             "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
             )
     ###--------------------------------------------------------------
@@ -133,8 +120,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     
     # The HCAL laser filter
     process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
-    process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cff")
-    process.hcallasereventfilter2012.eventFileName = cms.string('HCALLaser2012AllDatasets.txt.gz')
+    #process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cff")
+    #process.hcallasereventfilter2012.eventFileName = cms.string('HCALLaser2012AllDatasets.txt.gz')
+    process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
     
     # The ECAL dead cell trigger primitive filter
     process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
@@ -350,6 +338,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     #process.patPFMETtype0Corr.correction.par2 = cms.double(0.0303531)
     #process.patPFMETtype0Corr.correction.par1 = cms.double(-0.703151)
     #process.patPFMETtype0Corr.correction.par0 = cms.double(0.0)
+    # Need this line for CMSSW_5_3_11
+    process.producePatPFMETCorrections.replace(process.patPFJetMETtype2Corr,process.patPFJetMETtype2Corr + process.type0PFMEtCorrectionPFCandToVertexAssociation + process.patPFMETtype0Corr)
+    #process.producePatPFMETCorrections.replace(process.patPFJetMETtype2Corr,process.patPFJetMETtype2Corr + process.patPFMETtype0Corr)
     ###--------------------------------------------------------------
 
 
@@ -400,7 +391,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.p5 = cms.Path( process.ecalLaserCorrFilter )
     process.p6 = cms.Path( process.goodVertices * process.trackingFailureFilter )
     process.p7 = cms.Path( process.trkPOGFilters )
-    process.p8 = cms.Path( process.hcallLaserEvent2012Filter )
+    #process.p8 = cms.Path( process.hcallLaserEvent2012Filter )
+    process.p8 = cms.Path( process.hcalfilter )
 
     if iRunOnData == True:
     	process.p = cms.Path(    
