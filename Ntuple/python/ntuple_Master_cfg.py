@@ -18,22 +18,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     ###--------------------------------------------------------------
     ### GlobalTag
     if iRunOnData == True:
-        if (iData.find("Jul13")==0):
-            process.GlobalTag.globaltag = "FT_53_V6_AN3::All"
-        elif (iData.find("Aug06")==0):
-            process.GlobalTag.globaltag = "FT_53_V6C_AN3::All"
-        elif (iData.find("Aug24")==0):
-            process.GlobalTag.globaltag = "FT_53_V10_AN3::All"
-        elif (iData.find("PromptC2")==0):
-            process.GlobalTag.globaltag = "GR_P_V41_AN3::All"
-        elif (iData.find("PromptD")==0):
-            process.GlobalTag.globaltag = "GR_P_V42_AN3::All"
-        elif (iData.find("Dec11")==0): #Run201191
-            process.GlobalTag.globaltag = "FT_P_V42C_AN3::All"
-        else:
-            process.GlobalTag.globaltag = "GR_P_V42_AN3::All"
+        process.GlobalTag.globaltag = "FT_53_V21_AN4::All"
     else:
-        process.GlobalTag.globaltag = "START53_V7G::All"
+        process.GlobalTag.globaltag = "START53_V22::All"
     ###--------------------------------------------------------------
 
     
@@ -61,7 +48,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.hltHighLevel.andOr = cms.bool(True)   # True = OR, False = AND
     if (iHLTFilter.find("MET")==0):
         process.hltHighLevel.HLTPaths = cms.vstring(
-            "HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
+            #"HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
             "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
             )
     elif (iHLTFilter.find("SingleMu")==0):
@@ -76,7 +63,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         process.hltHighLevel.HLTPaths = cms.vstring("*")
     else:
         process.hltHighLevel.HLTPaths = cms.vstring(
-            "HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
+            #"HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
             "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
             )
     ###--------------------------------------------------------------
@@ -84,7 +71,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
     ###--------------------------------------------------------------
     print "-----------------------------------------------"
-    print "INVISIBLE HIGGS: Ntuple V9"
+    print "INVISIBLE HIGGS: Ntuple V10"
     print "-----------------------------------------------"
     print "RunOnData = ", iRunOnData
     if iRunOnData == True:
@@ -133,6 +120,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     
     # The HCAL laser filter
     process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
+    #process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cff")
+    #process.hcallasereventfilter2012.eventFileName = cms.string('HCALLaser2012AllDatasets.txt.gz')
+    process.load("EventFilter.HcalRawToDigi.hcallaserFilterFromTriggerResult_cff")
     
     # The ECAL dead cell trigger primitive filter
     process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
@@ -153,6 +143,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
     # The tracking failure filter
     process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
+
+    # The tracking POG filters
+    process.load('RecoMET.METFilters.trackingPOGFilters_cff')
     ###--------------------------------------------------------------
 
 
@@ -243,9 +236,44 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
     ###--------------------------------------------------------------
     ### Load the PU JetID sequence
-    process.load("CMGTools.External.pujetidsequence_cff")
-    process.puJetMva.jets = cms.InputTag("goodPatJets")
-    process.puJetId.jets = cms.InputTag("goodPatJets")
+    if iRunOnData == True:
+    	process.load("CMGTools.External.pujetidsequence_cff")
+    	process.puJetMva.jets = cms.InputTag("goodPatJets")
+    	process.puJetId.jets = cms.InputTag("goodPatJets")
+    else:
+        process.load("CMGTools.External.pujetidsequence_cff")
+        process.puJetMva.jets		= cms.InputTag("goodPatJets")
+        process.puJetId.jets 		= cms.InputTag("goodPatJets")
+	process.puJetMvaSmeared		= process.puJetMva.clone()
+	process.puJetIdSmeared		= process.puJetId.clone()  
+	process.puJetMvaResUp 		= process.puJetMva.clone()
+	process.puJetIdResUp 		= process.puJetId.clone()
+        process.puJetMvaResDown		= process.puJetMva.clone()
+        process.puJetIdResDown  	= process.puJetId.clone()
+        process.puJetMvaEnUp   		= process.puJetMva.clone()
+        process.puJetIdEnUp    		= process.puJetId.clone()
+        process.puJetMvaEnDown 		= process.puJetMva.clone()
+        process.puJetIdEnDown  		= process.puJetId.clone()
+
+        process.puJetIdSmeared.jets     = cms.InputTag("smearedGoodPatJets")
+        process.puJetMvaSmeared.jetids  = cms.InputTag("puJetIdSmeared")
+        process.puJetMvaSmeared.jets    = cms.InputTag("smearedGoodPatJets")
+
+	process.puJetIdResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
+	process.puJetMvaResUp.jetids 	= cms.InputTag("puJetIdResUp")
+	process.puJetMvaResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
+
+        process.puJetIdResDown.jets     = cms.InputTag("smearedGoodPatJetsResDown")
+        process.puJetMvaResDown.jetids  = cms.InputTag("puJetIdResDown")
+        process.puJetMvaResDown.jets    = cms.InputTag("smearedGoodPatJetsResDown")
+
+        process.puJetIdEnUp.jets        = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
+        process.puJetMvaEnUp.jetids     = cms.InputTag("puJetIdEnUp")
+        process.puJetMvaEnUp.jets       = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
+
+        process.puJetIdEnDown.jets      = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt")
+        process.puJetMvaEnDown.jetids   = cms.InputTag("puJetIdEnDown")
+        process.puJetMvaEnDown.jets     = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt")
     ###--------------------------------------------------------------
 
 
@@ -259,54 +287,87 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         cms.InputTag('pfJetMETcorr', 'type1')
         )
 
-    # Get PFMET from runMEtUncertainties
-    #from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-    #process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+    # Get loose ID/Iso muons and veto ID electrons
+    process.load("InvisibleHiggs.Ntuple.PhysicsObjectCandidates_cff")
 
-    #if iRunOnData == True:
-    #    runMEtUncertainties(process,
-    #                        electronCollection = cms.InputTag('cleanPatElectrons'),
-    #                        photonCollection = '',
-    #                        muonCollection = 'cleanPatMuons',
-    #                        tauCollection = '',
-    #                        jetCollection = cms.InputTag('selectedPatJets'),
-    #                        jetCorrLabel = 'L2L3Residual',
-    #                        doSmearJets = False,
-    #                        makeType1corrPFMEt = True,
-    #                        makeType1p2corrPFMEt = False,
-    #                        makePFMEtByMVA = False,
-    #                        makeNoPileUpPFMEt = False,
-    #                        doApplyType0corr = True,
-    #                        sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data,
-    #                        doApplySysShiftCorr = False,
-    #                        )
-    #    process.patPFJetMETtype1p2Corr.jetCorrLabel = cms.string('L2L3Residual')
-    #    process.patPFJetMETtype2Corr.jetCorrLabel = cms.string('L2L3Residual')
-    #else:
-    #    runMEtUncertainties(process,
-    #                        electronCollection = cms.InputTag('cleanPatElectrons'),
-    #                        photonCollection = '',
-    #                        muonCollection = 'cleanPatMuons',
-    #                        tauCollection = '',
-    #                        jetCollection = cms.InputTag('selectedPatJets'),
-    #                        jetCorrLabel = 'L3Absolute',
-    #                        doSmearJets = True,
-    #                        makeType1corrPFMEt = True,
-    #                        makeType1p2corrPFMEt = False,
-    #                        makePFMEtByMVA = False,
-    #                        makeNoPileUpPFMEt = False,
-    #                        doApplyType0corr = True,
-    #                        sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc,
-    #                        doApplySysShiftCorr = False,
-    #                        )
+    # Get PFMET from runMEtUncertainties
+    from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+    process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+
+    if iRunOnData == True:
+        runMEtUncertainties(process,
+                            electronCollection = cms.InputTag('selectVetoElectrons'),
+                            photonCollection = '',
+                            muonCollection = 'selectLooseMuons',
+                            tauCollection = '',
+                            jetCollection = cms.InputTag('goodPatJets'),
+                            jetCorrLabel = 'L2L3Residual',
+                            doSmearJets = False,
+                            makeType1corrPFMEt = True,
+                            makeType1p2corrPFMEt = False,
+                            makePFMEtByMVA = False,
+                            makeNoPileUpPFMEt = False,
+                            doApplyType0corr = True,
+                            sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data,
+                            doApplySysShiftCorr = False,
+			    addToPatDefaultSequence = False,
+                            )
+        process.patPFJetMETtype1p2Corr.jetCorrLabel = cms.string('L2L3Residual')
+        process.patPFJetMETtype2Corr.jetCorrLabel = cms.string('L2L3Residual')
+    else:
+        runMEtUncertainties(process,
+                            electronCollection = cms.InputTag('selectVetoElectrons'),
+                            photonCollection = '',
+                            muonCollection = 'selectLooseMuons',
+                            tauCollection = '',
+                            jetCollection = cms.InputTag('goodPatJets'),
+                            jetCorrLabel = 'L3Absolute',
+                            doSmearJets = True,
+                            makeType1corrPFMEt = True,
+                            makeType1p2corrPFMEt = False,
+                            makePFMEtByMVA = False,
+                            makeNoPileUpPFMEt = False,
+                            doApplyType0corr = True,
+                            sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc,
+                            doApplySysShiftCorr = False,
+			    addToPatDefaultSequence = False,
+                            )
 
     # Fix Type0 correction module
     #process.patPFMETtype0Corr.correction.par3 = cms.double(0.909209)
     #process.patPFMETtype0Corr.correction.par2 = cms.double(0.0303531)
     #process.patPFMETtype0Corr.correction.par1 = cms.double(-0.703151)
     #process.patPFMETtype0Corr.correction.par0 = cms.double(0.0)
+    # Need this line for CMSSW_5_3_11
+    process.producePatPFMETCorrections.replace(process.patPFJetMETtype2Corr,process.patPFJetMETtype2Corr + process.type0PFMEtCorrectionPFCandToVertexAssociation + process.patPFMETtype0Corr)
+    #process.producePatPFMETCorrections.replace(process.patPFJetMETtype2Corr,process.patPFJetMETtype2Corr + process.patPFMETtype0Corr)
     ###--------------------------------------------------------------
 
+    # PAT/ntuples one step  
+    # Z and W candidates    
+    process.load('InvisibleHiggs/Ntuple/WCandidates_cff')
+    process.load('InvisibleHiggs/Ntuple/ZCandidates_cff')
+    # Ntuple producer       
+    process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
+    if iRunOnData == False: 
+        # Jet/MET uncertainty
+        process.invHiggsInfo.jetTag      = cms.untracked.InputTag("smearedGoodPatJets")
+        process.invHiggsInfo.metTag      = cms.untracked.InputTag("patType1CorrectedPFMet")
+        process.invHiggsInfo.puJetMvaTag = cms.untracked.InputTag("puJetMvaSmeared", "full53xDiscriminant")
+        process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMvaSmeared", "full53xId")
+
+        # PU re-weighting
+        process.invHiggsInfo.puMCFile    = cms.untracked.string("PUHistS10.root")
+        process.invHiggsInfo.puDataFile  = cms.untracked.string("PUHistRun2012All_forV9.root")
+        process.invHiggsInfo.puMCHist    = cms.untracked.string("pileup")
+        process.invHiggsInfo.puDataHist  = cms.untracked.string("pileup")
+        process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
+
+        process.invHiggsInfo.trigCorrFile   = cms.untracked.string("DataMCWeight_53X_v1.root")
+    # TTree output file
+    process.load("CommonTools.UtilAlgos.TFileService_cfi")
+    process.TFileService.fileName = cms.string('invHiggsInfo.root')
+    ###--------------------------------------------------------------
 
     ###--------------------------------------------------------------
     ### Tau
@@ -344,31 +405,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     # switchOnTriggerMatchEmbedding( process, [ 'metTriggerMatch', 'jetTriggerMatch' ] )
     ###--------------------------------------------------------------
 
-    
-    ###--------------------------------------------------------------
-    process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
-    process.load("CommonTools.UtilAlgos.TFileService_cfi")
-    process.TFileService.fileName = cms.string('invHiggsInfo.root')
-    if iRunOnData == True:
-        process.invHiggsInfo.mcPYTHIA   = cms.untracked.bool(False)
-        process.invHiggsInfo.puMCFile   = cms.untracked.string("")
-        process.invHiggsInfo.puDataFile = cms.untracked.string("")
-        process.invHiggsInfo.puMCHist   = cms.untracked.string("")
-        process.invHiggsInfo.puDataHist = cms.untracked.string("")
-    else:
-        process.invHiggsInfo.mcPYTHIA   = cms.untracked.bool(True)
-        process.invHiggsInfo.puMCFile   = cms.untracked.string("PUHistS10.root")
-        process.invHiggsInfo.puDataFile = cms.untracked.string("PUHistRun2012All_forV9.root")
-        process.invHiggsInfo.puMCHist   = cms.untracked.string("pileup")
-        process.invHiggsInfo.puDataHist = cms.untracked.string("pileup")
-    process.load('InvisibleHiggs/Ntuple/PhysicsObjectCandidates_cff')
-    process.load('InvisibleHiggs/Ntuple/WCandidates_cff')
-    process.load('InvisibleHiggs/Ntuple/ZCandidates_cff')
-    
 
-    ###--------------------------------------------------------------
-
-    
     ###--------------------------------------------------------------
     ### Paths
     process.p0 = cms.Path( process.HBHENoiseFilter )
@@ -378,41 +415,79 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.p4 = cms.Path( process.eeBadScFilter )
     process.p5 = cms.Path( process.ecalLaserCorrFilter )
     process.p6 = cms.Path( process.goodVertices * process.trackingFailureFilter )
+    process.p7 = cms.Path( process.trkPOGFilters )
+    if iRunOnData == True:
+        #process.p8 = cms.Path( process.hcallLaserEvent2012Filter )
+        process.p8 = cms.Path( process.hcalfilter )
+    else:
+        process.p8 = cms.Path( process.primaryVertexFilter )
 
-    process.p = cms.Path(    
-        # Trigger filter
-        process.hltHighLevel *
+    if iRunOnData == True:
+    	process.p = cms.Path(    
+        	# Trigger filter
+        	process.hltHighLevel *
         
-        # Basic filters
-        process.noscraping *
-        process.primaryVertexFilter *
+        	# Basic filters
+        	process.noscraping *
+        	process.primaryVertexFilter *
+        	
+        	# MET filters (Move to be flags)
         
-        # MET filters (Move to be flags)
-        process.HBHENoiseFilter *
-        process.CSCTightHaloFilter *
-        process.hcalLaserEventFilter *
-        process.EcalDeadCellTriggerPrimitiveFilter *
-        process.eeBadScFilter *
-        process.ecalLaserCorrFilter *
-        process.goodVertices * process.trackingFailureFilter *
+        	# MET Correction
+        	process.type0PFMEtCorrection *
         
-        # MET Correction
-        process.type0PFMEtCorrection *
+        	# Tau
+        	process.recoTauClassicHPSSequence *
         
-        # Tau
-        process.recoTauClassicHPSSequence *
-        
-        # Generate PAT
-        process.pfParticleSelectionSequence *
-        process.patDefaultSequence *
-        process.goodPatJets *
-        process.puJetIdSqeuence *
+        	# Generate PAT
+        	process.pfParticleSelectionSequence *
+        	process.patDefaultSequence *
+        	process.goodPatJets *
+		process.PhysicsObjectSequence *
+		process.metUncertaintySequence *
+        	process.puJetIdSqeuence *
+                process.WSequence *
+                process.ZSequence *
+                process.invHiggsInfo
+		)
+    else:
+        process.p = cms.Path(
+                # Trigger filter
+                process.hltHighLevel *
 
-        process.PhysicsObjectSequence *
-        process.WSequence *
-        process.ZSequence *
-        process.invHiggsInfo
-        )
+                # Basic filters
+                process.noscraping *
+                process.primaryVertexFilter *
+
+                # MET filters (Move to be flags)
+
+                # MET Correction
+                process.type0PFMEtCorrection *
+
+                # Tau
+                process.recoTauClassicHPSSequence *
+
+                # Generate PAT
+                process.pfParticleSelectionSequence *
+                process.patDefaultSequence *
+                process.goodPatJets *
+                process.PhysicsObjectSequence *
+                process.metUncertaintySequence *
+                process.puJetIdSqeuence *
+		process.puJetIdSmeared *
+		process.puJetMvaSmeared *
+        	process.puJetIdResUp *
+		process.puJetMvaResUp *
+         	process.puJetIdResDown *
+        	process.puJetMvaResDown *
+        	process.puJetIdEnUp *
+        	process.puJetMvaEnUp *
+        	process.puJetIdEnDown *
+        	process.puJetMvaEnDown *
+                process.WSequence *
+                process.ZSequence *
+                process.invHiggsInfo
+        	)
     ###--------------------------------------------------------------
 
 
@@ -422,11 +497,14 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         # trigger results
         'keep edmTriggerResults_*_*_*'
         ,'keep *_hltTriggerSummaryAOD_*_*'
+        # L1
+        ,'keep *_l1extraParticles_MET_RECO'
+        ,'keep *_l1extraParticles_MHT_RECO'
         # good jets
         ,'keep *_goodPatJets_*_*'
         # PU jet ID
-        ,'keep *_puJetId_*_*'
-        ,'keep *_puJetMva_*_*'
+        ,'keep *_puJetId*_*_*'
+        ,'keep *_puJetMva*_*_*'
         # vertices
         ,'keep *_offlineBeamSpot_*_*'
         ,'keep *_offlinePrimaryVertices*_*_*'
@@ -443,7 +521,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                                        ]
         
     process.out.fileName = 'patTuple.root'
-    ###--------------------------------------------------------------
-
+                
     del(process.out)
     del(process.outpath)
+    ###--------------------------------------------------------------
+

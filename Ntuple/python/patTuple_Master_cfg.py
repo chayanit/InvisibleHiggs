@@ -391,8 +391,11 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.p5 = cms.Path( process.ecalLaserCorrFilter )
     process.p6 = cms.Path( process.goodVertices * process.trackingFailureFilter )
     process.p7 = cms.Path( process.trkPOGFilters )
-    #process.p8 = cms.Path( process.hcallLaserEvent2012Filter )
-    process.p8 = cms.Path( process.hcalfilter )
+    if iRunOnData == True:
+	#process.p8 = cms.Path( process.hcallLaserEvent2012Filter )
+	process.p8 = cms.Path( process.hcalfilter )
+    else:
+	process.p8 = cms.Path( process.primaryVertexFilter )
 
     if iRunOnData == True:
     	process.p = cms.Path(    
