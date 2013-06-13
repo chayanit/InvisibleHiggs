@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.32 2013/05/24 13:29:03 raggleto Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.33 2013/05/27 09:00:51 chayanit Exp $
 //
 //
 
@@ -1150,6 +1150,8 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
     // check jet is associated with PV
     int puflag = (*puJetIdFlags)[jets->refAt(k)];
     if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) ) {
+
+    if (jets->at(k).pt() < 30) continue;
  
     if(k != tagJet1Index_) sumJet1 += std::pow((info_->jet1Pt*TMath::Cos(info_->jet1Phi) * jets->at(k).py()) - (info_->jet1Pt*TMath::Sin(info_->jet1Phi) * jets->at(k).px()),2);
     if(k != tagJet2Index_) sumJet2 += std::pow((info_->jet2Pt*TMath::Cos(info_->jet2Phi) * jets->at(k).py()) - (info_->jet2Pt*TMath::Sin(info_->jet2Phi) * jets->at(k).px()),2);
