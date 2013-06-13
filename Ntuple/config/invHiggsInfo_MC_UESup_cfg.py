@@ -5,8 +5,8 @@ from InvisibleHiggs.Ntuple.invHiggsInfo_Master_cfg import *
 # Jet/MET uncertainty
 process.invHiggsInfo.jetTag      = cms.untracked.InputTag("smearedGoodPatJets")
 process.invHiggsInfo.metTag      = cms.untracked.InputTag("patType1CorrectedPFMetUnclusteredEnUp")
-process.invHiggsInfo.puJetMvaTag = cms.untracked.InputTag("puJetMvaSmeared", "fullDiscriminant")
-process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMvaSmeared", "fullId")
+process.invHiggsInfo.puJetMvaTag = cms.untracked.InputTag("puJetMvaSmeared", "full53xDiscriminant")
+process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMvaSmeared", "full53xId")
  
 # PU re-weighting
 process.invHiggsInfo.puMCFile    = cms.untracked.string("PUHistS10.root")
@@ -23,7 +23,7 @@ process.TFileService.fileName = cms.string('invHiggsInfo_MC.root')
 ### THINGS TO EDIT BELOW ###
 
 # change Global Tag
-process.GlobalTag.globaltag = 'START53_V7G::All'
+process.GlobalTag.globaltag = 'START53_V22::All'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
