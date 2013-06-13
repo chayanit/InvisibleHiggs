@@ -7,7 +7,7 @@ from InvisibleHiggs.Ntuple.patTuple_Master_cfg import addInvHiggsProcess
 
 ###--------------------------------------------------------------
 ### Set these parameters
-iRunOnData  = True 
+iRunOnData  = False 
 
 #iData Jul13, Aug06, Aug24, PromptC2, PromptD, Dec11
 #No meaning if iRunData = False
@@ -19,7 +19,7 @@ iHLTFilter  = "MET"
 
 #MCSignal or Background if True, PDF will be collected (Not applied yet)
 #No meaning if iRunData = True
-iMCSignal   = False  
+iMCSignal   = True  
 
 iFile       = '/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/04BCEC26-AA02-E211-A81D-003048CF99BA.root'
 
