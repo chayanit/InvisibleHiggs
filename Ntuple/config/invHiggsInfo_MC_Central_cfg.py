@@ -10,7 +10,7 @@ process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMvaSmeared", "fu
  
 # PU re-weighting
 process.invHiggsInfo.puMCFile    = cms.untracked.string("PUHistS10.root")
-process.invHiggsInfo.puDataFile  = cms.untracked.string("PUHistRun2012All_forV9.root")
+process.invHiggsInfo.puDataFile  = cms.untracked.string("PUHistRun2012All_forV12.root")
 process.invHiggsInfo.puMCHist    = cms.untracked.string("pileup")
 process.invHiggsInfo.puDataHist  = cms.untracked.string("pileup")
 process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
@@ -32,6 +32,6 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-        'file:patTuple.root'
+        'file:patTuple_MC.root'
     ] );
 
