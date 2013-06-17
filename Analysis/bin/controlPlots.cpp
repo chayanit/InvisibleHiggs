@@ -8,6 +8,7 @@
 #include "TTree.h"
 #include "TMath.h"
 #include "TH1D.h"
+#include "TH2D.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -66,10 +67,16 @@ int main(int argc, char* argv[]) {
     // create histograms
     // TH1D* hjet1pt      = new TH1D("hjet1pt",    "", 100, 0.,  200.);
     TH1D* hjet1pt         = new TH1D("hjet1pt",    "", 75, 0.,  2000.);
+    TH1D* hjet1eta        = new TH1D("hjet1eta",   "", 50, -5.,  5.);
+    TH1D* hjet1phi        = new TH1D("hjet1phi",   "", 72, -1*TMath::Pi(), TMath::Pi());
+    TH2D* hjet1etaphi     = new TH2D("hjet1etaphi","", 100, -5., 5., 72, -1*TMath::Pi(), TMath::Pi());
+
     // TH1D* hjet2pt      = new TH1D("hjet2pt",    "", 100, 0.,  200.);
     TH1D* hjet2pt         = new TH1D("hjet2pt",    "", 75, 0.,  1000.);
-    TH1D* hjet1eta        = new TH1D("hjet1eta",   "", 50, -5.,  5.);
     TH1D* hjet2eta        = new TH1D("hjet2eta",   "", 50, -5.,  5.);
+    TH1D* hjet2phi        = new TH1D("hjet2phi",   "", 72, -1*TMath::Pi(), TMath::Pi());
+    TH2D* hjet2etaphi     = new TH2D("hjet2etaphi","", 100, -5., 5., 72, -1*TMath::Pi(), TMath::Pi());
+
     TH1D* hjetdeta        = new TH1D("hjetdeta",   "", 50,  0.,  10.);
     // TH1D* hjetdphi     = new TH1D("hjetdphi",   "", 72,  0.,  TMath::Pi());
     TH1D* hjetdphi        = new TH1D("hjetdphi",   "", 50,  0.,  TMath::Pi());
@@ -79,6 +86,8 @@ int main(int argc, char* argv[]) {
     TH1D* hmjj            = new TH1D("hmjj",       "", 50, 0.,  4000.);
     // TH1D* hmet         = new TH1D("hmet",       "", 100, 0.,  200.);
     TH1D* hmet            = new TH1D("hmet",       "", 50, 0.,  800.);
+    TH1D* hmetphi        = new TH1D("hmetphi",   "", 72, -1*TMath::Pi(), TMath::Pi());
+
 
     // set up cuts
 
@@ -101,41 +110,58 @@ int main(int argc, char* argv[]) {
 
     // fill histograms
     tree->Draw("jet1Pt>>hjet1pt", ctrl2);
-    tree->Draw("jet2Pt>>hjet2pt", ctrl2);
     tree->Draw("jet1Eta>>hjet1eta", ctrl2);
+    tree->Draw("jet1Phi>>hjet1phi", ctrl2);
+    tree->Draw("jet1Phi:jet1Eta>>hjet1etaphi", ctrl2);
+
+    tree->Draw("jet2Pt>>hjet2pt", ctrl2);
     tree->Draw("jet2Eta>>hjet2eta", ctrl2);
+    tree->Draw("jet2Phi>>hjet2phi", ctrl2);
+    tree->Draw("jet2Phi:jet2Eta>>hjet2etaphi", ctrl2);
+
     tree->Draw("vbfDEta>>hjetdeta", ctrl2);
     tree->Draw("vbfDPhi>>hjetdphi", ctrl2);
     tree->Draw("jmDPhiNMin>>hJetMetDPhiNorm",ctrl2);
     tree->Draw("jmDPhi>>hJetMetDPhi",ctrl2);
     tree->Draw("vbfM>>hmjj", ctrl2);
     tree->Draw("met>>hmet", ctrl1);
+    tree->Draw("metPhi>>hmetphi", ctrl1);
     // scale MC to lumi
     if (!dataset.isData) {
       double weight = lumi * dataset.sigma / dataset.nEvents;
       hjet1pt->Scale(weight);
-      hjet2pt->Scale(weight);
       hjet1eta->Scale(weight);
+      hjet1phi->Scale(weight);
+      hjet1etaphi->Scale(weight);
+      hjet2pt->Scale(weight);
       hjet2eta->Scale(weight);
+      hjet2phi->Scale(weight);
+      hjet2etaphi->Scale(weight);
       hjetdeta->Scale(weight);
       hjetdphi->Scale(weight);
       hJetMetDPhiNorm->Scale(weight);  
       hJetMetDPhi->Scale(weight);  
       hmjj->Scale(weight);
       hmet->Scale(weight);
+      hmetphi->Scale(weight);
     }
 
     // write histograms
     hjet1pt->Write("",TObject::kOverwrite);
-    hjet2pt->Write("",TObject::kOverwrite);
     hjet1eta->Write("",TObject::kOverwrite);
+    hjet1phi->Write("",TObject::kOverwrite);
+    hjet1etaphi->Write("",TObject::kOverwrite);
+    hjet2pt->Write("",TObject::kOverwrite);
     hjet2eta->Write("",TObject::kOverwrite);
+    hjet2phi->Write("",TObject::kOverwrite);
+    hjet2etaphi->Write("",TObject::kOverwrite);
     hjetdeta->Write("",TObject::kOverwrite);
     hjetdphi->Write("",TObject::kOverwrite);
     hJetMetDPhiNorm->Write("",TObject::kOverwrite);
     hJetMetDPhi->Write("",TObject::kOverwrite);
     hmjj->Write("",TObject::kOverwrite);
     hmet->Write("",TObject::kOverwrite);
+    hmetphi->Write("",TObject::kOverwrite);
 
     ofile->Close();    
     ifile->Close();
@@ -145,15 +171,18 @@ int main(int argc, char* argv[]) {
   // list histograms for dataset summing
   std::vector<std::string> hists;
   hists.push_back("hjet1pt");
-  hists.push_back("hjet2pt");
   hists.push_back("hjet1eta");
+  hists.push_back("hjet1phi");
+  hists.push_back("hjet2pt");
   hists.push_back("hjet2eta");
+  hists.push_back("hjet2phi");
   hists.push_back("hjetdeta");
   hists.push_back("hjetdphi");
   hists.push_back("hJetMetDPhiNorm");
   hists.push_back("hJetMetDPhi");
   hists.push_back("hmjj");
   hists.push_back("hmet");
+  hists.push_back("hmetphi");
 
 
   // sum QCD histograms
@@ -244,12 +273,15 @@ int main(int argc, char* argv[]) {
   plots.dumpInfo(std::cout);
 
   plots.draw("hjet1pt", "Leading jet p_{T} [GeV]", "N_{events}");
-  plots.draw("hjet2pt", "Sub-leading jet p_{T} [GeV]", "N_{events}");
   plots.draw("hjet1eta", "Leading jet #eta", "N_{events}");
+  plots.draw("hjet1phi", "Leading jet #phi", "N_{events}");
+  plots.draw("hjet2pt", "Sub-leading jet p_{T} [GeV]", "N_{events}");
   plots.draw("hjet2eta", "Sub-leading jet #eta", "N_{events}");
+  plots.draw("hjet2phi", "Sub-leading jet #phi", "N_{events}");
   plots.draw("hjetdeta", "#Delta #eta_{jj}", "N_{events}");
   plots.draw("hmjj", "M_{jj} [GeV]", "N_{events}");
   plots.draw("hmet", "E_{T}^{miss} [GeV]", "N_{events}");
+  plots.draw("hmetphi", "#phi (E_{T}^{miss}) [GeV]", "N_{events}");
   plots.setYMin(1e-1);
   plots.draw("hjetdphi", "#Delta #phi_{jj} [GeV]", "N_{events}");
   plots.draw("hJetMetDPhi", "#Delta #phi_{j-#slash{E}_{T}} [GeV]", "N_{events}");
