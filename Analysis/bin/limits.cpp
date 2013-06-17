@@ -69,7 +69,6 @@ int main(int argc, char* argv[]) {
   std::string oDir = options.oDir;
   double lumi = options.lumi;
 
-
   // read background estimates from file
   std::cout << "Backgrounds" << std::endl;
   double bgZjets(0.), err_bgZjets(0.);
@@ -77,7 +76,7 @@ int main(int argc, char* argv[]) {
   double bgQCD(0.), err_bgQCD(0.);
   double bgOther(0.), err_bgOther(0.);
   double nObs(0.);
-
+  
   ifstream file;
   double n(0.), err_n(0.);
   std::string name;
@@ -128,7 +127,7 @@ int main(int argc, char* argv[]) {
 
   // read signal efficiencies from cut flow histograms
   std::cout << "Signal efficiency" << std::endl;
- std:;cout << std::endl;
+  std::cout << std::endl;
 
   std::vector<double> mH, xsH, effSignal, err_effSignal;
 
@@ -143,6 +142,8 @@ int main(int argc, char* argv[]) {
 
   std::cout << "mass\txs\teff\terr" << std::endl;
 
+  Cuts cuts;
+  double nCuts = cuts.nCuts();
   for (unsigned i=0; i<mH.size(); ++i) {
     std::string name("hCutFlow_SignalM");
     stringstream ss;
@@ -150,8 +151,8 @@ int main(int argc, char* argv[]) {
     name += ss.str();
     name += std::string("_POWHEG");
     TH1D* h = (TH1D*) sigFile->Get(name.c_str());
-    double n = h->GetBinContent(10);
-    double err = h->GetBinError(10);
+    double n = h->GetBinContent(nCuts);
+    double err = h->GetBinError(nCuts);
     effSignal.push_back (n / (lumi * xsH.at(i)) );
     err_effSignal.push_back (err / (lumi * xsH.at(i)) );
     std::cout << mH.at(i) << "\t" << xsH.at(i) << "\t" << effSignal.at(i) << "\t" << err_effSignal.at(i) << std::endl;
