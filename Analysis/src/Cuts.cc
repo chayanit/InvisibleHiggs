@@ -4,7 +4,7 @@
 Cuts::Cuts() {
 
   addCut("trigger",    "hltResult2>0.");
-  addCut("metFilter",  "metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
+  addCut("metFilter",  "metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");// && !(abs(jet1Phi+1.5)<0.3 && abs(jet1Eta+2.3)<0.3) && !(abs(jet1Phi+0.7)<0.3 && abs(jet1Eta-1.6)<0.3) && !(abs(jet2Phi+1.5)<0.3 && abs(jet2Eta+2.3)<0.3) && !(abs(jet2Phi+0.7)<0.3 && abs(jet2Eta-1.6)<0.3) && !(abs(jet3Phi+1.5)<0.3 && abs(jet3Eta+2.3)<0.3) && !(abs(jet3Phi+0.7)<0.3 && abs(jet3Eta-1.6)<0.3)");
   addCut("EVeto",      "ele1Pt<10.");
   addCut("MuVeto",     "mu1Pt<10.");
   addCut("dijet",      "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7");
@@ -12,6 +12,7 @@ Cuts::Cuts() {
   addCut("dEtaJJ",     "vbfDEta>4.2");
   addCut("MET",        "met>130.");
   addCut("Mjj",        "vbfM>1200.");
+  addCut("CJV",        "cenJetEt<30.");
   addCut("dPhiJJ",     "vbfDPhi<1.0");
 
   addZMuMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
@@ -21,7 +22,8 @@ Cuts::Cuts() {
   addZMuMuCut("dEtaJJ",    "vbfDEta>4.2");
   addZMuMuCut("MET",       "metNo2Muon>130.");
   addZMuMuCut("Mjj",       "vbfM>1200.");
-  addZMuMuCut("dPhiJJ",     "vbfDPhi<1.0");
+  addZMuMuCut("CJV",       "cenJetEt<30.");
+  addZMuMuCut("dPhiJJ",    "vbfDPhi<1.0");
 
   addWMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
   addWMuCut("wMu",       "nW>0 && wChannel==1");
@@ -30,6 +32,7 @@ Cuts::Cuts() {
   addWMuCut("dEtaJJ",    "vbfDEta>4.2");
   addWMuCut("MET",       "metNoWLepton>130.");
   addWMuCut("Mjj",       "vbfM>1200.");
+  addWMuCut("CJV",       "cenJetEt<30.");
   addWMuCut("dPhiJJ",    "vbfDPhi<1.0");
 
   addWElCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
@@ -39,6 +42,7 @@ Cuts::Cuts() {
   addWElCut("dEtaJJ",    "vbfDEta>4.2");
   addWElCut("MET",       "metNoWLepton>130.");
   addWElCut("Mjj",       "vbfM>1200.");
+  addWElCut("CJV",       "cenJetEt<30.");
   addWElCut("dPhiJJ",    "vbfDPhi<1.0");
 
 }
@@ -189,6 +193,7 @@ TCut Cuts::vbf() {
   tmp += cut("sgnEtaJJ");
   tmp += cut("dEtaJJ");
   tmp += cut("Mjj");
+  tmp += cut("CJV");
   return tmp;
 }
 
@@ -275,6 +280,7 @@ TCut Cuts::wMuVBF() {
   tmp += cutWMu("dijet");
   tmp += cutWMu("dEtaJJ");
   tmp += cutWMu("Mjj");
+  tmp += cutWMu("CJV");
   return tmp;
 }
 
@@ -300,6 +306,7 @@ TCut Cuts::wElVBF() {
   tmp += cutWEl("dijet");
   tmp += cutWEl("dEtaJJ");
   tmp += cutWEl("Mjj");
+  tmp += cutWEl("CJV");
   return tmp;
 }
 

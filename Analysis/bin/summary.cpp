@@ -46,6 +46,8 @@ int main(int argc, char* argv[]) {
   TH1D* hWMu = (TH1D*) wFile->Get("hWMu_EstS_DPhi");
   TH1D* hWEl = (TH1D*) wFile->Get("hWEl_EstS_DPhi");
   TH1D* hQCD = (TH1D*) qFile->Get("hQCD_Est_S_DPhi");
+
+  // get results from bin 1 which is dphi<1.0
   double nBG_Z     = hZ->GetBinContent(1);
   double errBG_Z   = hZ->GetBinError(1);
   double nBG_WMu   = hWMu->GetBinContent(1);
@@ -65,20 +67,23 @@ int main(int argc, char* argv[]) {
   TH1D* hWTauHad = (TH1D*) mcFile->Get("hCutFlow_WTauNu");
   TH1D* hSingleT = (TH1D*) mcFile->Get("hCutFlow_SingleTSum");
   TH1D* hDiboson = (TH1D*) mcFile->Get("hCutFlow_Diboson");
-  double nBG_TTBar     = hTTBar->GetBinContent(10);
-  double errBG_TTBar   = hTTBar->GetBinError(10);
-  double nBG_ZMC       = hZNuNuMC->GetBinContent(10);
-  double errBG_ZMC     = hZNuNuMC->GetBinError(10);
-  double nBG_WMuMC     = hWMuMC->GetBinContent(10);
-  double errBG_WMuMC   = hWMuMC->GetBinError(10);
-  double nBG_WElMC     = hWElMC->GetBinContent(10);
-  double errBG_WElMC   = hWElMC->GetBinError(10);
-  double nBG_WTauHad   = hWTauHad->GetBinContent(10);
-  double errBG_WTauHad = hWTauHad->GetBinError(10);
-  double nBG_SingleT   = hSingleT->GetBinContent(10);
-  double errBG_SingleT = hSingleT->GetBinError(10);
-  double nBG_Diboson   = hDiboson->GetBinContent(10);
-  double errBG_Diboson = hDiboson->GetBinError(10);
+
+  // get results from last bin, which is after all cuts
+  int nCuts = cuts.nCuts();
+  double nBG_TTBar     = hTTBar->GetBinContent(nCuts);
+  double errBG_TTBar   = hTTBar->GetBinError(nCuts);
+  double nBG_ZMC       = hZNuNuMC->GetBinContent(nCuts);
+  double errBG_ZMC     = hZNuNuMC->GetBinError(nCuts);
+  double nBG_WMuMC     = hWMuMC->GetBinContent(nCuts);
+  double errBG_WMuMC   = hWMuMC->GetBinError(nCuts);
+  double nBG_WElMC     = hWElMC->GetBinContent(nCuts);
+  double errBG_WElMC   = hWElMC->GetBinError(nCuts);
+  double nBG_WTauHad   = hWTauHad->GetBinContent(nCuts);
+  double errBG_WTauHad = hWTauHad->GetBinError(nCuts);
+  double nBG_SingleT   = hSingleT->GetBinContent(nCuts);
+  double errBG_SingleT = hSingleT->GetBinError(nCuts);
+  double nBG_Diboson   = hDiboson->GetBinContent(nCuts);
+  double errBG_Diboson = hDiboson->GetBinError(nCuts);
 
   // calculate some numbers
   double nBG_Total = (nBG_Z +
