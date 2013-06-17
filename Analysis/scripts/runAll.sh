@@ -1,10 +1,11 @@
 #!/bin/sh
 
 VER=v11
+FILEVER=v11c
 LUMI=19576
 
-IDIR=/storage/phjjb/invisibleHiggs/InvHiggsInfo_$VER/Central
-ODIR=InvHiggsInfo_$VER
+IDIR=/storage/phjjb/invisibleHiggs/InvHiggsInfo_$FILEVER/Central
+ODIR=InvHiggsInfo_$FILEVER
 
 echo "Deleting and recreating $ODIR"
 if [ -d "$ODIR" ]; then
@@ -22,36 +23,39 @@ echo "efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
 efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/efficiency.log
 
 echo "nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-echo "Not working yet!"
-echo ""
 nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/nMinusOne.log
+echo ""
 
 # MC vs data
 echo "controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-echo "Not working yet !"
+controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/controlPlots.log
 echo ""
-#controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/controlPlots.log
 
 # BG estimates
 echo "wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI"
 wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI > $ODIR/wBackground.log
+echo ""
 
 echo "zBackground -i $IDIR -o $ODIR -f $DATASETS_Z -l $LUMI"
 zBackground -i $IDIR -o $ODIR -f $DATASETS_Z -l $LUMI > $ODIR/zBackground.log
+echo ""
 
 echo "qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI"
 qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground.log
+echo ""
 
 echo "summary -o $ODIR $LUMI"
 summary -o $ODIR -l $LUMI > $ODIR/summary.log
+echo ""
 
 # homegrown limits
 echo "limits -o $ODIR $LUMI"
 limits -o $ODIR -l $LUMI > $ODIR/limits.log
+echo ""
 
 # combine tool limits
 echo "combine -M Asymptotic $ODIR/card.txt"
-combine -M Asymptotic $ODIR/card.txt
+#combine -M Asymptotic $ODIR/card.txt
 
 echo "combine -M HybridNew --rule CLs --testStat LEP $ODIR/card.txt"
 echo "Not running this now because it takes forever!"
