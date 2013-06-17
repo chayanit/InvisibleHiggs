@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
   // calculate factors for combine tool
   TFile* sigFile = TFile::Open((oDir+std::string("/Efficiency.root")).c_str(), "READ");
   TH1D* sigCutFlow = (TH1D*) sigFile->Get("hCutFlow_SignalM125_POWHEG");
-  double nSig = sigCutFlow->GetBinContent(10);
+  double nSig = sigCutFlow->GetBinContent(nCuts);
 
   TH1D* zCtrl = (TH1D*) zFile->Get("hZ_Data_C_DPhi");
   int nCtrlZ = zCtrl->GetBinContent(1);
