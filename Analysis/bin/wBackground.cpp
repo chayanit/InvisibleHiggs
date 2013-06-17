@@ -142,24 +142,24 @@ int main(int argc, char* argv[]) {
 
     // different cuts for W MC
     if (isWJets) {
-      cutWMu_C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF() + cuts.cutWMu("MET"));
+      cutWMu_C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
       cutWMu_S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cuts.allCutsNoDPhi());
-      cutWEl_C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.wElVBF() + cuts.cutWEl("MET"));
+      cutWEl_C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
       cutWEl_S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.allCutsNoDPhi());
 
-      cutWMu_NoMETC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF() );
+      cutWMu_NoMETC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() );
       cutWMu_NoMETS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi);
-      cutWEl_NoMETC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.wElVBF() );
+      cutWEl_NoMETC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() );
       cutWEl_NoMETS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi);
 
-      cutWMu_Loose2C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF() + metCtrl35);
+      cutWMu_Loose2C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() + metCtrl35);
       cutWMu_Loose2S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi + met35);
-      cutWEl_Loose2C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.wElVBF() + metCtrl35);
+      cutWEl_Loose2C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl35);
       cutWEl_Loose2S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met35);
 
-      cutWMu_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cuts.wMuVBF() + metCtrl70);
+      cutWMu_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() + metCtrl70);
       cutWMu_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi + met70);
-      cutWEl_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.wElVBF() + metCtrl70);
+      cutWEl_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl70);
       cutWEl_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met70);
     }
     else {
