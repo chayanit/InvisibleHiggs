@@ -45,10 +45,12 @@ int main(int argc, char* argv[]) {
   TCut wWeight = cuts.wWeight();
 
   TCut cutSignalNoMETNoDPhi = cuts.HLTandMETFilters() + cuts.leptonVeto() + cuts.vbf();
-  TCut met35("met>35.");
-  TCut metCtrl35("metNoWLepton>35.");
-  TCut met70("met>70.");
-  TCut metCtrl70("metNoWLepton>70.");
+  TCut met80("met>80.");
+  TCut metCtrl80("metNoWLepton>80.");
+  TCut met90("met>90.");
+  TCut metCtrl90("metNoWLepton>90.");
+  TCut met100("met>100.");
+  TCut metCtrl100("metNoWLepton>100.");
 
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
@@ -62,7 +64,7 @@ int main(int argc, char* argv[]) {
   TH1D* hWEl_MCS_DPhi = new TH1D("hWEl_MCS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
   TH1D* hWEl_BGC_DPhi = new TH1D("hWEl_BGC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
   TH1D* hWEl_DataC_DPhi = new TH1D("hWEl_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
-
+  // MET > 80
   TH1D* hWMu_MC_NoMETC_DPhi = new TH1D("hWMu_MC_NoMETC_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
   TH1D* hWMu_MC_NoMETS_DPhi = new TH1D("hWMu_MC_NoMETS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
   TH1D* hWMu_BG_NoMETC_DPhi = new TH1D("hWMu_BG_NoMETC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
@@ -72,7 +74,7 @@ int main(int argc, char* argv[]) {
   TH1D* hWEl_MC_NoMETS_DPhi = new TH1D("hWEl_MC_NoMETS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
   TH1D* hWEl_BG_NoMETC_DPhi = new TH1D("hWEl_BG_NoMETC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
   TH1D* hWEl_Data_NoMETC_DPhi = new TH1D("hWEl_Data_NoMETC_DPhi", "", 3, dphiEdges);  // Data ctrl region
-
+  // MET > 90
   TH1D* hWMu_MC_Loose2C_DPhi = new TH1D("hWMu_MC_Loose2C_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
   TH1D* hWMu_MC_Loose2S_DPhi = new TH1D("hWMu_MC_Loose2S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
   TH1D* hWMu_BG_Loose2C_DPhi = new TH1D("hWMu_BG_Loose2C_DPhi", "", 3, dphiEdges);  // background MC ctrl region
@@ -82,7 +84,7 @@ int main(int argc, char* argv[]) {
   TH1D* hWEl_MC_Loose2S_DPhi = new TH1D("hWEl_MC_Loose2S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
   TH1D* hWEl_BG_Loose2C_DPhi = new TH1D("hWEl_BG_Loose2C_DPhi", "", 3, dphiEdges);  // background MC ctrl region
   TH1D* hWEl_Data_Loose2C_DPhi = new TH1D("hWEl_Data_Loose2C_DPhi", "", 3, dphiEdges);  // Data ctrl region
-
+  // MET > 100
   TH1D* hWMu_MC_LooseC_DPhi = new TH1D("hWMu_MCC_LooseC_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
   TH1D* hWMu_MC_LooseS_DPhi = new TH1D("hWMu_MCC_LooseS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
   TH1D* hWMu_BG_LooseC_DPhi = new TH1D("hWMu_BGC_LooseC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
@@ -147,20 +149,20 @@ int main(int argc, char* argv[]) {
       cutWEl_C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
       cutWEl_S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.allCutsNoDPhi());
 
-      cutWMu_NoMETC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() );
-      cutWMu_NoMETS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi);
-      cutWEl_NoMETC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() );
-      cutWEl_NoMETS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi);
+      cutWMu_NoMETC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() + metCtrl80);
+      cutWMu_NoMETS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi + met80);
+      cutWEl_NoMETC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl80);
+      cutWEl_NoMETS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met80);
 
-      cutWMu_Loose2C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() + metCtrl35);
-      cutWMu_Loose2S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi + met35);
-      cutWEl_Loose2C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl35);
-      cutWEl_Loose2S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met35);
+      cutWMu_Loose2C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() + metCtrl90);
+      cutWMu_Loose2S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi + met90);
+      cutWEl_Loose2C = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl90);
+      cutWEl_Loose2S = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met90);
 
-      cutWMu_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() + metCtrl70);
-      cutWMu_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi + met70);
-      cutWEl_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl70);
-      cutWEl_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met70);
+      cutWMu_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuVBF() + metCtrl100);
+      cutWMu_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi + met100);
+      cutWEl_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl100);
+      cutWEl_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met100);
     }
     else {
       cutWMu_C = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
@@ -168,20 +170,20 @@ int main(int argc, char* argv[]) {
       cutWEl_C = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
       cutWEl_S = puWeight * trigCorrWeight * (cutD + cuts.allCutsNoDPhi());
 
-      cutWMu_NoMETC = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() );
-      cutWMu_NoMETS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi);
-      cutWEl_NoMETC = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() );
-      cutWEl_NoMETS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi);
+      cutWMu_NoMETC = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() + metCtrl80);
+      cutWMu_NoMETS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met80);
+      cutWEl_NoMETC = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + metCtrl80);
+      cutWEl_NoMETS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met80);
 
-      cutWMu_Loose2C = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() + metCtrl35);
-      cutWMu_Loose2S = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met35);
-      cutWEl_Loose2C = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + metCtrl35);
-      cutWEl_Loose2S = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met35);
+      cutWMu_Loose2C = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() + metCtrl90);
+      cutWMu_Loose2S = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met90);
+      cutWEl_Loose2C = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + metCtrl90);
+      cutWEl_Loose2S = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met90);
 
-      cutWMu_LooseC = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() + metCtrl70);
-      cutWMu_LooseS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met70);
-      cutWEl_LooseC = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + metCtrl70);
-      cutWEl_LooseS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met70);
+      cutWMu_LooseC = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() + metCtrl100);
+      cutWMu_LooseS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met100);
+      cutWEl_LooseC = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + metCtrl100);
+      cutWEl_LooseS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met100);
     }
 
     //    std::cout << "  cutWMu_C   " << cutWEl_C << std::endl;
@@ -333,10 +335,19 @@ int main(int argc, char* argv[]) {
 
     for (unsigned c=0; c<nCutsWMu; ++c) {
 
-      TCut cut = puWeight * (cutD + cuts.cutflowWMu(c));
-//      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
-      if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
-
+      TCut cut;
+      if(c == nCutsWMu-1)
+        {
+          cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowWMu(c));
+          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+          if(isWJets) cut = puWeight * trigCorrWeight * wWeight * (cuts.cutflowWMu(c));
+        }
+      else
+        {
+          cut = puWeight * (cutD + cuts.cutflowWMu(c));
+          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+          if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+        }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
 
@@ -348,10 +359,19 @@ int main(int argc, char* argv[]) {
 
     for (unsigned c=0; c<nCutsWEl; ++c) {
 
-      TCut cut = puWeight * (cutD + cuts.cutflowWEl(c));
-//      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
-      if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
-
+      TCut cut;
+      if(c == nCutsWMu-1)
+        {
+          cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowWEl(c));
+          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+          if(isWJets) cut = puWeight * trigCorrWeight * wWeight * (cuts.cutflowWEl(c));
+        }
+      else
+        {
+          cut = puWeight * (cutD + cuts.cutflowWEl(c));
+          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+          if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+        }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
 

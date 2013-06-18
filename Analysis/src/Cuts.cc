@@ -334,6 +334,7 @@ TCut Cuts::qcdNoMET() {
   tmp += cut("EVeto");
   tmp += cut("MuVeto");
   tmp += vbf();
+  tmp += TCut("met>80.");
   return tmp;
 }
 
@@ -343,7 +344,7 @@ TCut Cuts::qcdLoose2() {
   tmp += cut("EVeto");
   tmp += cut("MuVeto");
   tmp += vbf();
-  tmp += TCut("met>35.");
+  tmp += TCut("met>90.");
   return tmp;
 }
 
@@ -353,7 +354,7 @@ TCut Cuts::qcdLoose() {
   tmp += cut("EVeto");
   tmp += cut("MuVeto");
   tmp += vbf();
-  tmp += TCut("met>70.");
+  tmp += TCut("met>100.");
   return tmp;
 }
 
