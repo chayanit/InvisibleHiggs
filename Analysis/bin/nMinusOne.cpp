@@ -50,6 +50,7 @@ int main(int argc, char* argv[]) {
   TCut met       = cuts.nMinusOneCuts("MET");
   TCut mJJ       = cuts.nMinusOneCuts("Mjj");
   TCut dPhiJJ    = cuts.nMinusOneCuts("dPhiJJ");
+  TCut cjv       = cuts.nMinusOneCuts("CJV");
 
   // loop over datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
@@ -121,8 +122,8 @@ int main(int argc, char* argv[]) {
     tree->Draw("vbfDPhi>>hDPhiJJNM1", (dPhiJJ + cutD) * otherCuts);
     tree->Draw("ele1Pt>>hEVetoNM1", (eVeto + cutD) * otherCuts);
     tree->Draw("mu1Pt>>hMuVetoNM1", (muVeto + cutD) * otherCuts);
-    tree->Draw("cenJetEt>>hCenEtNM1", (cuts.allCuts() + cutD) * otherCuts);
-    tree->Draw("cenJetEta>>hCenEtaNM1", (cuts.allCuts() + cutD) * otherCuts);
+    tree->Draw("cenJetEt>>hCenEtNM1", (cjv + cutD) * otherCuts);
+    tree->Draw("cenJetEta>>hCenEtaNM1", (cjv + cutD) * otherCuts);
 
     // Scale MC according to luminosity
     if (!dataset.isData) {
