@@ -11,7 +11,7 @@ Cuts::Cuts() {
   addCut("sgnEtaJJ",   "(jet1Eta*jet2Eta)<0.");
   addCut("dEtaJJ",     "vbfDEta>4.2");
   addCut("MET",        "met>130.");
-  addCut("Mjj",        "vbfM>1200.");
+  addCut("Mjj",        "vbfM>1100.");
   addCut("CJV",        "cenJetEt<30.");
   addCut("dPhiJJ",     "vbfDPhi<1.0");
 
@@ -21,7 +21,7 @@ Cuts::Cuts() {
   addZMuMuCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addZMuMuCut("dEtaJJ",    "vbfDEta>4.2");
   addZMuMuCut("MET",       "metNo2Muon>130.");
-  addZMuMuCut("Mjj",       "vbfM>1200.");
+  addZMuMuCut("Mjj",       "vbfM>1100.");
   addZMuMuCut("CJV",       "cenJetEt<30.");
   addZMuMuCut("dPhiJJ",    "vbfDPhi<1.0");
 
@@ -41,7 +41,7 @@ Cuts::Cuts() {
   addWElCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addWElCut("dEtaJJ",    "vbfDEta>4.2");
   addWElCut("MET",       "metNoWLepton>130.");
-  addWElCut("Mjj",       "vbfM>1200.");
+  addWElCut("Mjj",       "vbfM>1100.");
   addWElCut("CJV",       "cenJetEt<30.");
   addWElCut("dPhiJJ",    "vbfDPhi<1.0");
 
