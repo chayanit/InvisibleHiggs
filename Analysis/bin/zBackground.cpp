@@ -33,6 +33,12 @@ int main(int argc, char* argv[]) {
  
   std::string oDir_Plot = options.oDir+std::string("/ZBackground");
 
+  boost::filesystem::path opath(oDir_Plot);
+  if (!exists(opath)) {
+    std::cout << "Creating output directory : " << oDir_Plot << std::endl;
+    boost::filesystem::create_directory(opath);
+  }
+
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "RECREATE");
 
