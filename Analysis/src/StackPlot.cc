@@ -47,7 +47,7 @@ void StackPlot::setLegPos(float x1, float y1, float x2, float y2) {
   legY2_ = y2;
 }
 
-void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) {
+void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, bool drawRatioPlot) {
 
   std::cout << "Drawing " << hname << " " << std::endl;
 
@@ -59,7 +59,14 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
   TCanvas canvas;
 
   canvas.SetLogy();
-
+  TPad *pad1; // Use TPad to allow us to draw ratio plot below main plot
+  if (drawRatioPlot)
+    pad1 = new TPad("pad1","",0,0.31,1,1);
+  else
+    pad1 = new TPad("pad1","",0,0,1,1);
+  pad1->Draw();
+  pad1->cd();
+  pad1->SetLogy();
   THStack stack("hs", (hname+std::string(" stack")).c_str());
 
   TLegend leg(legX1_, legY1_, legX2_, legY2_);
@@ -85,11 +92,14 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
 
     if (h==0) {
       std::cout << "No histogram " << hname << " in file " << labels_.at(i) << std::endl;
-      break;
+      continue;
     }
 
-    double min = h->GetMinimum();
-    if ((min < ymin)&&(min>0)) ymin = min;
+    if (styles_.at(i) == 0) {
+      double min = h->GetMinimum(0);
+      if (min != 0) ymin = min;
+    }
+    if (ymin != 1) break;
   }
 
   /////////////////////////////////
@@ -116,6 +126,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
       	std::cout << "No entries in histogram " << labels_.at(i) << std::endl;
       	continue;
       }
+      
       drawStack=true;
       // h->SetLineColor(cols_.at(i));
       // h->SetLineWidth(0);
@@ -154,7 +165,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
   /////////////////////////////////
   // draw non-stacked histograms //
   /////////////////////////////////
-  
+  TH1D* hData;
   file = files_.begin();
   i=0;
   for (; file!=files_.end(); ++file, ++i) {
@@ -174,11 +185,13 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
     // data
     if (styles_.at(i) == 1) {
       h->SetMarkerStyle(8);
+      h->SetLineColor(kBlack);
       h->SetMarkerColor(cols_.at(i));
       // leg.AddEntry(h, "Data", "P");
       TLegendEntry *legE = new TLegendEntry(h, "Data", "P");
       entries.push_back(legE);
       h->Draw("PE SAME");
+      hData = (TH1D*)h->Clone("hData");
     }
 
     // signal
@@ -204,6 +217,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
   else if (!hname.compare("hMjjNM1")) cutVal = 1200.;
   else if (!hname.compare("hMETNM1")) cutVal = 130.;
   else if (!hname.compare("hDPhiJJNM1")) cutVal = 1.0;
+  else if (!hname.compare("hCenEtNM1")) cutVal = 30.0;
 
   if (cutVal != 0) {
     TLine *cutLine = new TLine(cutVal,0,cutVal,stack.GetMaximum()*1.5);
@@ -236,6 +250,51 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle) 
     leg.AddEntry(entries.at(n)->GetObject(), entries.at(n)->GetLabel(), entries.at(n)->GetOption());
   }
   leg.Draw();
+
+  canvas.cd();
+
+  if (drawRatioPlot){
+    // Draw ratio plot time!
+    TPad *pad2 = new TPad("pad2","",0,0.05,1,0.30);
+    pad2->Draw();
+    pad2->cd();
+
+     // Little hack here to get sum of hists in the THStack
+     // ROOT doesn't have a method to convert a THStack to a TH1 for some stupid reason
+     // Good ol' Rene...
+     
+    TList *histList = stack.GetHists();
+    TIter next(histList); // Get list of hists in Stack
+    TH1 *hMC  = (TH1*) histList->First()->Clone();
+    TObject *obj;
+    while ((obj = next())) // Loop through all hists in stack
+    {
+      // skip first object since it's used by creating the histogram                               
+      if(obj == histList->First()) continue;
+      hMC -> Add((TH1*)obj);
+    }
+
+    hData->Divide(hMC);
+    hData->SetMarkerStyle(8);
+    // hData->Draw("ep");
+    hData->SetXTitle(xTitle.c_str());
+    hData->SetYTitle("Data/MC");
+    hData->GetXaxis()->SetTitleSize(0.1);
+    hData->GetXaxis()->SetLabelSize(0.1);
+    hData->GetYaxis()->SetTitleSize(0.1);
+    hData->GetYaxis()->SetLabelSize(0.1);
+    hData->GetXaxis()->SetTitleOffset(0.9);
+    hData->GetYaxis()->SetTitleOffset(0.9);
+    hData->Draw("ep");
+    double lineMin = hData->GetXaxis()->GetXmin();
+    double lineMax = hData->GetXaxis()->GetXmax();
+    TLine *line = new TLine(lineMin,1,lineMax,1);
+    line->SetLineColor(kBlack);
+    line->SetLineWidth(2);
+    line->SetLineStyle(7);
+    line->Draw();
+    canvas.cd();
+  }
 
   std::string filename = dir_+std::string("/")+hname+std::string("_log.pdf");
   std::cout << "Writing file " << filename << std::endl;
