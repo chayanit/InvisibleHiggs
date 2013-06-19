@@ -30,6 +30,8 @@ int main(int argc, char* argv[]) {
   // input datasets
   Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
+ 
+  std::string oDir_Plot = options.oDir+std::string("/ZBackground");
 
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "RECREATE");
@@ -301,16 +303,57 @@ int main(int argc, char* argv[]) {
 
     delete hZ_CutFlow;
 
-    // control plots
-    TCut cutPlots = puWeight * cuts.zMuMuVBF();
+    // Z control plots
+    TCut cutPlots = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBFLoose());
+ 
+    TFile* ofile_Plot = TFile::Open( (oDir_Plot+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
-    hname = std::string("hZ_mZ_")+dataset.name;
-    TH1D* hZ_mZ = new TH1D(hname.c_str(), "", 30, 60., 120.);
-    std::string str = std::string("zMass>>")+hname;
-    tree->Draw(str.c_str(), cutPlots);
+    TH1D* hZ_mZ	  	  = new TH1D("hZ_mZ",	     "", 30, 60., 120.);
+    TH1D* hZ_pT           = new TH1D("hZ_pT",        "", 30, 0.,  600.);
+    TH1D* hZ_jet1pt       = new TH1D("hZ_jet1pt",    "", 75, 0.,  2000.);
+    TH1D* hZ_jet1eta      = new TH1D("hZ_jet1eta",   "", 50, -5., 5.);
+    TH1D* hZ_jet2pt       = new TH1D("hZ_jet2pt",    "", 75, 0.,  1000.);
+    TH1D* hZ_jet2eta      = new TH1D("hZ_jet2eta",   "", 50, -5., 5.);
+    TH1D* hZ_jetdeta      = new TH1D("hZ_jetdeta",   "", 50, 0.,  10.);
+    TH1D* hZ_mjj          = new TH1D("hZ_mjj",       "", 50, 0.,  4000.);
+    TH1D* hZ_met          = new TH1D("hZ_met",       "", 50, 0.,  800.);
+    TH1D* hZ_jetdphi      = new TH1D("hZ_jetdphi",   "", 50, 0.,  TMath::Pi());
+
+    tree->Draw("zMass>>hZ_mZ"		, cutPlots);
+    tree->Draw("zPt>>hZ_pT"		, cutPlots);
+    tree->Draw("jet1Pt>>hZ_jet1pt"	, cutPlots);
+    tree->Draw("jet1Eta>>hZ_jet1eta"	, cutPlots);
+    tree->Draw("jet2Pt>>hZ_jet2pt"	, cutPlots);
+    tree->Draw("jet2Eta>>hZ_jet2eta"	, cutPlots);
+    tree->Draw("vbfDEta>>hZ_jetdeta"	, cutPlots);
+    tree->Draw("vbfM>>hZ_mjj"		, cutPlots);
+    tree->Draw("met>>hZ_met"		, cutPlots);
+    tree->Draw("vbfDPhi>>hZ_jetdphi"	, cutPlots);
+
     hZ_mZ->Scale(weight);
-    hZ_mZ->Write("",TObject::kOverwrite);
+    hZ_pT->Scale(weight);
+    hZ_jet1pt->Scale(weight);
+    hZ_jet1eta->Scale(weight);
+    hZ_jet2pt->Scale(weight);
+    hZ_jet2eta->Scale(weight);
+    hZ_jetdeta->Scale(weight);
+    hZ_mjj->Scale(weight);
+    hZ_met->Scale(weight);
+    hZ_jetdphi->Scale(weight);
 
+    ofile_Plot->cd();
+    hZ_mZ->Write("",TObject::kOverwrite);
+    hZ_pT->Write("",TObject::kOverwrite);
+    hZ_jet1pt->Write("",TObject::kOverwrite);
+    hZ_jet1eta->Write("",TObject::kOverwrite);
+    hZ_jet2pt->Write("",TObject::kOverwrite);
+    hZ_jet2eta->Write("",TObject::kOverwrite);
+    hZ_jetdeta->Write("",TObject::kOverwrite);
+    hZ_mjj->Write("",TObject::kOverwrite);
+    hZ_met->Write("",TObject::kOverwrite);
+    hZ_jetdphi->Write("",TObject::kOverwrite);
+
+    ofile_Plot->Close();
 
     // clean up
     delete tree;
@@ -492,92 +535,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_S_DPhi->GetBinError(1) << "(stat.) + " << 0.0169 * hZ_Est_S_DPhi->GetBinContent(1) << ", - " << 0.0311 * hZ_Est_S_DPhi->GetBinContent(1) << "(syst.)" << std::endl;
   std::cout << "#####################################################################################" << std::endl;
   std::cout << std::endl << std::endl;
-  /*
-  std::cout << std::endl;
-  std::cout << "###################################### MET > 80 ######################################" << std::endl;
-  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
-  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_NoMET_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_NoMET_EffVBFS->GetBinError(1) << std::endl;
-  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_NoMET_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_NoMET_EffVBFC->GetBinError(1) << std::endl;
-  std::cout << "  ratio_vbf by histogram : " << hZ_DY_NoMET_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_NoMET_RatioVBF->GetBinError(1) << std::endl;
-  std::cout << "  total eff by histogram : " << hZ_DY_NoMET_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_NoMET_TotalEff->GetBinError(1) << std::endl;
-  std::cout << std::endl;
 
-  std::cout << std::endl;
-  std::cout << "dphi>2.6" << std::endl;
-  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_NoMETC_DPhi->GetBinContent(3) << " +/- " << hZ_DY_NoMETC_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_NoMETC_DPhi->GetBinContent(3) << " +/- " << hZ_BG_NoMETC_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_NoMETC_DPhi->GetBinContent(3) << " +/- " << hZ_Data_NoMETC_DPhi->GetBinError(3) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_NoMETC_DPhi->GetBinContent(3) << " +/- " << hZ_Est_NoMETC_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_NoMETS_DPhi->GetBinContent(3) << " +/- " << hZ_Est_NoMETS_DPhi->GetBinError(3) << std::endl;
-  std::cout << std::endl << std::endl;
-  std::cout << "dphi<1.0" << std::endl;
-  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_NoMETC_DPhi->GetBinContent(1) << " +/- " << hZ_DY_NoMETC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_NoMETC_DPhi->GetBinContent(1) << " +/- " << hZ_BG_NoMETC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_NoMETC_DPhi->GetBinContent(1) << " +/- " << hZ_Data_NoMETC_DPhi->GetBinError(1) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_NoMETC_DPhi->GetBinContent(1) << " +/- " << hZ_Est_NoMETC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_NoMETS_DPhi->GetBinContent(1) << " +/- " << hZ_Est_NoMETS_DPhi->GetBinError(1) << std::endl;
-  std::cout << "#####################################################################################" << std::endl;
-  std::cout << std::endl << std::endl;
-
-
-  std::cout << std::endl;
-  std::cout << "##################################### MET > 90 ######################################" << std::endl;
-  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
-  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_Loose2_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_Loose2_EffVBFS->GetBinError(1) << std::endl;
-  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_Loose2_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_Loose2_EffVBFC->GetBinError(1) << std::endl;
-  std::cout << "  ratio_vbf by histogram : " << hZ_DY_Loose2_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_Loose2_RatioVBF->GetBinError(1) << std::endl;
-  std::cout << "  total eff by histogram : " << hZ_DY_Loose2_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_Loose2_TotalEff->GetBinError(1) << std::endl;
-  std::cout << std::endl;
-
-  std::cout << std::endl;
-  std::cout << "dphi>2.6" << std::endl;
-  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_Loose2C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_Loose2C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_Loose2C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_Loose2C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_Loose2C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_Loose2C_DPhi->GetBinError(3) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_Loose2C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_Loose2C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_Loose2S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_Loose2S_DPhi->GetBinError(3) << std::endl;
-  std::cout << std::endl << std::endl;
-  std::cout << "dphi<1.0" << std::endl;
-  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_Loose2C_DPhi->GetBinContent(1) << " +/- " << hZ_DY_Loose2C_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_Loose2C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_Loose2C_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_Loose2C_DPhi->GetBinContent(1) << " +/- " << hZ_Data_Loose2C_DPhi->GetBinError(1) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_Loose2C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_Loose2C_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_Loose2S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_Loose2S_DPhi->GetBinError(1) << std::endl;
-  std::cout << "#####################################################################################" << std::endl;
-  std::cout << std::endl << std::endl;
-
-  std::cout << std::endl;
-  std::cout << "##################################### MET > 100 ######################################" << std::endl;
-  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
-  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_Loose_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_Loose_EffVBFS->GetBinError(1) << std::endl;
-  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_Loose_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_Loose_EffVBFC->GetBinError(1) << std::endl;
-  std::cout << "  ratio_vbf by histogram : " << hZ_DY_Loose_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_Loose_RatioVBF->GetBinError(1) << std::endl;
-  std::cout << "  total eff by histogram : " << hZ_DY_Loose_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_Loose_TotalEff->GetBinError(1) << std::endl;
-  std::cout << std::endl;
-
-  std::cout << std::endl;
-  std::cout << "dphi>2.6" << std::endl;
-  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_LooseC_DPhi->GetBinContent(3) << " +/- " << hZ_DY_LooseC_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_LooseC_DPhi->GetBinContent(3) << " +/- " << hZ_BG_LooseC_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_LooseC_DPhi->GetBinContent(3) << " +/- " << hZ_Data_LooseC_DPhi->GetBinError(3) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_LooseC_DPhi->GetBinContent(3) << " +/- " << hZ_Est_LooseC_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_LooseS_DPhi->GetBinContent(3) << " +/- " << hZ_Est_LooseS_DPhi->GetBinError(3) << std::endl;
-  std::cout << std::endl << std::endl;
-  std::cout << "dphi<1.0" << std::endl;
-  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_LooseC_DPhi->GetBinContent(1) << " +/- " << hZ_DY_LooseC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_LooseC_DPhi->GetBinContent(1) << " +/- " << hZ_BG_LooseC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_LooseC_DPhi->GetBinContent(1) << " +/- " << hZ_Data_LooseC_DPhi->GetBinError(1) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_LooseC_DPhi->GetBinContent(1) << " +/- " << hZ_Est_LooseC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_LooseS_DPhi->GetBinContent(1) << " +/- " << hZ_Est_LooseS_DPhi->GetBinError(1) << std::endl;
-  std::cout << "#####################################################################################" << std::endl;
-  std::cout << std::endl << std::endl;
-  */
   // write the cutflow table
   std::cout << "Writing cut flow TeX file" << std::endl;
 
@@ -604,6 +562,64 @@ int main(int argc, char* argv[]) {
   effFile << std::endl << std::endl;
   effFile.close();
 
+  // list histograms for dataset summing
+  std::vector<std::string> hists;
+  hists.push_back("hZ_mZ");
+  hists.push_back("hZ_pT");
+  hists.push_back("hZ_jet1pt");
+  hists.push_back("hZ_jet1eta");
+  hists.push_back("hZ_jet2pt");
+  hists.push_back("hZ_jet2eta");
+  hists.push_back("hZ_jetdeta");
+  hists.push_back("hZ_mjj");
+  hists.push_back("hZ_met");
+  hists.push_back("hZ_jetdphi");
+
+  // sum DY datasets
+  std::vector<std::string> DYDatasets;
+  DYDatasets.push_back(std::string("DYJetsToLL_NoTrig"));
+  DYDatasets.push_back(std::string("DYJetsToLL_PtZ-100_NoTrig"));
+  DYDatasets.push_back(std::string("DYJetsToLL_EWK_NoTrig"));
+  SumDatasets(oDir_Plot, DYDatasets, hists, "DYJets");
+
+  // sum single top datasets
+  std::vector<std::string> topDatasets;
+  topDatasets.push_back(std::string("SingleT_t"));
+  topDatasets.push_back(std::string("SingleTbar_t"));
+  topDatasets.push_back(std::string("SingleT_s"));
+  topDatasets.push_back(std::string("SingleTbar_s"));
+  topDatasets.push_back(std::string("SingleT_tW"));
+  topDatasets.push_back(std::string("SingleTbar_tW"));
+  topDatasets.push_back(std::string("TTBar"));
+  SumDatasets(oDir_Plot, topDatasets, hists, "SingleT+TTbar"); 
+
+  // sum single top datasets
+  std::vector<std::string> dibDatasets;
+  dibDatasets.push_back(std::string("WW"));
+  dibDatasets.push_back(std::string("WZ"));
+  dibDatasets.push_back(std::string("ZZ"));
+  SumDatasets(oDir_Plot, dibDatasets, hists, "DiBoson");
+
+  // make plots
+  std::cout << "Making plots" << std::endl;
+  StackPlot plots(oDir_Plot);
+  plots.setLegPos(0.69,0.77,0.98,0.97);
+
+  plots.addDataset("DiBoson", kViolet-6, 0);
+  plots.addDataset("SingleT+TTbar", kAzure-2, 0);
+  plots.addDataset("Z #rightarrow #mu#mu", kPink-4,0);
+  plots.addDataset("METABCD", kBlack, 1);
+
+  plots.draw("hZ_mZ",		"M_{#mu#mu}  [GeV/c^{2}]",	"N_{events}");
+  plots.draw("hZ_pT",		"Z_p_{T} [GeV]",		"N_{events}");
+  plots.draw("hZ_jet1pt", 	"Leading jet p_{T} [GeV]", 	"N_{events}");
+  plots.draw("hZ_jet1eta", 	"Leading jet #eta", 		"N_{events}");
+  plots.draw("hZ_jet1pt",       "Sub-leading jet p_{T} [GeV]",  "N_{events}");
+  plots.draw("hZ_jet1eta",      "Sub-leading jet #eta",         "N_{events}");
+  plots.draw("hZ_jetdeta",	"#Delta #eta_{jj}",		"N_{events}");
+  plots.draw("hZ_mjj", 		"M_{jj} [GeV]",			"N_{events}");
+  plots.draw("hZ_met", 		"E_{T}^{miss} [GeV]",		"N_{events}");
+  plots.draw("hZ_jetdphi", 	"#Delta #phi_{jj} [GeV]",	"N_{events}");
 
   //store histograms
   ofile->cd();
