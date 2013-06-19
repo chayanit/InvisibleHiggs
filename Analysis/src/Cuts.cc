@@ -31,7 +31,7 @@ Cuts::Cuts() {
   addWMuCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addWMuCut("dEtaJJ",    "vbfDEta>4.2");
   addWMuCut("MET",       "metNoWLepton>130.");
-  addWMuCut("Mjj",       "vbfM>1200.");
+  addWMuCut("Mjj",       "vbfM>1100.");
   addWMuCut("CJV",       "cenJetEt<30.");
   addWMuCut("dPhiJJ",    "vbfDPhi<1.0");
 
