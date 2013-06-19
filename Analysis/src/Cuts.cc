@@ -40,7 +40,7 @@ Cuts::Cuts() {
   addWElCut("lVeto",     "ele2Pt<10. && mu1Pt<10.");
   addWElCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addWElCut("dEtaJJ",    "vbfDEta>4.2");
-  addWElCut("MET",       "metNoWLepton>130.");
+  addWElCut("MET",       "met>130.");
   addWElCut("Mjj",       "vbfM>1100.");
   addWElCut("CJV",       "cenJetEt<30.");
   addWElCut("dPhiJJ",    "vbfDPhi<1.0");
