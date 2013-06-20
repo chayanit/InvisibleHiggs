@@ -33,6 +33,12 @@ int main(int argc, char* argv[]) {
  
   std::string oDir_Plot = options.oDir+std::string("/ZBackground");
 
+  boost::filesystem::path opath(oDir_Plot);
+  if (!exists(opath)) {
+    std::cout << "Creating output directory : " << oDir_Plot << std::endl;
+    boost::filesystem::create_directory(opath);
+  }
+
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "RECREATE");
 
@@ -42,6 +48,7 @@ int main(int argc, char* argv[]) {
 
   TCut puWeight("puWeight");
   TCut trigCorrWeight("trigCorrWeight");
+  TCut trigCorr( "( (trigCorrWeight>0)*trigCorrWeight + (trigCorrWeight<=0)*1 )" );
   TCut METNoMuon130("metNoMuon>130.");	// add here later for VBF efficiency when MET>35, MET>70 (QCD estimation)
   TCut METNoMuon100("metNoMuon>100.");
   TCut METNoMuon90("metNoMuon>90.");
@@ -304,54 +311,60 @@ int main(int argc, char* argv[]) {
     delete hZ_CutFlow;
 
     // Z control plots
-    TCut cutPlots = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBFLoose());
+    TCut cutPlots = puWeight * trigCorr * (cutD + cuts.zMuMuVBFLoose());
  
     TFile* ofile_Plot = TFile::Open( (oDir_Plot+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
-    TH1D* hZ_mZ	  	  = new TH1D("hZ_mZ",	     "", 30, 60., 120.);
-    TH1D* hZ_pT           = new TH1D("hZ_pT",        "", 30, 0.,  600.);
-    TH1D* hZ_jet1pt       = new TH1D("hZ_jet1pt",    "", 75, 0.,  2000.);
-    TH1D* hZ_jet1eta      = new TH1D("hZ_jet1eta",   "", 50, -5., 5.);
-    TH1D* hZ_jet2pt       = new TH1D("hZ_jet2pt",    "", 75, 0.,  1000.);
-    TH1D* hZ_jet2eta      = new TH1D("hZ_jet2eta",   "", 50, -5., 5.);
-    TH1D* hZ_jetdeta      = new TH1D("hZ_jetdeta",   "", 50, 0.,  10.);
-    TH1D* hZ_mjj          = new TH1D("hZ_mjj",       "", 50, 0.,  4000.);
-    TH1D* hZ_met          = new TH1D("hZ_met",       "", 50, 0.,  800.);
-    TH1D* hZ_jetdphi      = new TH1D("hZ_jetdphi",   "", 50, 0.,  TMath::Pi());
+    TH1D* ZCtrlZMass	    = new TH1D("ZCtrlZMass",	 "", 30, 60., 120.);
+    TH1D* ZCtrlZpT          = new TH1D("ZCtrlZpT",       "", 50, 0.,  1000.);
+    TH1D* ZCtrlJet1pT       = new TH1D("ZCtrlJet1pT",    "", 50, 0.,  1000.);
+    TH1D* ZCtrlJet1Eta      = new TH1D("ZCtrlJet1Eta",   "", 50, -5., 5.);
+    TH1D* ZCtrlJet2pT       = new TH1D("ZCtrlJet2pT",    "", 50, 0.,  1000.);
+    TH1D* ZCtrlJet2Eta      = new TH1D("ZCtrlJet2Eta",   "", 50, -5., 5.);
+    TH1D* ZCtrlCenJetpT     = new TH1D("ZCtrlCenJetpT",  "", 50, 0.,  400.);
+    TH1D* ZCtrlDEtajj       = new TH1D("ZCtrlDEtajj",    "", 50, 0.,  8.);
+    TH1D* ZCtrlMjj          = new TH1D("ZCtrlMjj",       "", 50, 0.,  4000.);
+    TH1D* ZCtrlMET          = new TH1D("ZCtrlMET",       "", 50, 0.,  500.);
+    TH1D* ZCtrlDPhijj       = new TH1D("ZCtrlDPhijj",    "", 50, 0.,  TMath::Pi());
 
-    tree->Draw("zMass>>hZ_mZ"		, cutPlots);
-    tree->Draw("zPt>>hZ_pT"		, cutPlots);
-    tree->Draw("jet1Pt>>hZ_jet1pt"	, cutPlots);
-    tree->Draw("jet1Eta>>hZ_jet1eta"	, cutPlots);
-    tree->Draw("jet2Pt>>hZ_jet2pt"	, cutPlots);
-    tree->Draw("jet2Eta>>hZ_jet2eta"	, cutPlots);
-    tree->Draw("vbfDEta>>hZ_jetdeta"	, cutPlots);
-    tree->Draw("vbfM>>hZ_mjj"		, cutPlots);
-    tree->Draw("met>>hZ_met"		, cutPlots);
-    tree->Draw("vbfDPhi>>hZ_jetdphi"	, cutPlots);
+    tree->Draw("zMass>>ZCtrlZMass"	, cutPlots);
+    tree->Draw("zPt>>ZCtrlZpT"		, cutPlots);
+    tree->Draw("jet1Pt>>ZCtrlJet1pT"	, cutPlots);
+    tree->Draw("jet1Eta>>ZCtrlJet1Eta"	, cutPlots);
+    tree->Draw("jet2Pt>>ZCtrlJet2pT"	, cutPlots);
+    tree->Draw("jet2Eta>>ZCtrlJet2Eta"	, cutPlots);
+    tree->Draw("cenJetEt>>ZCtrlCenJetpT", cutPlots);
+    tree->Draw("vbfDEta>>ZCtrlDEtajj"	, cutPlots);
+    tree->Draw("vbfM>>ZCtrlMjj"		, cutPlots);
+    tree->Draw("metNo2Muon>>ZCtrlMET"	, cutPlots);
+    tree->Draw("vbfDPhi>>ZCtrlDPhijj"	, cutPlots);
 
-    hZ_mZ->Scale(weight);
-    hZ_pT->Scale(weight);
-    hZ_jet1pt->Scale(weight);
-    hZ_jet1eta->Scale(weight);
-    hZ_jet2pt->Scale(weight);
-    hZ_jet2eta->Scale(weight);
-    hZ_jetdeta->Scale(weight);
-    hZ_mjj->Scale(weight);
-    hZ_met->Scale(weight);
-    hZ_jetdphi->Scale(weight);
+    if (!dataset.isData) {
+    ZCtrlZMass->Scale(weight);
+    ZCtrlZpT->Scale(weight);
+    ZCtrlJet1pT->Scale(weight);
+    ZCtrlJet1Eta->Scale(weight);
+    ZCtrlJet2pT->Scale(weight);
+    ZCtrlJet2Eta->Scale(weight);
+    ZCtrlCenJetpT->Scale(weight);
+    ZCtrlDEtajj->Scale(weight);
+    ZCtrlMjj->Scale(weight);
+    ZCtrlMET->Scale(weight);
+    ZCtrlDPhijj->Scale(weight);
+    }
 
     ofile_Plot->cd();
-    hZ_mZ->Write("",TObject::kOverwrite);
-    hZ_pT->Write("",TObject::kOverwrite);
-    hZ_jet1pt->Write("",TObject::kOverwrite);
-    hZ_jet1eta->Write("",TObject::kOverwrite);
-    hZ_jet2pt->Write("",TObject::kOverwrite);
-    hZ_jet2eta->Write("",TObject::kOverwrite);
-    hZ_jetdeta->Write("",TObject::kOverwrite);
-    hZ_mjj->Write("",TObject::kOverwrite);
-    hZ_met->Write("",TObject::kOverwrite);
-    hZ_jetdphi->Write("",TObject::kOverwrite);
+    ZCtrlZMass->Write("",TObject::kOverwrite);
+    ZCtrlZpT->Write("",TObject::kOverwrite);
+    ZCtrlJet1pT->Write("",TObject::kOverwrite);
+    ZCtrlJet1Eta->Write("",TObject::kOverwrite);
+    ZCtrlJet2pT->Write("",TObject::kOverwrite);
+    ZCtrlJet2Eta->Write("",TObject::kOverwrite);
+    ZCtrlCenJetpT->Write("",TObject::kOverwrite);
+    ZCtrlDEtajj->Write("",TObject::kOverwrite);
+    ZCtrlMjj->Write("",TObject::kOverwrite);
+    ZCtrlMET->Write("",TObject::kOverwrite);
+    ZCtrlDPhijj->Write("",TObject::kOverwrite);
 
     ofile_Plot->Close();
 
@@ -564,16 +577,17 @@ int main(int argc, char* argv[]) {
 
   // list histograms for dataset summing
   std::vector<std::string> hists;
-  hists.push_back("hZ_mZ");
-  hists.push_back("hZ_pT");
-  hists.push_back("hZ_jet1pt");
-  hists.push_back("hZ_jet1eta");
-  hists.push_back("hZ_jet2pt");
-  hists.push_back("hZ_jet2eta");
-  hists.push_back("hZ_jetdeta");
-  hists.push_back("hZ_mjj");
-  hists.push_back("hZ_met");
-  hists.push_back("hZ_jetdphi");
+  hists.push_back("ZCtrlZMass");
+  hists.push_back("ZCtrlZpT");
+  hists.push_back("ZCtrlJet1pT");
+  hists.push_back("ZCtrlJet1Eta");
+  hists.push_back("ZCtrlJet2pT");
+  hists.push_back("ZCtrlJet2Eta");
+  hists.push_back("ZCtrlCenJetpT");
+  hists.push_back("ZCtrlDEtajj");
+  hists.push_back("ZCtrlMjj");
+  hists.push_back("ZCtrlMET");
+  hists.push_back("ZCtrlDPhijj");
 
   // sum DY datasets
   std::vector<std::string> DYDatasets;
@@ -603,23 +617,26 @@ int main(int argc, char* argv[]) {
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir_Plot);
-  plots.setLegPos(0.69,0.77,0.98,0.97);
+  plots.setLegPos(0.69,0.69,0.89,0.89);
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
-  plots.addDataset("Z #rightarrow #mu#mu", kPink-4,0);
+  plots.addDataset("DYJets", kPink-4,0);
   plots.addDataset("METABCD", kBlack, 1);
 
-  plots.draw("hZ_mZ",		"M_{#mu#mu}  [GeV/c^{2}]",	"N_{events}");
-  plots.draw("hZ_pT",		"Z_p_{T} [GeV]",		"N_{events}");
-  plots.draw("hZ_jet1pt", 	"Leading jet p_{T} [GeV]", 	"N_{events}");
-  plots.draw("hZ_jet1eta", 	"Leading jet #eta", 		"N_{events}");
-  plots.draw("hZ_jet1pt",       "Sub-leading jet p_{T} [GeV]",  "N_{events}");
-  plots.draw("hZ_jet1eta",      "Sub-leading jet #eta",         "N_{events}");
-  plots.draw("hZ_jetdeta",	"#Delta #eta_{jj}",		"N_{events}");
-  plots.draw("hZ_mjj", 		"M_{jj} [GeV]",			"N_{events}");
-  plots.draw("hZ_met", 		"E_{T}^{miss} [GeV]",		"N_{events}");
-  plots.draw("hZ_jetdphi", 	"#Delta #phi_{jj} [GeV]",	"N_{events}");
+  plots.draw("ZCtrlZpT",	"Z_p_{T} [GeV]",		"N_{events}"	,1,1);
+  plots.draw("ZCtrlJet1pT", 	"Leading jet p_{T} [GeV]", 	"N_{events}"	,1,1);
+  plots.draw("ZCtrlJet1Eta", 	"Leading jet #eta", 		"N_{events}"	,1,1);
+  plots.draw("ZCtrlJet2pT",     "Sub-leading jet p_{T} [GeV]",  "N_{events}"	,1,1);
+  plots.draw("ZCtrlJet2Eta",    "Sub-leading jet #eta",         "N_{events}"	,1,1);
+  plots.draw("ZCtrlCenJetpT",	"Central jet p_{T} [GeV]",	"N_{events}"    ,1,1);
+  plots.draw("ZCtrlDEtajj",	"#Delta #eta_{jj}",		"N_{events}"	,1,1);
+  plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"N_{events}"	,1,1);
+  plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"N_{events}"	,1,1);
+  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj} [GeV]",	"N_{events}"	,1,1);
+  plots.setYMax(90.);
+  plots.setYMin(0.);
+  plots.draw("ZCtrlZMass",      "M_{#mu#mu}  [GeV/c^{2}]",      "N_{events}"    ,0,1);
 
   //store histograms
   ofile->cd();

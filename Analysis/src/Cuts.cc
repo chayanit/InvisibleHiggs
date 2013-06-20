@@ -200,7 +200,7 @@ TCut Cuts::vbf() {
 TCut Cuts::vbfloose() {
   TCut tmp = cut("dijet");
   tmp += cut("sgnEtaJJ");
-  tmp += cut("vbfM>1000.");
+  tmp += TCut("vbfM>1000.");
   return tmp;
 }
 
