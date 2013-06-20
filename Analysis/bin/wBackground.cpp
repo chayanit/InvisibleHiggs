@@ -169,7 +169,7 @@ int main(int argc, char* argv[]) {
     else {
       cutWMu_C = puWeight * trigCorrWeight * mu1Weight * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
       cutWMu_S = puWeight * trigCorrWeight * (cutD + cuts.allCutsNoDPhi());
-      cutWEl_C = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
+      cutWEl_C = puWeight * trigCorrWeight * el1Weight * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
       cutWEl_S = puWeight * trigCorrWeight * (cutD + cuts.allCutsNoDPhi());
 
       cutWMu_NoMETC = puWeight * trigCorrWeight * mu1Weight * (cutD + cuts.wMuVBF() + metCtrl80);
