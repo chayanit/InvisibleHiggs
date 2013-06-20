@@ -246,7 +246,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       h->SetLineColor(kBlack);
       h->SetMarkerColor(cols_.at(i));
       // leg.AddEntry(h, "Data", "P");
-      TLegendEntry *legE = new TLegendEntry(h, "Data", "P");
+      TLegendEntry *legE = new TLegendEntry(h, "Data", "PL");
       entries.push_back(legE);
       h->Draw("PE SAME");
       hData = (TH1D*)h->Clone("hData");
