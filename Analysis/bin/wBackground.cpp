@@ -35,6 +35,16 @@ int main(int argc, char* argv[]) {
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/WBackground.root")).c_str(), "RECREATE");
 
+  // For control plots
+  std::string oDirPlots = options.oDir+std::string("/WControlPlots");
+  boost::filesystem::path opath(oDirPlots);
+  if (!exists(opath)) {
+    std::cout << "Creating output directory : " << oDirPlots << std::endl;
+    boost::filesystem::create_directory(opath);
+  }
+  else std::cout << "Writing plots results to " << oDirPlots << std::endl;
+  std::vector<std::string> hnames; // to hold hist names for control plots
+
   // cuts
   Cuts cuts;
   unsigned nCutsWMu = cuts.nCutsWMu();
@@ -42,6 +52,7 @@ int main(int argc, char* argv[]) {
 
   TCut puWeight("puWeight");
   TCut trigCorrWeight("trigCorrWeight");
+  TCut trigCorrWeight2( "( (trigCorrWeight>0)*trigCorrWeight + (trigCorrWeight<=0)*1 )" );
   TCut wWeight = cuts.wWeight();
 
   TCut cutSignalNoMETNoDPhi = cuts.HLTandMETFilters() + cuts.leptonVeto() + cuts.vbf();
@@ -51,7 +62,7 @@ int main(int argc, char* argv[]) {
   TCut metCtrl90("metNoWLepton>90.");
   TCut met100("met>100.");
   TCut metCtrl100("metNoWLepton>100.");
-
+  
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
 
@@ -119,10 +130,10 @@ int main(int argc, char* argv[]) {
     // check it's  W+Jets
     bool isWJets = false;
     if (dataset.name == "WJets" ||
-	dataset.name == "W1Jets" || 
-	dataset.name == "W2Jets" || 
-	dataset.name == "W3Jets" || 
-	dataset.name == "W4Jets") {
+      	dataset.name == "W1Jets" || 
+      	dataset.name == "W2Jets" || 
+      	dataset.name == "W3Jets" || 
+      	dataset.name == "W4Jets") {
       isWJets = true;
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
     }
@@ -141,6 +152,8 @@ int main(int argc, char* argv[]) {
     TCut cutWMu_Loose2C(""), cutWMu_Loose2S(""), cutWEl_Loose2C(""), cutWEl_Loose2S("");
     TCut cutWMu_LooseC(""), cutWMu_LooseS(""), cutWEl_LooseC(""), cutWEl_LooseS("");
     
+    TCut cutWMuControlPlot("");
+    TCut cutWElControlPlot("");
 
     // different cuts for W MC
     if (isWJets) {
@@ -163,6 +176,9 @@ int main(int argc, char* argv[]) {
       cutWMu_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi + met100);
       cutWEl_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl100);
       cutWEl_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met100);
+
+      cutWMuControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") );
+      cutWElControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") );
     }
     else {
       cutWMu_C = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
@@ -184,6 +200,10 @@ int main(int argc, char* argv[]) {
       cutWMu_LooseS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met100);
       cutWEl_LooseC = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + metCtrl100);
       cutWEl_LooseS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met100);
+
+      cutWMuControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") );
+      cutWElControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") );
+
     }
 
     //    std::cout << "  cutWMu_C   " << cutWEl_C << std::endl;
@@ -192,6 +212,7 @@ int main(int argc, char* argv[]) {
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
 
+    
     // tmp histograms
     TH1D* hWMu_C_DPhi = new TH1D("hWMu_C_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
     TH1D* hWMu_S_DPhi = new TH1D("hWMu_S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
@@ -214,7 +235,7 @@ int main(int argc, char* argv[]) {
     TH1D* hWEl_LooseS_DPhi = new TH1D("hWEl_LooseS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
 
     // weight  to lumi
-    double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
+    double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents);
     std::cout << "  weight : " << weight << std::endl;
 
     tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
@@ -314,18 +335,105 @@ int main(int argc, char* argv[]) {
 
     // per-dataset control plots (just an example, add more later)
     ofile->cd();
+    
 
-    std::string hname = std::string("hWMu_WmT_")+dataset.name;
-    TH1D* hWMu_WmT = new TH1D(hname.c_str(), "", 40, 0., 120.);
-    std::string str = std::string("wMt>>")+hname;
-    tree->Draw(str.c_str(), cutWMu_C);
-    hWMu_WmT->Write("",TObject::kOverwrite);
+    // For electron and muon channels do control plots:
+    // jet1Pt, jet2Pt, jet1Eta, jet2Eta, Mjj, dEtajj, dPhijj, MET and W_mT, W_pT 
 
-    hname = std::string("hWEl_WmT_")+dataset.name;
-    TH1D* hWEl_WmT = new TH1D(hname.c_str(), "", 40, 0., 120.);
-    str = std::string("wMt>>")+hname;
-    tree->Draw(str.c_str(), cutWEl_C);
-    hWEl_WmT->Write("",TObject::kOverwrite);
+    TFile* ofilePlots = TFile::Open( (oDirPlots+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
+
+    std::string chan[] = {"Mu", "El"};
+     // weight = (dataset.isData) ? 1. : (lumi * dataset.sigma / dataset.nEvents);
+    // std::cout << "  weight : " << weight << std::endl;
+
+
+    for (int c = 0; c < 2; c++){
+        TCut Wcut = (c) ? cutWElControlPlot : cutWMuControlPlot; //wWeight included above
+
+        std::string hname = "hW"+chan[c]+"_jet1Pt";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hJet1Pt = new TH1D(hname.c_str(), "", 50, 0., 1000.);
+        std::string str = "jet1Pt>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hJet1Pt->Scale(weight);
+        hJet1Pt->Write("", TObject::kOverwrite); 
+
+        hname = "hW"+chan[c]+"_jet2Pt";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hJet2Pt = new TH1D(hname.c_str(), "", 50, 0., 1000.);
+        str = "jet2Pt>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hJet2Pt->Scale(weight); 
+        hJet2Pt->Write("", TObject::kOverwrite); 
+
+        hname = "hW"+chan[c]+"_jet1Eta";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hJet1Eta = new TH1D(hname.c_str(), "", 50, -5., 5.);
+        str = "jet1Eta>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hJet1Eta->Scale(weight); 
+        hJet1Eta->Write("", TObject::kOverwrite); 
+
+        hname = "hW"+chan[c]+"_jet2Eta";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hJet2Eta = new TH1D(hname.c_str(), "", 50, -5., 5.);
+        str = "jet2Eta>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hJet2Eta->Scale(weight); 
+        hJet2Eta->Write("", TObject::kOverwrite); 
+
+        hname = "hW"+chan[c]+"_Mjj";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hMjj = new TH1D(hname.c_str(), "", 50, 0., 4000. );
+        str = "vbfM>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hMjj->Scale(weight);
+        hMjj->Write("", TObject::kOverwrite);
+
+        hname = "hW"+chan[c]+"_dEtaJJ";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hDEtaJJ = new TH1D(hname.c_str(), "", 50, 0.,8.);
+        str = "vbfDEta>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hDEtaJJ->Scale(weight); 
+        hDEtaJJ->Write("", TObject::kOverwrite); 
+
+        hname = "hW"+chan[c]+"_dPhiJJ";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hDPhiJJ = new TH1D(hname.c_str(), "", 50, 0., TMath::Pi());
+        str = "vbfDPhi>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hDPhiJJ->Scale(weight); 
+        hDPhiJJ->Write("", TObject::kOverwrite); 
+        
+        hname = "hW"+chan[c]+"_MET";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hMET = new TH1D(hname.c_str(), "", 50, 0., 500. );
+        if (c)
+          str = "met>>"+hname;
+        else
+          str = "metNoWLepton>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hMET->Scale(weight);
+        hMET->Write("", TObject::kOverwrite);
+
+        hname = "hW"+chan[c]+"_WmT";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hWmT = new TH1D(hname.c_str(), "", 20, 0., 200.);
+        str = "wMt>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hWmT->Scale(weight); 
+        hWmT->Write("", TObject::kOverwrite); 
+
+        hname = "hW"+chan[c]+"_WpT";
+        if (i==0) hnames.push_back(hname);
+        TH1D* hWpT = new TH1D(hname.c_str(), "", 25, 0., 500. );
+        str = "wPt>>"+hname;
+        tree->Draw(str.c_str(), Wcut);
+        hWpT->Scale(weight); 
+        hWpT->Write("", TObject::kOverwrite); 
+
+    }   
 
     // per-dataset cutflow hists
     std::string hnameWMu = std::string("hWMu_CutFlow_")+dataset.name;
@@ -406,8 +514,8 @@ int main(int argc, char* argv[]) {
       hSingleTWEl->Add(hCutFlowWEl);
     }
     if (dataset.name.compare(0,2,"WW")==0 ||
-	dataset.name.compare(0,2,"WZ")==0 ||
-	dataset.name.compare(0,2,"ZZ")==0 ) {
+      	dataset.name.compare(0,2,"WZ")==0 ||
+      	dataset.name.compare(0,2,"ZZ")==0 ) {
       hDibosonWMu->Add(hCutFlowWMu);
       hDibosonWEl->Add(hCutFlowWEl);
     }
@@ -415,7 +523,9 @@ int main(int argc, char* argv[]) {
     hCutFlowWMu->Write("",TObject::kOverwrite);
     hCutFlowWEl->Write("",TObject::kOverwrite);
 
-    delete tree;
+    // delete tree;
+    ofilePlots->Close();
+
     file->Close();
    
   }
@@ -690,9 +800,117 @@ int main(int argc, char* argv[]) {
 
   effFile << std::endl << std::endl;
   effFile.close();
+  
 
+for (unsigned n = 0; n < hnames.size(); n++)
+  std::cout << hnames[n] <<std::endl;
 
+  // Do control plots
+  std::vector<std::string> wjetsDatasets;
+  wjetsDatasets.push_back(std::string("WJets"));
+  wjetsDatasets.push_back(std::string("W1Jets"));
+  wjetsDatasets.push_back(std::string("W2Jets"));
+  wjetsDatasets.push_back(std::string("W3Jets"));
+  wjetsDatasets.push_back(std::string("W4Jets"));
+  SumDatasets(oDirPlots, wjetsDatasets, hnames, "WNJets");
 
+  std::vector<std::string> topDatasets;
+  topDatasets.push_back(std::string("SingleT_t"));
+  topDatasets.push_back(std::string("SingleTbar_t"));
+  topDatasets.push_back(std::string("SingleT_s"));
+  topDatasets.push_back(std::string("SingleTbar_s"));
+  topDatasets.push_back(std::string("SingleT_tW"));
+  topDatasets.push_back(std::string("SingleTbar_tW"));
+  topDatasets.push_back(std::string("TTBar"));
+  SumDatasets(oDirPlots, topDatasets, hnames, "Single top + TTBar");
+
+  std::vector<std::string> ttbarDatasets;
+  ttbarDatasets.push_back(std::string("TTBar"));
+  SumDatasets(oDirPlots, ttbarDatasets, hnames, "TTbar");
+
+  // sum DY contributions
+  std::vector<std::string> dyjets;
+  dyjets.push_back("DYJetsToLL");
+  dyjets.push_back("DYJetsToLL_PtZ-100");
+  dyjets.push_back("DYJetsToLL_EWK");
+  SumDatasets(oDirPlots,dyjets,hnames,"DYJets");
+
+  // sum single top datasets
+  std::vector<std::string> dibDatasets;
+  dibDatasets.push_back(std::string("WW"));
+  dibDatasets.push_back(std::string("WZ"));
+  dibDatasets.push_back(std::string("ZZ"));
+  SumDatasets(oDirPlots, dibDatasets, hnames, "DiBoson");
+
+  // sum QCD histograms
+  std::vector<std::string> qcdDatasets;
+  qcdDatasets.push_back(std::string("QCD_Pt30to50"));
+  qcdDatasets.push_back(std::string("QCD_Pt50to80"));
+  qcdDatasets.push_back(std::string("QCD_Pt80to120"));
+  qcdDatasets.push_back(std::string("QCD_Pt120to170"));
+  qcdDatasets.push_back(std::string("QCD_Pt170to300"));
+  qcdDatasets.push_back(std::string("QCD_Pt300to470"));
+  qcdDatasets.push_back(std::string("QCD_Pt470to600"));
+  qcdDatasets.push_back(std::string("QCD_Pt600to800"));
+  qcdDatasets.push_back(std::string("QCD_Pt800to1000"));
+  qcdDatasets.push_back(std::string("QCD_Pt1000to1400"));
+  qcdDatasets.push_back(std::string("QCD_Pt1400to1800"));
+  qcdDatasets.push_back(std::string("QCD_Pt1800"));
+  SumDatasets(oDirPlots, qcdDatasets, hnames, "QCD");
+
+  // make plots
+  std::cout << "Making plots" << std::endl;
+  StackPlot plots(oDirPlots);
+  plots.setLegPos(0.66,0.60,0.89,0.89);
+
+  plots.addDataset("DiBoson", kViolet-6, 0);
+  plots.addDataset("QCD", kGreen+3, 0);
+  plots.addDataset("DYJets", kPink-4,0);
+  plots.addDataset("Single top + TTBar", kAzure-2, 0);
+  plots.addDataset("WNJets", kBlue+1, 0);
+  plots.addDataset("METABCD", kBlack, 1);
+
+  std::string chan[] = {"Mu", "El"};
+  for (int c = 0; c < 2; c++){
+    std::string label = (c) ? "e channel" : "#mu channel";
+    plots.setLabel(label.c_str());
+    std::string hname = "hW"+chan[c]+"_jet1Pt";
+    plots.draw(hname.c_str(), "Leading jet p_{T} [GeV]", "N_{events}", true, true);
+
+    hname = "hW"+chan[c]+"_jet2Pt";
+    plots.draw(hname.c_str(), "Sub-leading jet p_{T} [GeV]", "N_{events}",true, true);
+
+    hname = "hW"+chan[c]+"_jet1Eta";
+    if (c == 0) plots.setYMax(1E5);
+    plots.draw(hname.c_str(), "Leading jet #eta", "N_{events}",true, true);
+    if (c == 0) plots.setYMax(-1);
+
+    if (c == 0) plots.setYMax(1E5); else plots.setYMax(3E4);
+    hname = "hW"+chan[c]+"_jet2Eta";
+    plots.draw(hname.c_str(), "Sub-leading jet #eta", "N_{events}",true, true);
+    plots.setYMax(-1);
+
+    hname = "hW"+chan[c]+"_Mjj";
+    plots.draw(hname.c_str(), "M_{jj} [GeV]", "N_{events}",true, true);
+
+    hname = "hW"+chan[c]+"_dEtaJJ";
+    plots.draw(hname.c_str(), "#Delta #eta_{jj}", "N_{events}",true, true);
+
+    hname = "hW"+chan[c]+"_dPhiJJ";
+    if (c == 1) plots.setYMax(2E4);
+    plots.draw(hname.c_str(), "#Delta #phi_{jj}", "N_{events}",true, true);
+    plots.setYMax(-1);
+
+    hname = "hW"+chan[c]+"_MET";
+    plots.draw(hname.c_str(), "E_{T}^{miss} [GeV]", "N_{events}",true, true);
+
+    hname = "hW"+chan[c]+"_WmT";
+    plots.draw(hname.c_str(), "M^{W}_{T} [GeV]", "N_{events}",true, true);
+
+    hname = "hW"+chan[c]+"_WpT";
+    plots.draw(hname.c_str(), "p^{W}_{T} [GeV]", "N_{events}",true, true);
+
+  }
   ofile->Close();    
 
 }
