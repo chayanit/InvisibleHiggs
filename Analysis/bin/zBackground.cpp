@@ -5,6 +5,7 @@
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
+#include "InvisibleHiggs/Analysis/interface/LeptonWeights.h"
 
 #include "TTree.h"
 #include "TMath.h"
@@ -48,6 +49,7 @@ int main(int argc, char* argv[]) {
 
   TCut puWeight("puWeight");
   TCut trigCorrWeight("trigCorrWeight");
+  TCut mu2Weight("mu1Weight*mu2Weight");
   TCut METNoMuon130("metNoMuon>130.");	// add here later for VBF efficiency when MET>35, MET>70 (QCD estimation)
   TCut METNoMuon100("metNoMuon>100.");
   TCut METNoMuon90("metNoMuon>90.");
@@ -129,6 +131,8 @@ int main(int argc, char* argv[]) {
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
 
+    LeptonWeights lwTree(tree, options.oDir+std::string("/LeptonWeights.root"), true);
+    
     // set up cuts
     TCut cutZMuMu_C80     = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon80);
     TCut cutZMuMu_C90     = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon90);
@@ -136,7 +140,7 @@ int main(int argc, char* argv[]) {
     TCut cutZMuMu_C130    = puWeight * trigCorrWeight * (cutD + cuts.zMuMuVBF() + METNo2Muon130);
     
     TCut cutEfficiencyMuMu_D    = puWeight * (cutD + cuts.zMuMuGen());
-    TCut cutEfficiencyMuMu_N    = puWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
+    TCut cutEfficiencyMuMu_N    = puWeight * mu2Weight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
  
     TCut cutEfficiencyVBFS_D    = puWeight * (cutD + cuts.zMuMuGenMass());
     TCut cutEfficiencyVBFS_N80  = puWeight * trigCorrWeight * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon80);
