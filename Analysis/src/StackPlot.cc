@@ -9,6 +9,7 @@
 #include "TPaveText.h"
 #include "TLegendEntry.h"
 #include "TH1.h"
+#include "TGraphErrors.h"
 #include <TStyle.h>
 #include <TROOT.h>
 
@@ -190,8 +191,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       stack.GetYaxis()->SetTitleSize(0.07);
       stack.GetYaxis()->SetTitleOffset(0.7);
       stack.GetYaxis()->SetLabelSize(0.05);
-    } 
-    else{
+    } else{
       stack.GetXaxis()->SetTitleSize(0.045);
       stack.GetXaxis()->SetTitleOffset(0.9);
       stack.GetXaxis()->SetTitle(xTitle.c_str());
@@ -206,6 +206,19 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
 
   }
+
+  //////////////////////////
+  // draw errors on stack //
+  //////////////////////////
+
+  TH1D* ErrComp = (TH1D *) hMC->Clone();
+  ErrComp->SetMarkerStyle(0);
+  ErrComp->SetMarkerSize(0);
+  ErrComp->SetLineColor(kGray+1);
+  ErrComp->SetLineWidth(0);
+  ErrComp->SetFillColor(kGray+1);
+  ErrComp->SetFillStyle(3001);
+  ErrComp->Draw("E2same");
 
   /////////////////////////////////
   // draw non-stacked histograms //
@@ -335,7 +348,26 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     hData->Draw("ep");
     hData->SetMaximum(2.);
     hData->SetMinimum(-2.);
-    hData->Draw("ep");
+
+    int NBins = hMC->GetNbinsX();
+    TGraphErrors * Erreff = new TGraphErrors(NBins);
+    for(int iBin = 1; iBin <= NBins; ++iBin) {   
+      double x = hMC->GetBinCenter(iBin);
+      double y_smSum = hMC->GetBinContent(iBin); 
+      if(!(y_smSum > 0.)) continue;
+      double relerr = hMC->GetBinError(iBin)/hMC->GetBinContent(iBin);
+      Erreff->SetPoint(iBin-1, x, 0);
+      Erreff->SetPointError(iBin-1, 0.5*hMC->GetBinWidth(iBin),relerr);
+    }
+    Erreff->SetMarkerStyle(0);
+    Erreff->SetMarkerSize(0);
+    Erreff->SetLineColor(kGray+1);
+    Erreff->SetLineWidth(0);
+    Erreff->SetFillColor(kGray+1);
+    Erreff->SetFillStyle(3001);
+    Erreff->Draw("2");
+
+    hData->Draw("ep same");
 
     double lineMin = hData->GetXaxis()->GetXmin();
     double lineMax = hData->GetXaxis()->GetXmax();
