@@ -47,7 +47,7 @@ void StackPlot::setLegPos(float x1, float y1, float x2, float y2) {
   legY2_ = y2;
 }
 
-void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, bool drawRatioPlot) {
+void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, bool logy, bool drawRatioPlot) {
 
   std::cout << "Drawing " << hname << " " << std::endl;
 
@@ -58,15 +58,17 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
   TCanvas canvas;
 
-  canvas.SetLogy();
+  // canvas.SetLogy();
   TPad *pad1; // Use TPad to allow us to draw ratio plot below main plot
-  if (drawRatioPlot)
-    pad1 = new TPad("pad1","",0,0.31,1,1);
-  else
+  if (drawRatioPlot) {
+    pad1 = new TPad("pad1","",0,0.30,1,1);
+     pad1->SetBottomMargin(3.2);
+        // pad1->SetBottomMargin(0);
+  } else
     pad1 = new TPad("pad1","",0,0,1,1);
   pad1->Draw();
   pad1->cd();
-  pad1->SetLogy();
+  if (logy) pad1->SetLogy();
   THStack stack("hs", (hname+std::string(" stack")).c_str());
 
   TLegend leg(legX1_, legY1_, legX2_, legY2_);
@@ -79,8 +81,9 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   std::vector<TFile*>::iterator file = files_.begin();
   
   // Some method of scanning all input files and determining the min y value needed for y axis
+  // BIT BROKEN - if you get a seg fault when drawing, you prob have no events in the first file and it gets angry
   int i = 0;
-  double ymin=1.0;
+  double ymin=0;
   for (; file!=files_.end(); ++file, ++i) {
 
     if (*file==0) {
@@ -99,7 +102,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       double min = h->GetMinimum(0);
       if (min != 0) ymin = min;
     }
-    if (ymin != 1) break;
+    if (ymin != 0) break;
   }
 
   /////////////////////////////////
@@ -145,21 +148,33 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     stack.Draw("HIST");
 
     // Some auto-axis ranging, doesn't work brilliantly, try tweaking the 5 and 0.1
-    // assumes log axes
-    stack.SetMaximum(stack.GetMaximum()*5);
-    stack.SetMinimum(ymin*0.1);
+    // assumes log axes!!!
+    if (logy){
+      stack.SetMaximum(stack.GetMaximum()*100);
+      // stack.SetMinimum(ymin*0.1);
+      stack.SetMinimum(ymin);
+    }
     // If user has set axis range, use that preferentially
     if (yMax_ > 0.) stack.SetMaximum(yMax_);
     if (yMin_ > 0.) stack.SetMinimum(yMin_);
     stack.Draw("HIST"); //redraw to update axes
 
     // Make axis labels nice
-    stack.GetXaxis()->SetTitleSize(0.045);
-    stack.GetYaxis()->SetTitleSize(0.045);
-    stack.GetXaxis()->SetTitle(xTitle.c_str());
-    stack.GetYaxis()->SetTitle(yTitle.c_str());
-    stack.GetXaxis()->SetTitleOffset(0.9);
-    // stack.GetYaxis()->SetTitleOffset(1.2);    
+    // Change size depending on if ratio plot or not (ratio plot shrinks actual sizes, so need to account for this)
+    if (drawRatioPlot){
+      stack.GetXaxis()->SetTitleSize(0.055);
+      stack.GetYaxis()->SetTitleSize(0.06);
+      stack.GetXaxis()->SetTitleOffset(0.8);
+      stack.GetYaxis()->SetTitleOffset(0.7);
+    } 
+    else{
+      stack.GetXaxis()->SetTitleSize(0.045);
+      stack.GetYaxis()->SetTitleSize(0.045);
+      stack.GetXaxis()->SetTitleOffset(0.9);
+      // stack.GetYaxis()->SetTitleOffset(1.2);    
+    }
+      stack.GetXaxis()->SetTitle(xTitle.c_str());
+      stack.GetYaxis()->SetTitle(yTitle.c_str());
   }
 
   /////////////////////////////////
@@ -249,13 +264,16 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   {
     leg.AddEntry(entries.at(n)->GetObject(), entries.at(n)->GetLabel(), entries.at(n)->GetOption());
   }
+  leg.SetLineWidth(0);
   leg.Draw();
 
   canvas.cd();
 
   if (drawRatioPlot){
     // Draw ratio plot time!
-    TPad *pad2 = new TPad("pad2","",0,0.05,1,0.30);
+    TPad *pad2 = new TPad("pad2","",0,0.05,1,0.27);
+    pad2->SetTopMargin(1.2);
+    // pad2->SetTopMargin(0);
     pad2->Draw();
     pad2->cd();
 
@@ -273,30 +291,34 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       if(obj == histList->First()) continue;
       hMC -> Add((TH1*)obj);
     }
-
+    hData->Add(hMC,-1);
     hData->Divide(hMC);
     hData->SetMarkerStyle(8);
     // hData->Draw("ep");
     hData->SetXTitle(xTitle.c_str());
-    hData->SetYTitle("Data/MC");
+    hData->SetYTitle("#frac{Data - MC}{MC}");
     hData->GetXaxis()->SetTitleSize(0.1);
     hData->GetXaxis()->SetLabelSize(0.1);
-    hData->GetYaxis()->SetTitleSize(0.1);
-    hData->GetYaxis()->SetLabelSize(0.1);
     hData->GetXaxis()->SetTitleOffset(0.9);
-    hData->GetYaxis()->SetTitleOffset(0.9);
+
+    hData->GetYaxis()->SetTitleSize(0.15);
+    hData->GetYaxis()->SetLabelSize(0.1);
+    hData->GetYaxis()->SetTitleOffset(0.3);
     hData->Draw("ep");
     double lineMin = hData->GetXaxis()->GetXmin();
     double lineMax = hData->GetXaxis()->GetXmax();
-    TLine *line = new TLine(lineMin,1,lineMax,1);
+    TLine *line = new TLine(lineMin,0,lineMax,0);
     line->SetLineColor(kBlack);
     line->SetLineWidth(2);
-    line->SetLineStyle(7);
+    line->SetLineStyle(2);
     line->Draw();
     canvas.cd();
   }
+  std::string append;
+  if (logy) append = "_log.pdf";
+  else append = "_lin.pdf";
 
-  std::string filename = dir_+std::string("/")+hname+std::string("_log.pdf");
+  std::string filename = dir_+std::string("/")+hname+append;
   std::cout << "Writing file " << filename << std::endl;
 
   canvas.Print( filename.c_str() ,"pdf");

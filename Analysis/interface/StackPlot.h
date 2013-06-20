@@ -33,7 +33,7 @@ public:
   void setLegPos(float x1, float y1, float x2, float y2);
 
   // draw a histogram
-  void draw(std::string hname, std::string xTitle, std::string yTitle, bool drawRatioPlot = false);
+  void draw(std::string hname, std::string xTitle, std::string yTitle, bool logy = true, bool drawRatioPlot = false);
 
   void dumpInfo(std::ostream &o);
 
