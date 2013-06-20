@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
     TH1D* hWEl_LooseS_DPhi = new TH1D("hWEl_LooseS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
 
     // weight  to lumi
-    double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents);
+    double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents;
     std::cout << "  weight : " << weight << std::endl;
 
     tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
