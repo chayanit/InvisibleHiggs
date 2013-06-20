@@ -633,7 +633,7 @@ int main(int argc, char* argv[]) {
   plots.draw("ZCtrlDEtajj",	"#Delta #eta_{jj}",		"N_{events}"	,1,1);
   plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"N_{events}"	,1,1);
   plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"N_{events}"	,1,1);
-  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj} [GeV]",	"N_{events}"	,1,1);
+  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj}",		"N_{events}"	,1,1);
   plots.setYMax(90.);
   plots.setYMin(0.);
   plots.draw("ZCtrlZMass",      "M_{#mu#mu}  [GeV/c^{2}]",      "N_{events}"    ,0,1);
