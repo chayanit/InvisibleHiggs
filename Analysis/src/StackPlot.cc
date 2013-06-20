@@ -57,13 +57,14 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   TH1::SetDefaultSumw2();
 
   TCanvas canvas;
-
   // canvas.SetLogy();
   TPad *pad1; // Use TPad to allow us to draw ratio plot below main plot
   if (drawRatioPlot) {
+  canvas.Divide(1, 2);
+    // pad1 = (TPad *) canvas.cd(1);
     pad1 = new TPad("pad1","",0,0.30,1,1);
-     pad1->SetBottomMargin(3.2);
-        // pad1->SetBottomMargin(0);
+     // pad1->SetBottomMargin(2);
+    pad1->SetBottomMargin(0.01);
   } else
     pad1 = new TPad("pad1","",0,0,1,1);
   pad1->Draw();
@@ -144,6 +145,23 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
   }
   
+
+  // Little hack here to get sum of hists in the THStack
+  // ROOT doesn't have a method to convert a THStack to a TH1 for some stupid reason
+  // Good ol' Rene...
+
+  TList *histList = stack.GetHists();
+  TIter next(histList); // Get list of hists in Stack
+  TH1 *hMC  = (TH1*) histList->First()->Clone();
+  TObject *obj;
+  while ((obj = next())) // Loop through all hists in stack
+  {
+    // skip first object since it's used by creating the histogram                               
+    if(obj == histList->First()) continue;
+    hMC -> Add((TH1*)obj);
+  }
+
+
   if (drawStack) {
     stack.Draw("HIST");
 
@@ -154,6 +172,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       // stack.SetMinimum(ymin*0.1);
       stack.SetMinimum(ymin);
     }
+
+
     // If user has set axis range, use that preferentially
     if (yMax_ > 0.) stack.SetMaximum(yMax_);
     if (yMin_ > 0.) stack.SetMinimum(yMin_);
@@ -162,19 +182,29 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     // Make axis labels nice
     // Change size depending on if ratio plot or not (ratio plot shrinks actual sizes, so need to account for this)
     if (drawRatioPlot){
-      stack.GetXaxis()->SetTitleSize(0.055);
-      stack.GetYaxis()->SetTitleSize(0.06);
-      stack.GetXaxis()->SetTitleOffset(0.8);
+      // stack.GetXaxis()->SetTitleSize(0.07);
+      stack.GetXaxis()->SetTitleOffset(999); //Effectively turn off x axis title on main plot
+      // stack.GetXaxis()->SetLabelSize(0.07);
+      stack.GetXaxis()->SetLabelOffset(999); //Effectively turn off x axis label on main plot
+
+      stack.GetYaxis()->SetTitleSize(0.07);
       stack.GetYaxis()->SetTitleOffset(0.7);
+      stack.GetYaxis()->SetLabelSize(0.05);
     } 
     else{
       stack.GetXaxis()->SetTitleSize(0.045);
-      stack.GetYaxis()->SetTitleSize(0.045);
       stack.GetXaxis()->SetTitleOffset(0.9);
+      stack.GetXaxis()->SetTitle(xTitle.c_str());
+
+      stack.GetYaxis()->SetTitleSize(0.045);
       // stack.GetYaxis()->SetTitleOffset(1.2);    
     }
-      stack.GetXaxis()->SetTitle(xTitle.c_str());
-      stack.GetYaxis()->SetTitle(yTitle.c_str());
+    stack.GetYaxis()->SetTitle(yTitle.c_str());
+
+    if (!drawRatioPlot){
+    }
+
+
   }
 
   /////////////////////////////////
@@ -242,9 +272,11 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     cutLine->Draw();
   }
 
-  // draw labels
+  /////////////////
+  // draw labels //
+  /////////////////
   // First, CMS text in top left of plot
-  TPaveText cms(0.12, 0.72, 0.45, 0.9, "NDC");
+  TPaveText cms(0.12, 0.68, 0.45, 0.9, "NDC");
   cms.SetFillColor(0);
   cms.SetFillStyle(4000);
   cms.SetBorderSize(0);
@@ -253,58 +285,58 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   cms.AddText("CMS Preliminary 2012");
   cms.AddText("");
   cms.AddText("#int L = 19.6 fb^{-1}");
+  cms.AddText("");
   // any other text user has specified
   cms.AddText(label_.c_str());
-
   cms.Draw();
 
-  // draw legend, with entries in right order
+  //////////////////////////////////////////////
+  // draw legend, with entries in right order //
+  //////////////////////////////////////////////
   std::reverse(entries.begin(),entries.end());
   for (unsigned int n = 0;n < entries.size(); n++)
   {
     leg.AddEntry(entries.at(n)->GetObject(), entries.at(n)->GetLabel(), entries.at(n)->GetOption());
   }
-  leg.SetLineWidth(0);
+  leg.SetBorderSize(0);
   leg.Draw();
 
   canvas.cd();
 
+  //////////////////////
+  // Draw ratio plot  //
+  //////////////////////
   if (drawRatioPlot){
-    // Draw ratio plot time!
-    TPad *pad2 = new TPad("pad2","",0,0.05,1,0.27);
-    pad2->SetTopMargin(1.2);
+    TPad *pad2 = new TPad("pad2","",0,0.0,1,0.30);
+    // TPad *pad2 = (TPad *) canvas.cd(2);
+    pad2->SetTopMargin(1);
+    pad2->SetBottomMargin(0.33);
     // pad2->SetTopMargin(0);
     pad2->Draw();
     pad2->cd();
 
-     // Little hack here to get sum of hists in the THStack
-     // ROOT doesn't have a method to convert a THStack to a TH1 for some stupid reason
-     // Good ol' Rene...
      
-    TList *histList = stack.GetHists();
-    TIter next(histList); // Get list of hists in Stack
-    TH1 *hMC  = (TH1*) histList->First()->Clone();
-    TObject *obj;
-    while ((obj = next())) // Loop through all hists in stack
-    {
-      // skip first object since it's used by creating the histogram                               
-      if(obj == histList->First()) continue;
-      hMC -> Add((TH1*)obj);
-    }
     hData->Add(hMC,-1);
     hData->Divide(hMC);
     hData->SetMarkerStyle(8);
     // hData->Draw("ep");
     hData->SetXTitle(xTitle.c_str());
     hData->SetYTitle("#frac{Data - MC}{MC}");
-    hData->GetXaxis()->SetTitleSize(0.1);
-    hData->GetXaxis()->SetLabelSize(0.1);
-    hData->GetXaxis()->SetTitleOffset(0.9);
+    hData->GetXaxis()->SetTitleSize(0.15);
+    hData->GetXaxis()->SetTitleOffset(0.85);
+    hData->GetXaxis()->SetLabelSize(0.12);
+    hData->GetXaxis()->SetLabelOffset(0.008);
 
-    hData->GetYaxis()->SetTitleSize(0.15);
-    hData->GetYaxis()->SetLabelSize(0.1);
-    hData->GetYaxis()->SetTitleOffset(0.3);
+    hData->GetYaxis()->SetTitleSize(0.12);
+    hData->GetYaxis()->SetTitleOffset(0.28);
+    hData->GetYaxis()->SetNdivisions(3,5,0);
+    hData->GetYaxis()->SetLabelSize(0.12);
+    hData->GetYaxis()->SetLabelOffset(0.008);
     hData->Draw("ep");
+    hData->SetMaximum(2.);
+    hData->SetMinimum(-2.);
+    hData->Draw("ep");
+
     double lineMin = hData->GetXaxis()->GetXmin();
     double lineMax = hData->GetXaxis()->GetXmax();
     TLine *line = new TLine(lineMin,0,lineMax,0);
@@ -314,11 +346,9 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     line->Draw();
     canvas.cd();
   }
-  std::string append;
-  if (logy) append = "_log.pdf";
-  else append = "_lin.pdf";
 
-  std::string filename = dir_+std::string("/")+hname+append;
+
+  std::string filename = dir_+std::string("/")+hname+".pdf";
   std::cout << "Writing file " << filename << std::endl;
 
   canvas.Print( filename.c_str() ,"pdf");
