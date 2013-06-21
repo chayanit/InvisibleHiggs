@@ -29,6 +29,14 @@ int main(int argc, char* argv[]) {
   Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
 
+  std::string oDir_Plot = options.oDir+std::string("/QCDBackground");
+  
+  boost::filesystem::path opath(oDir_Plot);
+  if (!exists(opath)) {
+    std::cout << "Creating output directory : " << oDir_Plot << std::endl;
+    boost::filesystem::create_directory(opath);
+  }
+
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/QCDBackground.root")).c_str(), "RECREATE");
 
@@ -36,6 +44,7 @@ int main(int argc, char* argv[]) {
   Cuts cuts;
   TCut puWeight("puWeight");
   TCut trigCorrWeight("trigCorrWeight");
+  TCut trigCorrWeight2( "( (trigCorrWeight>0)*trigCorrWeight + (trigCorrWeight<=0)*1 )" );
 
   TCut cutQCDNoMET = puWeight * trigCorrWeight * cuts.qcdNoMET();
   TCut cutQCDLoose2 = puWeight * trigCorrWeight * cuts.qcdLoose2();
@@ -94,9 +103,15 @@ int main(int argc, char* argv[]) {
 
     TCut cutD = cuts.cutDataset(dataset.name);
     
-    // check if it's DYJets
+    // check if it's ZToNuNuJets
+    bool isZvv = false;
+
     if (dataset.isData) {
       std::cout << "Analysing Data         : " << dataset.name << std::endl;
+    }
+    else if (dataset.name.compare(0,3,"Zvv")==0) {
+      isZvv = true;
+      std::cout << "Analysing Zvv MC       : " << dataset.name << std::endl;
     }
     else {
       std::cout << "Analysing BG MC        : " << dataset.name << std::endl;
@@ -144,7 +159,7 @@ int main(int argc, char* argv[]) {
       hQCD_Data_Loose_DPhi->Add(hQCD_Loose_DPhi);
       hQCD_Data_Tight_DPhi->Add(hQCD_Tight_DPhi);
     }
-    else {
+    else if (!isZvv) {	// do not include Z->vv samples we use data-driven number
       hQCD_BG_NoMET_DPhi->Add(hQCD_NoMET_DPhi);
       hQCD_BG_Loose2_DPhi->Add(hQCD_Loose2_DPhi);
       hQCD_BG_Loose_DPhi->Add(hQCD_Loose_DPhi);
@@ -205,15 +220,37 @@ int main(int argc, char* argv[]) {
     delete hQCD_Loose2_DPhi;
     delete hQCD_Tight_DPhi;
 
-    // per-dataset control plots (just an example, add more later)
-    ofile->cd();
+    // QCD Figure 13 in AN
+    TCut cutPlots("");
 
-    std::string hname = std::string("hQCD_Loose_DPhi2_")+dataset.name;
-    TH1D* hQCD_Loose_DPhi2 = new TH1D(hname.c_str(), "", 72, 0., TMath::Pi());
-    std::string str = std::string("vbfDPhi>>")+hname;
-    tree->Draw(str.c_str(), cutQCDLoose);
-    hQCD_Loose_DPhi2->Scale(weight);
-    hQCD_Loose_DPhi2->Write("",TObject::kOverwrite);
+    if (dataset.name == "WJets"  ||
+        dataset.name == "W1Jets" ||
+        dataset.name == "W2Jets" ||
+        dataset.name == "W3Jets" ||
+        dataset.name == "W4Jets") {
+		cutPlots = puWeight * trigCorrWeight2 * cuts.wWeight() * (cuts.HLTandMETFilters() + cuts.leptonVeto() + cuts.vbf());  //no MET and dPhijj
+    }
+    else 	cutPlots = puWeight * trigCorrWeight2 * (cuts.HLTandMETFilters() + cuts.leptonVeto() + cuts.vbf());  //no MET and dPhijj
+
+    TFile* ofile_Plot = TFile::Open( (oDir_Plot+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
+
+    TH1D* QCD_DPhijj 	= new TH1D("QCD_DPhijj",    "", 50, 0.,  TMath::Pi());
+    TH1D* QCD_MET	= new TH1D("QCD_MET",       "", 50, 0.,  1000.);
+
+    tree->Draw("vbfDPhi>>QCD_DPhijj"	, cutPlots);
+    tree->Draw("met>>QCD_MET"		, cutPlots);
+
+    if (!dataset.isData) {
+    QCD_DPhijj->Scale(weight);
+    QCD_MET->Scale(weight);
+    }
+
+    ofile_Plot->cd();
+
+    QCD_DPhijj->Write("",TObject::kOverwrite);
+    QCD_MET->Write("",TObject::kOverwrite);
+
+    ofile_Plot->Close();
 
     // clean up
     delete tree;
@@ -405,6 +442,69 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "Signal region (MET>130, dphi<1.0)" << std::endl;
   std::cout << "   N QCD (est): " << hQCD_Est_S_DPhi->GetBinContent(1) << " +/- " << hQCD_Est_S_DPhi->GetBinError(1) << std::endl;
+
+  // list histograms for dataset summing
+  std::vector<std::string> hists;
+  hists.push_back("QCD_DPhijj");
+  hists.push_back("QCD_MET");
+
+  // sum Z+jets datasets
+  std::vector<std::string> zjetsDatasets;
+  zjetsDatasets.push_back(std::string("Zvv_50to100"));
+  zjetsDatasets.push_back(std::string("Zvv_100to200"));
+  zjetsDatasets.push_back(std::string("Zvv_200to400"));
+  zjetsDatasets.push_back(std::string("Zvv_400toinf"));
+  SumDatasets(oDir_Plot, zjetsDatasets, hists, "ZJets");
+
+  // sum W+jets datasets
+  std::vector<std::string> wjetsDatasets;
+  wjetsDatasets.push_back(std::string("WJets"));
+  wjetsDatasets.push_back(std::string("W1Jets"));
+  wjetsDatasets.push_back(std::string("W2Jets"));
+  wjetsDatasets.push_back(std::string("W3Jets"));
+  wjetsDatasets.push_back(std::string("W4Jets"));
+  SumDatasets(oDir_Plot, wjetsDatasets, hists, "WNJets");
+
+  // sum single top datasets
+  std::vector<std::string> topDatasets;
+  topDatasets.push_back(std::string("SingleT_t"));
+  topDatasets.push_back(std::string("SingleTbar_t"));
+  topDatasets.push_back(std::string("SingleT_s"));
+  topDatasets.push_back(std::string("SingleTbar_s"));
+  topDatasets.push_back(std::string("SingleT_tW"));
+  topDatasets.push_back(std::string("SingleTbar_tW"));
+  topDatasets.push_back(std::string("TTBar"));
+  SumDatasets(oDir_Plot, topDatasets, hists, "SingleT+TTbar");
+
+  // sum DY contributions
+  std::cout << "Summing histograms for DYJetsToLL" << std::endl;
+  std::vector<std::string> dyjets;
+  dyjets.push_back("DYJetsToLL");
+  dyjets.push_back("DYJetsToLL_EWK");
+  SumDatasets(oDir_Plot,dyjets,hists,"DYJets");
+
+  // sum diboson datasets
+  std::vector<std::string> dibDatasets;
+  dibDatasets.push_back(std::string("WW"));
+  dibDatasets.push_back(std::string("WZ"));
+  dibDatasets.push_back(std::string("ZZ"));
+  SumDatasets(oDir_Plot, dibDatasets, hists, "DiBoson");
+
+  // make plots
+  std::cout << "Making plots" << std::endl;
+  StackPlot plots(oDir_Plot);
+  plots.setLegPos(0.66,0.60,0.89,0.89);
+
+  plots.addDataset("DiBoson", kViolet-6, 0);
+  plots.addDataset("DYJets", kPink-4,0);
+  plots.addDataset("SingleT+TTbar", kAzure-2, 0);
+  plots.addDataset("ZJets", kOrange-2, 0);
+  plots.addDataset("WNJets", kBlue+1, 0);
+  plots.addDataset("METABCD",    kBlack, 1);
+
+  plots.setYMax(1e+8); 
+  plots.draw("QCD_DPhijj",	"#Delta #phi_{jj}",	"N_{events}"    ,1,1);
+  plots.draw("QCD_MET",		"E_{T}^{miss} [GeV]",	"N_{events}"    ,1,1);
 
   // write out histograms
   ofile->cd();
