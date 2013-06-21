@@ -523,23 +523,30 @@ int main(int argc, char* argv[]) {
 
   std::cout << std::endl;
   std::cout << "##################################### MET > 130 #####################################" << std::endl;
+  std::cout << "dphi>2.6" << std::endl;
+  std::cout << std::endl;
+  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(3) << " +/- " << hZ_DY_EffMuMu->GetBinError(3) << std::endl;
+  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(3) << " +/- " << hZ_DY_EffVBFS->GetBinError(3) << std::endl;
+  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(3) << " +/- " << hZ_DY_EffVBFC->GetBinError(3) << std::endl;
+  std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(3) << " +/- " << hZ_DY_RatioVBF->GetBinError(3) << "(stat.) + " << 0.01039 * hZ_DY_RatioVBF->GetBinContent(3) << ", - " << 0.0136 * hZ_DY_RatioVBF->GetBinContent(3) << "(syst.)" << std::endl;
+  std::cout << "  total eff by histogram : " << hZ_DY_TotalEff->GetBinContent(3) << " +/- " << hZ_DY_TotalEff->GetBinError(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_C_DPhi->GetBinError(3) << "(stat.) + " << 0.035 * hZ_BG_C_DPhi->GetBinContent(3) << ", - " << 0.09 * hZ_BG_C_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
+  std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_C_DPhi->GetBinError(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_C_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_S_DPhi->GetBinError(3) << "(stat.) + " << 0.0104 * hZ_Est_S_DPhi->GetBinContent(3) << ", - " << 0.0161 * hZ_Est_S_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
+  std::cout << std::endl << std::endl;
+
+  std::cout << "dphi<1.0" << std::endl;
+  std::cout << std::endl;
   std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
   std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
   std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
   std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << "(stat.) + " << 0.01039 * hZ_DY_RatioVBF->GetBinContent(1) << ", - " << 0.0136 * hZ_DY_RatioVBF->GetBinContent(1) << "(syst.)" << std::endl;
   std::cout << "  total eff by histogram : " << hZ_DY_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_TotalEff->GetBinError(1) << std::endl;
   std::cout << std::endl;
-
-  std::cout << std::endl;
-  std::cout << "dphi>2.6" << std::endl;
-  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_C_DPhi->GetBinError(3) << "(stat.) + " << 0.035 * hZ_BG_C_DPhi->GetBinContent(3) << ", - " << 0.0 * hZ_BG_C_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_C_DPhi->GetBinError(3) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_S_DPhi->GetBinError(3) << "(stat.) + " << 0.0104 * hZ_Est_S_DPhi->GetBinContent(3) << ", - " << 0.0161 * hZ_Est_S_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
-  std::cout << std::endl << std::endl;
-  std::cout << "dphi<1.0" << std::endl;
   std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(1) << " +/- " << hZ_DY_C_DPhi->GetBinError(1) << std::endl;
   std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_C_DPhi->GetBinError(1) << "(stat.) + " << 0.174 * hZ_BG_C_DPhi->GetBinContent(1) << ", - " << 0.09 * hZ_BG_C_DPhi->GetBinContent(1) << "(syst.)" << std::endl;
   std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(1) << " +/- " << hZ_Data_C_DPhi->GetBinError(1) << std::endl;
