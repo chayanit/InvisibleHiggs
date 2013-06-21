@@ -747,11 +747,7 @@ for (unsigned n = 0; n < hnames.size(); n++)
   topDatasets.push_back(std::string("SingleT_tW"));
   topDatasets.push_back(std::string("SingleTbar_tW"));
   topDatasets.push_back(std::string("TTBar"));
-  SumDatasets(oDirPlots, topDatasets, hnames, "Single top + TTBar");
-
-  std::vector<std::string> ttbarDatasets;
-  ttbarDatasets.push_back(std::string("TTBar"));
-  SumDatasets(oDirPlots, ttbarDatasets, hnames, "TTbar");
+  SumDatasets(oDirPlots, topDatasets, hnames, "SingleT+TTBar");
 
   // sum DY contributions
   std::vector<std::string> dyjets;
@@ -790,8 +786,8 @@ for (unsigned n = 0; n < hnames.size(); n++)
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   plots.addDataset("QCD", kGreen+3, 0);
+  plots.addDataset("SingleT+TTBar", kAzure-2, 0);
   plots.addDataset("DYJets", kPink-4,0);
-  plots.addDataset("Single top + TTBar", kAzure-2, 0);
   plots.addDataset("WNJets", kBlue+1, 0);
   plots.addDataset("METABCD", kBlack, 1);
 

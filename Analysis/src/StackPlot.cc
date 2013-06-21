@@ -59,8 +59,15 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
   TCanvas canvas;
   // canvas.SetLogy();
+  unsigned int ww = canvas.GetWindowWidth();
+  unsigned int wh = canvas.GetWindowHeight();
+
+  //std::cout << "canvas weight = " << ww << std::endl;
+  //std::cout << "canvas height = " << wh << std::endl;
+
   TPad *pad1; // Use TPad to allow us to draw ratio plot below main plot
   if (drawRatioPlot) {
+  canvas.SetCanvasSize(ww, 1.2*wh);
   canvas.Divide(1, 2);
     // pad1 = (TPad *) canvas.cd(1);
     pad1 = new TPad("pad1","",0,0.30,1,1);
