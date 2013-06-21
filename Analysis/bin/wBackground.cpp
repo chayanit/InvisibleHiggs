@@ -177,8 +177,8 @@ int main(int argc, char* argv[]) {
       cutWEl_LooseC = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElVBF() + metCtrl100);
       cutWEl_LooseS = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi + met100);
 
-      cutWMuControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") );
-      cutWElControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") );
+      cutWMuControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
+      cutWElControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
     }
     else {
       cutWMu_C = puWeight * trigCorrWeight * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
@@ -201,8 +201,8 @@ int main(int argc, char* argv[]) {
       cutWEl_LooseC = puWeight * trigCorrWeight * (cutD + cuts.wElVBF() + metCtrl100);
       cutWEl_LooseS = puWeight * trigCorrWeight * (cutD + cutSignalNoMETNoDPhi + met100);
 
-      cutWMuControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") );
-      cutWElControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") );
+      cutWMuControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
+      cutWElControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
 
     }
 
@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
     TH1D* hWEl_LooseS_DPhi = new TH1D("hWEl_LooseS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
 
     // weight  to lumi
-    double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents;
+    double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
     std::cout << "  weight : " << weight << std::endl;
 
     tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
@@ -332,10 +332,112 @@ int main(int argc, char* argv[]) {
     delete hWMu_S_DPhi;
     delete hWEl_C_DPhi;
     delete hWEl_S_DPhi;
-
+    delete hWMu_NoMETC_DPhi;
+    delete hWMu_NoMETS_DPhi;
+    delete hWEl_NoMETC_DPhi;
+    delete hWEl_NoMETS_DPhi;
+    delete hWMu_Loose2C_DPhi;
+    delete hWMu_Loose2S_DPhi;
+    delete hWEl_Loose2C_DPhi;
+    delete hWEl_Loose2S_DPhi;
+    delete hWMu_LooseC_DPhi;
+    delete hWMu_LooseS_DPhi;
+    delete hWEl_LooseC_DPhi;
+    delete hWEl_LooseS_DPhi;
+    
     // per-dataset control plots (just an example, add more later)
     ofile->cd();
     
+    // per-dataset cutflow hists
+    std::string hnameWMu = std::string("hWMu_CutFlow_")+dataset.name;
+    std::string hnameWEl = std::string("hWEl_CutFlow_")+dataset.name;
+    TH1D* hCutFlowWMu = new TH1D(hnameWMu.c_str(), "", nCutsWMu, 0., nCutsWMu);
+    TH1D* hCutFlowWEl = new TH1D(hnameWEl.c_str(), "", nCutsWEl, 0., nCutsWEl);
+
+    for (unsigned c=0; c<nCutsWMu; ++c) {
+
+      TCut cut;
+      if(c == nCutsWMu-1)
+        {
+          cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowWMu(c));
+          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+          if(isWJets) cut = puWeight * trigCorrWeight * wWeight * (cuts.cutflowWMu(c));
+        }
+      else
+        {
+          cut = puWeight * (cutD + cuts.cutflowWMu(c));
+          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+          if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+        }
+      TH1D* h = new TH1D("h","", 1, 0., 1.);
+      tree->Draw("0.5>>h", cut);
+
+      hCutFlowWMu->SetBinContent(c+1, h->GetBinContent(1));
+      hCutFlowWMu->SetBinError(c+1, h->GetBinError(1));
+
+      delete h;
+    }
+
+    for (unsigned c=0; c<nCutsWEl; ++c) {
+
+      TCut cut;
+      if(c == nCutsWMu-1)
+        {
+          cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowWEl(c));
+          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+          if(isWJets) cut = puWeight * trigCorrWeight * wWeight * (cuts.cutflowWEl(c));
+        }
+      else
+        {
+          cut = puWeight * (cutD + cuts.cutflowWEl(c));
+          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+          if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+        }
+      TH1D* h = new TH1D("h","", 1, 0., 1.);
+      tree->Draw("0.5>>h", cut);
+
+      hCutFlowWEl->SetBinContent(c+1, h->GetBinContent(1));
+      hCutFlowWEl->SetBinError(c+1, h->GetBinError(1));
+
+      delete h;
+    }
+
+    hCutFlowWMu->Scale(weight);
+    hCutFlowWEl->Scale(weight);
+
+    // sum histograms
+    if (dataset.isData) {
+      hDataWMu->Add(hCutFlowWMu);
+      hDataWEl->Add(hCutFlowWEl);
+    }
+    if (isWJets) {
+      hWLNuWMu->Add(hCutFlowWMu);
+      hWLNuWEl->Add(hCutFlowWEl);
+    }
+    if (dataset.name.compare(0,3,"QCD")==0) {
+      hQCDWMu->Add(hCutFlowWMu);
+      hQCDWEl->Add(hCutFlowWEl);
+    }
+    if (dataset.name.compare(0,2,"DY")==0) {
+      hDYWMu->Add(hCutFlowWMu);
+      hDYWEl->Add(hCutFlowWEl);
+    }
+    if (dataset.name.compare(0,7,"SingleT")==0) {
+      hSingleTWMu->Add(hCutFlowWMu);
+      hSingleTWEl->Add(hCutFlowWEl);
+    }
+    if (dataset.name.compare(0,2,"WW")==0 ||
+        dataset.name.compare(0,2,"WZ")==0 ||
+        dataset.name.compare(0,2,"ZZ")==0 ) {
+      hDibosonWMu->Add(hCutFlowWMu);
+      hDibosonWEl->Add(hCutFlowWEl);
+    }
+
+    hCutFlowWMu->Write("",TObject::kOverwrite);
+    hCutFlowWEl->Write("",TObject::kOverwrite);
+
+    delete hCutFlowWMu;
+    delete hCutFlowWEl;
 
     // For electron and muon channels do control plots:
     // jet1Pt, jet2Pt, jet1Eta, jet2Eta, Mjj, dEtajj, dPhijj, MET and W_mT, W_pT 
@@ -435,116 +537,12 @@ int main(int argc, char* argv[]) {
 
     }   
 
-    // per-dataset cutflow hists
-    std::string hnameWMu = std::string("hWMu_CutFlow_")+dataset.name;
-    std::string hnameWEl = std::string("hWEl_CutFlow_")+dataset.name;
-    TH1D* hCutFlowWMu = new TH1D(hnameWMu.c_str(), "", nCutsWMu, 0., nCutsWMu);
-    TH1D* hCutFlowWEl = new TH1D(hnameWEl.c_str(), "", nCutsWEl, 0., nCutsWEl);
-
-    for (unsigned c=0; c<nCutsWMu; ++c) {
-
-      TCut cut;
-      if(c == nCutsWMu-1)
-        {
-          cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowWMu(c));
-          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
-          if(isWJets) cut = puWeight * trigCorrWeight * wWeight * (cuts.cutflowWMu(c));
-        }
-      else
-        {
-          cut = puWeight * (cutD + cuts.cutflowWMu(c));
-          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
-          if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
-        }
-      TH1D* h = new TH1D("h","", 1, 0., 1.);
-      tree->Draw("0.5>>h", cut);
-
-      hCutFlowWMu->SetBinContent(c+1, h->GetBinContent(1));
-      hCutFlowWMu->SetBinError(c+1, h->GetBinError(1));
-
-      delete h;
-    }
-
-    for (unsigned c=0; c<nCutsWEl; ++c) {
-
-      TCut cut;
-      if(c == nCutsWMu-1)
-        {
-          cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowWEl(c));
-          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
-          if(isWJets) cut = puWeight * trigCorrWeight * wWeight * (cuts.cutflowWEl(c));
-        }
-      else
-        {
-          cut = puWeight * (cutD + cuts.cutflowWEl(c));
-          //      if (dataset.name.compare(0,1,"W")==0) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
-          if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
-        }
-      TH1D* h = new TH1D("h","", 1, 0., 1.);
-      tree->Draw("0.5>>h", cut);
-
-      hCutFlowWEl->SetBinContent(c+1, h->GetBinContent(1));
-      hCutFlowWEl->SetBinError(c+1, h->GetBinError(1));
-
-      delete h;
-    }
-
-    hCutFlowWMu->Scale(weight);
-    hCutFlowWEl->Scale(weight);
-
-    // sum histograms
-    if (dataset.isData) {
-      hDataWMu->Add(hCutFlowWMu);
-      hDataWEl->Add(hCutFlowWEl);
-    }
-    if (isWJets) {
-      hWLNuWMu->Add(hCutFlowWMu);
-      hWLNuWEl->Add(hCutFlowWEl);
-    }
-    if (dataset.name.compare(0,3,"QCD")==0) {
-      hQCDWMu->Add(hCutFlowWMu);
-      hQCDWEl->Add(hCutFlowWEl);
-    }
-    if (dataset.name.compare(0,2,"DY")==0) {
-      hDYWMu->Add(hCutFlowWMu);
-      hDYWEl->Add(hCutFlowWEl);
-    }
-    if (dataset.name.compare(0,7,"SingleT")==0) {
-      hSingleTWMu->Add(hCutFlowWMu);
-      hSingleTWEl->Add(hCutFlowWEl);
-    }
-    if (dataset.name.compare(0,2,"WW")==0 ||
-      	dataset.name.compare(0,2,"WZ")==0 ||
-      	dataset.name.compare(0,2,"ZZ")==0 ) {
-      hDibosonWMu->Add(hCutFlowWMu);
-      hDibosonWEl->Add(hCutFlowWEl);
-    }
-
-    hCutFlowWMu->Write("",TObject::kOverwrite);
-    hCutFlowWEl->Write("",TObject::kOverwrite);
-
-    // delete tree;
+    delete tree;
     ofilePlots->Close();
 
     file->Close();
    
   }
-
-  // write out summed cutflow histograms
-  hDataWMu->Write("",TObject::kOverwrite);  
-  hWLNuWMu->Write("",TObject::kOverwrite);  
-  hQCDWMu->Write("",TObject::kOverwrite);  
-  hDYWMu->Write("",TObject::kOverwrite);  
-  hSingleTWMu->Write("",TObject::kOverwrite);  
-  hDibosonWMu->Write("",TObject::kOverwrite);  
-
-  hDataWEl->Write("",TObject::kOverwrite);  
-  hWLNuWEl->Write("",TObject::kOverwrite);  
-  hQCDWEl->Write("",TObject::kOverwrite);  
-  hDYWEl->Write("",TObject::kOverwrite);  
-  hSingleTWEl->Write("",TObject::kOverwrite);  
-  hDibosonWEl->Write("",TObject::kOverwrite);  
-
 
   // create histograms with the background estimate
   TH1D* hWMu_R_DPhi    = new TH1D("hWMu_R_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
@@ -675,79 +673,6 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "Total W (dphi<1.0)" << std::endl;
   std::cout << "  W in sgnl region       : " << hW_Est_S_DPhi->GetBinContent(1) << std::endl;
-
-  // store histograms
-  ofile->cd();
-    
-  hWMu_MCC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_MCS_DPhi->Write("",TObject::kOverwrite);
-  hWMu_BGC_DPhi->Write("",TObject::kOverwrite);
-  //  hWMu_BGS_DPhi->Write("",TObject::kOverwrite);
-  hWMu_DataC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_R_DPhi->Write("",TObject::kOverwrite);
-  hWMu_EstC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_EstS_DPhi->Write("",TObject::kOverwrite);
-
-  hWEl_MCC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_MCS_DPhi->Write("",TObject::kOverwrite);
-  hWEl_BGC_DPhi->Write("",TObject::kOverwrite);
-  //  hWEl_BGS_DPhi->Write("",TObject::kOverwrite);
-  hWEl_DataC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_R_DPhi->Write("",TObject::kOverwrite);
-  hWEl_EstC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_EstS_DPhi->Write("",TObject::kOverwrite);
-  hW_Est_S_DPhi->Write("",TObject::kOverwrite);
-
-  hWMu_MC_NoMETC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_MC_NoMETS_DPhi->Write("",TObject::kOverwrite);
-  hWMu_BG_NoMETC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Data_NoMETC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_R_NoMET_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Est_NoMETC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
-
-  hWEl_MC_NoMETC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_MC_NoMETS_DPhi->Write("",TObject::kOverwrite);
-  hWEl_BG_NoMETC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Data_NoMETC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_R_NoMET_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Est_NoMETC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
-  hW_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
-
-  hWMu_MC_Loose2C_DPhi->Write("",TObject::kOverwrite);
-  hWMu_MC_Loose2S_DPhi->Write("",TObject::kOverwrite);
-  hWMu_BG_Loose2C_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Data_Loose2C_DPhi->Write("",TObject::kOverwrite);
-  hWMu_R_Loose2_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Est_Loose2C_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
-
-  hWEl_MC_Loose2C_DPhi->Write("",TObject::kOverwrite);
-  hWEl_MC_Loose2S_DPhi->Write("",TObject::kOverwrite);
-  hWEl_BG_Loose2C_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Data_Loose2C_DPhi->Write("",TObject::kOverwrite);
-  hWEl_R_Loose2_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Est_Loose2C_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
-  hW_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
-
-  hWMu_MC_LooseC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_MC_LooseS_DPhi->Write("",TObject::kOverwrite);
-  hWMu_BG_LooseC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Data_LooseC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_R_Loose_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Est_LooseC_DPhi->Write("",TObject::kOverwrite);
-  hWMu_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
-
-  hWEl_MC_LooseC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_MC_LooseS_DPhi->Write("",TObject::kOverwrite);
-  hWEl_BG_LooseC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Data_LooseC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_R_Loose_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Est_LooseC_DPhi->Write("",TObject::kOverwrite);
-  hWEl_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
-  hW_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
 
   // write the cutflow table
   std::cout << "Writing cut flow TeX file" << std::endl;
@@ -911,6 +836,95 @@ for (unsigned n = 0; n < hnames.size(); n++)
     plots.draw(hname.c_str(), "p^{W}_{T} [GeV]", "N_{events}",true, true);
 
   }
+
+  // store histograms
+  ofile->cd(); 
+    
+  hWMu_MCC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_MCS_DPhi->Write("",TObject::kOverwrite);
+  hWMu_BGC_DPhi->Write("",TObject::kOverwrite); 
+  //  hWMu_BGS_DPhi->Write("",TObject::kOverwrite);
+  hWMu_DataC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_R_DPhi->Write("",TObject::kOverwrite);
+  hWMu_EstC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_EstS_DPhi->Write("",TObject::kOverwrite);
+  
+  hWEl_MCC_DPhi->Write("",TObject::kOverwrite); 
+  hWEl_MCS_DPhi->Write("",TObject::kOverwrite); 
+  hWEl_BGC_DPhi->Write("",TObject::kOverwrite);
+  //  hWEl_BGS_DPhi->Write("",TObject::kOverwrite);
+  hWEl_DataC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_R_DPhi->Write("",TObject::kOverwrite);
+  hWEl_EstC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_EstS_DPhi->Write("",TObject::kOverwrite);
+  hW_Est_S_DPhi->Write("",TObject::kOverwrite); 
+  
+  hWMu_MC_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_MC_NoMETS_DPhi->Write("",TObject::kOverwrite);
+  hWMu_BG_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Data_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_R_NoMET_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Est_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
+  
+  hWEl_MC_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_MC_NoMETS_DPhi->Write("",TObject::kOverwrite);
+  hWEl_BG_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Data_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_R_NoMET_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Est_NoMETC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
+  hW_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
+  
+  hWMu_MC_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hWMu_MC_Loose2S_DPhi->Write("",TObject::kOverwrite);
+  hWMu_BG_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Data_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hWMu_R_Loose2_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Est_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
+
+  hWEl_MC_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hWEl_MC_Loose2S_DPhi->Write("",TObject::kOverwrite);
+  hWEl_BG_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Data_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hWEl_R_Loose2_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Est_Loose2C_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
+  hW_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
+
+  hWMu_MC_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_MC_LooseS_DPhi->Write("",TObject::kOverwrite);
+  hWMu_BG_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Data_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_R_Loose_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Est_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
+
+  hWEl_MC_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_MC_LooseS_DPhi->Write("",TObject::kOverwrite);
+  hWEl_BG_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Data_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_R_Loose_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Est_LooseC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
+  hW_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
+
+  // write out summed cutflow histograms
+  hDataWMu->Write("",TObject::kOverwrite);
+  hWLNuWMu->Write("",TObject::kOverwrite);
+  hQCDWMu->Write("",TObject::kOverwrite);
+  hDYWMu->Write("",TObject::kOverwrite);
+  hSingleTWMu->Write("",TObject::kOverwrite);
+  hDibosonWMu->Write("",TObject::kOverwrite);
+      
+  hDataWEl->Write("",TObject::kOverwrite);
+  hWLNuWEl->Write("",TObject::kOverwrite);
+  hQCDWEl->Write("",TObject::kOverwrite);
+  hDYWEl->Write("",TObject::kOverwrite);
+  hSingleTWEl->Write("",TObject::kOverwrite);
+  hDibosonWEl->Write("",TObject::kOverwrite);
+
   ofile->Close();    
 
 }
