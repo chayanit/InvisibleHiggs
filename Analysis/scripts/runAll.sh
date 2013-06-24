@@ -20,15 +20,15 @@ DATASETS_QCD=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_QCD_$VER.txt
 
 # MC numbers & plots
 echo "efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/efficiency.log
+#efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/efficiency.log
 
 echo "nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/nMinusOne.log
+#nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/nMinusOne.log
 echo ""
 
 # MC vs data
 echo "controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/controlPlots.log
+#controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/controlPlots.log
 echo ""
 
 # BG estimates
@@ -50,7 +50,7 @@ echo ""
 
 # homegrown limits
 echo "limits -o $ODIR $LUMI"
-limits -o $ODIR -l $LUMI > $ODIR/limits.log
+#limits -o $ODIR -l $LUMI > $ODIR/limits.log
 echo ""
 
 # combine tool limits

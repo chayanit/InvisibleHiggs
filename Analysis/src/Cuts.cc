@@ -334,7 +334,6 @@ TCut Cuts::qcdNoMET() {
   tmp += cut("EVeto");
   tmp += cut("MuVeto");
   tmp += vbf();
-  tmp += TCut("met>80.");
   return tmp;
 }
 
