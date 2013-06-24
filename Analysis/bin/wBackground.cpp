@@ -153,8 +153,8 @@ int main(int argc, char* argv[]) {
       cutWEl_MET0C = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.wElVBF());
       cutWEl_MET0S = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi);
 
-      cutWMuControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
-      cutWElControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
+      cutWMuControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
+      cutWElControlPlot = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
 
       // weight  to lumi
       weight = lumi * dataset.sigma / dataset.nEvents;
@@ -231,8 +231,8 @@ int main(int argc, char* argv[]) {
       cutWEl_MET0C = puWeight * trigCorrWeight2 * (cutD + cuts.wElVBF());
       cutWEl_MET0S = puWeight * trigCorrWeight2 * (cutD + cutSignalNoMETNoDPhi);
 
-      cutWMuControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
-      cutWElControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
+      cutWMuControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
+      cutWElControlPlot = puWeight * trigCorrWeight2 * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
 
       // weight  to lumi
       weight = lumi * dataset.sigma / dataset.nEvents;
@@ -733,8 +733,8 @@ for (unsigned n = 0; n < hnames.size(); n++)
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   plots.addDataset("QCD", kGreen+3, 0);
-  plots.addDataset("SingleT+TTBar", kAzure-2, 0);
   plots.addDataset("DYJets", kPink-4,0);
+  plots.addDataset("SingleT+TTBar", kAzure-2, 0);
   plots.addDataset("WNJets", kBlue+1, 0);
   plots.addDataset("METABCD", kBlack, 1);
 
