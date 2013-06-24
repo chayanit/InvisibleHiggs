@@ -371,6 +371,16 @@ int main(int argc, char* argv[]) {
   hQCD_BG_Tight_DPhi->Write("", TObject::kOverwrite);
   hQCD_Z_Tight_DPhi->Write("", TObject::kOverwrite);
   hQCD_W_Tight_DPhi->Write("", TObject::kOverwrite);
+  hQCD_WTau_METDPhi->Write("", TObject::kOverwrite);
+  hQCD_WTau_Tight_DPhi->Write("", TObject::kOverwrite);
+  hQCD_TTBar_METDPhi->Write("", TObject::kOverwrite);
+  hQCD_TTBar_Tight_DPhi->Write("", TObject::kOverwrite);
+  hQCD_SingleTSum_METDPhi->Write("", TObject::kOverwrite);
+  hQCD_SingleTSum_Tight_DPhi->Write("", TObject::kOverwrite);
+  hQCD_DY_METDPhi->Write("", TObject::kOverwrite);
+  hQCD_DY_Tight_DPhi->Write("", TObject::kOverwrite);
+  hQCD_Diboson_METDPhi->Write("", TObject::kOverwrite);
+  hQCD_Diboson_Tight_DPhi->Write("", TObject::kOverwrite);
   hQCD_Est_METDPhi->Write("", TObject::kOverwrite);
   hQCD_Est_S_DPhi->Write("", TObject::kOverwrite);
 
