@@ -279,7 +279,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   double cutVal = 0.;
   if (!hname.compare("hDijetNM1")) cutVal = 50.;
   else if (!hname.compare("hDEtaJJNM1")) cutVal = 4.2;
-  else if (!hname.compare("hMjjNM1")) cutVal = 1200.;
+  else if (!hname.compare("hMjjNM1")) cutVal = 1100.;
   else if (!hname.compare("hMETNM1")) cutVal = 130.;
   else if (!hname.compare("hDPhiJJNM1")) cutVal = 1.0;
   else if (!hname.compare("hCenEtNM1")) cutVal = 30.0;
