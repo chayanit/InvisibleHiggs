@@ -29,14 +29,21 @@ int main(int argc, char* argv[]) {
   Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
 
+  std::string oDir_Plot = options.oDir+std::string("/QCDBackground2");
+
+  boost::filesystem::path opath(oDir_Plot);
+  if (!exists(opath)) {
+    std::cout << "Creating output directory : " << oDir_Plot << std::endl;
+    boost::filesystem::create_directory(opath);
+  }
+
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/QCDBackground2.root")).c_str(), "UPDATE");
 
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
-  //TCut trigCorrWeight("trigCorrWeight");
-  TCut trigCorrWeight("1.");
+  TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
   TCut wWeight = cuts.wWeight();
 
   TCut Dphi_sig("vbfDPhi<1.0");
@@ -95,9 +102,9 @@ int main(int argc, char* argv[]) {
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
  
-    TCut cutQCDHiDPhi;
-    TCut cutQCDLowDPhi;
-    TCut cutQCDLowDPhiMET;
+    TCut cutQCDHiDPhi("");
+    TCut cutQCDLowDPhi("");
+    TCut cutQCDLowDPhiMET("");
 
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" ||
@@ -207,16 +214,6 @@ int main(int argc, char* argv[]) {
     delete hQCD_HiDPhi_METshape;
     delete hQCD_LowDPhi_METshape;
     delete hQCD_LowDPhi_METshape2;
-
-    // per-dataset control plots (just an example, add more later)
-    //ofile->cd();
-
-    //std::string hname = std::string("hQCD_Loose_DPhi2_")+dataset.name;
-    //TH1D* hQCD_Loose_DPhi2 = new TH1D(hname.c_str(), "", 72, 0., TMath::Pi());
-    //std::string str = std::string("vbfDPhi>>")+hname;
-    //tree->Draw(str.c_str(), cutQCDLoose);
-    //hQCD_Loose_DPhi2->Scale(weight);
-    //hQCD_Loose_DPhi2->Write("",TObject::kOverwrite);
 
     // clean up
     delete tree;
