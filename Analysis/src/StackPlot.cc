@@ -318,7 +318,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   {
     leg.AddEntry(entries.at(n)->GetObject(), entries.at(n)->GetLabel(), entries.at(n)->GetOption());
   }
-  leg.SetBorderSize(0);
+  if (drawRatioPlot) leg.SetBorderSize(0);
   leg.Draw();
 
   canvas.cd();
@@ -388,10 +388,9 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
 
   std::string filename = dir_+std::string("/")+hname+".pdf";
-  std::cout << "Writing file " << filename << std::endl;
+  std::cout << "Writing pdf file " << filename << std::endl;
 
   canvas.Print( filename.c_str() ,"pdf");
-
 }
 
 
