@@ -39,12 +39,14 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
   if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
 
   // create output directory if it doesn't exist already
-  boost::filesystem::path opath(oDir);
-  if (!exists(opath)) {
-    std::cout << "Creating output directory : " << oDir << std::endl;
-    boost::filesystem::create_directory(opath);
+  if (oDir!="") {
+    boost::filesystem::path opath(oDir);
+    if (!exists(opath)) {
+      std::cout << "Creating output directory : " << oDir << std::endl;
+      boost::filesystem::create_directory(opath);
+    }
+    std::cout << "Writing results to " << oDir << std::endl;
   }
-  else std::cout << "Writing results to " << oDir << std::endl;
 
   std::cout << "Integrated luminosity : " << lumi << " pb-1" << std::endl;
   std::cout << std::endl;

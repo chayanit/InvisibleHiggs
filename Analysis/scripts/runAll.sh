@@ -18,17 +18,22 @@ DATASETS_W=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_W_$VER.txt
 DATASETS_Z=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_Z_$VER.txt
 DATASETS_QCD=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_QCD_$VER.txt
 
+
+# create lepton weight TTree
+echo "writeLeptonWeights -i $IDIR -f $DATASETS"
+#writeLeptonWeights -i $IDIR -f $DATASETS > $ODIR/leptonWeights.log
+
 # MC numbers & plots
 echo "efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-#efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/efficiency.log
+efficiency -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/efficiency.log
 
 echo "nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-#nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/nMinusOne.log
+nMinusOne -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/nMinusOne.log
 echo ""
 
 # MC vs data
 echo "controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI"
-#controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/controlPlots.log
+controlPlots -i $IDIR -o $ODIR -f $DATASETS -l $LUMI > $ODIR/controlPlots.log
 echo ""
 
 # BG estimates

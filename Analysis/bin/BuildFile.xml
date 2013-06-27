@@ -25,3 +25,5 @@
 <bin name="summary" file="summary.cpp"/>
 
 <bin name="limits" file="limits.cpp"/>
+
+<bin name="writeLeptonWeights" file="writeLeptonWeights.cpp"/>
