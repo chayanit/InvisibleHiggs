@@ -210,7 +210,7 @@ int main(int argc, char* argv[]) {
       hZ_BG_C_METDPhi->Add(hZ_C_METDPhi);
     }
 
-    std::cout << "  N ctrl (dphi<1.0) : " << hZ_C_DPhi->GetBinContent(1) << " +/- " << hZ_C_DPhi->GetBinError(1) << std::endl;	
+    std::cout << "  N ctrl (dphi<1.0) : " << hZ_C_DPhi->GetBinContent(1) << " +/- " << hZ_C_DPhi->GetBinError(1) << std::endl;  
     std::cout << "  N ctrl (dphi>2.6) : " << hZ_C_DPhi->GetBinContent(3) << " +/- " << hZ_C_DPhi->GetBinError(3) << std::endl;
     
     delete hZ_C_DPhi;
@@ -261,8 +261,8 @@ int main(int argc, char* argv[]) {
       hZ_CutFlow_SingleTSum->Add(hZ_CutFlow);
     }
     if (dataset.name.compare(0,2,"WW")==0 ||
-	dataset.name.compare(0,2,"WZ")==0 ||
-	dataset.name.compare(0,2,"ZZ")==0 ) {
+  dataset.name.compare(0,2,"WZ")==0 ||
+  dataset.name.compare(0,2,"ZZ")==0 ) {
       hZ_CutFlow_Diboson->Add(hZ_CutFlow);
     }
 
@@ -275,7 +275,7 @@ int main(int argc, char* argv[]) {
  
     TFile* ofile_Plot = TFile::Open( (oDir_Plot+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
-    TH1D* ZCtrlZMass	    = new TH1D("ZCtrlZMass",	 "", 30, 60., 120.);
+    TH1D* ZCtrlZMass      = new TH1D("ZCtrlZMass",   "", 30, 60., 120.);
     TH1D* ZCtrlZpT          = new TH1D("ZCtrlZpT",       "", 50, 0.,  1000.);
     TH1D* ZCtrlJet1pT       = new TH1D("ZCtrlJet1pT",    "", 50, 0.,  1000.);
     TH1D* ZCtrlJet1Eta      = new TH1D("ZCtrlJet1Eta",   "", 50, -5., 5.);
@@ -520,7 +520,7 @@ int main(int argc, char* argv[]) {
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir_Plot);
-  plots.setLegPos(0.69,0.69,0.89,0.89);
+  plots.setLegPos(0.62,0.62,0.89,0.89);
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
