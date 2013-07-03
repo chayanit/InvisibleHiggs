@@ -1,4 +1,3 @@
-
 #include "InvisibleHiggs/Analysis/interface/ProgramOptions.h"
 #include "InvisibleHiggs/Analysis/interface/Cuts.h"
 #include "InvisibleHiggs/Analysis/interface/Histogrammer.h"
@@ -356,7 +355,7 @@ int main(int argc, char* argv[]) {
   plots.addDataset("DYJets", kPink-4,0);
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
   plots.addDataset("ZJets", kOrange-2, 0);
-  plots.addDataset("WNJets", kBlue+1, 0);
+  plots.addDataset("WNJets", kGreen-3, 0);
   plots.addDataset("METABCD",    kBlack, 1);
 
   plots.setYMax(1e+8); 
