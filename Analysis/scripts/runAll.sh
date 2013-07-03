@@ -49,6 +49,14 @@ echo "qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI"
 qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground.log
 echo ""
 
+echo "qcdBackground2 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI"
+qcdBackground2 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground2.log
+echo ""
+
+echo "qcdBackground3 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI"
+qcdBackground3 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground3.log
+echo ""
+
 echo "summary -o $ODIR $LUMI"
 summary -o $ODIR -l $LUMI > $ODIR/summary.log
 echo ""
