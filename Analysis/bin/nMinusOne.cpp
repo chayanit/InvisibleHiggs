@@ -266,7 +266,7 @@ int main(int argc, char* argv[]) {
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
   plots.addDataset("QCD", kGreen+3, 0);
   plots.addDataset("ZJets", kOrange-2, 0);
-  plots.addDataset("WNJets", kBlue+1, 0);
+  plots.addDataset("WNJets", kGreen-3, 0);
   plots.addDataset("SignalM125_POWHEG", kRed, 2);
 
   plots.draw("hTrigNM1", "", "");
