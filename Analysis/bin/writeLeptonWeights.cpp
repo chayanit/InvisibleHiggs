@@ -1,9 +1,5 @@
 
 #include "InvisibleHiggs/Analysis/interface/ProgramOptions.h"
-#include "InvisibleHiggs/Analysis/interface/Cuts.h"
-#include "InvisibleHiggs/Analysis/interface/Histogrammer.h"
-#include "InvisibleHiggs/Analysis/interface/StackPlot.h"
-#include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
 #include "InvisibleHiggs/Analysis/interface/LeptonWeights.h"
 

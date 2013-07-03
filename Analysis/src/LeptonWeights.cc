@@ -74,8 +74,8 @@ void LeptonWeights::createTree(TTree* tree,
   lwTree->Branch("mu2WeightErr", &mu2WeightErr, "mu2WeightErr/D");
   
   // fill the new branch
-  int nEvt = tree->GetEntriesFast();
-  for (int iEvt=0; iEvt<nEvt; ++iEvt) {
+  Long64_t nEvt = tree->GetEntriesFast();
+  for (Long64_t iEvt=0; iEvt<nEvt; ++iEvt) {
     
     long nb = tree->GetEntry(iEvt);
     if (nb == 0) {  std::cout << "GetEntry() failed" << std::endl; }
