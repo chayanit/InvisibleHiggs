@@ -136,10 +136,10 @@ int main(int argc, char* argv[]) {
     // check it's  W+Jets
     bool isWJets = false;
     if (dataset.name == "WJets" ||
-      	dataset.name == "W1Jets" || 
-      	dataset.name == "W2Jets" || 
-      	dataset.name == "W3Jets" || 
-      	dataset.name == "W4Jets") {
+        dataset.name == "W1Jets" || 
+        dataset.name == "W2Jets" || 
+        dataset.name == "W3Jets" || 
+        dataset.name == "W4Jets") {
       isWJets = true;
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
 
@@ -188,6 +188,7 @@ int main(int argc, char* argv[]) {
       hWMu_MCS_METDPhi->Add(hWMu_S_METDPhi);
       hWEl_MCC_METDPhi->Add(hWEl_C_METDPhi);
       hWEl_MCS_METDPhi->Add(hWEl_S_METDPhi);
+      
     }
     else if (dataset.isData) {
       std::cout << "Analysing Data     : " << dataset.name << std::endl;
@@ -216,7 +217,11 @@ int main(int argc, char* argv[]) {
       hWEl_DataC_DPhi->Add(hWEl_C_DPhi);
 
       hWMu_DataC_METDPhi->Add(hWMu_C_METDPhi);
-      hWEl_DataC_METDPhi->Add(hWEl_C_METDPhi);
+      hWEl_DataC_METDPhi->Add(hWEl_C_METDPhi); 
+
+      cutWMuControlPlot = (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
+      cutWElControlPlot = (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
+
     }
     else {
       std::cout << "Analysing BG MC    : " << dataset.name << std::endl;
@@ -367,7 +372,7 @@ int main(int argc, char* argv[]) {
     TFile* ofilePlots = TFile::Open( (oDirPlots+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
     std::string chan[] = {"Mu", "El"};
-     // weight = (dataset.isData) ? 1. : (lumi * dataset.sigma / dataset.nEvents);
+    // weight = (dataset.isData) ? 1. : (lumi * dataset.sigma / dataset.nEvents);
     // std::cout << "  weight : " << weight << std::endl;
 
 
@@ -729,13 +734,13 @@ for (unsigned n = 0; n < hnames.size(); n++)
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDirPlots);
-  plots.setLegPos(0.66,0.60,0.89,0.89);
+  plots.setLegPos(0.70,0.60,0.93,0.89);
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   plots.addDataset("QCD", kGreen+3, 0);
   plots.addDataset("DYJets", kPink-4,0);
   plots.addDataset("SingleT+TTBar", kAzure-2, 0);
-  plots.addDataset("WNJets", kBlue+1, 0);
+  plots.addDataset("WNJets", kGreen-3, 0);
   plots.addDataset("METABCD", kBlack, 1);
 
   std::string chan[] = {"Mu", "El"};
