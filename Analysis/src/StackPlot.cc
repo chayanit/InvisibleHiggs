@@ -67,12 +67,13 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
   TPad *pad1; // Use TPad to allow us to draw ratio plot below main plot
   if (drawRatioPlot) {
-  canvas.SetCanvasSize(ww, 1.2*wh);
-  canvas.Divide(1, 2);
+    canvas.SetCanvasSize(500, 600);
+    canvas.Divide(1, 2);
     // pad1 = (TPad *) canvas.cd(1);
     pad1 = new TPad("pad1","",0,0.30,1,1);
-     // pad1->SetBottomMargin(2);
     pad1->SetBottomMargin(0.01);
+    pad1->SetRightMargin(0.05); // The ratio plot below inherits the right and left margins settings here!
+    pad1->SetLeftMargin(0.16);
   } else
     pad1 = new TPad("pad1","",0,0,1,1);
   pad1->Draw();
@@ -196,7 +197,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       stack.GetXaxis()->SetLabelOffset(999); //Effectively turn off x axis label on main plot
 
       stack.GetYaxis()->SetTitleSize(0.07);
-      stack.GetYaxis()->SetTitleOffset(0.7);
+      stack.GetYaxis()->SetTitleOffset(1.);
       stack.GetYaxis()->SetLabelSize(0.05);
     } else{
       stack.GetXaxis()->SetTitleSize(0.045);
@@ -296,19 +297,35 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   // draw labels //
   /////////////////
   // First, CMS text in top left of plot
-  TPaveText cms(0.12, 0.68, 0.45, 0.9, "NDC");
-  cms.SetFillColor(0);
-  cms.SetFillStyle(4000);
-  cms.SetBorderSize(0);
-  cms.SetLineColor(0);
-  cms.SetTextAlign(12);
-  cms.AddText("CMS Preliminary 2012");
-  cms.AddText("");
-  cms.AddText("#int L = 19.6 fb^{-1}");
-  cms.AddText("");
-  // any other text user has specified
-  cms.AddText(label_.c_str());
-  cms.Draw();
+  // Note, it's just repeated with different constructor values
+  // That's because using SetX1NDC doesn't work, even if you call Draw() again
+  // So I'm stuck doing this 
+  // Also I found that if you create the object NOT via pointer (i.e. TPaveText cms(...))
+  // it doesn't like doing it INSIDE the if(drawRatioPlot){...} bit
+  // Hence the null pointer first, then the constructors...
+  
+  TPaveText *cms = 0;
+  if(drawRatioPlot){
+    // Optimised for ratio plots
+    cms = new TPaveText(0.18, 0.68, 0.51, 0.9, "NDC");
+  } else {
+    // Optimised for N-1
+    cms = new TPaveText(0.12, 0.68, 0.45, 0.9, "NDC");
+  }
+    cms->SetFillColor(0);
+    cms->SetFillStyle(4000);
+    cms->SetBorderSize(0);
+    cms->SetLineColor(0);
+    cms->SetTextAlign(12);
+    cms->AddText("CMS Preliminary 2012");
+    cms->AddText("");
+    cms->AddText("#int L = 19.6 fb^{-1}");
+    cms->AddText("");
+    // any other text user has specified
+    cms->AddText(label_.c_str());
+    cms->Draw();
+  // gPad->Modified();
+  // gPad->Update();
 
   //////////////////////////////////////////////
   // draw legend, with entries in right order //
@@ -331,6 +348,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     // TPad *pad2 = (TPad *) canvas.cd(2);
     pad2->SetTopMargin(1);
     pad2->SetBottomMargin(0.33);
+    pad2->SetLeftMargin(pad1->GetLeftMargin());
+    pad2->SetRightMargin(pad1->GetRightMargin());
     // pad2->SetTopMargin(0);
     pad2->Draw();
     pad2->cd();
@@ -348,10 +367,18 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     hData->GetXaxis()->SetLabelOffset(0.008);
 
     hData->GetYaxis()->SetTitleSize(0.12);
-    hData->GetYaxis()->SetTitleOffset(0.28);
+    hData->GetYaxis()->SetTitleOffset(0.5);
     hData->GetYaxis()->SetNdivisions(3,5,0);
     hData->GetYaxis()->SetLabelSize(0.12);
     hData->GetYaxis()->SetLabelOffset(0.008);
+
+    // remove any points if no data ie (data-mc)/mc= -1
+    for(int nbin = 1; nbin<= hData->GetNbinsX(); nbin++)
+    {
+      if(hData->GetBinContent(nbin) == -1)
+        hData->SetBinContent(nbin,1000);
+    }
+
     hData->Draw("ep");
     hData->SetMaximum(2.);
     hData->SetMinimum(-2.);
@@ -391,6 +418,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   std::cout << "Writing pdf file " << filename << std::endl;
 
   canvas.Print( filename.c_str() ,"pdf");
+  canvas.Print( (dir_+std::string("/")+hname+".png").c_str(),"png");
 }
 
 
