@@ -418,7 +418,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   std::cout << "Writing pdf file " << filename << std::endl;
 
   canvas.Print( filename.c_str() ,"pdf");
-  canvas.Print( (dir_+std::string("/")+hname+".png").c_str(),"png");
+  // canvas.Print( (dir_+std::string("/")+hname+".png").c_str(),"png");
 }
 
 
