@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.33 2013/05/27 09:00:51 chayanit Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.34 2013/06/13 17:17:12 chayanit Exp $
 //
 //
 
@@ -81,9 +81,13 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/PatCandidates/interface/MHT.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+
+// Tau
+#include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
 
 // PU jet ID
 #include "CMGTools/External/interface/PileupJetIdentifier.h"
@@ -194,6 +198,9 @@ private:
 	     const reco::CandidateView& zMs,                     //Z candidate
 	     const reco::CandidateView& wMs,                     //Wmu candidate
 	     const reco::CandidateView& wEs);                    //Wel candidate
+  void doTaus(const std::vector<pat::Tau>& taus,		 //Tau selection
+	      const std::vector<reco::Vertex>& vertices,
+	      const std::vector<pat::MET>& met);
   void doMHT(const std::vector<pat::MHT>& mht);
   void doZs(const reco::CandidateView& zs, int channel);
   void doWs(const reco::CandidateView& ws, int channel);
@@ -238,6 +245,8 @@ private:
   //
   edm::InputTag electronTag_;
   edm::InputTag looseElectronTag_;
+  //
+  edm::InputTag tauTag_;
   //
   edm::InputTag metTag_;
   edm::InputTag mhtTag_;
@@ -321,6 +330,8 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   
   electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag",edm::InputTag("patElectrons"))),
   looseElectronTag_(iConfig.getUntrackedParameter<edm::InputTag>("looseElectronTag",edm::InputTag("patElectrons"))),
+
+  tauTag_(iConfig.getUntrackedParameter<edm::InputTag>("tauTag",edm::InputTag("patTaus"))),
   
   metTag_(iConfig.getUntrackedParameter<edm::InputTag>("metTag",edm::InputTag("patMET"))),
   mhtTag_(iConfig.getUntrackedParameter<edm::InputTag>("mhtTag",edm::InputTag("patMHT"))),
@@ -566,6 +577,9 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::Handle<pat::ElectronCollection> looseElectrons;
   iEvent.getByLabel(looseElectronTag_,looseElectrons);
 
+  edm::Handle<pat::TauCollection> taus;
+  iEvent.getByLabel(tauTag_,taus);
+
   edm::Handle<reco::CandidateView> zMus;
   iEvent.getByLabel(zMuTag_, zMus);
 
@@ -592,6 +606,8 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   if (looseMuons.isValid()) doMuons(*looseMuons);
 
   if (looseElectrons.isValid()) doElectrons(*looseElectrons);
+
+  //if (taus.isValid()) doTaus(*taus, *vertices, *met);
   
   if (zMus.isValid()) doZs(*zMus, 1);
 
@@ -1313,6 +1329,93 @@ void InvHiggsInfoProducer::doElectrons(const std::vector<pat::Electron>& electro
   
 }
 
+/*
+void InvHiggsInfoProducer::doTaus(const std::vector<pat::Tau>& taus,
+				  const std::vector<reco::Vertex>&  vertices,
+				  const std::vector<pat::MET>& met) {
+
+  math::XYZTLorentzVector tau1(0., 0., 0., 0.);
+  math::XYZTLorentzVector tau_(0., 0., 0., 0.);
+
+  float dz  = 99.;
+  float dR1 = 0.;
+  float dR2 = 0.;
+
+  bool foundFirst = false;
+  bool foundSecond = false;
+
+  int Match0(0),Match1(0),Match2(0);
+
+  for (unsigned i=0; i < taus.size(); ++i) {
+
+    info_->nTaus_tot++;
+   
+    //tau_.SetXYZT(0., 0., 0., 0.);
+
+    const pat::Tau& tau = taus.at(i);
+
+    if (vertices.size() > 0) {
+    //  reco::VertexRef vtx(vertices, 0);
+      dz  = fabs(tau.leadPFChargedHadrCand()->trackRef()->dz(vertices.at(0).position()));
+      std::cout << "Tau dz = " << dz << std::endl;
+    }
+
+    // do Tau selection here and store 2 leading Taus info
+    if( tau.tauID("decayModeFinding") == 0 ||
+	tau.tauID("byTightCombinedIsolationDeltaBetaCorr3Hits") == 0 ||
+	tau.tauID("againstMuonLoose") == 0 ||
+	tau.tauID("againstElectronLoose") == 0 ||
+	taus.at(i).pt() < 20 ||
+	fabs(taus.at(i).eta()) > 2.3 ||
+ 	dz > 0.2 )	continue;
+
+    info_->nTaus_pass++;
+
+    if (foundFirst && !foundSecond) {
+
+        info_->tau2Pt   = taus.at(i).pt();
+        info_->tau2Eta  = taus.at(i).eta();
+        info_->tau2Phi  = taus.at(i).phi();
+        info_->tau2M    = taus.at(i).mass();
+        info_->tau2mT   = sqrt(2 * met.at(0).pt() * taus.at(i).pt() * (1 - cos(met.at(0).phi() - taus.at(i).phi())));
+	
+	foundSecond = true;
+    }
+
+    if (!foundFirst) {
+
+	info_->tau1Pt 	= taus.at(i).pt();
+	info_->tau1Eta	= taus.at(i).eta();
+	info_->tau1Phi 	= taus.at(i).phi();
+	info_->tau1M	= taus.at(i).mass();
+	info_->tau1mT	= sqrt(2 * met.at(0).pt() * taus.at(i).pt() * (1 - cos(met.at(0).phi() - taus.at(i).phi())));
+
+	tau1		= taus.at(i).p4();
+	dR1		= reco::deltaR(tau1.Eta(),tau1.Phi(),tagJet1_.Eta(),tagJet1_.Phi());
+	dR2		= reco::deltaR(tau1.Eta(),tau1.Phi(),tagJet2_.Eta(),tagJet2_.Phi()); 
+	info_->tau1dR 	= std::min(dR1,dR2);
+
+	foundFirst = true;
+    }
+
+    // check how many taus matched with tagging jets
+    tau_ 	= taus.at(i).p4(); 
+    dR1		= reco::deltaR(tau_.Eta(),tau_.Phi(),tagJet1_.Eta(),tagJet1_.Phi()); 
+    dR2         = reco::deltaR(tau_.Eta(),tau_.Phi(),tagJet2_.Eta(),tagJet2_.Phi());  
+    if (dR1 > 0.5 && dR2 > 0.5)	Match0++; 	// not matched to both tagging jets
+    if (dR1 < 0.5) Match1++;			// matched to jet1
+    if (dR2 < 0.5) Match2++;			// matched to jet2
+
+  }
+
+  if (Match0 != 0 && Match0 == info_->nTaus_pass)	info_->nTaus_match = 0;
+  if (Match1 > 0)			info_->nTaus_match = 1;
+  if (Match2 > 0)			info_->nTaus_match = 2;
+  if (Match1 > 0 && Match2 > 0)		info_->nTaus_match = 3;
+
+}
+*/
+	
 
 void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
 				 const std::vector<pat::Muon>& muons,

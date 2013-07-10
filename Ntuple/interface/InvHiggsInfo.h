@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.20 2013/05/24 13:29:03 raggleto Exp $
+// $Id: InvHiggsInfo.h,v 1.21 2013/05/27 09:00:51 chayanit Exp $
 //
 //
 
@@ -174,6 +174,22 @@ class InvHiggsInfo { //: public TObject {
   Double_t mu3Eta;
   Double_t mu3Phi;
   Double_t mu3M;
+
+  // Taus
+  Int_t nTaus_tot;
+  Int_t nTaus_pass;
+  Double_t tau1Pt;
+  Double_t tau1Eta;
+  Double_t tau1Phi;
+  Double_t tau1M;
+  Double_t tau1mT;
+  Double_t tau1dR;
+  Double_t tau2Pt;
+  Double_t tau2Eta;
+  Double_t tau2Phi; 
+  Double_t tau2M;
+  Double_t tau2mT;
+  Int_t nTaus_match;
 
   // Ws
   Int_t nW;

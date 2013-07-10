@@ -19,8 +19,8 @@ invHiggsInfo = cms.EDAnalyzer(
     
     # jets 
     jetTag      = cms.untracked.InputTag("goodPatJets"),
-    puJetMvaTag = cms.untracked.InputTag("puJetMva", "full53xDiscriminant"),
-    puJetIdTag  = cms.untracked.InputTag("puJetMva", "full53xId"),
+    puJetMvaTag = cms.untracked.InputTag("puJetMva", "fullDiscriminant"),
+    puJetIdTag  = cms.untracked.InputTag("puJetMva", "fullId"),
     useLeadingJets = cms.untracked.bool(True),
 
     # leptons
@@ -30,6 +30,8 @@ invHiggsInfo = cms.EDAnalyzer(
     electronTag = cms.untracked.InputTag("selectElectrons"), #cleanPatElectrons
     #looseElectronTag = cms.untracked.InputTag("selectLooseElectrons"), #cleanPatElectrons
     looseElectronTag = cms.untracked.InputTag("selectVetoElectrons"), #cleanPatElectrons
+
+    tauTag 	= cms.untracked.InputTag("cleanPatTaus"),
 
     # met
     metResultsTag = cms.untracked.InputTag("TriggerResults","","PAT"),
