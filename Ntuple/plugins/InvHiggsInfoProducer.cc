@@ -13,7 +13,7 @@
 //
 // Original Author:  Jim Brooke
 //         Created:  
-// $Id: InvHiggsInfoProducer.cc,v 1.34 2013/06/13 17:17:12 chayanit Exp $
+// $Id: InvHiggsInfoProducer.cc,v 1.35 2013/07/10 13:15:31 chayanit Exp $
 //
 //
 
@@ -607,8 +607,8 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   if (looseElectrons.isValid()) doElectrons(*looseElectrons);
 
-  //if (taus.isValid()) doTaus(*taus, *vertices, *met);
-  
+  if (taus.isValid()) doTaus(*taus, *vertices, *met);
+
   if (zMus.isValid()) doZs(*zMus, 1);
 
   if (zEls.isValid()) doZs(*zEls, 2);
@@ -1329,7 +1329,7 @@ void InvHiggsInfoProducer::doElectrons(const std::vector<pat::Electron>& electro
   
 }
 
-/*
+
 void InvHiggsInfoProducer::doTaus(const std::vector<pat::Tau>& taus,
 				  const std::vector<reco::Vertex>&  vertices,
 				  const std::vector<pat::MET>& met) {
@@ -1349,25 +1349,23 @@ void InvHiggsInfoProducer::doTaus(const std::vector<pat::Tau>& taus,
   for (unsigned i=0; i < taus.size(); ++i) {
 
     info_->nTaus_tot++;
-   
-    //tau_.SetXYZT(0., 0., 0., 0.);
 
     const pat::Tau& tau = taus.at(i);
 
-    if (vertices.size() > 0) {
-    //  reco::VertexRef vtx(vertices, 0);
-      dz  = fabs(tau.leadPFChargedHadrCand()->trackRef()->dz(vertices.at(0).position()));
-      std::cout << "Tau dz = " << dz << std::endl;
-    }
+    //if (vertices.size() > 0) {
+    //  if(tau.leadPFChargedHadrCand()->trackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->trackRef()->dz(vertices.at(0).position()));
+    //  else if(tau.leadPFChargedHadrCand()->gsfTrackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->gsfTrackRef()->dz(vertices.at(0).position()));
+    //  std::cout << "dz = " << dz << std::endl;
+    //}
 
     // do Tau selection here and store 2 leading Taus info
     if( tau.tauID("decayModeFinding") == 0 ||
 	tau.tauID("byTightCombinedIsolationDeltaBetaCorr3Hits") == 0 ||
-	tau.tauID("againstMuonLoose") == 0 ||
-	tau.tauID("againstElectronLoose") == 0 ||
+	tau.tauID("againstMuonTight") == 0 ||
+	tau.tauID("againstElectronTight") == 0 ||
 	taus.at(i).pt() < 20 ||
-	fabs(taus.at(i).eta()) > 2.3 ||
- 	dz > 0.2 )	continue;
+	fabs(taus.at(i).eta()) > 2.3) continue;
+ 	//|| dz > 0.2 )	continue;
 
     info_->nTaus_pass++;
 
@@ -1414,7 +1412,7 @@ void InvHiggsInfoProducer::doTaus(const std::vector<pat::Tau>& taus,
   if (Match1 > 0 && Match2 > 0)		info_->nTaus_match = 3;
 
 }
-*/
+
 	
 
 void InvHiggsInfoProducer::doMET(const std::vector<pat::MET>& met,
