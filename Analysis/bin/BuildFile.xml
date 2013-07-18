@@ -28,4 +28,6 @@
 
 <bin name="limits" file="limits.cpp"/>
 
+<bin name="limitPlots" file="limitPlots.cpp"/>
+
 <bin name="writeLeptonWeights" file="writeLeptonWeights.cpp"/>

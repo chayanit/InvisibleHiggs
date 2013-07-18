@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 
   TFile* ofile = TFile::Open((oDir+std::string("/QCD3.root")).c_str(), "RECREATE");
 
-  double metEdges[3] = { 0., 130., 1000. };
+  double metEdges[3] = { 50., 130., 1000. };
   double cjvEdges[3] = { -100., 30., 1000. };
   int metBins = 25;
   double metMax = 250.;
@@ -91,16 +91,25 @@ int main(int argc, char* argv[]) {
   TH2D* hSignal_HiDPhi_METCJV = new TH2D("hSignal_HiDPhi_METCJV", "", 2, metEdges, 2, cjvEdges);
 
   // control plots
-  TH1D* hData_CJVP_MET  = new TH1D("hData_CJVP_MET",  "", metBins, 0., metMax);
-  TH1D* hBG_CJVP_MET    = new TH1D("hBG_CJVP_MET",    "", metBins, 0., metMax);
-  TH1D* hData_CJVF_MET  = new TH1D("hData_CJVF_MET",  "", metBins, 0., metMax);
-  TH1D* hBG_CJVF_MET    = new TH1D("hBG_CJVF_MET",    "", metBins, 0., metMax);
+  TH1D* hDataHi_CJVP_MET  = new TH1D("hDataHi_CJVP_MET",  "", metBins, 0., metMax);
+  TH1D* hBGHi_CJVP_MET    = new TH1D("hBGHi_CJVP_MET",    "", metBins, 0., metMax);
+  TH1D* hDataHi_CJVF_MET  = new TH1D("hDataHi_CJVF_MET",  "", metBins, 0., metMax);
+  TH1D* hBGHi_CJVF_MET    = new TH1D("hBGHi_CJVF_MET",    "", metBins, 0., metMax);
 
-  TH1D* hData_METP_CJEt = new TH1D("hData_METP_CJEt", "", cjvBins, 0., cjvMax);
-  TH1D* hBG_METP_CJEt   = new TH1D("hBG_METP_CJEt",   "", cjvBins, 0., cjvMax);
-  TH1D* hData_METF_CJEt = new TH1D("hData_METF_CJEt", "", cjvBins, 0., cjvMax);
-  TH1D* hBG_METF_CJEt   = new TH1D("hBG_METF_CJEt",   "", cjvBins, 0., cjvMax);
+  TH1D* hDataHi_METP_CJEt = new TH1D("hDataHi_METP_CJEt", "", cjvBins, 0., cjvMax);
+  TH1D* hBGHi_METP_CJEt   = new TH1D("hBGHi_METP_CJEt",   "", cjvBins, 0., cjvMax);
+  TH1D* hDataHi_METF_CJEt = new TH1D("hDataHi_METF_CJEt", "", cjvBins, 0., cjvMax);
+  TH1D* hBGHi_METF_CJEt   = new TH1D("hBGHi_METF_CJEt",   "", cjvBins, 0., cjvMax);
 
+  TH1D* hDataLo_CJVP_MET  = new TH1D("hDataLo_CJVP_MET",  "", 13, 0., 130.);
+  TH1D* hBGLo_CJVP_MET    = new TH1D("hBGLo_CJVP_MET",    "", 13, 0., 130.);
+  TH1D* hDataLo_CJVF_MET  = new TH1D("hDataLo_CJVF_MET",  "", 13, 0., 130.);
+  TH1D* hBGLo_CJVF_MET    = new TH1D("hBGLo_CJVF_MET",    "", 13, 0., 130.);
+
+  TH1D* hDataLo_METP_CJEt = new TH1D("hDataLo_METP_CJEt", "", 17, 30., 200.);
+  TH1D* hBGLo_METP_CJEt   = new TH1D("hBGLo_METP_CJEt",   "", 17, 30., 200.);
+  TH1D* hDataLo_METF_CJEt = new TH1D("hDataLo_METF_CJEt", "", 17, 30., 200.);
+  TH1D* hBGLo_METF_CJEt   = new TH1D("hBGLo_METF_CJEt",   "", 17, 30., 200.);
 
   // loop over MC datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
@@ -114,10 +123,15 @@ int main(int argc, char* argv[]) {
     TH2D* hTmp_METCJV        = new TH2D("hTmp_METCJV", "", 2, metEdges, 2, cjvEdges);
     TH2D* hTmp_HiDPhi_METCJV = new TH2D("hTmp_HiDPhi_METCJV", "", 2, metEdges, 2, cjvEdges);
 
-    TH1D* hTmp_CJVP_MET  = new TH1D("hTmp_CJVP_MET",  "", metBins, 0., metMax);
-    TH1D* hTmp_CJVF_MET  = new TH1D("hTmp_CJVF_MET",  "", metBins, 0., metMax);    
-    TH1D* hTmp_METP_CJEt = new TH1D("hTmp_METP_CJEt", "", cjvBins, 0., cjvMax);
-    TH1D* hTmp_METF_CJEt = new TH1D("hTmp_METF_CJEt", "", cjvBins, 0., cjvMax);
+    TH1D* hTmpHi_CJVP_MET  = new TH1D("hTmpHi_CJVP_MET",  "", metBins, 0., metMax);
+    TH1D* hTmpHi_CJVF_MET  = new TH1D("hTmpHi_CJVF_MET",  "", metBins, 0., metMax);    
+    TH1D* hTmpHi_METP_CJEt = new TH1D("hTmpHi_METP_CJEt", "", cjvBins, 0., cjvMax);
+    TH1D* hTmpHi_METF_CJEt = new TH1D("hTmpHi_METF_CJEt", "", cjvBins, 0., cjvMax);
+
+    TH1D* hTmpLo_CJVP_MET  = new TH1D("hTmpLo_CJVP_MET",  "", 13, 0., 130.);
+    TH1D* hTmpLo_CJVF_MET  = new TH1D("hTmpLo_CJVF_MET",  "", 13, 0., 130.);
+    TH1D* hTmpLo_METP_CJEt = new TH1D("hTmpLo_METP_CJEt", "", 17, 30., 200.);
+    TH1D* hTmpLo_METF_CJEt = new TH1D("hTmpLo_METF_CJEt", "", 17, 30., 200.);
    
     double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
 
@@ -136,20 +150,35 @@ int main(int argc, char* argv[]) {
       hData_HiDPhi_METCJV->Add(hTmp_HiDPhi_METCJV, 1.);
 
       // control plots
-      TCut ctrlMETP = cutHi + TCut("met>130");
-      TCut ctrlMETF = cutHi + TCut("met<130");
-      TCut ctrlCJVP = cutHi + TCut("cenJetEt<30.");
-      TCut ctrlCJVF = cutHi + TCut("cenJetEt>30.");
+      TCut ctrlHiMETP = cutHi + TCut("met>130");
+      TCut ctrlHiMETF = cutHi + TCut("met>50&&met<130");
+      TCut ctrlHiCJVP = cutHi + TCut("cenJetEt<30.");
+      TCut ctrlHiCJVF = cutHi + TCut("cenJetEt>30.");
 
-      tree->Draw("met>>hTmp_CJVP_MET",          ctrlCJVP);
-      tree->Draw("met>>hTmp_CJVF_MET",          ctrlCJVF);
-      tree->Draw("cenJetEt>>hTmp_METP_CJEt",    ctrlMETP);
-      tree->Draw("cenJetEt>>hTmp_METF_CJEt",    ctrlMETF);
+      tree->Draw("met>>hTmpHi_CJVP_MET",          ctrlHiCJVP);
+      tree->Draw("met>>hTmpHi_CJVF_MET",          ctrlHiCJVF);
+      tree->Draw("cenJetEt>>hTmpHi_METP_CJEt",    ctrlHiMETP);
+      tree->Draw("cenJetEt>>hTmpHi_METF_CJEt",    ctrlHiMETF);
 
-      hData_CJVP_MET->Add(hTmp_CJVP_MET, 1.);
-      hData_CJVF_MET->Add(hTmp_CJVF_MET, 1.);
-      hData_METP_CJEt->Add(hTmp_METP_CJEt, 1.);
-      hData_METF_CJEt->Add(hTmp_METF_CJEt, 1.);
+      hDataHi_CJVP_MET->Add(hTmpHi_CJVP_MET, 1.);
+      hDataHi_CJVF_MET->Add(hTmpHi_CJVF_MET, 1.);
+      hDataHi_METP_CJEt->Add(hTmpHi_METP_CJEt, 1.);
+      hDataHi_METF_CJEt->Add(hTmpHi_METF_CJEt, 1.);
+
+      TCut ctrlLoMETP = cutLo + TCut("met>130");
+      TCut ctrlLoMETF = cutLo + TCut("met<130");
+      TCut ctrlLoCJVP = cutLo + TCut("cenJetEt<30.");
+      TCut ctrlLoCJVF = cutLo + TCut("cenJetEt>30.");
+
+      tree->Draw("met>>hTmpLo_CJVP_MET",          ctrlLoCJVP);
+      tree->Draw("met>>hTmpLo_CJVF_MET",          ctrlLoCJVF);
+      tree->Draw("cenJetEt>>hTmpLo_METP_CJEt",    ctrlLoMETP);
+      tree->Draw("cenJetEt>>hTmpLo_METF_CJEt",    ctrlLoMETF);
+
+      hDataLo_CJVP_MET->Add(hTmpLo_CJVP_MET, 1.);
+      hDataLo_CJVF_MET->Add(hTmpLo_CJVF_MET, 1.);
+      hDataLo_METP_CJEt->Add(hTmpLo_METP_CJEt, 1.);
+      hDataLo_METF_CJEt->Add(hTmpLo_METF_CJEt, 1.);
 
     }
     else if (dataset.name=="SignalM125_POWHEG") {
@@ -191,25 +220,45 @@ int main(int argc, char* argv[]) {
       hBG_HiDPhi_METCJV->Add(hTmp_HiDPhi_METCJV, 1.);
 
       // control plots
-      TCut ctrlMETP = cutHi + TCut("met>130");
-      TCut ctrlMETF = cutHi + TCut("met<130");
-      TCut ctrlCJVP = cutHi + TCut("cenJetEt<30.");
-      TCut ctrlCJVF = cutHi + TCut("cenJetEt>30.");
+      TCut ctrlHiMETP = cutHi + TCut("met>130");
+      TCut ctrlHiMETF = cutHi + TCut("met>50&&met<130");
+      TCut ctrlHiCJVP = cutHi + TCut("cenJetEt<30.");
+      TCut ctrlHiCJVF = cutHi + TCut("cenJetEt>30.");
 
-      tree->Draw("met>>hTmp_CJVP_MET",          ctrlCJVP);
-      tree->Draw("met>>hTmp_CJVF_MET",          ctrlCJVF);
-      tree->Draw("cenJetEt>>hTmp_METP_CJEt",    ctrlMETP);
-      tree->Draw("cenJetEt>>hTmp_METF_CJEt",    ctrlMETF);
+      tree->Draw("met>>hTmpHi_CJVP_MET",          ctrlHiCJVP);
+      tree->Draw("met>>hTmpHi_CJVF_MET",          ctrlHiCJVF);
+      tree->Draw("cenJetEt>>hTmpHi_METP_CJEt",    ctrlHiMETP);
+      tree->Draw("cenJetEt>>hTmpHi_METF_CJEt",    ctrlHiMETF);
 
-      hTmp_CJVP_MET->Scale(weight);
-      hTmp_CJVF_MET->Scale(weight);
-      hTmp_METP_CJEt->Scale(weight);
-      hTmp_METF_CJEt->Scale(weight);
+      hTmpHi_CJVP_MET->Scale(weight);
+      hTmpHi_CJVF_MET->Scale(weight);
+      hTmpHi_METP_CJEt->Scale(weight);
+      hTmpHi_METF_CJEt->Scale(weight);
 
-      hBG_CJVP_MET->Add(hTmp_CJVP_MET, 1.);
-      hBG_CJVF_MET->Add(hTmp_CJVF_MET, 1.);
-      hBG_METP_CJEt->Add(hTmp_METP_CJEt, 1.);
-      hBG_METF_CJEt->Add(hTmp_METF_CJEt, 1.);
+      hBGHi_CJVP_MET->Add(hTmpHi_CJVP_MET, 1.);
+      hBGHi_CJVF_MET->Add(hTmpHi_CJVF_MET, 1.);
+      hBGHi_METP_CJEt->Add(hTmpHi_METP_CJEt, 1.);
+      hBGHi_METF_CJEt->Add(hTmpHi_METF_CJEt, 1.);
+
+      TCut ctrlLoMETP = cutLo + TCut("met>130");
+      TCut ctrlLoMETF = cutLo + TCut("met<130");
+      TCut ctrlLoCJVP = cutLo + TCut("cenJetEt<30.");
+      TCut ctrlLoCJVF = cutLo + TCut("cenJetEt>30.");
+
+      tree->Draw("met>>hTmpLo_CJVP_MET",          ctrlLoCJVP);
+      tree->Draw("met>>hTmpLo_CJVF_MET",          ctrlLoCJVF);
+      tree->Draw("cenJetEt>>hTmpLo_METP_CJEt",    ctrlLoMETP);
+      tree->Draw("cenJetEt>>hTmpLo_METF_CJEt",    ctrlLoMETF);
+
+      hTmpLo_CJVP_MET->Scale(weight);
+      hTmpLo_CJVF_MET->Scale(weight);
+      hTmpLo_METP_CJEt->Scale(weight);
+      hTmpLo_METF_CJEt->Scale(weight);
+
+      hBGLo_CJVP_MET->Add(hTmpLo_CJVP_MET, 1.);
+      hBGLo_CJVF_MET->Add(hTmpLo_CJVF_MET, 1.);
+      hBGLo_METP_CJEt->Add(hTmpLo_METP_CJEt, 1.);
+      hBGLo_METF_CJEt->Add(hTmpLo_METF_CJEt, 1.);
 
 //       // fake Z->nunu EWK for DY->LL
 //       if (dataset.name=="DYJetsToLL_EWK") {
@@ -354,52 +403,94 @@ int main(int argc, char* argv[]) {
 
 
   // control plots
-  TH1D* hEst_CJVP_MET  = new TH1D("hEst_CJVP_MET",  "", metBins, 0., metMax);
-  TH1D* hEst_CJVF_MET  = new TH1D("hEst_CJVF_MET",  "", metBins, 0., metMax);
-  TH1D* hEst_METP_CJEt = new TH1D("hEst_METP_CJEt", "", cjvBins, 0., cjvMax);
-  TH1D* hEst_METF_CJEt = new TH1D("hEst_METF_CJEt", "", cjvBins, 0., cjvMax);
+  TH1D* hEstHi_CJVP_MET  = new TH1D("hEstHi_CJVP_MET",  "", metBins, 0., metMax);
+  TH1D* hEstHi_CJVF_MET  = new TH1D("hEstHi_CJVF_MET",  "", metBins, 0., metMax);
+  TH1D* hEstHi_METP_CJEt = new TH1D("hEstHi_METP_CJEt", "", cjvBins, 0., cjvMax);
+  TH1D* hEstHi_METF_CJEt = new TH1D("hEstHi_METF_CJEt", "", cjvBins, 0., cjvMax);
 
-  hEst_CJVP_MET->Add(hData_CJVP_MET, hBG_CJVP_MET, 1., -.1);
-  hEst_CJVF_MET->Add(hData_CJVF_MET, hBG_CJVF_MET, 1., -.1);
-  hEst_METP_CJEt->Add(hData_METP_CJEt, hBG_METP_CJEt, 1., -.1);
-  hEst_METF_CJEt->Add(hData_METF_CJEt, hBG_METF_CJEt, 1., -.1);
+  hEstHi_CJVP_MET->Add(hDataHi_CJVP_MET, hBGHi_CJVP_MET, 1., -.1);
+  hEstHi_CJVF_MET->Add(hDataHi_CJVF_MET, hBGHi_CJVF_MET, 1., -.1);
+  hEstHi_METP_CJEt->Add(hDataHi_METP_CJEt, hBGHi_METP_CJEt, 1., -.1);
+  hEstHi_METF_CJEt->Add(hDataHi_METF_CJEt, hBGHi_METF_CJEt, 1., -.1);
 
-  hEst_CJVP_MET->Scale(1/hEst_CJVP_MET->Integral());
-  std::cout << "hEst_CJVP_MET integral : " << hEst_CJVP_MET->Integral() << std::endl;
-  hEst_CJVF_MET->Scale(1/hEst_CJVF_MET->Integral());
-  std::cout << "hEst_CJVF_MET integral : " << hEst_CJVF_MET->Integral() << std::endl;
+  hEstHi_CJVP_MET->Scale(1/hEstHi_CJVP_MET->Integral());
+  std::cout << "hEst_CJVP_MET integral : " << hEstHi_CJVP_MET->Integral() << std::endl;
+  hEstHi_CJVF_MET->Scale(1/hEstHi_CJVF_MET->Integral());
+  std::cout << "hEst_CJVF_MET integral : " << hEstHi_CJVF_MET->Integral() << std::endl;
 
-  hEst_METP_CJEt->Scale(1/hEst_METP_CJEt->Integral());
-  std::cout << "hEst_METP_CJEt integral : " << hEst_METP_CJEt->Integral() << std::endl;
-  hEst_METF_CJEt->Scale(1/hEst_METF_CJEt->Integral());
-  std::cout << "hEst_METF_CJEt integral : " << hEst_METF_CJEt->Integral() << std::endl;
+  hEstHi_METP_CJEt->Scale(1/hEstHi_METP_CJEt->Integral());
+  std::cout << "hEst_METP_CJEt integral : " << hEstHi_METP_CJEt->Integral() << std::endl;
+  hEstHi_METF_CJEt->Scale(1/hEstHi_METF_CJEt->Integral());
+  std::cout << "hEst_METF_CJEt integral : " << hEstHi_METF_CJEt->Integral() << std::endl;
 
+  TH1D* hEstLo_CJVP_MET  = new TH1D("hEstLo_CJVP_MET",  "", 13, 0., 130.);
+  TH1D* hEstLo_CJVF_MET  = new TH1D("hEstLo_CJVF_MET",  "", 13, 0., 130.);
+  TH1D* hEstLo_METP_CJEt = new TH1D("hEstLo_METP_CJEt", "", 17, 30., 200.);
+  TH1D* hEstLo_METF_CJEt = new TH1D("hEstLo_METF_CJEt", "", 17, 30., 200.);
+
+  hEstLo_CJVP_MET->Add(hDataLo_CJVP_MET, hBGLo_CJVP_MET, 1., -.1);
+  hEstLo_CJVF_MET->Add(hDataLo_CJVF_MET, hBGLo_CJVF_MET, 1., -.1);
+  hEstLo_METP_CJEt->Add(hDataLo_METP_CJEt, hBGLo_METP_CJEt, 1., -.1);
+  hEstLo_METF_CJEt->Add(hDataLo_METF_CJEt, hBGLo_METF_CJEt, 1., -.1);
+
+  hEstLo_CJVP_MET->Scale(1/hEstLo_CJVP_MET->Integral());
+  std::cout << "hEst_CJVP_MET integral : " << hEstLo_CJVP_MET->Integral() << std::endl;
+  hEstLo_CJVF_MET->Scale(1/hEstLo_CJVF_MET->Integral());
+  std::cout << "hEst_CJVF_MET integral : " << hEstLo_CJVF_MET->Integral() << std::endl;
+
+  hEstLo_METP_CJEt->Scale(1/hEstLo_METP_CJEt->Integral());
+  std::cout << "hEst_METP_CJEt integral : " << hEstLo_METP_CJEt->Integral() << std::endl;
+  hEstLo_METF_CJEt->Scale(1/hEstLo_METF_CJEt->Integral());
+  std::cout << "hEst_METF_CJEt integral : " << hEstLo_METF_CJEt->Integral() << std::endl;
 
   // make ratio graphs
-  TGraphAsymmErrors hEst_CJVRatio_MET(metBins);
-  TGraphAsymmErrors hEst_METRatio_CJEt(cjvBins);
+  TGraphAsymmErrors hEstHi_CJVRatio_MET(metBins);
+  TGraphAsymmErrors hEstHi_METRatio_CJEt(cjvBins);
 
   for (int i=1; i<metBins+1; ++i) {
 
-    double r1 = (hEst_CJVP_MET->GetBinContent(i) - hEst_CJVF_MET->GetBinContent(i))/hEst_CJVP_MET->GetBinContent(i);
-    double e1 = r1 * sqrt(pow(hEst_CJVP_MET->GetBinError(i)/hEst_CJVP_MET->GetBinContent(i),2) +
-			  pow(hEst_CJVF_MET->GetBinError(i)/hEst_CJVF_MET->GetBinContent(i),2));
+    double r1 = (hEstHi_CJVP_MET->GetBinContent(i) - hEstHi_CJVF_MET->GetBinContent(i))/hEstHi_CJVP_MET->GetBinContent(i);
+    double e1 = r1 * sqrt(pow(hEstHi_CJVP_MET->GetBinError(i)/hEstHi_CJVP_MET->GetBinContent(i),2) +
+			  pow(hEstHi_CJVF_MET->GetBinError(i)/hEstHi_CJVF_MET->GetBinContent(i),2));
 
-    hEst_CJVRatio_MET.SetPoint(i-1, hEst_CJVP_MET->GetBinCenter(i), r1);
-    hEst_CJVRatio_MET.SetPointError(i-1, 0., 0., e1, e1);
+    hEstHi_CJVRatio_MET.SetPoint(i-1, hEstHi_CJVP_MET->GetBinCenter(i), r1);
+    hEstHi_CJVRatio_MET.SetPointError(i-1, 0., 0., e1, e1);
   }
 
   for (int i=1; i<cjvBins+1; ++i) {
 
-    double r2 = (hEst_METP_CJEt->GetBinContent(i) - hEst_METF_CJEt->GetBinContent(i))/hEst_METP_CJEt->GetBinContent(i);
-    double e2 = r2 * sqrt(pow(hEst_METP_CJEt->GetBinError(i)/hEst_METP_CJEt->GetBinContent(i),2) + 
-			  pow(hEst_METF_CJEt->GetBinError(i)/hEst_METF_CJEt->GetBinContent(i),2));
+    double r2 = (hEstHi_METP_CJEt->GetBinContent(i) - hEstHi_METF_CJEt->GetBinContent(i))/hEstHi_METP_CJEt->GetBinContent(i);
+    double e2 = r2 * sqrt(pow(hEstHi_METP_CJEt->GetBinError(i)/hEstHi_METP_CJEt->GetBinContent(i),2) + 
+			  pow(hEstHi_METF_CJEt->GetBinError(i)/hEstHi_METF_CJEt->GetBinContent(i),2));
 
-    hEst_METRatio_CJEt.SetPoint(i-1, hEst_METP_CJEt->GetBinCenter(i), r2);
-    hEst_METRatio_CJEt.SetPointError(i-1, 0., 0., e2, e2);
+    hEstHi_METRatio_CJEt.SetPoint(i-1, hEstHi_METP_CJEt->GetBinCenter(i), r2);
+    hEstHi_METRatio_CJEt.SetPointError(i-1, 0., 0., e2, e2);
 
   }
 
+  TGraphAsymmErrors hEstLo_CJVRatio_MET(13);
+  TGraphAsymmErrors hEstLo_METRatio_CJEt(17);
+
+  for (int i=1; i<14; ++i) {
+
+    double r1 = (hEstLo_CJVP_MET->GetBinContent(i) - hEstLo_CJVF_MET->GetBinContent(i))/hEstLo_CJVP_MET->GetBinContent(i);
+    double e1 = r1 * sqrt(pow(hEstLo_CJVP_MET->GetBinError(i)/hEstLo_CJVP_MET->GetBinContent(i),2) +
+			  pow(hEstLo_CJVF_MET->GetBinError(i)/hEstLo_CJVF_MET->GetBinContent(i),2));
+
+    hEstLo_CJVRatio_MET.SetPoint(i-1, hEstLo_CJVP_MET->GetBinCenter(i), r1);
+    hEstLo_CJVRatio_MET.SetPointError(i-1, 0., 0., e1, e1);
+  }
+
+  for (int i=1; i<18; ++i) {
+
+    double r2 = (hEstLo_METP_CJEt->GetBinContent(i) - hEstLo_METF_CJEt->GetBinContent(i))/hEstLo_METP_CJEt->GetBinContent(i);
+    double e2 = r2 * sqrt(pow(hEstLo_METP_CJEt->GetBinError(i)/hEstLo_METP_CJEt->GetBinContent(i),2) + 
+			  pow(hEstLo_METF_CJEt->GetBinError(i)/hEstLo_METF_CJEt->GetBinContent(i),2));
+
+    hEstLo_METRatio_CJEt.SetPoint(i-1, hEstLo_METP_CJEt->GetBinCenter(i), r2);
+    hEstLo_METRatio_CJEt.SetPointError(i-1, 0., 0., e2, e2);
+
+  }
 
   // draw control plots
   std::string pdfName;
@@ -422,79 +513,158 @@ int main(int argc, char* argv[]) {
   // MET
   //  pad1.cd();
 
-  hEst_CJVP_MET->SetMarkerColor(kRed);
-  hEst_CJVP_MET->SetMarkerStyle(22);
+  hEstHi_CJVP_MET->SetMarkerColor(kRed);
+  hEstHi_CJVP_MET->SetMarkerStyle(22);
 
-  hEst_CJVF_MET->SetMarkerColor(kBlue);
-  hEst_CJVF_MET->SetMarkerStyle(23);
+  hEstHi_CJVF_MET->SetMarkerColor(kBlue);
+  hEstHi_CJVF_MET->SetMarkerStyle(23);
 
-  hEst_CJVP_MET->GetYaxis()->SetTitle("arbitrary units");
-  hEst_CJVP_MET->GetXaxis()->SetTitle("MET [GeV]");
+  hEstHi_CJVP_MET->GetYaxis()->SetTitle("arbitrary units");
+  hEstHi_CJVP_MET->GetXaxis()->SetTitle("MET [GeV]");
 
-  hEst_CJVP_MET->Draw();
-  hEst_CJVF_MET->Draw("SAME");
+  hEstHi_CJVP_MET->Draw();
+  hEstHi_CJVF_MET->Draw("SAME");
 
-  TLegend leg(0.60, 0.7, 0.75, 0.85, "#Delta #phi > 2.6", "NDC");
-  leg.AddEntry(hEst_CJVP_MET, "CJV Pass", "P");
-  leg.AddEntry(hEst_CJVF_MET, "CJV Fail", "P");
+  TLegend leg(0.60, 0.7, 0.75, 0.85, "#Delta#phi>2.6", "NDC");
+  leg.AddEntry(hEstHi_CJVP_MET, "CJV Pass", "P");
+  leg.AddEntry(hEstHi_CJVF_MET, "CJV Fail", "P");
   leg.SetFillColor(0);
   leg.Draw();
   
-  pdfName= oDir+std::string("/QCD3_Ctrl_MET.pdf");
+  pdfName= oDir+std::string("/QCD3_CtrlHi_MET.pdf");
   canvas.Print(pdfName.c_str());
 
   //  pad2.cd();
   
-  hEst_CJVRatio_MET.SetMaximum(1.0);
-  hEst_CJVRatio_MET.SetMinimum(-1.0);
-  hEst_CJVRatio_MET.SetMarkerStyle(8);
-  hEst_CJVRatio_MET.SetTitle("");
-  hEst_CJVRatio_MET.GetXaxis()->SetTitle("MET [GeV]");
-  hEst_CJVRatio_MET.GetYaxis()->SetTitle("(f_{pass CJV} - f_{fail CJV})/f_{pass CJV}");
+  hEstHi_CJVRatio_MET.SetMaximum(1.0);
+  hEstHi_CJVRatio_MET.SetMinimum(-1.0);
+  hEstHi_CJVRatio_MET.SetMarkerStyle(8);
+  hEstHi_CJVRatio_MET.SetTitle("");
+  hEstHi_CJVRatio_MET.GetXaxis()->SetTitle("MET [GeV]");
+  hEstHi_CJVRatio_MET.GetYaxis()->SetTitle("(f_{pass CJV} - f_{fail CJV})/f_{pass CJV}");
 
-  hEst_CJVRatio_MET.Draw("AP");
+  hEstHi_CJVRatio_MET.Draw("AP");
   
 
-  pdfName = oDir+std::string("/QCD3_CtrlRatio_MET.pdf");
+  pdfName = oDir+std::string("/QCD3_CtrlHi_MET_Ratio.pdf");
   canvas.Print(pdfName.c_str());
 
   // CJV
   //  pad1.cd();
 
-  hEst_METP_CJEt->SetMarkerColor(kRed);
-  hEst_METP_CJEt->SetMarkerStyle(22);
+  hEstHi_METP_CJEt->SetMarkerColor(kRed);
+  hEstHi_METP_CJEt->SetMarkerStyle(22);
 
-  hEst_METF_CJEt->SetMarkerColor(kBlue);
-  hEst_METF_CJEt->SetMarkerStyle(23);
+  hEstHi_METF_CJEt->SetMarkerColor(kBlue);
+  hEstHi_METF_CJEt->SetMarkerStyle(23);
 
-  hEst_METP_CJEt->GetYaxis()->SetTitle("arbitrary units");
-  hEst_METP_CJEt->GetXaxis()->SetTitle("cen jet E_{T} [GeV]");
+  hEstHi_METP_CJEt->GetYaxis()->SetTitle("arbitrary units");
+  hEstHi_METP_CJEt->GetXaxis()->SetTitle("cen jet E_{T} [GeV]");
 
-  hEst_METP_CJEt->Draw();
-  hEst_METF_CJEt->Draw("SAME");
+  hEstHi_METP_CJEt->Draw();
+  hEstHi_METF_CJEt->Draw("SAME");
 
-  TLegend leg2(0.60, 0.7, 0.75, 0.85, "#Delta #phi > 2.6", "NDC");
-  leg2.AddEntry(hEst_METP_CJEt, "MET > 130", "P");
-  leg2.AddEntry(hEst_METF_CJEt, "MET < 130", "P");
+  TLegend leg2(0.60, 0.7, 0.75, 0.85, "#Delta#phi>2.6", "NDC");
+  leg2.AddEntry(hEstHi_METP_CJEt, "MET > 130", "P");
+  leg2.AddEntry(hEstHi_METF_CJEt, "MET < 130", "P");
   leg2.SetFillColor(0);
   leg2.Draw();
 
-  pdfName = oDir+std::string("/QCD3_Ctrl_CenJetEt.pdf");
+  pdfName = oDir+std::string("/QCD3_CtrlHi_CenJetEt.pdf");
   canvas.Print(pdfName.c_str());
 
   //  pad2.cd();
 
-  hEst_METRatio_CJEt.SetMaximum(1.5);
-  hEst_METRatio_CJEt.SetMinimum(-1.5);
-  hEst_METRatio_CJEt.SetMarkerStyle(8);
-  hEst_METRatio_CJEt.SetTitle("");
-  hEst_METRatio_CJEt.GetXaxis()->SetTitle("cen jet E_{T} [GeV]");
-  hEst_METRatio_CJEt.GetYaxis()->SetTitle("(f_{pass MET}-f_{fail MET})/f_{pass MET}");
+  hEstHi_METRatio_CJEt.SetMaximum(1.5);
+  hEstHi_METRatio_CJEt.SetMinimum(-1.5);
+  hEstHi_METRatio_CJEt.SetMarkerStyle(8);
+  hEstHi_METRatio_CJEt.SetTitle("");
+  hEstHi_METRatio_CJEt.GetXaxis()->SetTitle("cen jet E_{T} [GeV]");
+  hEstHi_METRatio_CJEt.GetYaxis()->SetTitle("(f_{pass MET}-f_{fail MET})/f_{pass MET}");
 
-  hEst_METRatio_CJEt.Draw("AP");
+  hEstHi_METRatio_CJEt.Draw("AP");
   
-  pdfName = oDir+std::string("/QCD3_CtrlRatio_CenJetEt.pdf");
+  pdfName = oDir+std::string("/QCD3_CtrlHi_CenJetEt_Ratio.pdf");
   canvas.Print(pdfName.c_str());
+
+
+  // MET dphi<1.0
+  //  pad1.cd();
+
+  hEstLo_CJVP_MET->SetMarkerColor(kRed);
+  hEstLo_CJVP_MET->SetMarkerStyle(22);
+
+  hEstLo_CJVF_MET->SetMarkerColor(kBlue);
+  hEstLo_CJVF_MET->SetMarkerStyle(23);
+
+  hEstLo_CJVP_MET->GetYaxis()->SetTitle("arbitrary units");
+  hEstLo_CJVP_MET->GetXaxis()->SetTitle("MET [GeV]");
+
+  hEstLo_CJVP_MET->Draw();
+  hEstLo_CJVF_MET->Draw("SAME");
+
+  TLegend leg3(0.60, 0.7, 0.75, 0.85, "#Delta#phi<1.0", "NDC");
+  leg3.AddEntry(hEstLo_CJVP_MET, "CJV Pass", "P");
+  leg3.AddEntry(hEstLo_CJVF_MET, "CJV Fail", "P");
+  leg3.SetFillColor(0);
+  leg3.Draw();
+  
+  pdfName= oDir+std::string("/QCD3_CtrlLo_MET.pdf");
+  canvas.Print(pdfName.c_str());
+
+  //  pad2.cd();
+  
+  hEstLo_CJVRatio_MET.SetMaximum(1.0);
+  hEstLo_CJVRatio_MET.SetMinimum(-1.0);
+  hEstLo_CJVRatio_MET.SetMarkerStyle(8);
+  hEstLo_CJVRatio_MET.SetTitle("");
+  hEstLo_CJVRatio_MET.GetXaxis()->SetTitle("MET [GeV]");
+  hEstLo_CJVRatio_MET.GetYaxis()->SetTitle("(f_{pass CJV} - f_{fail CJV})/f_{pass CJV}");
+
+  hEstLo_CJVRatio_MET.Draw("AP");
+  
+
+  pdfName = oDir+std::string("/QCD3_CtrlLo_MET_Ratio.pdf");
+  canvas.Print(pdfName.c_str());
+
+  // CJV
+  //  pad1.cd();
+
+  hEstLo_METP_CJEt->SetMarkerColor(kRed);
+  hEstLo_METP_CJEt->SetMarkerStyle(22);
+
+  hEstLo_METF_CJEt->SetMarkerColor(kBlue);
+  hEstLo_METF_CJEt->SetMarkerStyle(23);
+
+  hEstLo_METP_CJEt->GetYaxis()->SetTitle("arbitrary units");
+  hEstLo_METP_CJEt->GetXaxis()->SetTitle("cen jet E_{T} [GeV]");
+
+  hEstLo_METP_CJEt->Draw();
+  hEstLo_METF_CJEt->Draw("SAME");
+
+  TLegend leg4(0.60, 0.7, 0.75, 0.85, "#Delta#phi<1.0", "NDC");
+  leg4.AddEntry(hEstLo_METP_CJEt, "MET > 130", "P");
+  leg4.AddEntry(hEstLo_METF_CJEt, "MET < 130", "P");
+  leg4.SetFillColor(0);
+  leg4.Draw();
+
+  pdfName = oDir+std::string("/QCD3_CtrlLo_CenJetEt.pdf");
+  canvas.Print(pdfName.c_str());
+
+  //  pad2.cd();
+
+  hEstLo_METRatio_CJEt.SetMaximum(5.0);
+  hEstLo_METRatio_CJEt.SetMinimum(-5.0);
+  hEstLo_METRatio_CJEt.SetMarkerStyle(8);
+  hEstLo_METRatio_CJEt.SetTitle("");
+  hEstLo_METRatio_CJEt.GetXaxis()->SetTitle("cen jet E_{T} [GeV]");
+  hEstLo_METRatio_CJEt.GetYaxis()->SetTitle("(f_{pass MET}-f_{fail MET})/f_{pass MET}");
+
+  hEstLo_METRatio_CJEt.Draw("AP");
+  
+  pdfName = oDir+std::string("/QCD3_CtrlLo_CenJetEt_Ratio.pdf");
+  canvas.Print(pdfName.c_str());
+
 
   // save output
   ofile->cd();
@@ -508,24 +678,44 @@ int main(int argc, char* argv[]) {
   hSignal_HiDPhi_METCJV->Write("", TObject::kOverwrite);
   hEst_HiDPhi_METCJV->Write("", TObject::kOverwrite);
 
-  hData_CJVP_MET->Write("", TObject::kOverwrite);
-  hBG_CJVP_MET->Write("", TObject::kOverwrite);
-  hEst_CJVP_MET->Write("", TObject::kOverwrite);
+  hDataHi_CJVP_MET->Write("", TObject::kOverwrite);
+  hBGHi_CJVP_MET->Write("", TObject::kOverwrite);
+  hEstHi_CJVP_MET->Write("", TObject::kOverwrite);
 
-  hData_CJVF_MET->Write("", TObject::kOverwrite);
-  hBG_CJVF_MET->Write("", TObject::kOverwrite);
-  hEst_CJVF_MET->Write("", TObject::kOverwrite);
+  hDataHi_CJVF_MET->Write("", TObject::kOverwrite);
+  hBGHi_CJVF_MET->Write("", TObject::kOverwrite);
+  hEstHi_CJVF_MET->Write("", TObject::kOverwrite);
 
-  hData_METP_CJEt->Write("", TObject::kOverwrite);
-  hBG_METP_CJEt->Write("", TObject::kOverwrite);
-  hEst_METP_CJEt->Write("", TObject::kOverwrite);
+  hDataHi_METP_CJEt->Write("", TObject::kOverwrite);
+  hBGHi_METP_CJEt->Write("", TObject::kOverwrite);
+  hEstHi_METP_CJEt->Write("", TObject::kOverwrite);
 
-  hData_METF_CJEt->Write("", TObject::kOverwrite);
-  hBG_METF_CJEt->Write("", TObject::kOverwrite);
-  hEst_METF_CJEt->Write("", TObject::kOverwrite);
+  hDataHi_METF_CJEt->Write("", TObject::kOverwrite);
+  hBGHi_METF_CJEt->Write("", TObject::kOverwrite);
+  hEstHi_METF_CJEt->Write("", TObject::kOverwrite);
 
-  hEst_CJVRatio_MET.Write("", TObject::kOverwrite);
-  hEst_METRatio_CJEt.Write("", TObject::kOverwrite);
+  hEstHi_CJVRatio_MET.Write("", TObject::kOverwrite);
+  hEstHi_METRatio_CJEt.Write("", TObject::kOverwrite);
+
+  hDataLo_CJVP_MET->Write("", TObject::kOverwrite);
+  hBGLo_CJVP_MET->Write("", TObject::kOverwrite);
+  hEstLo_CJVP_MET->Write("", TObject::kOverwrite);
+
+  hDataLo_CJVF_MET->Write("", TObject::kOverwrite);
+  hBGLo_CJVF_MET->Write("", TObject::kOverwrite);
+  hEstLo_CJVF_MET->Write("", TObject::kOverwrite);
+
+  hDataLo_METP_CJEt->Write("", TObject::kOverwrite);
+  hBGLo_METP_CJEt->Write("", TObject::kOverwrite);
+  hEstLo_METP_CJEt->Write("", TObject::kOverwrite);
+
+  hDataLo_METF_CJEt->Write("", TObject::kOverwrite);
+  hBGLo_METF_CJEt->Write("", TObject::kOverwrite);
+  hEstLo_METF_CJEt->Write("", TObject::kOverwrite);
+
+  hEstLo_CJVRatio_MET.Write("", TObject::kOverwrite);
+  hEstLo_METRatio_CJEt.Write("", TObject::kOverwrite);
+
 
   // clean up
   ofile->Close();
