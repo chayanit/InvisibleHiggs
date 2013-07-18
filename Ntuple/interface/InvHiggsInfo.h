@@ -15,7 +15,7 @@
 */
 //
 // Original Author:  Jim Brooke
-// $Id: InvHiggsInfo.h,v 1.21 2013/05/27 09:00:51 chayanit Exp $
+// $Id: InvHiggsInfo.h,v 1.22 2013/07/10 13:15:31 chayanit Exp $
 //
 //
 
@@ -178,6 +178,7 @@ class InvHiggsInfo { //: public TObject {
   // Taus
   Int_t nTaus_tot;
   Int_t nTaus_pass;
+  Double_t tau_dz;
   Double_t tau1Pt;
   Double_t tau1Eta;
   Double_t tau1Phi;

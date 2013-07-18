@@ -116,6 +116,7 @@ InvHiggsInfo::InvHiggsInfo() :
   nTaus_tot(0),
   nTaus_pass(0),
   nTaus_match(-1),
+  tau_dz(99.),
   tau1Pt(-10.),
   tau1Eta(-10.),
   tau1Phi(-10.),

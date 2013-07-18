@@ -1352,11 +1352,14 @@ void InvHiggsInfoProducer::doTaus(const std::vector<pat::Tau>& taus,
 
     const pat::Tau& tau = taus.at(i);
 
-    //if (vertices.size() > 0) {
-    //  if(tau.leadPFChargedHadrCand()->trackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->trackRef()->dz(vertices.at(0).position()));
-    //  else if(tau.leadPFChargedHadrCand()->gsfTrackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->gsfTrackRef()->dz(vertices.at(0).position()));
-    //  std::cout << "dz = " << dz << std::endl;
-    //}
+    if (vertices.size() > 0) {
+      //if(tau.leadPFChargedHadrCand()->trackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->trackRef()->dz(vertices.at(0).position()));
+      //else if(tau.leadPFChargedHadrCand()->gsfTrackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->gsfTrackRef()->dz(vertices.at(0).position()));
+      //std::cout << "dz from track = " << dz << std::endl;
+
+      info_->tau_dz = fabs(tau.vz() - vertices.at(0).z());
+      //std::cout << "dz from hand = " << info_->tau_dz << std::endl;      	
+    }
 
     // do Tau selection here and store 2 leading Taus info
     if( tau.tauID("decayModeFinding") == 0 ||
@@ -1364,7 +1367,8 @@ void InvHiggsInfoProducer::doTaus(const std::vector<pat::Tau>& taus,
 	tau.tauID("againstMuonTight") == 0 ||
 	tau.tauID("againstElectronTight") == 0 ||
 	taus.at(i).pt() < 20 ||
-	fabs(taus.at(i).eta()) > 2.3) continue;
+	fabs(taus.at(i).eta()) > 2.3 || 
+	info_->tau_dz > 0.2) continue;
  	//|| dz > 0.2 )	continue;
 
     info_->nTaus_pass++;
