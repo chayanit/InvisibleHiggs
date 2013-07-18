@@ -14,6 +14,7 @@ class ProgramOptions{
   std::string oDir;
   std::string datasetFile;
   double lumi;
+  int qcdMethod;
   
 };
 

@@ -9,7 +9,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
   iDir(""),
   oDir(""),
   datasetFile(""),
-  lumi(0.)
+  lumi(0.),
+  qcdMethod(1)
  {
 
   namespace po = boost::program_options;
@@ -21,7 +22,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
     ("outdir,o", po::value<std::string>(), "Output directory")
     ("indir,i", po::value<std::string>(), "Input directory")
     ("datasets,f", po::value<std::string>(), "Datasets file")
-    ("lumi,l", po::value<double>(), "Integrated luminosity");
+    ("lumi,l", po::value<double>(), "Integrated luminosity")
+    ("qcd,q", po::value<int>(), "QCD method");
 
   po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
@@ -37,6 +39,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
   if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
   if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
   if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
+  if (vm.count("qcd"))      qcdMethod=vm["qcd"].as<int>();
 
   // create output directory if it doesn't exist already
   if (oDir!="") {
