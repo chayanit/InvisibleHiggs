@@ -15,6 +15,7 @@ class Cuts {
   void addZMuMuCut(std::string name, std::string cut);
   void addWMuCut(std::string name, std::string cut);
   void addWElCut(std::string name, std::string cut);
+  void addWTauCut(std::string name, std::string cut);
   void addQCDCut(std::string name, std::string cut);
 
   // getters
@@ -33,6 +34,10 @@ class Cuts {
   unsigned nWElCuts() { return cutsWEl_.size(); }
   TCut cutWEl(std::string name);
   std::string cutNameWEl(unsigned i) { return namesWEl_.at(i); }
+
+  unsigned nWTauCuts() { return cutsWTau_.size(); }
+  TCut cutWTau(std::string name);
+  std::string cutNameWTau(unsigned i) { return namesWTau_.at(i); }
 
   unsigned nQCDCuts() { return cutsQCD_.size(); }
   std::string cutNameQCD(unsigned i) { return namesQCD_.at(i); }
@@ -86,6 +91,8 @@ class Cuts {
 
   // W -> tau
   TCut wTauGen();
+  TCut cutflowWTau(unsigned i);
+  unsigned nCutsWTau() { return cutsWTau_.size(); }
 
   // QCD
   TCut qcdNoMET();
@@ -108,6 +115,9 @@ class Cuts {
 
   std::vector<std::string> namesWEl_;
   std::vector<TCut> cutsWEl_;
+
+  std::vector<std::string> namesWTau_;
+  std::vector<TCut> cutsWTau_;
 
   std::vector<std::string> namesQCD_;
   std::vector<TCut> cutsQCD_;

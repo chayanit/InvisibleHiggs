@@ -18,6 +18,8 @@
 
 <bin name="wBackground" file="wBackground.cpp"/>
 
+<bin name="wTauBackground" file="wTauBackground.cpp"/>
+
 <bin name="qcdBackground" file="qcdBackground.cpp"/>
 
 <bin name="qcdBackground2" file="qcdBackground2.cpp"/>

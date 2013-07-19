@@ -45,6 +45,15 @@ Cuts::Cuts() {
   addWElCut("CJV",       "cenJetEt<30.");
   addWElCut("dPhiJJ",    "vbfDPhi<1.0");
 
+  addWTauCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
+  addWTauCut("wTau",      "nW>0 && nTaus_pass>0"); 
+  addWTauCut("lVeto",     "ele1Pt<10. && mu1Pt<10.");
+  addWTauCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
+  addWTauCut("dEtaJJ",    "vbfDEta>4.2");
+  addWTauCut("MET",       "met>130.");
+  addWTauCut("Mjj",       "vbfM>1100.");
+  addWTauCut("CJV",       "cenJetEt<30.");
+  addWTauCut("dPhiJJ",    "vbfDPhi<1.0");
 }
 
 Cuts::~Cuts() {
@@ -75,6 +84,12 @@ void Cuts::addWElCut(std::string name, std::string cut) {
   namesWEl_.push_back(name);
   TCut c(cut.c_str());
   cutsWEl_.push_back(c);
+}
+
+void Cuts::addWTauCut(std::string name, std::string cut) {
+  namesWTau_.push_back(name);
+  TCut c(cut.c_str());
+  cutsWTau_.push_back(c);
 }
 
 
@@ -110,6 +125,13 @@ TCut Cuts::cutWMu(std::string s) {
 TCut Cuts::cutWEl(std::string s) {
   for (unsigned i=0; i<namesWEl_.size(); ++i) {
     if (namesWEl_.at(i) == s) return cutsWEl_.at(i);
+  }
+  return TCut();
+}
+
+TCut Cuts::cutWTau(std::string s) {
+  for (unsigned i=0; i<namesWTau_.size(); ++i) {
+    if (namesWTau_.at(i) == s) return cutsWTau_.at(i);
   }
   return TCut();
 }
@@ -171,7 +193,8 @@ TCut Cuts::cutDataset(std::string name) {
 
 
 TCut Cuts::wWeight() {
-  return TCut("(1.0*(wgennj==0)+0.369253*(wgennj==1)+0.11401*(wgennj==2)+0.0771589*(wgennj==3)+0.03849*(wgennj==4))");
+  return TCut("(1.0*(wgennj==0)+0.369253*(wgennj==1)+0.11401*(wgennj==2)+0.0771589*(wgennj==3)+0.03849*(wgennj==4))"); //PROMPT v11
+  // return TCut("(1.0*(wgennj==0)+0.369253*(wgennj==1)+0.11528*(wgennj==2)+0.0771589*(wgennj==3)+0.03849*(wgennj==4))"); //RE RECO V12
 }
 
 
@@ -322,6 +345,14 @@ TCut Cuts::cutflowWEl(unsigned i) {
 // W -> tau
 TCut Cuts::wTauGen() {
   TCut tmp("wltype==3 && wtauhadron==1");
+  return tmp;
+}
+
+TCut Cuts::cutflowWTau(unsigned i) {
+  TCut tmp("");
+  for (unsigned j=0; j<i+1; ++j) {
+    tmp += cutsWTau_.at(j);
+  }
   return tmp;
 }
 
