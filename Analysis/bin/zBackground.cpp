@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
   TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
   TCut METNoMuon130("metNoMuon>130.");	// add here later for VBF efficiency when MET>35, MET>70 (QCD estimation)
   TCut METNo2Muon130("metNo2Muon>130.");
+  TCut cutLoDPhi = cuts.cut("dPhiJJ");
 
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
@@ -117,10 +118,10 @@ int main(int argc, char* argv[]) {
     TCut cutEfficiencyMuMu_N    = puWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
  
     TCut cutEfficiencyVBFS_D    = puWeight * (cutD + cuts.zMuMuGenMass());
-    TCut cutEfficiencyVBFS_N    = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130);
+    TCut cutEfficiencyVBFS_N    = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130 + cutLoDPhi);
     
     TCut cutEfficiencyVBFC_D    = puWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
-    TCut cutEfficiencyVBFC_N    = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon130);
+    TCut cutEfficiencyVBFC_N    = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon130 + cutLoDPhi);
 
     // cuts for 2D
     TCut cutZMuMu_MET0_C    = puWeight * trigCorr * (cutD + cuts.zMuMuVBF());
@@ -211,7 +212,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "  N ctrl (dphi<1.0) : " << hZ_C_DPhi->GetBinContent(1) << " +/- " << hZ_C_DPhi->GetBinError(1) << std::endl;  
-    std::cout << "  N ctrl (dphi>2.6) : " << hZ_C_DPhi->GetBinContent(3) << " +/- " << hZ_C_DPhi->GetBinError(3) << std::endl;
+    //std::cout << "  N ctrl (dphi>2.6) : " << hZ_C_DPhi->GetBinContent(3) << " +/- " << hZ_C_DPhi->GetBinError(3) << std::endl;
     
     delete hZ_C_DPhi;
     delete hZ_EffMuMu_D;
@@ -419,32 +420,32 @@ int main(int argc, char* argv[]) {
 
   std::cout << std::endl;
   std::cout << "##################################### MET > 130 #####################################" << std::endl;
-  std::cout << "dphi>2.6" << std::endl;
-  std::cout << std::endl;
-  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(3) << " +/- " << hZ_DY_EffMuMu->GetBinError(3) << std::endl;
-  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(3) << " +/- " << hZ_DY_EffVBFS->GetBinError(3) << std::endl;
-  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(3) << " +/- " << hZ_DY_EffVBFC->GetBinError(3) << std::endl;
-  std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(3) << " +/- " << hZ_DY_RatioVBF->GetBinError(3) << "(stat.) + " << 0.01039 * hZ_DY_RatioVBF->GetBinContent(3) << ", - " << 0.0136 * hZ_DY_RatioVBF->GetBinContent(3) << "(syst.)" << std::endl;
-  std::cout << "  total eff by histogram : " << hZ_DY_TotalEff->GetBinContent(3) << " +/- " << hZ_DY_TotalEff->GetBinError(3) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_C_DPhi->GetBinError(3) << "(stat.) + " << 0.035 * hZ_BG_C_DPhi->GetBinContent(3) << ", - " << 0.09 * hZ_BG_C_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
-  std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_C_DPhi->GetBinError(3) << std::endl;
-  std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_C_DPhi->GetBinError(3) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_S_DPhi->GetBinError(3) << "(stat.) + " << 0.0104 * hZ_Est_S_DPhi->GetBinContent(3) << ", - " << 0.0161 * hZ_Est_S_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
-  std::cout << std::endl << std::endl;
+  //std::cout << "dphi>2.6" << std::endl;
+  //std::cout << std::endl;
+  //std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
+  //std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
+  //std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
+  //std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << "(stat.) + " << 0.01039 * hZ_DY_RatioVBF->GetBinContent(3) << ", - " << 0.0136 * hZ_DY_RatioVBF->GetBinContent(3) << "(syst.)" << std::endl;
+  //std::cout << "  total eff by histogram : " << hZ_DY_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_TotalEff->GetBinError(1) << std::endl;
+  //std::cout << std::endl;
+  //std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_C_DPhi->GetBinError(3) << std::endl;
+  //std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_C_DPhi->GetBinError(3) << "(stat.) + " << 0.035 * hZ_BG_C_DPhi->GetBinContent(3) << ", - " << 0.09 * hZ_BG_C_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
+  //std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_C_DPhi->GetBinError(3) << std::endl;
+  //std::cout << std::endl;
+  //std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_C_DPhi->GetBinError(3) << std::endl;
+  //std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_S_DPhi->GetBinError(3) << "(stat.) + " << 0.0104 * hZ_Est_S_DPhi->GetBinContent(3) << ", - " << 0.0161 * hZ_Est_S_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
+  //std::cout << std::endl << std::endl;
 
   std::cout << "dphi<1.0" << std::endl;
   std::cout << std::endl;
   std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
   std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
   std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
-  std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << "(stat.) + " << 0.01039 * hZ_DY_RatioVBF->GetBinContent(1) << ", - " << 0.0136 * hZ_DY_RatioVBF->GetBinContent(1) << "(syst.)" << std::endl;
+  std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << std::endl;
   std::cout << "  total eff by histogram : " << hZ_DY_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_TotalEff->GetBinError(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(1) << " +/- " << hZ_DY_C_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_C_DPhi->GetBinError(1) << "(stat.) + " << 0.174 * hZ_BG_C_DPhi->GetBinContent(1) << ", - " << 0.09 * hZ_BG_C_DPhi->GetBinContent(1) << "(syst.)" << std::endl;
+  std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_C_DPhi->GetBinError(1) << std::endl;
   std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(1) << " +/- " << hZ_Data_C_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_C_DPhi->GetBinError(1) << std::endl;
@@ -497,7 +498,7 @@ int main(int argc, char* argv[]) {
   DYDatasets.push_back(std::string("DYJetsToLL_NoTrig"));
   DYDatasets.push_back(std::string("DYJetsToLL_PtZ-100_NoTrig"));
   DYDatasets.push_back(std::string("DYJetsToLL_EWK_NoTrig"));
-  SumDatasets(oDir_Plot, DYDatasets, hists, "DYJets");
+  SumDatasets(oDir_Plot, DYDatasets, hists, "DYJets+EWK");
 
   // sum single top datasets
   std::vector<std::string> topDatasets;
@@ -524,7 +525,7 @@ int main(int argc, char* argv[]) {
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
-  plots.addDataset("DYJets", kPink-4,0);
+  plots.addDataset("DYJets+EWK", kPink-4,0);
   plots.addDataset("METABCD", kBlack, 1);
 
   plots.draw("ZCtrlZpT",	"Z_p_{T} [GeV]",		"N_{events}"	,1,1);
