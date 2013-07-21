@@ -94,12 +94,20 @@ int main(int argc, char* argv[]) {
 
     // Additional WJets corrections (so can use inclusive & exclusive samples)
     TCut wWeight("");
+    bool isWJets = false;
+    bool isEwkW  = false;
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" || 
         dataset.name == "W2Jets" || 
         dataset.name == "W3Jets" || 
-        dataset.name == "W4Jets") {
-      wWeight =  cuts.wWeight();
+        dataset.name == "W4Jets" ||
+        dataset.name == "EWK_Wp2Jets" ||
+        dataset.name == "EWK_Wm2Jets") {
+
+      if (dataset.name == "EWK_Wp2Jets" || dataset.name == "EWK_Wm2Jets") isEwkW = true;
+      else isWJets = true;
+
+      if(isWJets) wWeight =  cuts.wWeight();
     } 
 
     TCut otherCuts = puWeight * trigCorr * wWeight;
@@ -208,7 +216,9 @@ int main(int argc, char* argv[]) {
   wJets.push_back(std::string("W2Jets"));
   wJets.push_back(std::string("W3Jets"));
   wJets.push_back(std::string("W4Jets"));
-  SumDatasets(oDir, wJets, hists, "WNJets");
+  wJets.push_back(std::string("EWK_Wp2Jets"));
+  wJets.push_back(std::string("EWK_Wm2Jets"));
+  SumDatasets(oDir, wJets, hists, "WNJets+EWK");
 
   // sum QCD
   std::cout << "Summing histograms for QCD" << std::endl;
@@ -254,7 +264,7 @@ int main(int argc, char* argv[]) {
   dyjets.push_back("DYJetsToLL");
   dyjets.push_back("DYJetsToLL_PtZ-100");
   dyjets.push_back("DYJetsToLL_EWK");
-  SumDatasets(oDir, dyjets, hists, "DYJets");
+  SumDatasets(oDir, dyjets, hists, "DYJets+EWK");
 
   // make plots
   std::cout << "Making plots" << std::endl;
@@ -262,11 +272,11 @@ int main(int argc, char* argv[]) {
   plots.setLegPos(0.69,0.72,0.98,0.97);
 
   plots.addDataset("Diboson", kViolet-6, 0);
-  plots.addDataset("DYJets", kPink-4,0);
+  plots.addDataset("DYJets+EWK", kPink-4,0);
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
   plots.addDataset("QCD", kGreen+3, 0);
   plots.addDataset("ZJets", kOrange-2, 0);
-  plots.addDataset("WNJets", kGreen-3, 0);
+  plots.addDataset("WNJets+EWK", kGreen-3, 0);
   plots.addDataset("SignalM125_POWHEG", kRed, 2);
 
   plots.draw("hTrigNM1", "", "");
