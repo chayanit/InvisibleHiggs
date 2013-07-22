@@ -5,6 +5,7 @@
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
+#include "InvisibleHiggs/Analysis/interface/Constants.h"
 
 #include "TTree.h"
 #include "TMath.h"
@@ -336,15 +337,17 @@ int main(int argc, char* argv[]) {
   }
 
   // numbers - calculate these from MC in this program later!
-  double ratioBF = 5.626;  //  MCFM + NLO
-  //double eps_mumu = 0.290;
-  //double eps_s_vbf = 0.0194;
-  //double eps_c_vbf = 0.0315;
-  //double f = (ratioBF * eps_s_vbf) / (eps_mumu * eps_c_vbf);
+  double ratioBF = constants::ratioZToNuNuZToLL;
+
+
+  TH1D* hZ_Data_C_DPhi_Syst = new TH1D("hZ_Data_C_DPhi_Syst", "", 3, dphiEdges); // estimated Z in ctrl region
 
   TH1D* hZ_Est_C_DPhi = new TH1D("hZ_Est_C_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
-  TH1D* hZ_Est_S_DPhi = new TH1D("hZ_Est_S_DPhi", "", 3, dphiEdges); // estimated Z in bkgrnd region  
+  TH1D* hZ_Est_C_DPhi_Syst = new TH1D("hZ_Est_C_DPhi_Syst", "", 3, dphiEdges); // estimated Z in ctrl region
+  TH1D* hZ_Est_S_DPhi = new TH1D("hZ_Est_S_DPhi", "", 3, dphiEdges); // estimated Z in signal region  
+  TH1D* hZ_Est_S_DPhi_Syst = new TH1D("hZ_Est_S_DPhi_Syst", "", 3, dphiEdges); // estimated Z in signal region  
   TH1D* hZ_Eff_S_DPhi = new TH1D("hZ_Eff_S_DPhi", "", 3, dphiEdges);
+  TH1D* hZ_Eff_S_DPhi_Syst = new TH1D("hZ_Eff_S_DPhi_Syst", "", 3, dphiEdges);
 
   TH1D* hZ_DY_EffMuMu = new TH1D("hZ_DY_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
   TH1D* hZ_DY_EffVBFS = new TH1D("hZ_DY_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
@@ -365,55 +368,64 @@ int main(int argc, char* argv[]) {
 
   hZ_DY_RatioVBF->Add(hZ_DY_EffVBFS);
   hZ_DY_RatioVBF->Divide(hZ_DY_EffVBFC);
-  //hZ_DY_RatioVBF->SetBinError(1,TMath::Sqrt(hZ_DY_RatioVBF->GetBinError(1)*hZ_DY_RatioVBF->GetBinError(1) + eps_vbf_syst*eps_vbf_syst));
 
   hZ_DY_TotalEff->Add(hZ_DY_RatioVBF);
   hZ_DY_TotalEff->Divide(hZ_DY_EffMuMu);
 
   for(int ibin = 1; ibin <= hZ_Eff_S_DPhi->GetNbinsX(); ++ibin) {
     hZ_Eff_S_DPhi->SetBinContent(ibin,hZ_DY_TotalEff->GetBinContent(1));
-    hZ_Eff_S_DPhi->SetBinError  (ibin,hZ_DY_TotalEff->GetBinError(1));
+    hZ_Eff_S_DPhi->SetBinError(ibin,0.);
+    hZ_Eff_S_DPhi_Syst->SetBinContent(ibin,hZ_DY_TotalEff->GetBinContent(1));
+    hZ_Eff_S_DPhi_Syst->SetBinError(ibin,hZ_DY_TotalEff->GetBinError(1));
   }
 
+  // do stat only version
   hZ_Est_C_DPhi->Add(hZ_Data_C_DPhi, hZ_BG_C_DPhi, 1., -1.);
-  //hZ_Est_S_DPhi->Add(hZ_Est_C_DPhi, f);
   hZ_Est_S_DPhi->Add(hZ_Est_C_DPhi,ratioBF);
   hZ_Est_S_DPhi->Multiply(hZ_Eff_S_DPhi);
 
+  // do syst only version
+  hZ_Data_C_DPhi_Syst->Add(hZ_Data_C_DPhi, 1.);
+  for (int i=1; i<=hZ_Data_C_DPhi_Syst->GetNbinsX(); ++i) hZ_Data_C_DPhi_Syst->SetBinError(i,0.);
+
+  hZ_Est_C_DPhi_Syst->Add(hZ_Data_C_DPhi_Syst, hZ_BG_C_DPhi, 1., -1.);
+  hZ_Est_S_DPhi_Syst->Add(hZ_Est_C_DPhi_Syst,ratioBF);
+  hZ_Est_S_DPhi_Syst->Multiply(hZ_Eff_S_DPhi_Syst);
+
 
   // 2D calculation
-  TH2D* hZ_Est_C_METDPhi = new TH2D("hZ_Est_C_METDPhi", "", 3, dphiEdges, 12, metEdges); // estimated Z in ctrl region
-  TH2D* hZ_Est_S_METDPhi = new TH2D("hZ_Est_S_METDPhi", "", 3, dphiEdges, 12, metEdges); // estimated Z in bkgrnd region  
-  TH2D* hZ_Eff_S_METDPhi = new TH2D("hZ_Eff_S_METDPhi", "", 3, dphiEdges, 12, metEdges);
+//   TH2D* hZ_Est_C_METDPhi = new TH2D("hZ_Est_C_METDPhi", "", 3, dphiEdges, 12, metEdges); // estimated Z in ctrl region
+//   TH2D* hZ_Est_S_METDPhi = new TH2D("hZ_Est_S_METDPhi", "", 3, dphiEdges, 12, metEdges); // estimated Z in bkgrnd region  
+//   TH2D* hZ_Eff_S_METDPhi = new TH2D("hZ_Eff_S_METDPhi", "", 3, dphiEdges, 12, metEdges);
 
-  TH1D* hZ_DY_EffVBFS_MET0 = new TH1D("hZ_DY_EffVBFS_MET0", "", 12, metEdges);
-  TH1D* hZ_DY_EffVBFC_MET0 = new TH1D("hZ_DY_EffVBFC_MET0", "", 12, metEdges);
-  TH1D* hZ_DY_RatioVBF_MET0 = new TH1D("hZ_DY_RatioVBF_MET0", "", 12, metEdges);
-  TH1D* hZ_DY_TotalEff_MET0 = new TH1D("hZ_DY_TotalEff_MET0", "", 12, metEdges); 
+//   TH1D* hZ_DY_EffVBFS_MET0 = new TH1D("hZ_DY_EffVBFS_MET0", "", 12, metEdges);
+//   TH1D* hZ_DY_EffVBFC_MET0 = new TH1D("hZ_DY_EffVBFC_MET0", "", 12, metEdges);
+//   TH1D* hZ_DY_RatioVBF_MET0 = new TH1D("hZ_DY_RatioVBF_MET0", "", 12, metEdges);
+//   TH1D* hZ_DY_TotalEff_MET0 = new TH1D("hZ_DY_TotalEff_MET0", "", 12, metEdges); 
 
-  hZ_DY_EffVBFS_MET0->Add(hZ_DY_EffVBFS_MET0_N);
-  hZ_DY_EffVBFS_MET0->Divide(hZ_DY_EffVBFS_MET0_D);
+//   hZ_DY_EffVBFS_MET0->Add(hZ_DY_EffVBFS_MET0_N);
+//   hZ_DY_EffVBFS_MET0->Divide(hZ_DY_EffVBFS_MET0_D);
 
-  hZ_DY_EffVBFC_MET0->Add(hZ_DY_EffVBFC_MET0_N);
-  hZ_DY_EffVBFC_MET0->Divide(hZ_DY_EffVBFC_MET0_D);
+//   hZ_DY_EffVBFC_MET0->Add(hZ_DY_EffVBFC_MET0_N);
+//   hZ_DY_EffVBFC_MET0->Divide(hZ_DY_EffVBFC_MET0_D);
 
-  hZ_DY_RatioVBF_MET0->Add(hZ_DY_EffVBFS_MET0);
-  hZ_DY_RatioVBF_MET0->Divide(hZ_DY_EffVBFC_MET0);
+//   hZ_DY_RatioVBF_MET0->Add(hZ_DY_EffVBFS_MET0);
+//   hZ_DY_RatioVBF_MET0->Divide(hZ_DY_EffVBFC_MET0);
 
-  hZ_DY_TotalEff_MET0->Add(hZ_DY_RatioVBF_MET0);
-  hZ_DY_TotalEff_MET0->Scale(1/hZ_DY_EffMuMu->GetBinContent(1));
+//   hZ_DY_TotalEff_MET0->Add(hZ_DY_RatioVBF_MET0);
+//   hZ_DY_TotalEff_MET0->Scale(1/hZ_DY_EffMuMu->GetBinContent(1));
 
-  for(int ibin = 1; ibin <= hZ_Eff_S_METDPhi->GetNbinsX(); ++ibin) {
-    for(int jbin = 1; jbin <= hZ_Eff_S_METDPhi->GetNbinsY(); ++jbin) {
-      hZ_Eff_S_METDPhi->SetBinContent(ibin,jbin,hZ_DY_TotalEff_MET0->GetBinContent(jbin));
-      hZ_Eff_S_METDPhi->SetBinError  (ibin,jbin,hZ_DY_TotalEff_MET0->GetBinError(jbin));
-    }
-  }
+//   for(int ibin = 1; ibin <= hZ_Eff_S_METDPhi->GetNbinsX(); ++ibin) {
+//     for(int jbin = 1; jbin <= hZ_Eff_S_METDPhi->GetNbinsY(); ++jbin) {
+//       hZ_Eff_S_METDPhi->SetBinContent(ibin,jbin,hZ_DY_TotalEff_MET0->GetBinContent(jbin));
+//       hZ_Eff_S_METDPhi->SetBinError  (ibin,jbin,hZ_DY_TotalEff_MET0->GetBinError(jbin));
+//     }
+//   }
 
-  hZ_Est_C_METDPhi->Add(hZ_Data_C_METDPhi, hZ_BG_C_METDPhi, 1., -1.);
-  //hZ_Est_S_METDPhi->Add(hZ_Est_C_METDPhi, f);
-  hZ_Est_S_METDPhi->Add(hZ_Est_C_METDPhi,ratioBF);
-  hZ_Est_S_METDPhi->Multiply(hZ_Eff_S_METDPhi);
+//   hZ_Est_C_METDPhi->Add(hZ_Data_C_METDPhi, hZ_BG_C_METDPhi, 1., -1.);
+//   //hZ_Est_S_METDPhi->Add(hZ_Est_C_METDPhi, f);
+//   hZ_Est_S_METDPhi->Add(hZ_Est_C_METDPhi,ratioBF);
+//   hZ_Est_S_METDPhi->Multiply(hZ_Eff_S_METDPhi);
 
 
   // print out
@@ -548,8 +560,12 @@ int main(int argc, char* argv[]) {
   hZ_BG_C_DPhi->Write("",TObject::kOverwrite);
   hZ_Data_C_DPhi->Write("",TObject::kOverwrite);
   hZ_Est_C_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_C_DPhi_Syst->Write("",TObject::kOverwrite);
   hZ_Est_S_DPhi->Write("",TObject::kOverwrite);
+  hZ_Est_S_DPhi_Syst->Write("",TObject::kOverwrite);
+
   hZ_Eff_S_DPhi->Write("",TObject::kOverwrite);
+  hZ_Eff_S_DPhi_Syst->Write("",TObject::kOverwrite);
   hZ_DY_EffMuMu_D->Write("",TObject::kOverwrite);
   hZ_DY_EffMuMu_N->Write("",TObject::kOverwrite);
   hZ_DY_EffVBFS_D->Write("",TObject::kOverwrite);
@@ -562,12 +578,12 @@ int main(int argc, char* argv[]) {
   hZ_DY_RatioVBF->Write("",TObject::kOverwrite);
   hZ_DY_TotalEff->Write("",TObject::kOverwrite);
 
-  hZ_DY_C_METDPhi->Write("",TObject::kOverwrite);
-  hZ_BG_C_METDPhi->Write("",TObject::kOverwrite);
-  hZ_Data_C_METDPhi->Write("",TObject::kOverwrite);
-  hZ_Est_C_METDPhi->Write("",TObject::kOverwrite);
-  hZ_Est_S_METDPhi->Write("",TObject::kOverwrite);
-  hZ_Eff_S_METDPhi->Write("",TObject::kOverwrite);
+//   hZ_DY_C_METDPhi->Write("",TObject::kOverwrite);
+//   hZ_BG_C_METDPhi->Write("",TObject::kOverwrite);
+//   hZ_Data_C_METDPhi->Write("",TObject::kOverwrite);
+//   hZ_Est_C_METDPhi->Write("",TObject::kOverwrite);
+//   hZ_Est_S_METDPhi->Write("",TObject::kOverwrite);
+//   hZ_Eff_S_METDPhi->Write("",TObject::kOverwrite);
 
 
   hZ_CutFlow_Data->Write("",TObject::kOverwrite);

@@ -5,6 +5,7 @@
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
+#include "InvisibleHiggs/Analysis/interface/LeptonWeights.h"
 #include "InvisibleHiggs/Analysis/interface/Constants.h"
 
 
@@ -33,6 +34,8 @@ int main(int argc, char* argv[]) {
   Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
 
+  LeptonWeights lw;
+
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/WBackground.root")).c_str(), "RECREATE");
 
@@ -52,15 +55,16 @@ int main(int argc, char* argv[]) {
   unsigned nCutsWEl = cuts.nCutsWEl();
 
   TCut puWeight("puWeight");
-  //TCut trigCorrWeight("trigCorrWeight");
+  TCut elWeight("");//el1Weight");
+  TCut muWeight("");//mu1Weight");
+  TCut wWeight = cuts.wWeight();
   TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
-  //TCut wWeight("");
 
   TCut cutSignalNoMETNoDPhi = cuts.HLTandMETFilters() + cuts.leptonVeto() + cuts.vbf();
   
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
-  //double metEdges[13] = { 0., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 120. };
+  double metEdges[13] = { 0., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 120. };
 
   TH1D* hWMu_MCC_DPhi = new TH1D("hWMu_MCC_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
   TH1D* hWMu_MCS_DPhi = new TH1D("hWMu_MCS_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
@@ -105,6 +109,9 @@ int main(int argc, char* argv[]) {
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
 
+//     std::string lwFile = options.iDir + std::string("/") + dataset.name + std::string("_LeptonWeights.root");   
+//     lw.addFriend(tree, lwFile);
+
     // setup cuts
     TCut cutD = cuts.cutDataset(dataset.name);
     TCut otherCuts = puWeight * trigCorr;
@@ -145,6 +152,7 @@ int main(int argc, char* argv[]) {
       else isWJets = true;
 
       if(isWJets) wWeight =  cuts.wWeight();
+
 
       cutWMu_C = otherCuts * wWeight * (cuts.wMuVBF() + cuts.cutWMu("MET"));
       cutWMu_S = otherCuts * wWeight * (cuts.wMuGen() + cuts.allCutsNoDPhi());
@@ -471,28 +479,44 @@ int main(int argc, char* argv[]) {
   }
 
   // create histograms with the background estimate
-  TH1D* hWMu_R_DPhi    = new TH1D("hWMu_R_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
-  TH1D* hWMu_EstC_DPhi = new TH1D("hWMu_EstC_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
-  TH1D* hWMu_EstS_DPhi = new TH1D("hWMu_EstS_DPhi", "", 3, dphiEdges); // estimated W in signal region
-
-  TH1D* hWEl_R_DPhi    = new TH1D("hWEl_R_DPhi", "", 3, dphiEdges);
-  TH1D* hWEl_EstC_DPhi = new TH1D("hWEl_EstC_DPhi", "", 3, dphiEdges);
-  TH1D* hWEl_EstS_DPhi = new TH1D("hWEl_EstS_DPhi", "", 3, dphiEdges);
+  TH1D* hWMu_DataC_DPhi_Syst = new TH1D("hWMu_DataC_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWMu_R_DPhi          = new TH1D("hWMu_R_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
+  TH1D* hWMu_R_DPhi_Syst     = new TH1D("hWMu_R_DPhi_Syst", "", 3, dphiEdges);  // ratio of sngl/ctrl
+  TH1D* hWMu_EstC_DPhi       = new TH1D("hWMu_EstC_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
+  TH1D* hWMu_EstC_DPhi_Syst  = new TH1D("hWMu_EstC_DPhi_Syst", "", 3, dphiEdges); // estimated W in ctrl region
+  TH1D* hWMu_EstS_DPhi       = new TH1D("hWMu_EstS_DPhi", "", 3, dphiEdges); // estimated W in signal region
+  TH1D* hWMu_EstS_DPhi_Syst  = new TH1D("hWMu_EstS_DPhi_Syst", "", 3, dphiEdges); // estimated W in signal region
 
   hWMu_R_DPhi->Divide(hWMu_MCS_DPhi, hWMu_MCC_DPhi, 1., 1.);
+  for (int i=1; i<=hWMu_R_DPhi->GetNbinsX(); ++i) hWMu_R_DPhi->SetBinError(i,0.);
   hWMu_EstC_DPhi->Add(hWMu_DataC_DPhi, hWMu_BGC_DPhi, 1., -1.);
   hWMu_EstS_DPhi->Multiply(hWMu_EstC_DPhi, hWMu_R_DPhi, 1., 1.);
 
-  // apply MC/data correction for electron ID
-  //  hWEl_BGC_DPhi->Scale(constants::electronIdCorrection);
+  hWMu_DataC_DPhi_Syst->Add(hWMu_DataC_DPhi, 1.);
+  for (int i=1; i<=hWMu_DataC_DPhi_Syst->GetNbinsX(); ++i) hWMu_DataC_DPhi_Syst->SetBinError(i,0.);
+  hWMu_R_DPhi_Syst->Divide(hWMu_MCS_DPhi, hWMu_MCC_DPhi, 1., 1.);
+  hWMu_EstC_DPhi_Syst->Add(hWMu_DataC_DPhi_Syst, hWMu_BGC_DPhi, 1., -1.);
+  hWMu_EstS_DPhi_Syst->Multiply(hWMu_EstC_DPhi_Syst, hWMu_R_DPhi_Syst, 1., 1.);
+
+
+  TH1D* hWEl_DataC_DPhi_Syst = new TH1D("hWEl_DataC_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWEl_R_DPhi          = new TH1D("hWEl_R_DPhi", "", 3, dphiEdges);
+  TH1D* hWEl_R_DPhi_Syst     = new TH1D("hWEl_R_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWEl_EstC_DPhi       = new TH1D("hWEl_EstC_DPhi", "", 3, dphiEdges);
+  TH1D* hWEl_EstC_DPhi_Syst  = new TH1D("hWEl_EstC_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWEl_EstS_DPhi       = new TH1D("hWEl_EstS_DPhi", "", 3, dphiEdges);
+  TH1D* hWEl_EstS_DPhi_Syst  = new TH1D("hWEl_EstS_DPhi_Syst", "", 3, dphiEdges);
 
   hWEl_R_DPhi->Divide(hWEl_MCS_DPhi, hWEl_MCC_DPhi, 1., 1.);
+  for (int i=1; i<=hWEl_R_DPhi->GetNbinsX(); ++i) hWEl_R_DPhi->SetBinError(i,0.);
   hWEl_EstC_DPhi->Add(hWEl_DataC_DPhi, hWEl_BGC_DPhi, 1., -1.);
   hWEl_EstS_DPhi->Multiply(hWEl_EstC_DPhi, hWEl_R_DPhi, 1., 1.);
 
-  TH1D* hW_Est_S_DPhi = new TH1D("hW_Est_S_DPhi", "", 3, dphiEdges); 
-  hW_Est_S_DPhi->Add(hWMu_EstS_DPhi, hWEl_EstS_DPhi, 1., 1.);
-
+  hWEl_DataC_DPhi_Syst->Add(hWEl_DataC_DPhi, 1.);
+  for (int i=1; i<=hWEl_DataC_DPhi_Syst->GetNbinsX(); ++i) hWEl_DataC_DPhi_Syst->SetBinError(i,0.);
+  hWEl_R_DPhi_Syst->Divide(hWEl_MCS_DPhi, hWEl_MCC_DPhi, 1., 1.);
+  hWEl_EstC_DPhi_Syst->Add(hWEl_DataC_DPhi, hWEl_BGC_DPhi, 1., -1.);
+  hWEl_EstS_DPhi_Syst->Multiply(hWEl_EstC_DPhi_Syst, hWEl_R_DPhi_Syst, 1., 1.);
 
   // create 2D histograms with the background estimate
   //TH2D* hWMu_R_METDPhi    = new TH2D("hWMu_R_METDPhi", "", 3, dphiEdges, 12, metEdges);  // ratio of sngl/ctrl
@@ -507,74 +531,10 @@ int main(int argc, char* argv[]) {
   //hWMu_EstC_METDPhi->Add(hWMu_DataC_METDPhi, hWMu_BGC_METDPhi, 1., -1.);
   //hWMu_EstS_METDPhi->Multiply(hWMu_EstC_METDPhi, hWMu_R_METDPhi, 1., 1.);
 
-  // apply MC/data correction for electron ID
-  //  hWEl_BGC_DPhi->Scale(constants::electronIdCorrection);
-
   //hWEl_R_METDPhi->Divide(hWEl_MCS_METDPhi, hWEl_MCC_METDPhi, 1., 1.);
   //hWEl_EstC_METDPhi->Add(hWEl_DataC_METDPhi, hWEl_BGC_METDPhi, 1., -1.);
   //hWEl_EstS_METDPhi->Multiply(hWEl_EstC_METDPhi, hWEl_R_METDPhi, 1., 1.);
 
-  //TH2D* hW_Est_S_METDPhi = new TH2D("hW_Est_S_METDPhi", "", 3, dphiEdges, 12, metEdges); 
-  //hW_Est_S_DPhi->Add(hWMu_EstS_METDPhi, hWEl_EstS_METDPhi, 1., 1.);
-
-
-//   // repeat for loose MET regions
-//   TH1D* hWMu_R_NoMET_DPhi    = new TH1D("hWMu_R_NoMET_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
-//   TH1D* hWMu_Est_NoMETC_DPhi = new TH1D("hWMu_Est_NoMETC_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
-//   TH1D* hWMu_Est_NoMETS_DPhi = new TH1D("hWMu_Est_NoMETS_DPhi", "", 3, dphiEdges); // estimated W in signal region
-
-//   TH1D* hWEl_R_NoMET_DPhi    = new TH1D("hWEl_R_NoMET_DPhi", "", 3, dphiEdges);
-//   TH1D* hWEl_Est_NoMETC_DPhi = new TH1D("hWEl_Est_NoMETC_DPhi", "", 3, dphiEdges);
-//   TH1D* hWEl_Est_NoMETS_DPhi = new TH1D("hWEl_Est_NoMETS_DPhi", "", 3, dphiEdges);
-
-//   hWMu_R_NoMET_DPhi->Divide(hWMu_MC_NoMETS_DPhi, hWMu_MC_NoMETC_DPhi, 1., 1.);
-//   hWMu_Est_NoMETC_DPhi->Add(hWMu_Data_NoMETC_DPhi, hWMu_BG_NoMETC_DPhi, 1., -1.);
-//   hWMu_Est_NoMETS_DPhi->Multiply(hWMu_Est_NoMETC_DPhi, hWMu_R_NoMET_DPhi, 1., 1.);
-
-//   hWEl_R_NoMET_DPhi->Divide(hWEl_MC_NoMETS_DPhi, hWEl_MC_NoMETC_DPhi, 1., 1.);
-//   hWEl_Est_NoMETC_DPhi->Add(hWEl_Data_NoMETC_DPhi, hWEl_BG_NoMETC_DPhi, 1., -1.);
-//   hWEl_Est_NoMETS_DPhi->Multiply(hWEl_Est_NoMETC_DPhi, hWEl_R_NoMET_DPhi, 1., 1.);
-
-//   TH1D* hW_Est_NoMETS_DPhi = new TH1D("hW_Est_NoMETS_DPhi", "", 3, dphiEdges); 
-//   hW_Est_NoMETS_DPhi->Add(hWMu_Est_NoMETS_DPhi, hWEl_Est_NoMETS_DPhi, 1., 1.);
-
-//   TH1D* hWMu_R_Loose2_DPhi    = new TH1D("hWMu_R_Loose2_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
-//   TH1D* hWMu_Est_Loose2C_DPhi = new TH1D("hWMu_Est_Loose2C_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
-//   TH1D* hWMu_Est_Loose2S_DPhi = new TH1D("hWMu_Est_Loose2S_DPhi", "", 3, dphiEdges); // estimated W in signal region
-
-//   TH1D* hWEl_R_Loose2_DPhi    = new TH1D("hWEl_R_Loose2_DPhi", "", 3, dphiEdges);
-//   TH1D* hWEl_Est_Loose2C_DPhi = new TH1D("hWEl_Est_Loose2C_DPhi", "", 3, dphiEdges);
-//   TH1D* hWEl_Est_Loose2S_DPhi = new TH1D("hWEl_Est_Loose2S_DPhi", "", 3, dphiEdges);
-
-//   hWMu_R_Loose2_DPhi->Divide(hWMu_MC_Loose2S_DPhi, hWMu_MC_Loose2C_DPhi, 1., 1.);
-//   hWMu_Est_Loose2C_DPhi->Add(hWMu_Data_Loose2C_DPhi, hWMu_BG_Loose2C_DPhi, 1., -1.);
-//   hWMu_Est_Loose2S_DPhi->Multiply(hWMu_Est_Loose2C_DPhi, hWMu_R_Loose2_DPhi, 1., 1.);
-
-//   hWEl_R_Loose2_DPhi->Divide(hWEl_MC_Loose2S_DPhi, hWEl_MC_Loose2C_DPhi, 1., 1.);
-//   hWEl_Est_Loose2C_DPhi->Add(hWEl_Data_Loose2C_DPhi, hWEl_BG_Loose2C_DPhi, 1., -1.);
-//   hWEl_Est_Loose2S_DPhi->Multiply(hWEl_Est_Loose2C_DPhi, hWEl_R_Loose2_DPhi, 1., 1.);
-
-//   TH1D* hW_Est_Loose2S_DPhi = new TH1D("hW_Est_Loose2S_DPhi", "", 3, dphiEdges); 
-//   hW_Est_Loose2S_DPhi->Add(hWMu_Est_Loose2S_DPhi, hWEl_Est_Loose2S_DPhi, 1., 1.);
-
-//   TH1D* hWMu_R_Loose_DPhi    = new TH1D("hWMu_R_Loose_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
-//   TH1D* hWMu_Est_LooseC_DPhi = new TH1D("hWMu_Est_LooseC_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
-//   TH1D* hWMu_Est_LooseS_DPhi = new TH1D("hWMu_Est_LooseS_DPhi", "", 3, dphiEdges); // estimated W in signal region
-
-//   TH1D* hWEl_R_Loose_DPhi    = new TH1D("hWEl_R_Loose_DPhi", "", 3, dphiEdges);
-//   TH1D* hWEl_Est_LooseC_DPhi = new TH1D("hWEl_Est_LooseC_DPhi", "", 3, dphiEdges);
-//   TH1D* hWEl_Est_LooseS_DPhi = new TH1D("hWEl_Est_LooseS_DPhi", "", 3, dphiEdges);
-
-//   hWMu_R_Loose_DPhi->Divide(hWMu_MC_LooseS_DPhi, hWMu_MC_LooseC_DPhi, 1., 1.);
-//   hWMu_Est_LooseC_DPhi->Add(hWMu_Data_LooseC_DPhi, hWMu_BG_LooseC_DPhi, 1., -1.);
-//   hWMu_Est_LooseS_DPhi->Multiply(hWMu_Est_LooseC_DPhi, hWMu_R_Loose_DPhi, 1., 1.);
-
-//   hWEl_R_Loose_DPhi->Divide(hWEl_MC_LooseS_DPhi, hWEl_MC_LooseC_DPhi, 1., 1.);
-//   hWEl_Est_LooseC_DPhi->Add(hWEl_Data_LooseC_DPhi, hWEl_BG_LooseC_DPhi, 1., -1.);
-//   hWEl_Est_LooseS_DPhi->Multiply(hWEl_Est_LooseC_DPhi, hWEl_R_Loose_DPhi, 1., 1.);
-
-//   TH1D* hW_Est_LooseS_DPhi = new TH1D("hW_Est_LooseS_DPhi", "", 3, dphiEdges); 
-//   hW_Est_LooseS_DPhi->Add(hWMu_Est_LooseS_DPhi, hWEl_Est_LooseS_DPhi, 1., 1.);
 
 
   std::cout << std::endl;
@@ -624,8 +584,6 @@ int main(int argc, char* argv[]) {
   std::cout << "  N_S(MC)/N_C(MC)        : " << hWEl_R_DPhi->GetBinContent(1) << " +/- " << hWEl_R_DPhi->GetBinError(1) << std::endl;
   std::cout << "  W in sgnl region       : " << hWEl_EstS_DPhi->GetBinContent(1) << " +/- " << hWEl_EstS_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
-  std::cout << "Total W (dphi<1.0)" << std::endl;
-  std::cout << "  W in sgnl region       : " << hW_Est_S_DPhi->GetBinContent(1) << " +/- " << hW_Est_S_DPhi->GetBinError(1) << std::endl;
 
   // write the cutflow table
   std::cout << "Writing cut flow TeX file" << std::endl;
@@ -797,8 +755,11 @@ for (unsigned n = 0; n < hnames.size(); n++)
   //  hWMu_BGS_DPhi->Write("",TObject::kOverwrite);
   hWMu_DataC_DPhi->Write("",TObject::kOverwrite);
   hWMu_R_DPhi->Write("",TObject::kOverwrite);
+  hWMu_R_DPhi_Syst->Write("",TObject::kOverwrite);
   hWMu_EstC_DPhi->Write("",TObject::kOverwrite);
+  hWMu_EstC_DPhi_Syst->Write("",TObject::kOverwrite);
   hWMu_EstS_DPhi->Write("",TObject::kOverwrite);
+  hWMu_EstS_DPhi_Syst->Write("",TObject::kOverwrite);
   
   hWEl_MCC_DPhi->Write("",TObject::kOverwrite); 
   hWEl_MCS_DPhi->Write("",TObject::kOverwrite); 
@@ -806,79 +767,12 @@ for (unsigned n = 0; n < hnames.size(); n++)
   //  hWEl_BGS_DPhi->Write("",TObject::kOverwrite);
   hWEl_DataC_DPhi->Write("",TObject::kOverwrite);
   hWEl_R_DPhi->Write("",TObject::kOverwrite);
+  hWEl_R_DPhi_Syst->Write("",TObject::kOverwrite);
   hWEl_EstC_DPhi->Write("",TObject::kOverwrite);
+  hWEl_EstC_DPhi_Syst->Write("",TObject::kOverwrite);
   hWEl_EstS_DPhi->Write("",TObject::kOverwrite);
-  hW_Est_S_DPhi->Write("",TObject::kOverwrite); 
- 
-  //hWMu_MCC_METDPhi->Write("",TObject::kOverwrite);
-  //hWMu_MCS_METDPhi->Write("",TObject::kOverwrite);
-  //hWMu_BGC_METDPhi->Write("",TObject::kOverwrite); 
-  //  hWMu_BGS_METDPhi->Write("",TObject::kOverwrite);
-  //hWMu_DataC_METDPhi->Write("",TObject::kOverwrite);
-  //hWMu_R_METDPhi->Write("",TObject::kOverwrite);
-  //hWMu_EstC_METDPhi->Write("",TObject::kOverwrite);
-  //hWMu_EstS_METDPhi->Write("",TObject::kOverwrite);
-  
-  //hWEl_MCC_METDPhi->Write("",TObject::kOverwrite); 
-  //hWEl_MCS_METDPhi->Write("",TObject::kOverwrite); 
-  //hWEl_BGC_METDPhi->Write("",TObject::kOverwrite);
-  //  hWEl_BGS_METDPhi->Write("",TObject::kOverwrite);
-  //hWEl_DataC_METDPhi->Write("",TObject::kOverwrite);
-  //hWEl_R_METDPhi->Write("",TObject::kOverwrite);
-  //hWEl_EstC_METDPhi->Write("",TObject::kOverwrite);
-  //hWEl_EstS_METDPhi->Write("",TObject::kOverwrite);
-  //hW_Est_S_METDPhi->Write("",TObject::kOverwrite); 
-  
-//   hWMu_MC_NoMETC_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_MC_NoMETS_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_BG_NoMETC_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Data_NoMETC_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_R_NoMET_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Est_NoMETC_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
-  
-//   hWEl_MC_NoMETC_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_MC_NoMETS_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_BG_NoMETC_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Data_NoMETC_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_R_NoMET_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Est_NoMETC_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
-//   hW_Est_NoMETS_DPhi->Write("",TObject::kOverwrite);
-  
-//   hWMu_MC_Loose2C_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_MC_Loose2S_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_BG_Loose2C_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Data_Loose2C_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_R_Loose2_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Est_Loose2C_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
+  hWEl_EstS_DPhi_Syst->Write("",TObject::kOverwrite);
 
-//   hWEl_MC_Loose2C_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_MC_Loose2S_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_BG_Loose2C_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Data_Loose2C_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_R_Loose2_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Est_Loose2C_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
-//   hW_Est_Loose2S_DPhi->Write("",TObject::kOverwrite);
-
-//   hWMu_MC_LooseC_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_MC_LooseS_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_BG_LooseC_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Data_LooseC_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_R_Loose_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Est_LooseC_DPhi->Write("",TObject::kOverwrite);
-//   hWMu_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
-
-//   hWEl_MC_LooseC_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_MC_LooseS_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_BG_LooseC_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Data_LooseC_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_R_Loose_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Est_LooseC_DPhi->Write("",TObject::kOverwrite);
-//   hWEl_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
-//   hW_Est_LooseS_DPhi->Write("",TObject::kOverwrite);
 
   // write out summed cutflow histograms
   hDataWMu->Write("",TObject::kOverwrite);
