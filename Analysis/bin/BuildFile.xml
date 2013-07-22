@@ -16,7 +16,15 @@
 
 <bin name="zBackground" file="zBackground.cpp"/>
 
+<bin name="zBackground_testA" file="zBackground_testA.cpp"/>
+
+<bin name="zBackground_testB" file="zBackground_testB.cpp"/>
+
+<bin name="zBackground_testC" file="zBackground_testC.cpp"/>
+
 <bin name="wBackground" file="wBackground.cpp"/>
+
+<bin name="wBackground_testA" file="wBackground_testA.cpp"/>
 
 <bin name="wTauBackground" file="wTauBackground.cpp"/>
 
