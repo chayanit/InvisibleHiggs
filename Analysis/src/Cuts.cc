@@ -46,14 +46,14 @@ Cuts::Cuts() {
   addWElCut("dPhiJJ",    "vbfDPhi<1.0");
 
   addWTauCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
-  addWTauCut("wTau",      "nW>0 && nTaus_pass>0"); 
+  addWTauCut("wTau",      "nTaus_pass>0"); 
   addWTauCut("lVeto",     "ele1Pt<10. && mu1Pt<10.");
   addWTauCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addWTauCut("dEtaJJ",    "vbfDEta>4.2");
   addWTauCut("MET",       "met>130.");
   addWTauCut("Mjj",       "vbfM>1100.");
-  addWTauCut("CJV",       "cenJetEt<30.");
   addWTauCut("dPhiJJ",    "vbfDPhi<1.0");
+  addWTauCut("CJV",       "cenJetEt<30."); // Different order to above as our control region is without CJV
 }
 
 Cuts::~Cuts() {

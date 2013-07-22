@@ -70,14 +70,13 @@ int main(int argc, char* argv[]) {
   // Define histograms for counting //
   ////////////////////////////////////
 
-  // NOTE: Since we don't use QCD method 1 anymore, and we don't use data-driven BG for our QCD/Z/W estimates (yet?), we don't really need to bin by DPhiJJ anymore
-  // Did it this way to match other codes, and incase we need a control region for closure test or something
-  // Think about optimising & cleaning this up!
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
   
   // For N_data and N_BG
   TH1D* hWTau_BGC_DPhi       = new TH1D("hWTau_BGC_DPhi",   "", 3, dphiEdges);  // background MC ctrl region (ctrl region = require tau reconstructed)
   TH1D* hWTau_DataC_DPhi     = new TH1D("hWTau_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
+
+  TH1D* hWTau_MCS_DPhi       = new TH1D("hWTau_MCS_DPhi",   "", 3, dphiEdges);  // WJets MC in signal region for MC estimate
   
   // Plots for eff_tauID
   TH1D* hWTau_MCC_NoCJV_DPhi = new TH1D("hWTau_MCC_NoCJV_DPhi", "", 3, dphiEdges);  // W+jets MC at gen level in ctrl region, no CJV
@@ -92,6 +91,7 @@ int main(int argc, char* argv[]) {
   TH1D* hWLNuWTau            = new TH1D("hWTau_CutFlow_WToLNu",      "", nCutsWTau, 0., nCutsWTau);
   TH1D* hQCDWTau             = new TH1D("hWTau_CutFlow_QCD",         "", nCutsWTau, 0., nCutsWTau);
   TH1D* hDYWTau              = new TH1D("hWTau_CutFlow_DY",          "", nCutsWTau, 0., nCutsWTau);
+  TH1D* hZvvWTau             = new TH1D("hWTau_CutFlow_Zvv",         "", nCutsWTau, 0., nCutsWTau);
   TH1D* hSingleTWTau         = new TH1D("hWTau_CutFlow_SingleTSum",  "", nCutsWTau, 0., nCutsWTau);
   TH1D* hDibosonWTau         = new TH1D("hWTau_CutFlow_Diboson",     "", nCutsWTau, 0., nCutsWTau);
 
@@ -116,8 +116,13 @@ int main(int argc, char* argv[]) {
     TCut cutWTau_MCC_NoCJV(""), cutWTau_MCS_NoCJV(""); // Cuts for Tau ID eff
     TCut cutWTau_MC_CJV(""), cutWTau_MC_NoCJV(""); // Cuts for CJV eff
 
-    // tmp histograms - numbers of BG. DOn't need one for data, we can put that straight into hWTau_DataC_DPhi
+    // tmp histograms - numbers of BG & data. you need one for data otherwise it comes out at 0. 
+    // I don't know why - I think it's something to do with the fact that hists belong to certain files depending on which one was last opened, 
+    // so closing a file below might delete that hist, hence you get out 0
     TH1D* hWTau_BGC_DPhi_tmp       = new TH1D("hWTau_BGC_DPhi_tmp","",3,dphiEdges);
+    TH1D* hWTau_DataC_DPhi_tmp     = new TH1D("hWTau_DataC_DPhi_tmp","",3,dphiEdges);
+    
+    TH1D* hWTau_MCC_DPhi_tmp       = new TH1D("hWTau_MCC_DPhi_tmp","",3,dphiEdges);
     
     // tmp histograms - tau ID eff
     TH1D* hWTau_MCC_NoCJV_DPhi_tmp = new TH1D("hWTau_MCC_NoCJV_DPhi_tmp", "", 3, dphiEdges);  // W+jets MC ctrl region
@@ -163,14 +168,18 @@ int main(int argc, char* argv[]) {
       cutWTau_MC_CJV   = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.wTauGen() + cutTightMjj_basic + cuts.cutWTau("CJV"));
       cutWTau_MC_NoCJV = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.wTauGen() + cutTightMjj_basic);
 
-      tree->Draw("vbfDPhi>>hWTau_MCC_NoCJV_DPhi_tmp", cutWTau_MC_CJV);
-      tree->Draw("vbfDPhi>>hWTau_MCS_NoCJV_DPhi_tmp", cutWTau_MC_NoCJV); 
+      tree->Draw("vbfDPhi>>hWTau_MC_CJV_DPhi_tmp", cutWTau_MC_CJV);
+      tree->Draw("vbfDPhi>>hWTau_MC_NoCJV_DPhi_tmp", cutWTau_MC_NoCJV); 
 
       hWTau_MC_CJV_DPhi_tmp->Scale(weight);  
       hWTau_MC_NoCJV_DPhi_tmp->Scale(weight);  
 
       hWTau_MC_CJV_DPhi->Add(hWTau_MC_CJV_DPhi_tmp);
       hWTau_MC_NoCJV_DPhi->Add(hWTau_MC_NoCJV_DPhi_tmp);
+
+      // Do MC signal estimate
+      tree->Draw("vbfDPhi>>hWTau_MCS_DPhi_tmp");
+      hWTau_MCS_DPhi_tmp->Scale(weight);  
       
       // Setup control plot cuts
       cutTightMjj        = puWeight * trigCorrWeight2 * wWeight * cutTightMjj_basic;
@@ -181,12 +190,18 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing Data     : " << dataset.name << std::endl;
 
       // Count number of tau in control region in data
-      cutWTau_C = puWeight * (cuts.cutWTau("wTau") + cutDPhiSignalNoCJV_basic);
-      tree->Draw("vbfDPhi>>hWTau_DataC_DPhi", cutWTau_C);
+      // cutWTau_C = (cuts.cutWTau("wTau") + cutDPhiSignalNoCJV_basic);
+      cutWTau_C = cutDPhiSignalNoCJV_basic + cuts.cutWTau("wTau");
+
+      tree->Draw("vbfDPhi>>hWTau_DataC_DPhi_tmp",cuts.cutWTau("wTau") && cutDPhiSignalNoCJV_basic);
+      hWTau_DataC_DPhi->Add(hWTau_DataC_DPhi_tmp);
 
       // Setup cuts for control plots 
-      cutTightMjj        = puWeight * trigCorrWeight2 * cutTightMjj_basic;
-      cutDPhiSignalNoCJV = puWeight * trigCorrWeight2 * cutDPhiSignalNoCJV_basic;
+      cutTightMjj        = cutTightMjj_basic;
+      cutDPhiSignalNoCJV = cutDPhiSignalNoCJV_basic;
+
+      // debug output
+      std::cout << "  N ctrl region (dphi<1) : " << hWTau_DataC_DPhi->GetBinContent(1) << " +/- " << hWTau_DataC_DPhi->Integral() << std::endl;
 
     } else { // All MC _BUT_ WJets. Need to go into hWTau_BGC_DPhi
 
@@ -205,12 +220,13 @@ int main(int argc, char* argv[]) {
       cutTightMjj        = puWeight * trigCorrWeight2 * (cutD + cutTightMjj_basic);
       cutDPhiSignalNoCJV = puWeight * trigCorrWeight2 * (cutD + cutDPhiSignalNoCJV_basic);
 
+      // debug output
+      std::cout << "  N ctrl region (dphi<1) : " << hWTau_BGC_DPhi_tmp->GetBinContent(1) << " +/- " << hWTau_BGC_DPhi_tmp->GetBinError(1) << std::endl;
     }
         
-    // debug output
-    std::cout << "  N ctrl region (dphi<1) : " << hWTau_BGC_DPhi_tmp->GetBinContent(1) << " +/- " << hWTau_BGC_DPhi_tmp->GetBinError(1) << std::endl;
     
     delete hWTau_BGC_DPhi_tmp;
+    delete hWTau_DataC_DPhi_tmp;
     delete hWTau_MCC_NoCJV_DPhi_tmp;
     delete hWTau_MCS_NoCJV_DPhi_tmp;
     delete hWTau_MC_CJV_DPhi_tmp;    
@@ -224,10 +240,10 @@ int main(int argc, char* argv[]) {
     std::string hnameWTau = std::string("hWTau_CutFlow_")+dataset.name;
     TH1D* hCutFlowWTau = new TH1D(hnameWTau.c_str(), "", nCutsWTau, 0., nCutsWTau);
 
-    for (unsigned c=0; c<nCutsWTau; ++c) {
+    for (unsigned c=0; c<(nCutsWTau-1); ++c) {
 
       TCut cut;
-      if(c == nCutsWTau-1) {
+      if(c == nCutsWTau-2) {
           cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowWTau(c));
           if(isWJets) cut = puWeight * trigCorrWeight * wWeight * (cuts.cutflowWTau(c));
       } else {
@@ -259,6 +275,9 @@ int main(int argc, char* argv[]) {
     
     if (dataset.name.compare(0,2,"DY")==0) 
       hDYWTau->Add(hCutFlowWTau);
+
+    if (dataset.name.compare(0,3,"Zvv")==0) 
+      hZvvWTau->Add(hCutFlowWTau);
     
     if (dataset.name.compare(0,7,"SingleT")==0) 
       hSingleTWTau->Add(hCutFlowWTau);
@@ -282,7 +301,7 @@ int main(int argc, char* argv[]) {
     // Ones with DPhiSignalNoCJV cut
     std::string hname = "hWTau_tau1Pt";
     if (i==0) hnames.push_back(hname);
-    TH1D* hTau1Pt = new TH1D(hname.c_str(), "", 20, 0., 200.);
+    TH1D* hTau1Pt = new TH1D(hname.c_str(), "", 10, 0., 200.);
     std::string str = "tau1Pt>>"+hname;
     tree->Draw(str.c_str(), cutDPhiSignalNoCJV);
     hTau1Pt->Scale(weight);
@@ -290,29 +309,30 @@ int main(int argc, char* argv[]) {
 
     hname = "hWTau_tau1Eta";
     if (i==0) hnames.push_back(hname);
-    TH1D* hTau1Eta = new TH1D(hname.c_str(), "", 25, -5., 5.);
+    TH1D* hTau1Eta = new TH1D(hname.c_str(), "", 11, -2.5, 2.5);
     str = "tau1Eta>>"+hname;
     tree->Draw(str.c_str(), cutDPhiSignalNoCJV);
     hTau1Eta->Scale(weight); 
     hTau1Eta->Write("", TObject::kOverwrite); 
 
-    hname = "hWTau_dPhiJJ";
-    if (i==0) hnames.push_back(hname);
-    TH1D* hDPhiJJ = new TH1D(hname.c_str(), "", 50, 0., TMath::Pi());
-    str = "vbfDPhi>>"+hname;
-    tree->Draw(str.c_str(), cutDPhiSignalNoCJV);
-    hDPhiJJ->Scale(weight); 
-    hDPhiJJ->Write("", TObject::kOverwrite); 
     
     hname = "hWTau_mT_DPhiSignalNoCJV";
     if (i==0) hnames.push_back(hname);
-    TH1D* hWmT_DPhiSignalNoCJV = new TH1D(hname.c_str(), "", 20, 0., 200.);
+    TH1D* hWmT_DPhiSignalNoCJV = new TH1D(hname.c_str(), "", 21, 0., 168.);
     str = "tau1mT>>"+hname;
     tree->Draw(str.c_str(), cutDPhiSignalNoCJV);
     hWmT_DPhiSignalNoCJV->Scale(weight); 
     hWmT_DPhiSignalNoCJV->Write("", TObject::kOverwrite); 
 
     // Plots with TightMjj (+tau)
+    hname = "hWTau_dPhiJJ";
+    if (i==0) hnames.push_back(hname);
+    TH1D* hDPhiJJ = new TH1D(hname.c_str(), "", 25, 0., TMath::Pi());
+    str = "vbfDPhi>>"+hname;
+    tree->Draw(str.c_str(), cutTightMjj);
+    hDPhiJJ->Scale(weight); 
+    hDPhiJJ->Write("", TObject::kOverwrite); 
+    
     hname = "hNumberTaus";
     if (i==0) hnames.push_back(hname);
     TH1D* hNTaus = new TH1D(hname.c_str(), "", 5, 0., 5.);
@@ -339,7 +359,7 @@ int main(int argc, char* argv[]) {
 
     hname = "hWTau_mT_TightMjj";
     if (i==0) hnames.push_back(hname);
-    TH1D* hWmT_TightMjj = new TH1D(hname.c_str(), "", 20, 0., 200);
+    TH1D* hWmT_TightMjj = new TH1D(hname.c_str(), "", 21, 0., 168);
     str = "tau1mT>>"+hname;
     tree->Draw(str.c_str(), cutTightMjj);
     hWmT_TightMjj->Scale(weight); 
@@ -386,16 +406,17 @@ int main(int argc, char* argv[]) {
   ofstream effFile;
   effFile.open(options.oDir+std::string("/cutflowWTau.tex"));
 
-  effFile << "Cut & N(data) & N($W\\rightarrow l\\nu$) & N(DY) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) \\\\" << std::endl;
+  effFile << "Cut & N(data) & N($W\\rightarrow l\\nu$) & N($Z\\rightarrow \\nu \\nu$) & N(DY) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) \\\\" << std::endl;
 
   TH1D* hTTbarWTau = (TH1D*) ofile->Get("hWTau_CutFlow_TTBar");
 
   // cutflow table
-  for (unsigned i=0; i<nCutsWTau; ++i) {
+  for (unsigned i=0; i<(nCutsWTau-1); ++i) {
 
     effFile << cuts.cutNameWTau(i) << " & ";
     effFile << "$" << hDataWTau->GetBinContent(i+1) << " \\pm " << hDataWTau->GetBinError(i+1) << "$ & ";
     effFile << "$" << hWLNuWTau->GetBinContent(i+1) << " \\pm " << hWLNuWTau->GetBinError(i+1) << "$ & ";
+    effFile << "$" << hZvvWTau->GetBinContent(i+1) << " \\pm " << hZvvWTau->GetBinError(i+1) << "$ & ";
     effFile << "$" << hDYWTau->GetBinContent(i+1) << " \\pm " << hDYWTau->GetBinError(i+1) << "$ & ";
     effFile << "$" << hQCDWTau->GetBinContent(i+1) << " \\pm " << hQCDWTau->GetBinError(i+1) << "$ & ";
     effFile << "$" << hTTbarWTau->GetBinContent(i+1) << " \\pm " << hTTbarWTau->GetBinError(i+1) << "$ & ";
@@ -437,7 +458,16 @@ int main(int argc, char* argv[]) {
   dyjets.push_back("DYJetsToLL");
   dyjets.push_back("DYJetsToLL_PtZ-100");
   dyjets.push_back("DYJetsToLL_EWK");
-  SumDatasets(oDirPlots,dyjets,hnames,"DYJets");
+  // dyjets.push_back("EWK_Wp2Jets");
+  // dyjets.push_back("EWK_Wm2Jets");
+  SumDatasets(oDirPlots,dyjets,hnames,"DYJetsToLL");
+
+  std::vector<std::string> zJets;
+  zJets.push_back("Zvv_50to100");
+  zJets.push_back("Zvv_100to200");
+  zJets.push_back("Zvv_200to400");
+  zJets.push_back("Zvv_400toinf");
+  SumDatasets(oDirPlots, zJets, hnames, "ZJets");
 
   // sum single top datasets
   std::vector<std::string> dibDatasets;
@@ -468,24 +498,25 @@ int main(int argc, char* argv[]) {
   plots.setLegPos(0.70,0.60,0.93,0.89);
 
   plots.addDataset("DiBoson", kViolet-6, 0);
-  plots.addDataset("QCD", kGreen+3, 0);
-  plots.addDataset("DYJets", kPink-4,0);
+  // plots.addDataset("QCD", kGreen+3, 0);
+  plots.addDataset("DYJetsToLL", kPink-4,0);
   plots.addDataset("SingleT+TTBar", kAzure-2, 0);
+  plots.addDataset("ZJets", kOrange-2, 0);
   plots.addDataset("WNJets", kGreen-3, 0);
   plots.addDataset("METABCD", kBlack, 1);
 
   plots.setLabel("#tau channel");
   std::string hname = "hWTau_tau1Pt";
-  plots.draw(hname.c_str(), "Leading #tau p_{T} [GeV]", "N_{events}", true, true);
+  plots.draw(hname.c_str(), "Leading #tau p_{T} [GeV]", "N_{events}", false, true);
 
   hname = "hWTau_tau1Eta";
-  plots.draw(hname.c_str(), "Leading jet #eta", "N_{events}",true, true);
+  plots.draw(hname.c_str(), "Leading jet #eta", "N_{events}",false, true);
 
   hname = "hWTau_dPhiJJ";
   plots.draw(hname.c_str(), "#Delta #phi_{jj}", "N_{events}",true, true);
 
   hname = "hWTau_mT_DPhiSignalNoCJV";
-  plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",true, true);
+  plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",false, true);
 
   hname = "hNumberTaus";
   plots.draw(hname.c_str(), "Number of #tau", "N_{events}",true, true);
@@ -497,7 +528,7 @@ int main(int argc, char* argv[]) {
   plots.draw(hname.c_str(), "#tau matching with tagging jets", "N_{events}",true, true);
   
   hname = "hWTau_mT_TightMjj";
-  plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",true, true);
+  plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",false, true);
 
   //////////////////////////////////////
   // store cutflow & other histograms //
