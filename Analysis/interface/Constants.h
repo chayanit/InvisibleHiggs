@@ -19,6 +19,8 @@ namespace constants {
 
   //// systematics (these are fractional values not percentages)
   ////   these should not include MC stats !
+  static const double syst_effMu  = 0.025;
+
   static const double syst_lumi   = 0.04;
   static const double syst_Z      = 0.03;
   static const double syst_WMu    = 0.04;

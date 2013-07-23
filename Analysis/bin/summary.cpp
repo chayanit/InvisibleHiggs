@@ -96,6 +96,7 @@ int main(int argc, char* argv[]) {
     TH1D* hQCD = (TH1D*) qFile->Get("hQCD_Est_S_DPhi");
     nBG_QCD   = hQCD->GetBinContent(1);
     stat_BG_QCD = hQCD->GetBinError(1);
+    syst_BG_QCD = nBG_QCD*constants::syst_QCD1;
     qFile->Close();
   }
   if (options.qcdMethod==2) {
@@ -109,6 +110,7 @@ int main(int argc, char* argv[]) {
     TH2D* hQCD = (TH2D*) qFile->Get("hEst_METCJV");
     nBG_QCD   = hQCD->GetBinContent(2,1);
     stat_BG_QCD = hQCD->GetBinError(2,1);
+    syst_BG_QCD = nBG_QCD*constants::syst_QCD3;
     qFile->Close();
   }
 
@@ -206,11 +208,11 @@ int main(int argc, char* argv[]) {
 
   texFile << "Background \t & $N_{est}$ (data) \t & $N_{est}$ (MC) \\\\" << std::endl;
   texFile << "\\hline";
-  texFile << "$Z \\rightarrow \\nu\\nu$ \t & $" << nBG_Z << " \\pm " << stat_BG_Z << "$ \t &  $" << nBG_ZMC << " \\pm " << stat_BG_ZMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << "$ \t &  $" << nBG_WElMC << " \\pm " << stat_BG_WElMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << "$ \t & $" << nBG_WMuMC << " \\pm " << stat_BG_WMuMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << "$ \t & $" << nBG_WTauMC << " \\pm " << stat_BG_WTauMC << "$ \\\\" << std::endl;
-  texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_BG_QCD << "$ \t & - \\\\" << std::endl;
+  texFile << "$Z \\rightarrow \\nu\\nu$ \t & $" << nBG_Z << " \\pm " << stat_BG_Z << " \\pm " << syst_BG_Z << "$ \t &  $" << nBG_ZMC << " \\pm " << stat_BG_ZMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << " \\pm " << syst_BG_WEl << "$ \t &  $" << nBG_WElMC << " \\pm " << stat_BG_WElMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << " \\pm " << syst_BG_WMu << "$ \t & $" << nBG_WMuMC << " \\pm " << stat_BG_WMuMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << " \\pm " << syst_BG_WTau << "$ \t & $" << nBG_WTauMC << " \\pm " << stat_BG_WTauMC << "$ \\\\" << std::endl;
+  texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_BG_QCD << " \\pm " << syst_BG_QCD << "$ \t & - \\\\" << std::endl;
   texFile << "$t\\bar{t}$ \t & -	\t & $" << nBG_TTBar << " \\pm << " << stat_BG_TTBar << "$ \\\\" << std::endl;
   texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << stat_BG_SingleT << "$ \\\\" << std::endl;
   texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << stat_BG_Diboson<< "$ \\\\" << std::endl;
@@ -293,7 +295,6 @@ int main(int argc, char* argv[]) {
 
       std::cout << "mH : " << constants::mH[i] << "  eff : " << effSig.at(i) << "+/-" << errEffSig.at(i) << "  yield=" << nSig.at(i) << "+/-" << errNSig.at(i) << std::endl;
     
-      
     }
   }
 

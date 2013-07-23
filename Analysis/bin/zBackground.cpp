@@ -339,26 +339,30 @@ int main(int argc, char* argv[]) {
   // numbers - calculate these from MC in this program later!
   double ratioBF = constants::ratioZToNuNuZToLL;
 
+  // efficiencies (these will all have syst uncertainty only)
+  TH1D* hZ_DY_EffMuMu       = new TH1D("hZ_DY_EffMuMu",  "", 1, 0., 1.);     	// epsilon mumu
+  TH1D* hZ_DY_EffVBFS       = new TH1D("hZ_DY_EffVBFS",  "", 1, 0., 1.);  	// epsilon_s_vbf
+  TH1D* hZ_DY_EffVBFC       = new TH1D("hZ_DY_EffVBFC",  "", 1, 0., 1.);       // epsilon_c_vbf
+  TH1D* hZ_DY_RatioVBF      = new TH1D("hZ_DY_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
+  TH1D* hZ_DY_TotalEff      = new TH1D("hZ_DY_TotalEff", "", 1, 0., 1.); 
 
-  TH1D* hZ_Data_C_DPhi_Syst = new TH1D("hZ_Data_C_DPhi_Syst", "", 3, dphiEdges); // estimated Z in ctrl region
+  // for stat only calculation
+  TH1D* hZ_Eff_S_DPhi       = new TH1D("hZ_Eff_S_DPhi",       "", 3, dphiEdges);
+  TH1D* hZ_Est_C_DPhi       = new TH1D("hZ_Est_C_DPhi",       "", 3, dphiEdges);
+  TH1D* hZ_Est_S_DPhi       = new TH1D("hZ_Est_S_DPhi",       "", 3, dphiEdges);
 
-  TH1D* hZ_Est_C_DPhi = new TH1D("hZ_Est_C_DPhi", "", 3, dphiEdges); // estimated Z in ctrl region
-  TH1D* hZ_Est_C_DPhi_Syst = new TH1D("hZ_Est_C_DPhi_Syst", "", 3, dphiEdges); // estimated Z in ctrl region
-  TH1D* hZ_Est_S_DPhi = new TH1D("hZ_Est_S_DPhi", "", 3, dphiEdges); // estimated Z in signal region  
-  TH1D* hZ_Est_S_DPhi_Syst = new TH1D("hZ_Est_S_DPhi_Syst", "", 3, dphiEdges); // estimated Z in signal region  
-  TH1D* hZ_Eff_S_DPhi = new TH1D("hZ_Eff_S_DPhi", "", 3, dphiEdges);
-  TH1D* hZ_Eff_S_DPhi_Syst = new TH1D("hZ_Eff_S_DPhi_Syst", "", 3, dphiEdges);
+  // for syst only calculation
+  TH1D* hZ_BG_C_DPhi_Syst   = new TH1D("hZ_BG_C_DPhi_Syst",   "", 3, dphiEdges);
+  TH1D* hZ_Data_C_DPhi_Syst = new TH1D("hZ_Data_C_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hZ_Eff_S_DPhi_Syst  = new TH1D("hZ_Eff_S_DPhi_Syst",  "", 3, dphiEdges);
+  TH1D* hZ_Est_C_DPhi_Syst  = new TH1D("hZ_Est_C_DPhi_Syst",  "", 3, dphiEdges);
+  TH1D* hZ_Est_S_DPhi_Syst  = new TH1D("hZ_Est_S_DPhi_Syst",  "", 3, dphiEdges);
 
-  TH1D* hZ_DY_EffMuMu = new TH1D("hZ_DY_EffMuMu", "", 1, 0., 1.);     	// epsilon mumu
-  TH1D* hZ_DY_EffVBFS = new TH1D("hZ_DY_EffVBFS", "", 1, 0., 1.);  	// epsilon_s_vbf
-  TH1D* hZ_DY_EffVBFC = new TH1D("hZ_DY_EffVBFC", "", 1, 0., 1.);       // epsilon_c_vbf
-  TH1D* hZ_DY_RatioVBF = new TH1D("hZ_DY_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
-  TH1D* hZ_DY_TotalEff = new TH1D("hZ_DY_TotalEff", "", 1, 0., 1.); 
-
+  // calculate efficiencies
   hZ_DY_EffMuMu->Add(hZ_DY_EffMuMu_N);
   hZ_DY_EffMuMu->Divide(hZ_DY_EffMuMu_D);
-  double mu_syst = 0.025*hZ_DY_EffMuMu->GetBinContent(1);      //2.5% Muon ID/Iso efficiency uncertainty from EWK-10-002
-  hZ_DY_EffMuMu->SetBinError(1,TMath::Sqrt(hZ_DY_EffMuMu->GetBinError(1)*hZ_DY_EffMuMu->GetBinError(1) + mu_syst*mu_syst));
+  double syst_EffMuMu = constants::syst_effMu*hZ_DY_EffMuMu->GetBinContent(1);      //2.5% Muon ID/Iso efficiency uncertainty from EWK-10-002
+  hZ_DY_EffMuMu->SetBinError(1,TMath::Sqrt(hZ_DY_EffMuMu->GetBinError(1)*hZ_DY_EffMuMu->GetBinError(1) + syst_EffMuMu*syst_EffMuMu));
  
   hZ_DY_EffVBFS->Add(hZ_DY_EffVBFS_N);
   hZ_DY_EffVBFS->Divide(hZ_DY_EffVBFS_D);
@@ -380,6 +384,8 @@ int main(int argc, char* argv[]) {
   }
 
   // do stat only version
+  hZ_BG_C_DPhi_Syst->Add(hZ_BG_C_DPhi, 1.);  // copy MC BG histogram for syst calculation
+  for (int i=1; i<=hZ_BG_C_DPhi->GetNbinsX(); ++i) hZ_BG_C_DPhi->SetBinError(i,0.);  // set MC BG errors to zero for stat only
   hZ_Est_C_DPhi->Add(hZ_Data_C_DPhi, hZ_BG_C_DPhi, 1., -1.);
   hZ_Est_S_DPhi->Add(hZ_Est_C_DPhi,ratioBF);
   hZ_Est_S_DPhi->Multiply(hZ_Eff_S_DPhi);
@@ -432,36 +438,20 @@ int main(int argc, char* argv[]) {
 
   std::cout << std::endl;
   std::cout << "##################################### MET > 130 #####################################" << std::endl;
-  //std::cout << "dphi>2.6" << std::endl;
-  //std::cout << std::endl;
-  //std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
-  //std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
-  //std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
-  //std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << "(stat.) + " << 0.01039 * hZ_DY_RatioVBF->GetBinContent(3) << ", - " << 0.0136 * hZ_DY_RatioVBF->GetBinContent(3) << "(syst.)" << std::endl;
-  //std::cout << "  total eff by histogram : " << hZ_DY_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_TotalEff->GetBinError(1) << std::endl;
-  //std::cout << std::endl;
-  //std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(3) << " +/- " << hZ_DY_C_DPhi->GetBinError(3) << std::endl;
-  //std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(3) << " +/- " << hZ_BG_C_DPhi->GetBinError(3) << "(stat.) + " << 0.035 * hZ_BG_C_DPhi->GetBinContent(3) << ", - " << 0.09 * hZ_BG_C_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
-  //std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(3) << " +/- " << hZ_Data_C_DPhi->GetBinError(3) << std::endl;
-  //std::cout << std::endl;
-  //std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(3) << " +/- " << hZ_Est_C_DPhi->GetBinError(3) << std::endl;
-  //std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(3) << " +/- " << hZ_Est_S_DPhi->GetBinError(3) << "(stat.) + " << 0.0104 * hZ_Est_S_DPhi->GetBinContent(3) << ", - " << 0.0161 * hZ_Est_S_DPhi->GetBinContent(3) << "(syst.)" << std::endl;
-  //std::cout << std::endl << std::endl;
-
   std::cout << "dphi<1.0" << std::endl;
   std::cout << std::endl;
-  std::cout << "  eps_mumu by histogram  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
-  std::cout << "  eps_s_vbf by histogram  : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
-  std::cout << "  eps_c_vbf by histogram  : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
-  std::cout << "  ratio_vbf by histogram : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << std::endl;
-  std::cout << "  total eff by histogram : " << hZ_DY_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_TotalEff->GetBinError(1) << std::endl;
+  std::cout << "  eps_mumu  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
+  std::cout << "  eps_s_vbf : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
+  std::cout << "  eps_c_vbf : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
+  std::cout << "  ratio_vbf : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << std::endl;
+  std::cout << "  total eff : " << hZ_DY_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_TotalEff->GetBinError(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(1) << " +/- " << hZ_DY_C_DPhi->GetBinError(1) << std::endl;
   std::cout << "  Background ctrl region : " << hZ_BG_C_DPhi->GetBinContent(1) << " +/- " << hZ_BG_C_DPhi->GetBinError(1) << std::endl;
   std::cout << "  Data ctrl region       : " << hZ_Data_C_DPhi->GetBinContent(1) << " +/- " << hZ_Data_C_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
-  std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_C_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_S_DPhi->GetBinError(1) << "(stat.) + " << 0.0169 * hZ_Est_S_DPhi->GetBinContent(1) << ", - " << 0.0311 * hZ_Est_S_DPhi->GetBinContent(1) << "(syst.)" << std::endl;
+  std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_C_DPhi->GetBinError(1) << " (stat.) + " << hZ_Est_C_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_S_DPhi->GetBinError(1) << " (stat.) + " << hZ_Est_S_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   std::cout << "#####################################################################################" << std::endl;
   std::cout << std::endl << std::endl;
 

@@ -478,44 +478,60 @@ int main(int argc, char* argv[]) {
    
   }
 
-  // create histograms with the background estimate
-  TH1D* hWMu_DataC_DPhi_Syst = new TH1D("hWMu_DataC_DPhi_Syst", "", 3, dphiEdges);
+  // W->mu
+  // stat only histograms
   TH1D* hWMu_R_DPhi          = new TH1D("hWMu_R_DPhi", "", 3, dphiEdges);  // ratio of sngl/ctrl
-  TH1D* hWMu_R_DPhi_Syst     = new TH1D("hWMu_R_DPhi_Syst", "", 3, dphiEdges);  // ratio of sngl/ctrl
   TH1D* hWMu_EstC_DPhi       = new TH1D("hWMu_EstC_DPhi", "", 3, dphiEdges); // estimated W in ctrl region
-  TH1D* hWMu_EstC_DPhi_Syst  = new TH1D("hWMu_EstC_DPhi_Syst", "", 3, dphiEdges); // estimated W in ctrl region
   TH1D* hWMu_EstS_DPhi       = new TH1D("hWMu_EstS_DPhi", "", 3, dphiEdges); // estimated W in signal region
+
+  // syst only histograms
+  TH1D* hWMu_BGC_DPhi_Syst   = new TH1D("hWMu_BGC_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWMu_DataC_DPhi_Syst = new TH1D("hWMu_DataC_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWMu_R_DPhi_Syst     = new TH1D("hWMu_R_DPhi_Syst", "", 3, dphiEdges);  // ratio of sngl/ctrl
+  TH1D* hWMu_EstC_DPhi_Syst  = new TH1D("hWMu_EstC_DPhi_Syst", "", 3, dphiEdges); // estimated W in ctrl region
   TH1D* hWMu_EstS_DPhi_Syst  = new TH1D("hWMu_EstS_DPhi_Syst", "", 3, dphiEdges); // estimated W in signal region
 
+  // stat only calculation
   hWMu_R_DPhi->Divide(hWMu_MCS_DPhi, hWMu_MCC_DPhi, 1., 1.);
-  for (int i=1; i<=hWMu_R_DPhi->GetNbinsX(); ++i) hWMu_R_DPhi->SetBinError(i,0.);
+  for (int i=1; i<=hWMu_R_DPhi->GetNbinsX(); ++i) hWMu_R_DPhi->SetBinError(i,0.);  // ignore MC stats
+  hWMu_BGC_DPhi_Syst->Add(hWMu_BGC_DPhi, 1.);  // take a copy for the syst only
+  for (int i=1; i<=hWMu_BGC_DPhi->GetNbinsX(); ++i) hWMu_BGC_DPhi->SetBinError(i,0.);  // ignore MC stats
   hWMu_EstC_DPhi->Add(hWMu_DataC_DPhi, hWMu_BGC_DPhi, 1., -1.);
   hWMu_EstS_DPhi->Multiply(hWMu_EstC_DPhi, hWMu_R_DPhi, 1., 1.);
 
+  // syst only calculation
   hWMu_DataC_DPhi_Syst->Add(hWMu_DataC_DPhi, 1.);
-  for (int i=1; i<=hWMu_DataC_DPhi_Syst->GetNbinsX(); ++i) hWMu_DataC_DPhi_Syst->SetBinError(i,0.);
+  for (int i=1; i<=hWMu_DataC_DPhi_Syst->GetNbinsX(); ++i) hWMu_DataC_DPhi_Syst->SetBinError(i,0.); // ignore data stats
   hWMu_R_DPhi_Syst->Divide(hWMu_MCS_DPhi, hWMu_MCC_DPhi, 1., 1.);
-  hWMu_EstC_DPhi_Syst->Add(hWMu_DataC_DPhi_Syst, hWMu_BGC_DPhi, 1., -1.);
+  hWMu_EstC_DPhi_Syst->Add(hWMu_DataC_DPhi_Syst, hWMu_BGC_DPhi_Syst, 1., -1.);
   hWMu_EstS_DPhi_Syst->Multiply(hWMu_EstC_DPhi_Syst, hWMu_R_DPhi_Syst, 1., 1.);
 
-
-  TH1D* hWEl_DataC_DPhi_Syst = new TH1D("hWEl_DataC_DPhi_Syst", "", 3, dphiEdges);
+  // W->e
+  // stat only histograms
   TH1D* hWEl_R_DPhi          = new TH1D("hWEl_R_DPhi", "", 3, dphiEdges);
-  TH1D* hWEl_R_DPhi_Syst     = new TH1D("hWEl_R_DPhi_Syst", "", 3, dphiEdges);
   TH1D* hWEl_EstC_DPhi       = new TH1D("hWEl_EstC_DPhi", "", 3, dphiEdges);
-  TH1D* hWEl_EstC_DPhi_Syst  = new TH1D("hWEl_EstC_DPhi_Syst", "", 3, dphiEdges);
   TH1D* hWEl_EstS_DPhi       = new TH1D("hWEl_EstS_DPhi", "", 3, dphiEdges);
+
+  // syst only histograms
+  TH1D* hWEl_BGC_DPhi_Syst   = new TH1D("hWEl_BGC_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWEl_DataC_DPhi_Syst = new TH1D("hWEl_DataC_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWEl_R_DPhi_Syst     = new TH1D("hWEl_R_DPhi_Syst", "", 3, dphiEdges);
+  TH1D* hWEl_EstC_DPhi_Syst  = new TH1D("hWEl_EstC_DPhi_Syst", "", 3, dphiEdges);
   TH1D* hWEl_EstS_DPhi_Syst  = new TH1D("hWEl_EstS_DPhi_Syst", "", 3, dphiEdges);
 
+  // stat only calculation
   hWEl_R_DPhi->Divide(hWEl_MCS_DPhi, hWEl_MCC_DPhi, 1., 1.);
   for (int i=1; i<=hWEl_R_DPhi->GetNbinsX(); ++i) hWEl_R_DPhi->SetBinError(i,0.);
+  hWEl_BGC_DPhi_Syst->Add(hWEl_BGC_DPhi, 1.);  // take a copy for the syst only
+  for (int i=1; i<=hWEl_BGC_DPhi->GetNbinsX(); ++i) hWEl_BGC_DPhi->SetBinError(i,0.);  // ignore MC BG uncertainty
   hWEl_EstC_DPhi->Add(hWEl_DataC_DPhi, hWEl_BGC_DPhi, 1., -1.);
   hWEl_EstS_DPhi->Multiply(hWEl_EstC_DPhi, hWEl_R_DPhi, 1., 1.);
 
+  // syst only calculation
   hWEl_DataC_DPhi_Syst->Add(hWEl_DataC_DPhi, 1.);
-  for (int i=1; i<=hWEl_DataC_DPhi_Syst->GetNbinsX(); ++i) hWEl_DataC_DPhi_Syst->SetBinError(i,0.);
+  for (int i=1; i<=hWEl_DataC_DPhi_Syst->GetNbinsX(); ++i) hWEl_DataC_DPhi_Syst->SetBinError(i,0.); // ignore data stats
   hWEl_R_DPhi_Syst->Divide(hWEl_MCS_DPhi, hWEl_MCC_DPhi, 1., 1.);
-  hWEl_EstC_DPhi_Syst->Add(hWEl_DataC_DPhi, hWEl_BGC_DPhi, 1., -1.);
+  hWEl_EstC_DPhi_Syst->Add(hWEl_DataC_DPhi_Syst, hWEl_BGC_DPhi_Syst, 1., -1.);
   hWEl_EstS_DPhi_Syst->Multiply(hWEl_EstC_DPhi_Syst, hWEl_R_DPhi_Syst, 1., 1.);
 
   // create 2D histograms with the background estimate
@@ -563,27 +579,30 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl << std::endl;
   */
   std::cout << "W->mu channel (dphi<1.0)" << std::endl;
-  std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(1) << " +/- " << hWMu_MCC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  W+jets MC  sgnl region : " << hWMu_MCS_DPhi->GetBinContent(1) << " +/- " << hWMu_MCS_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Background ctrl region : " << hWMu_BGC_DPhi->GetBinContent(1) << " +/- " << hWMu_BGC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(1) << " +/- 0 (stat) +/- " << hWMu_MCC_DPhi->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  W+jets MC  sgnl region : " << hWMu_MCS_DPhi->GetBinContent(1) << " +/- 0 (stat) +/- " << hWMu_MCS_DPhi->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  Background ctrl region : " << hWMu_BGC_DPhi->GetBinContent(1) << " +/- " << hWMu_BGC_DPhi->GetBinError(1) << " (stat) +/- " << hWMu_BGC_DPhi->GetBinError(1) << " (syst)" << std::endl;
   //  std::cout << "  Background sgnl region : " << hWMu_BGS_DPhi->GetBinContent(1) << std::endl;
-  std::cout << "  Data ctrl region       : " << hWMu_DataC_DPhi->GetBinContent(1) << " +/- " << hWMu_DataC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Data ctrl region       : " << hWMu_DataC_DPhi->GetBinContent(1) << " +/- " << hWMu_DataC_DPhi->GetBinError(1) << " (stat) +/- " << hWMu_DataC_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   std::cout << std::endl;
-  std::cout << "  W in ctrl region       : " << hWMu_EstC_DPhi->GetBinContent(1) << " +/- " << hWMu_EstC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  N_S(MC)/N_C(MC)        : " << hWMu_R_DPhi->GetBinContent(1) << " +/- " << hWMu_R_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  W in sgnl region       : " << hWMu_EstS_DPhi->GetBinContent(1) << " +/- " << hWMu_EstS_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  W in ctrl region       : " << hWMu_EstC_DPhi->GetBinContent(1) << " +/- " << hWMu_EstC_DPhi->GetBinError(1) << " (stat) +/- " << hWMu_EstC_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  N_S(MC)/N_C(MC)        : " << hWMu_R_DPhi->GetBinContent(1) << " +/- " << hWMu_R_DPhi->GetBinError(1) << " (stat) +/- " << hWMu_R_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  W in sgnl region       : " << hWMu_EstS_DPhi->GetBinContent(1) << " +/- " << hWMu_EstS_DPhi->GetBinError(1) << " (stat) +/- " << hWMu_EstS_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   std::cout << std::endl << std::endl;
+
   std::cout << "W->el channel (dphi<1.0)" << std::endl;
-  std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(1) << " +/- " << hWEl_MCC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  W+jets MC  sgnl region : " << hWEl_MCS_DPhi->GetBinContent(1) << " +/- " << hWEl_MCS_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Background ctrl region : " << hWEl_BGC_DPhi->GetBinContent(1) << " +/- " << hWEl_BGC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(1) << " +/- 0 (stat) +/- " << hWEl_MCC_DPhi->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  W+jets MC  sgnl region : " << hWEl_MCS_DPhi->GetBinContent(1) << " +/- 0 (stat) +/- " << hWEl_MCS_DPhi->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  Background ctrl region : " << hWEl_BGC_DPhi->GetBinContent(1) << " +/- " << hWEl_BGC_DPhi->GetBinError(1) << " (stat) +/- " << hWEl_BGC_DPhi->GetBinError(1) << " (syst)" << std::endl;
   //  std::cout << "  Background sgnl region : " << hWEl_BGS_DPhi->GetBinContent(1) << std::endl;
-  std::cout << "  Data ctrl region       : " << hWEl_DataC_DPhi->GetBinContent(1) << " +/- " << hWEl_DataC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Data ctrl region       : " << hWEl_DataC_DPhi->GetBinContent(1) << " +/- " << hWEl_DataC_DPhi->GetBinError(1) << " (stat) +/- " << hWEl_DataC_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   std::cout << std::endl;
-  std::cout << "  W in ctrl region       : " << hWEl_EstC_DPhi->GetBinContent(1) << " +/- " << hWEl_EstC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  N_S(MC)/N_C(MC)        : " << hWEl_R_DPhi->GetBinContent(1) << " +/- " << hWEl_R_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  W in sgnl region       : " << hWEl_EstS_DPhi->GetBinContent(1) << " +/- " << hWEl_EstS_DPhi->GetBinError(1) << std::endl;
-  std::cout << std::endl;
+  std::cout << "  W in ctrl region       : " << hWEl_EstC_DPhi->GetBinContent(1) << " +/- " << hWEl_EstC_DPhi->GetBinError(1) << " (stat) +/- " << hWEl_EstC_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  N_S(MC)/N_C(MC)        : " << hWEl_R_DPhi->GetBinContent(1) << " +/- " << hWEl_R_DPhi->GetBinError(1) << " (stat) +/- " << hWEl_R_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  W in sgnl region       : " << hWEl_EstS_DPhi->GetBinContent(1) << " +/- " << hWEl_EstS_DPhi->GetBinError(1) << " (stat) +/- " << hWEl_EstS_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << std::endl << std::endl;
+
+
 
   // write the cutflow table
   std::cout << "Writing cut flow TeX file" << std::endl;
