@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
   TCut puWeight("puWeight");
   // TCut trigCorrWeight("trigCorrWeight");
   TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
-  TCut wWeight = cuts.wWeight();
+  TCut wWeight("");
 
   // Cuts for control plots
   // Get puWeight etc added below if necessary
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
   
   // Plots for eff_CJV
   TH1D* hWTau_MC_CJV_DPhi    = new TH1D("hWTau_MC_CJV_DPhi",   "", 3, dphiEdges); // W+jets MC at gen level with CJV - also provides MC signal estimate
-  TH1D* hWTau_MC_NoCJV_DPhi  = new TH1D("hWTau_MC_NoCJV_DPhi", "", 3, dphiEdges); // W+jets MC at gen level without CJV
+  TH1D* hWTau_MC_NoCJV_DPhi  = new TH1D("hWTau_MC_NoCJV_DPhi", "", 3, dphiEdges); // W+jets MC at gen level without CJV (same as hWTau_MCS_NoCJV_DPhi, so I should probably get rid of this to make it faster...)
   
   // cutflow histograms
   TH1D* hDataWTau            = new TH1D("hWTau_CutFlow_Data",        "", nCutsWTau, 0., nCutsWTau);
@@ -141,14 +141,22 @@ int main(int argc, char* argv[]) {
     ///////////////////////////////
 
     // check it's W+Jets as they are used for eff hists
-    bool isWJets = false;
+    bool isWJets = false;    
+    bool isEwkW  = false;
+
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" || 
         dataset.name == "W2Jets" || 
         dataset.name == "W3Jets" || 
-        dataset.name == "W4Jets") {
+        dataset.name == "W4Jets" ||
+        dataset.name == "EWK_Wp2Jets" ||
+        dataset.name == "EWK_Wm2Jets") {
 
-      isWJets = true;
+      if (dataset.name == "EWK_Wp2Jets" || dataset.name == "EWK_Wm2Jets") isEwkW = true;
+      else isWJets = true;
+
+      if(isWJets) wWeight =  cuts.wWeight();
+
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
       std::cout << "  weight : " << weight << std::endl;
 
@@ -186,7 +194,10 @@ int main(int argc, char* argv[]) {
       // Setup control plot cuts
       cutTightMjj        = puWeight * trigCorrWeight * wWeight * cutTightMjj_basic;
       cutDPhiSignalNoCJV = puWeight * trigCorrWeight * wWeight * cutDPhiSignalNoCJV_basic;
-      
+    
+      // Debug output  
+      std::cout << "  N ctrl region (dphi<1) : " << hWTau_MC_CJV_DPhi_tmp->GetBinContent(1) << " +/- " << hWTau_MC_CJV_DPhi_tmp->GetBinError(1) << std::endl;// debug output
+    
     } else if (dataset.isData) {
 
       std::cout << "Analysing Data     : " << dataset.name << std::endl;
@@ -274,7 +285,7 @@ int main(int argc, char* argv[]) {
     if (dataset.isData) 
       hDataWTau->Add(hCutFlowWTau);
     
-    if (isWJets)
+    if (isWJets || isEwkW)
       hWLNuWTau->Add(hCutFlowWTau);
     
     if (dataset.name.compare(0,3,"QCD")==0)
@@ -381,30 +392,39 @@ int main(int argc, char* argv[]) {
    
   } //end of datasets loop
 
-  // create histograms with the background estimate & systematic hists (with 0 errors)
+  // create histograms with the background estimate & efficiency calculations
   // Note that the eqn in the AN boils down to (data-bg) * (hWTau_MC_CJV_DPhi/hWTau_MCC_NoCJV_DPhi), and I'll call the latter bracket R (following convention in wBackground code)
-  TH1D* hWTau_DataC_DPhi_Syst = new TH1D("hWTau_DataC_DPhi_Syst", "", 3, dphiEdges); // Data in control region (syst)
+
+  // Stat hists
   TH1D* hWTau_TauIDEff_DPhi   = new TH1D("hWTau_TauIDEff_DPhi",   "", 3, dphiEdges); // tau ID eff
   TH1D* hWTau_CJVEff_DPhi     = new TH1D("hWTau_CJVEff_DPhi",     "", 3, dphiEdges); // CJV eff
-  TH1D* hWTau_EstC_DPhi       = new TH1D("hWTau_EstC_DPhi ",      "", 3, dphiEdges); // n^data - n^BG in Anne Marie's AN
-  TH1D* hWTau_EstC_DPhi_Syst  = new TH1D("hWTau_EstC_DPhi_Syst",  "", 3, dphiEdges); // n^data - n^BG in Anne Marie's AN (syst)
-  TH1D* hWTau_EstS_DPhi       = new TH1D("hWTau_EstS_DPhi",       "", 3, dphiEdges); // Final number of tau estimate
-  TH1D* hWTau_EstS_DPhi_Syst  = new TH1D("hWTau_EstS_DPhi_Syst",  "", 3, dphiEdges); // Final number of tau estimate (syst)
   TH1D* hWTau_R_DPhi          = new TH1D("hWTau_R_DPhi",          "", 3, dphiEdges); // ratio of sngl/ctrl
+  TH1D* hWTau_EstC_DPhi       = new TH1D("hWTau_EstC_DPhi ",      "", 3, dphiEdges); // n^data - n^BG in Anne Marie's AN
+  TH1D* hWTau_EstS_DPhi       = new TH1D("hWTau_EstS_DPhi",       "", 3, dphiEdges); // Final number of tau estimate
+    
+  // Syst hists
+  TH1D* hWTau_DataC_DPhi_Syst = new TH1D("hWTau_DataC_DPhi_Syst", "", 3, dphiEdges); // Data in control region (syst)
+  TH1D* hWTau_BGC_DPhi_Syst   = new TH1D("hWTau_BGC_DPhi_Syst",   "", 3, dphiEdges); // Data in control region (syst)
   TH1D* hWTau_R_DPhi_Syst     = new TH1D("hWTau_R_DPhi_Syst",     "", 3, dphiEdges); // ratio of sngl/ctrl
+  TH1D* hWTau_EstC_DPhi_Syst  = new TH1D("hWTau_EstC_DPhi_Syst",  "", 3, dphiEdges); // n^data - n^BG in Anne Marie's AN (syst)
+  TH1D* hWTau_EstS_DPhi_Syst  = new TH1D("hWTau_EstS_DPhi_Syst",  "", 3, dphiEdges); // Final number of tau estimate (syst)
 
   hWTau_TauIDEff_DPhi->Divide(hWTau_MCC_NoCJV_DPhi, hWTau_MCS_NoCJV_DPhi, 1., 1.); // calculate tau ID eff
   hWTau_CJVEff_DPhi->Divide(hWTau_MC_CJV_DPhi, hWTau_MC_NoCJV_DPhi, 1., 1.); // calculate CJV eff
 
+  // Stat only calc
   hWTau_R_DPhi->Divide(hWTau_MC_CJV_DPhi, hWTau_MCC_NoCJV_DPhi, 1., 1.);
-  for (int i=1; i<=hWTau_R_DPhi->GetNbinsX(); ++i) hWTau_R_DPhi->SetBinError(i,0.);
+  for (int i=1; i<=hWTau_R_DPhi->GetNbinsX(); ++i) hWTau_R_DPhi->SetBinError(i,0.); //ignore MC stats in R
+  hWTau_BGC_DPhi_Syst->Add(hWTau_BGC_DPhi, 1.);  // take a copy for the syst only
+  for (int i=1; i<=hWTau_BGC_DPhi->GetNbinsX(); ++i) hWTau_BGC_DPhi->SetBinError(i,0.);  // ignore MC stats
   hWTau_EstC_DPhi->Add(hWTau_DataC_DPhi, hWTau_BGC_DPhi, 1., -1.); // n^data - n^BG
-  hWTau_EstS_DPhi->Multiply(hWTau_EstC_DPhi, hWTau_R_DPhi,1.,1.); 
+  hWTau_EstS_DPhi->Multiply(hWTau_EstC_DPhi, hWTau_R_DPhi,1.,1.); //stat errors from data only, none from ratio
 
+  // Syst only calc
   hWTau_DataC_DPhi_Syst->Add(hWTau_DataC_DPhi, 1.);
   for (int i=1; i<=hWTau_DataC_DPhi_Syst->GetNbinsX(); ++i) hWTau_DataC_DPhi_Syst->SetBinError(i,0.);
   hWTau_R_DPhi_Syst->Divide(hWTau_MC_CJV_DPhi, hWTau_MCC_NoCJV_DPhi, 1., 1.);
-  hWTau_EstC_DPhi_Syst->Add(hWTau_DataC_DPhi_Syst, hWTau_BGC_DPhi, 1., -1.);
+  hWTau_EstC_DPhi_Syst->Add(hWTau_DataC_DPhi_Syst, hWTau_BGC_DPhi_Syst, 1., -1.);
   hWTau_EstS_DPhi_Syst->Multiply(hWTau_EstC_DPhi_Syst, hWTau_R_DPhi_Syst, 1., 1.);
 
   std::cout << std::endl << std::endl;
@@ -416,7 +436,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  W+jets MC - gen level tau, standard selection w/CJV (MC estimate in signal region) : " << hWTau_MC_CJV_DPhi->GetBinContent(1) << " +/- " << hWTau_MC_CJV_DPhi->GetBinError(1) << std::endl;
   std::cout << "  W+jets MC - gen level tau, standard selection wout/CJV : " << hWTau_MC_NoCJV_DPhi->GetBinContent(1) << " +/- " << hWTau_MC_NoCJV_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
-  std::cout << "  Number of W->enu that pass VBF + tau selection (no CJV): " << hWTau_MCEl_DPhi->GetBinContent(1) << "+/-" << hWTau_MCEl_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Number of W->enu that pass VBF + tau selection (no CJV): " << hWTau_MCEl_DPhi->GetBinContent(1) << " +/- " << hWTau_MCEl_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  W in ctrl region                                       : " << hWTau_EstC_DPhi ->GetBinContent(1) << " +/- " << hWTau_EstC_DPhi ->GetBinError(1) << std::endl;
   std::cout << "  eff_tauID                                              : " << hWTau_TauIDEff_DPhi->GetBinContent(1) << " +/- " << hWTau_TauIDEff_DPhi->GetBinError(1) << std::endl;
@@ -465,7 +485,9 @@ int main(int argc, char* argv[]) {
   wjetsDatasets.push_back(std::string("W2Jets"));
   wjetsDatasets.push_back(std::string("W3Jets"));
   wjetsDatasets.push_back(std::string("W4Jets"));
-  SumDatasets(oDirPlots, wjetsDatasets, hnames, "WNJets");
+  wjetsDatasets.push_back(std::string("EWK_Wp2Jets"));
+  wjetsDatasets.push_back(std::string("EWK_Wm2Jets"));
+  SumDatasets(oDirPlots, wjetsDatasets, hnames, "WNJets+EWK");
 
   std::vector<std::string> topDatasets;
   topDatasets.push_back(std::string("SingleT_t"));
@@ -484,7 +506,7 @@ int main(int argc, char* argv[]) {
   dyjets.push_back("DYJetsToLL_EWK");
   // dyjets.push_back("EWK_Wp2Jets");
   // dyjets.push_back("EWK_Wm2Jets");
-  SumDatasets(oDirPlots,dyjets,hnames,"DYJetsToLL");
+  SumDatasets(oDirPlots,dyjets,hnames,"DYJets+EWK");
 
   std::vector<std::string> zJets;
   zJets.push_back("Zvv_50to100");
@@ -523,10 +545,10 @@ int main(int argc, char* argv[]) {
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   // plots.addDataset("QCD", kGreen+3, 0);
-  plots.addDataset("DYJetsToLL", kPink-4,0);
+  plots.addDataset("DYJets+EWK", kPink-4,0);
   plots.addDataset("SingleT+TTBar", kAzure-2, 0);
   plots.addDataset("ZJets", kOrange-2, 0);
-  plots.addDataset("WNJets", kGreen-3, 0);
+  plots.addDataset("WNJets+EWK", kGreen-3, 0);
   plots.addDataset("SignalM125_POWHEG", kRed, 2);
   plots.addDataset("METABCD", kBlack, 1);
 
@@ -570,7 +592,9 @@ int main(int argc, char* argv[]) {
   
   // Store numbers for data, bg, efficiencies  
   hWTau_BGC_DPhi->Write("",TObject::kOverwrite);
+  hWTau_BGC_DPhi_Syst->Write("",TObject::kOverwrite);
   hWTau_DataC_DPhi->Write("",TObject::kOverwrite);
+  hWTau_DataC_DPhi_Syst->Write("",TObject::kOverwrite);
   hWTau_MCC_NoCJV_DPhi->Write("",TObject::kOverwrite);
   hWTau_MCS_NoCJV_DPhi->Write("",TObject::kOverwrite);
   hWTau_MC_CJV_DPhi->Write("",TObject::kOverwrite);
