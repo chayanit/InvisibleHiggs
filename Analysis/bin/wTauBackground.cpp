@@ -76,6 +76,8 @@ int main(int argc, char* argv[]) {
   TH1D* hWTau_BGC_DPhi       = new TH1D("hWTau_BGC_DPhi",   "", 3, dphiEdges);  // background MC ctrl region (ctrl region = require tau reconstructed)
   TH1D* hWTau_DataC_DPhi     = new TH1D("hWTau_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
 
+  TH1D* hWTau_MCEl_DPhi      = new TH1D("hWTau_MCEl_DPhi", "", 3, dphiEdges);  // Measuring Wenu contamination
+
   // Plots for eff_tauID
   TH1D* hWTau_MCC_NoCJV_DPhi = new TH1D("hWTau_MCC_NoCJV_DPhi", "", 3, dphiEdges);  // W+jets MC at gen level in ctrl region, no CJV
   TH1D* hWTau_MCS_NoCJV_DPhi = new TH1D("hWTau_MCS_NoCJV_DPhi", "", 3, dphiEdges);  // W+jets MC at gen level in signal region, no CJV
@@ -121,6 +123,8 @@ int main(int argc, char* argv[]) {
     TH1D* hWTau_BGC_DPhi_tmp       = new TH1D("hWTau_BGC_DPhi_tmp","",3,dphiEdges);
     TH1D* hWTau_DataC_DPhi_tmp     = new TH1D("hWTau_DataC_DPhi_tmp","",3,dphiEdges);
     
+    TH1D* hWTau_MCEl_DPhi_tmp      = new TH1D("hWTau_MCEl_DPhi_tmp", "", 3, dphiEdges);  
+
     // tmp histograms - tau ID eff
     TH1D* hWTau_MCC_NoCJV_DPhi_tmp = new TH1D("hWTau_MCC_NoCJV_DPhi_tmp", "", 3, dphiEdges);  // W+jets MC ctrl region
     TH1D* hWTau_MCS_NoCJV_DPhi_tmp = new TH1D("hWTau_MCS_NoCJV_DPhi_tmp", "", 3, dphiEdges);  // W+jets MC sgnl region
@@ -147,6 +151,11 @@ int main(int argc, char* argv[]) {
       isWJets = true;
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
       std::cout << "  weight : " << weight << std::endl;
+
+      // W->enu contamination
+      tree->Draw("vbfDPhi>>hWTau_MCEl_DPhi_tmp", puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.cutWTau("wTau") + cutTightMjj_basic));
+      hWTau_MCEl_DPhi_tmp->Scale(weight);
+      hWTau_MCEl_DPhi->Add(hWTau_MCEl_DPhi_tmp);
 
       // Do Tau ID eff
       cutWTau_MCC_NoCJV = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wTauGen() + cutTightMjj_basic + cuts.cutWTau("wTau"));
@@ -224,6 +233,7 @@ int main(int argc, char* argv[]) {
     
     delete hWTau_BGC_DPhi_tmp;
     delete hWTau_DataC_DPhi_tmp;
+    delete hWTau_MCEl_DPhi_tmp;
     delete hWTau_MCC_NoCJV_DPhi_tmp;
     delete hWTau_MCS_NoCJV_DPhi_tmp;
     delete hWTau_MC_CJV_DPhi_tmp;    
@@ -314,7 +324,6 @@ int main(int argc, char* argv[]) {
     tree->Draw(str.c_str(), cutDPhiSignalNoCJV);
     hTau1Eta->Scale(weight); 
     hTau1Eta->Write("", TObject::kOverwrite); 
-
     
     hname = "hWTau_mT_DPhiSignalNoCJV";
     if (i==0) hnames.push_back(hname);
@@ -406,6 +415,8 @@ int main(int argc, char* argv[]) {
   std::cout << "  W+jets MC - gen level tau, no CJV                      : " << hWTau_MCS_NoCJV_DPhi->GetBinContent(1) << " +/- " << hWTau_MCS_NoCJV_DPhi->GetBinError(1) << std::endl;
   std::cout << "  W+jets MC - gen level tau, standard selection w/CJV (MC estimate in signal region) : " << hWTau_MC_CJV_DPhi->GetBinContent(1) << " +/- " << hWTau_MC_CJV_DPhi->GetBinError(1) << std::endl;
   std::cout << "  W+jets MC - gen level tau, standard selection wout/CJV : " << hWTau_MC_NoCJV_DPhi->GetBinContent(1) << " +/- " << hWTau_MC_NoCJV_DPhi->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Number of W->enu that pass VBF + tau selection (no CJV): " << hWTau_MCEl_DPhi->GetBinContent(1) << "+/-" << hWTau_MCEl_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  W in ctrl region                                       : " << hWTau_EstC_DPhi ->GetBinContent(1) << " +/- " << hWTau_EstC_DPhi ->GetBinError(1) << std::endl;
   std::cout << "  eff_tauID                                              : " << hWTau_TauIDEff_DPhi->GetBinContent(1) << " +/- " << hWTau_TauIDEff_DPhi->GetBinError(1) << std::endl;
