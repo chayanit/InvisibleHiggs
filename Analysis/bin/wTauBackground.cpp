@@ -55,7 +55,6 @@ int main(int argc, char* argv[]) {
   TCut puWeight("puWeight");
   // TCut trigCorrWeight("trigCorrWeight");
   TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
-  TCut wWeight("");
 
   // Cuts for control plots
   // Get puWeight etc added below if necessary
@@ -144,6 +143,8 @@ int main(int argc, char* argv[]) {
     bool isWJets = false;    
     bool isEwkW  = false;
 
+    TCut wWeight("");
+
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" || 
         dataset.name == "W2Jets" || 
@@ -154,7 +155,7 @@ int main(int argc, char* argv[]) {
 
       if (dataset.name == "EWK_Wp2Jets" || dataset.name == "EWK_Wm2Jets") isEwkW = true;
       else isWJets = true;
-
+    
       if(isWJets) wWeight =  cuts.wWeight();
 
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
@@ -444,6 +445,7 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl << std::endl;
   std::cout << "  W in sgnl region                                       : " << hWTau_EstS_DPhi->GetBinContent(1) << " +/- " << hWTau_EstS_DPhi->GetBinError(1) << std::endl;
 
+
   // write the cutflow table
   std::cout << "Writing cut flow TeX file" << std::endl;
 
@@ -504,8 +506,6 @@ int main(int argc, char* argv[]) {
   dyjets.push_back("DYJetsToLL");
   dyjets.push_back("DYJetsToLL_PtZ-100");
   dyjets.push_back("DYJetsToLL_EWK");
-  // dyjets.push_back("EWK_Wp2Jets");
-  // dyjets.push_back("EWK_Wm2Jets");
   SumDatasets(oDirPlots,dyjets,hnames,"DYJets+EWK");
 
   std::vector<std::string> zJets;
@@ -541,7 +541,7 @@ int main(int argc, char* argv[]) {
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDirPlots);
-  plots.setLegPos(0.70,0.60,0.93,0.89);
+  plots.setLegPos(0.65,0.60,0.93,0.89);
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   // plots.addDataset("QCD", kGreen+3, 0);
