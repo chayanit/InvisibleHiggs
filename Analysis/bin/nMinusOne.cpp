@@ -4,6 +4,7 @@
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
+#include "InvisibleHiggs/Analysis/interface/Constants.h"
 
 // #include "TROOT.h"
 #include "TTree.h"
@@ -136,6 +137,7 @@ int main(int argc, char* argv[]) {
     // Scale MC according to luminosity
     if (!dataset.isData) {
       double weight = lumi * dataset.sigma / dataset.nEvents;
+      if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
       hTrig->Scale(weight);
       hMETfilt->Scale(weight);
       hDijet->Scale(weight);
@@ -205,8 +207,8 @@ int main(int argc, char* argv[]) {
   zJets.push_back("Zvv_100to200");
   zJets.push_back("Zvv_200to400");
   zJets.push_back("Zvv_400toinf");
-  
-  SumDatasets(oDir, zJets, hists, "ZJets");
+  zJets.push_back("EWK_ZvvFake");  
+  SumDatasets(oDir, zJets, hists, "ZJets+EWK");
 
   // sum W+jets datasets
   std::cout << "Summing histograms for W+Jets" << std::endl;
@@ -275,7 +277,7 @@ int main(int argc, char* argv[]) {
   plots.addDataset("DYJets+EWK", kPink-4,0);
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
   plots.addDataset("QCD", kGreen+3, 0);
-  plots.addDataset("ZJets", kOrange-2, 0);
+  plots.addDataset("ZJets+EWK", kOrange-2, 0);
   plots.addDataset("WNJets+EWK", kGreen-3, 0);
   plots.addDataset("SignalM125_POWHEG", kRed, 2);
 

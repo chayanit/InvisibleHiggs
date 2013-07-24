@@ -5,6 +5,7 @@
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
+#include "InvisibleHiggs/Analysis/interface/Constants.h"
 
 #include "TTree.h"
 #include "TMath.h"
@@ -47,6 +48,10 @@ int main(int argc, char* argv[]) {
   TH1D* hWMuNu   = new TH1D("hCutFlow_WMuNu", "", nCuts, 0., nCuts);
   TH1D* hWElNu   = new TH1D("hCutFlow_WElNu", "", nCuts, 0., nCuts);
   TH1D* hWTauNu  = new TH1D("hCutFlow_WTauNu", "", nCuts, 0., nCuts);
+  TH1D* hWEWK    = new TH1D("hCutFlow_WEWK", "", nCuts, 0., nCuts);
+  TH1D* hWEWKMu  = new TH1D("hCutFlow_WEWKMu", "", nCuts, 0., nCuts);
+  TH1D* hWEWKEl  = new TH1D("hCutFlow_WEWKEl", "", nCuts, 0., nCuts);
+  TH1D* hWEWKTau  = new TH1D("hCutFlow_WEWKTau", "", nCuts, 0., nCuts);
   TH1D* hSingleT = new TH1D("hCutFlow_SingleTSum", "", nCuts, 0., nCuts);
   TH1D* hDYLL	 = new TH1D("hCutFlow_DYLL", "", nCuts, 0., nCuts);
   TH1D* hDiboson = new TH1D("hCutFlow_Diboson", "", nCuts, 0., nCuts);
@@ -133,25 +138,39 @@ int main(int argc, char* argv[]) {
       delete hTau;
     }
 
-    hCutFlow->Scale( lumi * dataset.sigma / dataset.nEvents );
-    hCutFlowMu->Scale( lumi * dataset.sigma / dataset.nEvents );
-    hCutFlowEl->Scale( lumi * dataset.sigma / dataset.nEvents );
-    hCutFlowTau->Scale( lumi * dataset.sigma / dataset.nEvents );
+    double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents;
+    if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
+
+    hCutFlow->Scale(weight);
+    hCutFlowMu->Scale(weight);
+    hCutFlowEl->Scale(weight);
+    hCutFlowTau->Scale(weight);
  
     std::cout << "  N (dphi<1.0) : " << hCutFlow->GetBinContent(nCuts) << " +/- " << hCutFlow->GetBinError(nCuts) << std::endl;
 
     // sum binned datasets
     if (dataset.name.compare(0,3,"QCD")==0) hQCD->Add(hCutFlow);
-    if (dataset.name.compare(0,3,"Zvv")==0) hZNuNu->Add(hCutFlow);
+    if (dataset.name.compare(0,3,"Zvv")==0 || 
+	dataset.name == "EWK_ZvvFake" ) {
+      hZNuNu->Add(hCutFlow);
+    }
     if (dataset.name=="WJets" ||
         dataset.name=="W1Jets" ||
         dataset.name=="W2Jets" ||
         dataset.name=="W3Jets" ||
-        dataset.name=="W4Jets") {
+        dataset.name=="W4Jets" || 
+        dataset.name == "EWK_Wp2Jets" ||
+        dataset.name == "EWK_Wm2Jets") {
       hWLNu->Add(hCutFlow);
       hWMuNu->Add(hCutFlowMu);
       hWElNu->Add(hCutFlowEl);
       hWTauNu->Add(hCutFlowTau);
+    }
+    if (dataset.name.compare(0,5,"EWK_W")==0) {
+      hWEWK->Add(hCutFlow);
+      hWEWKMu->Add(hCutFlowMu);
+      hWEWKEl->Add(hCutFlowEl);
+      hWEWKTau->Add(hCutFlowTau);
     }
     if (dataset.name.compare(0,7,"SingleT")==0) hSingleT->Add(hCutFlow);
     if (dataset.name.compare(0,2,"WW")==0 ||
@@ -170,6 +189,10 @@ int main(int argc, char* argv[]) {
   ofile->cd();
   hQCD->Write("",TObject::kOverwrite);  
   hZNuNu->Write("",TObject::kOverwrite);  
+  hWEWK->Write("",TObject::kOverwrite);
+  hWEWKMu->Write("",TObject::kOverwrite);
+  hWEWKEl->Write("",TObject::kOverwrite);
+  hWEWKTau->Write("",TObject::kOverwrite);
   hWLNu->Write("",TObject::kOverwrite);  
   hWMuNu->Write("",TObject::kOverwrite);  
   hWElNu->Write("",TObject::kOverwrite);  
@@ -183,10 +206,11 @@ int main(int argc, char* argv[]) {
 
   ofstream texFile;
   texFile.open(options.oDir+std::string("/cutflow.tex"));
+ 
+  texFile << "Cut & N($Z\\rightarrow\\nu\\nu$) & N($W\\rightarrow \\mu\\nu$) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV \\\\" << std::endl;
 
-  texFile << "Cut & N($Z\\rightarrow\\nu\\nu) & N($W\\rightarrow l\\nu) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV \\\\" << std::endl;
-
-  TH1D* hTTbar = (TH1D*) ofile->Get("hCutFlow_TTBar");
+  TH1D* hZEWK   = (TH1D*) ofile->Get("hCutFlow_EWK_ZvvFake");
+  TH1D* hTTbar  = (TH1D*) ofile->Get("hCutFlow_TTBar");
   TH1D* hSignal = (TH1D*) ofile->Get("hCutFlow_SignalM125_POWHEG");
 
   // cutflow table
@@ -194,14 +218,15 @@ int main(int argc, char* argv[]) {
 
     texFile << cuts.cutName(i) << " & ";
     texFile << "$" << hZNuNu->GetBinContent(i+1) << " \\pm " << hZNuNu->GetBinError(i+1) << "$ & ";
+    //texFile << "$" << hZEWK->GetBinContent(i+1) << " \\pm " << hZEWK->GetBinError(i+1) << "$ & ";
     texFile << "$" << hWLNu->GetBinContent(i+1) << " \\pm " << hWLNu->GetBinError(i+1) << "$ & ";
+    //texFile << "$" << hWEWK->GetBinContent(i+1) << " \\pm " << hWEWK->GetBinError(i+1) << "$ & ";
     texFile << "$" << hQCD->GetBinContent(i+1) << " \\pm " << hQCD->GetBinError(i+1) << "$ & ";
     texFile << "$" << hTTbar->GetBinContent(i+1) << " \\pm " << hTTbar->GetBinError(i+1) << "$ & ";
     texFile << "$" << hSingleT->GetBinContent(i+1) << " \\pm " << hSingleT->GetBinError(i+1) << "$ & ";
     texFile << "$" << hDiboson->GetBinContent(i+1) << " \\pm " << hDiboson->GetBinError(i+1) << "$ & ";
     texFile << "$" << hDYLL->GetBinContent(i+1) << " \\pm " << hDYLL->GetBinError(i+1) << "$ & ";
     texFile << "$" << hSignal->GetBinContent(i+1) << " \\pm " << hSignal->GetBinError(i+1) << "$ \\\\ " << std::endl;
- 
   }
 
   texFile << std::endl << std::endl;
