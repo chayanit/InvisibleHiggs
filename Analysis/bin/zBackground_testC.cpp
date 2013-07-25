@@ -322,7 +322,7 @@ int main(int argc, char* argv[]) {
 
   // numbers - calculate these from MC in this program later!
   //double ratioBF = 5.626;  //  MCFM + NLO
-  double ratioBF = 1144./12173.;
+  double ratioBF = 1144./14428.;
 
   // bins dPhi
   TH1D* hZ_Est_ZC_DPhi = new TH1D("hZ_Est_ZC_DPhi", "", 4, dphiEdges); // estimated Z in ctrl region
