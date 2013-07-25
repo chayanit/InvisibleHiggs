@@ -52,8 +52,6 @@ int main(int argc, char* argv[]) {
 
   // cuts
   Cuts cuts;
-  //unsigned nCutsWMu = cuts.nCutsWMu();
-  //unsigned nCutsWEl = cuts.nCutsWEl();
 
   TCut puWeight("puWeight");
   //TCut trigCorrWeight("trigCorrWeight");
@@ -63,8 +61,8 @@ int main(int argc, char* argv[]) {
   double dphiEdges[5] = { 0., 1.0, 1.8, 2.6, TMath::Pi() };
   //double metEdges[13] = { 0., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 120. };
 
-  TH1D* hWMu_VBF_DPhi = new TH1D("hWMu_VBF_DPhi", "", 4, dphiEdges);  // WMu reco+VBF cuts
-  TH1D* hWMu_GEN_DPhi = new TH1D("hWMu_GEN_DPhi", "", 1, 0., 1.);  // WMu gen level
+  TH1D* hWMu_VBF_DPhi = new TH1D("hWMu_VBF_DPhi", "", 4, dphiEdges);
+  TH1D* hWMu_GEN_DPhi = new TH1D("hWMu_GEN_DPhi", "", 1, 0., 1.);  
   TH1D* hWMu_BGC_DPhi = new TH1D("hWMu_BGC_DPhi", "", 4, dphiEdges);  // background MC ctrl region
   TH1D* hWMu_DataC_DPhi = new TH1D("hWMu_DataC_DPhi", "", 4, dphiEdges);  // Data ctrl region
  
@@ -118,14 +116,21 @@ int main(int argc, char* argv[]) {
     TH1D* hWEl_C_DPhi = new TH1D("hWEl_C_DPhi", "", 4, dphiEdges);  // W+jets MC ctrl region
     TH1D* hWEl_S_DPhi = new TH1D("hWEl_S_DPhi", "", 1, 0., 1.);
  
-    TCut cutWMu_C = otherCuts * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
-    TCut cutWMu_S = otherCuts * cuts.wMuGen();
-    TCut cutWEl_C = otherCuts * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
-    TCut cutWEl_S = otherCuts * cuts.wElGen();
+    TH1D* hWMu_CN_DPhi = new TH1D("hWMu_CN_DPhi", "", 4, dphiEdges);  // W+jets MC ctrl region
+    TH1D* hWEl_CN_DPhi = new TH1D("hWEl_CN_DPhi", "", 4, dphiEdges);  // W+jets MC ctrl region
 
+    TCut cutWMu_C  = otherCuts * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
+    TCut cutWMu_CN = otherCuts * (cuts.wMuGen() + cuts.wMuVBF() + cuts.cutWMu("MET"));
+    TCut cutWMu_S  = otherCuts * cuts.wMuGen();
+    TCut cutWEl_C  = otherCuts * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
+    TCut cutWEl_CN = otherCuts * (cuts.wElGen() + cuts.wElVBF() + cuts.cutWEl("MET"));
+    TCut cutWEl_S  = otherCuts * cuts.wElGen();
+    
     tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
+    tree->Draw("vbfDPhi>>hWMu_CN_DPhi", cutWMu_CN);
     tree->Draw("0.5>>hWMu_S_DPhi", cutWMu_S);
     tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
+    tree->Draw("vbfDPhi>>hWEl_CN_DPhi", cutWEl_CN);
     tree->Draw("0.5>>hWEl_S_DPhi", cutWEl_S);
  
     double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents;
@@ -135,12 +140,14 @@ int main(int argc, char* argv[]) {
     hWMu_S_DPhi->Scale(weight);
     hWEl_C_DPhi->Scale(weight);
     hWEl_S_DPhi->Scale(weight);
+    hWMu_CN_DPhi->Scale(weight);
+    hWEl_CN_DPhi->Scale(weight);
 
     // add to final histogram
     if (isWJets || isEwkW) {
-    	hWMu_VBF_DPhi->Add(hWMu_C_DPhi);
+    	hWMu_VBF_DPhi->Add(hWMu_CN_DPhi);
     	hWMu_GEN_DPhi->Add(hWMu_S_DPhi);
-    	hWEl_VBF_DPhi->Add(hWEl_C_DPhi);
+    	hWEl_VBF_DPhi->Add(hWEl_CN_DPhi);
     	hWEl_GEN_DPhi->Add(hWEl_S_DPhi);
     }
     else if (dataset.isData) {
@@ -186,14 +193,14 @@ int main(int argc, char* argv[]) {
 
   for(int ibin = 1; ibin <= hWMu_R_DPhi->GetNbinsX(); ++ibin) {
 	hWMu_R_DPhi->SetBinContent(ibin, hWMu_RVBF_DPhi->GetBinContent(ibin) * hWMu_RGEN_DPhi->GetBinContent(1));
-	hWMu_R_DPhi->SetBinError(ibin, sqrt(pow(hWMu_RVBF_DPhi->GetBinError(ibin)/hWMu_RVBF_DPhi->GetBinContent(ibin),2) + pow(hWMu_RGEN_DPhi->GetBinError(1)/hWMu_RGEN_DPhi->GetBinContent(1),2)));
+	hWMu_R_DPhi->SetBinError(ibin, hWMu_R_DPhi->GetBinContent(ibin) * sqrt(pow(hWMu_RVBF_DPhi->GetBinError(ibin)/hWMu_RVBF_DPhi->GetBinContent(ibin),2) + pow(hWMu_RGEN_DPhi->GetBinError(1)/hWMu_RGEN_DPhi->GetBinContent(1),2)));
   }
 
   hWEl_RVBF_DPhi->Divide(hWEl_VBF_DPhi, hWMu_VBF_DPhi, 1., 1.);
   hWEl_RGEN_DPhi->Divide(hWMu_GEN_DPhi, hWEl_GEN_DPhi, 1., 1.); 
   for(int ibin = 1; ibin <= hWEl_R_DPhi->GetNbinsX(); ++ibin) {
         hWEl_R_DPhi->SetBinContent(ibin, hWEl_RVBF_DPhi->GetBinContent(ibin) * hWEl_RGEN_DPhi->GetBinContent(1));
-        hWEl_R_DPhi->SetBinError(ibin, sqrt(pow(hWEl_RVBF_DPhi->GetBinError(ibin)/hWEl_RVBF_DPhi->GetBinContent(ibin),2) + pow(hWEl_RGEN_DPhi->GetBinError(1)/hWEl_RGEN_DPhi->GetBinContent(1),2)));
+        hWEl_R_DPhi->SetBinError(ibin, hWEl_R_DPhi->GetBinContent(ibin) * sqrt(pow(hWEl_RVBF_DPhi->GetBinError(ibin)/hWEl_RVBF_DPhi->GetBinContent(ibin),2) + pow(hWEl_RGEN_DPhi->GetBinError(1)/hWEl_RGEN_DPhi->GetBinContent(1),2)));
   }
 
   // For WMu prediction from WEl
