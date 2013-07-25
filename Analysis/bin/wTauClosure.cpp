@@ -171,7 +171,6 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing BG MC    : " << dataset.name << std::endl;
 
       if (dataset.name.compare(0,17,"SignalM125_POWHEG")!=0) {
-        std::cout << "  weight : " << weight << std::endl;
 
         if(dataset.name.compare(0,3,"Zvv") != 0){ // Dont need Zvv in WMu estimates
           cutWMu_C = otherCuts * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
@@ -245,11 +244,7 @@ int main(int argc, char* argv[]) {
   // hWTau_Prediction_DPhi->Multiply(hWTau_Eff_DPhi);
   // hWTau_Prediction_DPhi->Divide(hWMu_Eff_DPhi);
 
-  // double xsecWTauHadronic = 8390.; 
-  double xsecWTauHadronic = 2732.72; 
-  // double xsecWMu = 12173.;
-  double xsecWMu = 4699.36;
-  double xsecRatio = xsecWTauHadronic/xsecWMu;
+  double xsecRatio = (0.1125*0.6476)/(0.1057+(0.1125*0.1741));
   hWTau_Prediction_DPhi->Scale(xsecRatio);
 
   std::cout << std::endl;
@@ -312,7 +307,6 @@ int main(int argc, char* argv[]) {
   std::cout << "  WTau in ctrl region expected                           : " << hWTau_EstC_DPhi->GetBinContent(3) << " +/- " << hWTau_EstC_DPhi->GetBinError(3) << std::endl;
   std::cout << std::endl ;
   std::cout << "  Closure test: WTau from WMu                            : " << hWTau_Prediction_DPhi->GetBinContent(3) << " +/- " << hWTau_Prediction_DPhi->GetBinError(3) << std::endl;
- 
   std::cout << std::endl;
   std::cout << std::endl;
   std::cout << "W->mu channel (dphi>2.6)" << std::endl;
@@ -347,10 +341,10 @@ int main(int argc, char* argv[]) {
   double diff1[4],ediff1[4];
 
   for(int i=0; i<4; ++i) {
-        y1[i]  = hWTau_EstC_DPhi->GetBinContent(i+1);  //Predicted WMu
-        ey1[i] = hWTau_EstC_DPhi->GetBinError(i+1);  
-        y2[i]  = hWTau_Prediction_DPhi->GetBinContent(i+1);  //Observed WMu
-        ey2[i] = hWTau_Prediction_DPhi->GetBinError(i+1);
+        y1[i]  = hWTau_Prediction_DPhi->GetBinContent(i+1);  //Predicted WMu
+        ey1[i] = hWTau_Prediction_DPhi->GetBinError(i+1);
+        y2[i]  = hWTau_EstC_DPhi->GetBinContent(i+1);  //Observed WMu
+        ey2[i] = hWTau_EstC_DPhi->GetBinError(i+1);  
         diff1[i]  = y1[i]-y2[i];
         ediff1[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
 
@@ -371,6 +365,7 @@ int main(int argc, char* argv[]) {
   gp1->GetXaxis()->SetTitle("#Delta #phi_{jj}");
   gp1->GetXaxis()->SetRangeUser(0,TMath::Pi());
   gp1->GetYaxis()->SetTitle("N(W#rightarrow #tau#nu)");
+  gp1->GetYaxis()->SetTitleOffset(1.2);
   gp1->GetYaxis()->SetRangeUser(0,100);
   gp1->Draw("AP");
   gp2->SetMarkerStyle(20);
@@ -386,7 +381,7 @@ int main(int argc, char* argv[]) {
   leg.AddEntry(gp2,"observed","P");
   leg.Draw();
 
-  pdfName= options.oDir + std::string("/Wmunu_num.pdf");
+  pdfName= options.oDir + std::string("/Wtaunu_num.pdf");
   canvas.Print(pdfName.c_str());
  
   h->Draw();
@@ -402,7 +397,7 @@ int main(int argc, char* argv[]) {
   h->Draw();
   gp3->Draw("P same");
 
-  pdfName= options.oDir + std::string("/Wmunu_diff.pdf");
+  pdfName= options.oDir + std::string("/Wtaunu_diff.pdf");
   canvas.Print(pdfName.c_str());
 
 
