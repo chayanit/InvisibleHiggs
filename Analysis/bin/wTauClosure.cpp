@@ -340,8 +340,7 @@ int main(int argc, char* argv[]) {
   double ex1[4] = {0.5, 0.4, 0.4, (TMath::Pi()-2.6)/2};
   double y1[4],ey1[4],y2[4],ey2[4]; // WMu closure
   double diff1[4],ediff1[4];
-  // double x_syst[] = {0,1.0,1.};
-  double y_syst[4],e_syst[4];
+  double y_syst[4],e_syst[4]; // for systematic bands
 
   for(int i=0; i<4; ++i) {
         y1[i]  = hWTau_Prediction_DPhi->GetBinContent(i+1);  //Predicted WMu
@@ -351,7 +350,7 @@ int main(int argc, char* argv[]) {
         diff1[i]  = y1[i]-y2[i];
         ediff1[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
         y_syst[i] = 0.;
-        e_syst[i] = 0.08*hWTau_Prediction_DPhi->GetBinContent(i+1);
+        e_syst[i] = 0.08*hWTau_Prediction_DPhi->GetBinContent(i+1); // 8% data/MC scale factor unc. 
   }
   TGraphErrors *gp1 = new TGraphErrors(4,x1,y1,ex1,ey1);
   TGraphErrors *gp2 = new TGraphErrors(4,x1,y2,ex1,ey2);
@@ -400,12 +399,18 @@ int main(int argc, char* argv[]) {
   gp3->SetMarkerStyle(20);
   gp3->SetMarkerSize(0.9);
   gp3->SetMarkerColor(kGreen-2);
-  TF1 *f1 = new TF1("f1","pol0",0,2.6);
+  TF1 *f1 = new TF1("f1","pol0",0,2.6); //To do a fit in first 3 bins only
   gp3->Fit("f1","R");
   h->Draw();
   gp4->Draw("2 same");
   gp3->Draw("P same");
 
+  TLegend leg2(0.12,0.67,0.40,0.87);
+  leg2.SetBorderSize(0);
+  leg2.SetFillColor(0);
+  leg2.AddEntry(f1,"pol0 fit (0 - 2.6)","l");
+  leg2.AddEntry(gp4,"Systematic error","f");
+  leg2.Draw();
   pdfName= options.oDir + std::string("/Wtaunu_diff.pdf");
   canvas.Print(pdfName.c_str());
 
