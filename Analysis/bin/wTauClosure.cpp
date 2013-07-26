@@ -19,6 +19,7 @@
 #include "TGraphErrors.h"
 #include "TStyle.h"
 #include "TAxis.h"
+#include "TF1.h"
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -339,6 +340,8 @@ int main(int argc, char* argv[]) {
   double ex1[4] = {0.5, 0.4, 0.4, (TMath::Pi()-2.6)/2};
   double y1[4],ey1[4],y2[4],ey2[4]; // WMu closure
   double diff1[4],ediff1[4];
+  // double x_syst[] = {0,1.0,1.};
+  double y_syst[4],e_syst[4];
 
   for(int i=0; i<4; ++i) {
         y1[i]  = hWTau_Prediction_DPhi->GetBinContent(i+1);  //Predicted WMu
@@ -347,11 +350,13 @@ int main(int argc, char* argv[]) {
         ey2[i] = hWTau_EstC_DPhi->GetBinError(i+1);  
         diff1[i]  = y1[i]-y2[i];
         ediff1[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
-
+        y_syst[i] = 0.;
+        e_syst[i] = 0.08*hWTau_Prediction_DPhi->GetBinContent(i+1);
   }
   TGraphErrors *gp1 = new TGraphErrors(4,x1,y1,ex1,ey1);
   TGraphErrors *gp2 = new TGraphErrors(4,x1,y2,ex1,ey2);
   TGraphErrors *gp3 = new TGraphErrors(4,x1,diff1,ex1,ediff1);
+  TGraphErrors *gp4 = new TGraphErrors(5,x1,y_syst,ex1,e_syst); // systematic error bands
   TH1D *h = new TH1D("h", "", 1, 0, TMath::Pi());
 
   TCanvas canvas; 
@@ -390,11 +395,15 @@ int main(int argc, char* argv[]) {
   h->GetYaxis()->SetRangeUser(-50,70);
   h->SetLineColor(kBlue);
   h->Draw();
+  gp4->SetFillColor(4);
+  gp4->SetFillStyle(3002);
   gp3->SetMarkerStyle(20);
   gp3->SetMarkerSize(0.9);
   gp3->SetMarkerColor(kGreen-2);
-  gp3->Fit("pol0");
+  TF1 *f1 = new TF1("f1","pol0",0,2.6);
+  gp3->Fit("f1","R");
   h->Draw();
+  gp4->Draw("2 same");
   gp3->Draw("P same");
 
   pdfName= options.oDir + std::string("/Wtaunu_diff.pdf");
