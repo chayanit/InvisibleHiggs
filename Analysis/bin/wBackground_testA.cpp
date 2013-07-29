@@ -10,6 +10,7 @@
 
 #include "TTree.h"
 #include "TMath.h"
+#include "TF1.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TCanvas.h"
@@ -316,6 +317,8 @@ int main(int argc, char* argv[]) {
   double y3[4],ey3[4],y4[4],ey4[4];	// WEl closure
   double diff1[4],ediff1[4];
   double diff2[4],ediff2[4];
+  double frac[4],efrac[4];
+  double y_syst[4],e_syst[4];
 
   for(int i=0; i<4; ++i) {
         y1[i]  = hWMu_EstS_DPhi->GetBinContent(i+1);	//Predicted WMu
@@ -331,6 +334,10 @@ int main(int argc, char* argv[]) {
 	ey4[i] = hWMu_EstC_DPhi->GetBinError(i+1);
         diff2[i]  = y3[i]-y4[i];
         ediff2[i] = sqrt(ey3[i]*ey3[i] + ey4[i]*ey4[i]);
+        y_syst[i] = 0.;
+        e_syst[i] = 0.14;  
+        if(y3[i] > 0) frac[i]  = (y3[i]-y4[i])/y4[i];
+        efrac[i] = sqrt(pow(ey3[i]/y3[i],2) + pow(ey4[i]/y4[i],2));
   }
   TGraphErrors *gp1 = new TGraphErrors(4,x1,y1,ex1,ey1);
   TGraphErrors *gp2 = new TGraphErrors(4,x1,y2,ex1,ey2);
@@ -338,6 +345,8 @@ int main(int argc, char* argv[]) {
   TGraphErrors *gp4 = new TGraphErrors(4,x1,y3,ex1,ey3);
   TGraphErrors *gp5 = new TGraphErrors(4,x1,y4,ex1,ey4);
   TGraphErrors *gp6 = new TGraphErrors(4,x1,diff2,ex1,ediff2);
+  TGraphErrors *gp7 = new TGraphErrors(4,x1,frac,ex1,efrac);
+  TGraphErrors *gp8 = new TGraphErrors(4,x1,y_syst,ex1,e_syst);
   TH1D *h = new TH1D("h", "", 1, 0, TMath::Pi());
 
   TCanvas canvas; 
@@ -412,11 +421,39 @@ int main(int argc, char* argv[]) {
   gp6->SetMarkerStyle(20);
   gp6->SetMarkerSize(0.9);
   gp6->SetMarkerColor(kGreen-2);
-  gp6->Fit("pol0");
+  TF1 *f1 = new TF1("f1","pol0",0,2.6);
+  gp6->Fit("f1","R");
   h->Draw();
   gp6->Draw("SAMEP");
 
   pdfName= oDir + std::string("/Welnu_diff.pdf");
+  canvas.Print(pdfName.c_str());
+
+  h->GetXaxis()->SetTitle("#Delta #phi_{jj}");
+  h->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
+  h->GetYaxis()->SetRangeUser(-2,2);
+  h->SetLineColor(kBlue);
+  h->SetLineWidth(2);
+  h->Draw();
+  gp8->SetLineColor(kGray+2);
+  gp8->SetLineWidth(0);
+  gp8->SetFillColor(kGray+2);
+  gp8->SetFillStyle(3002);
+  gp7->SetMarkerStyle(20);
+  gp7->SetMarkerSize(1.2);
+  gp7->SetMarkerColor(kGreen-2);
+  gp7->Fit("f1","R");
+  h->Draw();
+  gp8->Draw("2 same");
+  gp7->Draw("P same");
+
+  TLegend leg2(0.12,0.67,0.40,0.87);
+  leg2.SetBorderSize(0);
+  leg2.SetFillColor(0);
+  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
+  leg2.AddEntry(gp8,"Systematic error","f");
+  leg2.Draw();
+  pdfName= oDir + std::string("/Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
 
   // store histograms

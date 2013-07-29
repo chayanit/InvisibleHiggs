@@ -8,6 +8,7 @@
 
 #include "TTree.h"
 #include "TMath.h"
+#include "TF1.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TCanvas.h"
@@ -516,6 +517,8 @@ int main(int argc, char* argv[]) {
   double ex1[4] = {0.5, 0.4, 0.4, (TMath::Pi()-2.6)/2};
   double y1[4],ey1[4],y2[4],ey2[4];
   double diff[4],ediff[4];
+  double frac[4],efrac[4];
+  double y_syst[4],e_syst[4];
 
   for(int i=0; i<4; ++i) {
 	y1[i]  = hZ_Est_WS_DPhi->GetBinContent(i+1);
@@ -525,11 +528,18 @@ int main(int argc, char* argv[]) {
 
 	diff[i]  = y1[i]-y2[i];
 	ediff[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
+        y_syst[i] = 0.;
+        e_syst[i] = 0.04;
+
+	if(y1[i] > 0) frac[i]  = (y1[i]-y2[i])/y2[i];
+	efrac[i] = sqrt(pow(ey1[i]/y1[i],2) + pow(ey2[i]/y2[i],2));
   }
 
   TGraphErrors *graph1 = new TGraphErrors(4,x1,y1,ex1,ey1);
   TGraphErrors *graph2 = new TGraphErrors(4,x1,y2,ex1,ey2);
   TGraphErrors *graph3 = new TGraphErrors(4,x1,diff,ex1,ediff);
+  TGraphErrors *graph4 = new TGraphErrors(4,x1,frac,ex1,efrac);
+  TGraphErrors *graph5 = new TGraphErrors(4,x1,y_syst,ex1,e_syst);
   TH1D *h = new TH1D("h", "", 1, 0, TMath::Pi());
 
   TCanvas canvas;
@@ -569,11 +579,39 @@ int main(int argc, char* argv[]) {
   graph3->SetMarkerStyle(20);
   graph3->SetMarkerSize(0.9);
   graph3->SetMarkerColor(kGreen-2);
-  graph3->Fit("pol0");
+  TF1 *f1 = new TF1("f1","pol0",0,TMath::Pi());
+  graph3->Fit("f1","R");
   h->Draw();
   graph3->Draw("SAMEP");
 
   pdfName= oDir + std::string("/Zmumu_diff.pdf");
+  canvas.Print(pdfName.c_str());
+
+  h->GetXaxis()->SetTitle("#Delta #phi_{jj}");
+  h->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
+  h->GetYaxis()->SetRangeUser(-2,2);
+  h->SetLineColor(kBlue);
+  h->SetLineWidth(2);
+  h->Draw();
+  graph5->SetLineColor(kGray+2);
+  graph5->SetLineWidth(0);
+  graph5->SetFillColor(kGray+2);
+  graph5->SetFillStyle(3002);
+  graph4->SetMarkerStyle(20);
+  graph4->SetMarkerSize(1.2);
+  graph4->SetMarkerColor(kGreen-2);
+  graph4->Fit("f1","R");
+  h->Draw();
+  graph5->Draw("2 same");
+  graph4->Draw("P same");
+
+  TLegend leg2(0.12,0.67,0.40,0.87);
+  leg2.SetBorderSize(0);
+  leg2.SetFillColor(0);
+  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
+  leg2.AddEntry(graph5,"Systematic error","f");
+  leg2.Draw();
+  pdfName= oDir + std::string("/Zmumu_frac.pdf");
   canvas.Print(pdfName.c_str());
 
   //store histograms
