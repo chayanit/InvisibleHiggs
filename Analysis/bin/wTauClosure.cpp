@@ -348,12 +348,12 @@ int main(int argc, char* argv[]) {
         y2[i]  = hWTau_EstC_DPhi->GetBinContent(i+1);  //Observed WMu
         ey2[i] = hWTau_EstC_DPhi->GetBinError(i+1);  
         // diff1[i]  = y1[i]-y2[i];
-        diff1[i]  = 1-(y2[i]/y1[i]);
+        diff1[i]  = (y1[i]/y2[i])-1.;
         // ediff1[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
-        ediff1[i] = sqrt(pow(ey2[i]/y1[i],2) + pow(ey1[i]*y2[i]/(y1[i]*y1[i]),2) );
+        ediff1[i] = (y1[i]/y2[i])*sqrt(pow(ey1[i]/y1[i],2) + pow(ey2[i]/y2[i],2));
         y_syst[i] = 0.;
         // e_syst[i] = (0.08+0.05)*hWTau_Prediction_DPhi->GetBinContent(i+1); // 8% data/MC scale factor unc. 
-        e_syst[i] = (0.08+0.05)*y2[i]/y1[i]; // 8% data/MC scale factor unc. 
+        e_syst[i] = (0.08+0.05);//*y2[i]/y1[i]; // 8% data/MC scale factor unc., 5% is W_>e contamination, NEED JER 
   }
   std::cout << y1[3] << " " << y2[3] << " " << diff1[3] <<std::endl;
   TGraphErrors *gp1 = new TGraphErrors(4,x1,y1,ex1,ey1);
@@ -394,16 +394,19 @@ int main(int argc, char* argv[]) {
  
   h->Draw();
   h->GetXaxis()->SetTitle("#Delta #phi_{jj}");
-  h->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Predicted}");
+  h->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
   h->GetYaxis()->SetTitleOffset(1.2);
   // h->GetYaxis()->SetRangeUser(-50,70);
-  h->GetYaxis()->SetRangeUser(-2,2);
+  h->GetYaxis()->SetRangeUser(-1.5,3);
   h->SetLineColor(kBlue);
+  h->SetLineWidth(2);
   h->Draw();
-  gp4->SetFillColor(4);
+  gp4->SetLineColor(kGray);
+  gp4->SetLineWidth(0);
+  gp4->SetFillColor(kGray+2);
   gp4->SetFillStyle(3002);
   gp3->SetMarkerStyle(20);
-  gp3->SetMarkerSize(0.9);
+  gp3->SetMarkerSize(1.2);
   gp3->SetMarkerColor(kGreen-2);
   TF1 *f1 = new TF1("f1","pol0",0,2.6); //To do a fit in first 3 bins only
   gp3->Fit("f1","R");
