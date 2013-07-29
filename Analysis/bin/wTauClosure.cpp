@@ -264,7 +264,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Background ctrl region                                 : " << hWTau_BGC_DPhi->GetBinContent(1) << " +/- " << hWTau_BGC_DPhi->GetBinError(1) << std::endl;
   std::cout << "  Data ctrl region                                       : " << hWTau_DataC_DPhi->GetBinContent(1) << " +/- " << hWTau_DataC_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
-  std::cout << "  WTau in ctrl region expected                           : " << hWTau_EstC_DPhi->GetBinContent(1) << " +/- " << hWTau_EstC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  WTau in ctrl region observed                           : " << hWTau_EstC_DPhi->GetBinContent(1) << " +/- " << hWTau_EstC_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  Closure test: WTau from WMu                            : " << hWTau_Prediction_DPhi->GetBinContent(1) << " +/- " << hWTau_Prediction_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
@@ -284,7 +284,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Background ctrl region                                 : " << hWTau_BGC_DPhi->GetBinContent(2) << " +/- " << hWTau_BGC_DPhi->GetBinError(2) << std::endl;
   std::cout << "  Data ctrl region                                       : " << hWTau_DataC_DPhi->GetBinContent(2) << " +/- " << hWTau_DataC_DPhi->GetBinError(2) << std::endl;
   std::cout << std::endl;
-  std::cout << "  WTau in ctrl region expected                           : " << hWTau_EstC_DPhi->GetBinContent(2) << " +/- " << hWTau_EstC_DPhi->GetBinError(2) << std::endl;
+  std::cout << "  WTau in ctrl region observed                           : " << hWTau_EstC_DPhi->GetBinContent(2) << " +/- " << hWTau_EstC_DPhi->GetBinError(2) << std::endl;
   std::cout << std::endl ;
   std::cout << "  Closure test: WTau from WMu                            : " << hWTau_Prediction_DPhi->GetBinContent(2) << " +/- " << hWTau_Prediction_DPhi->GetBinError(2) << std::endl;
   
@@ -305,7 +305,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Background ctrl region                                 : " << hWTau_BGC_DPhi->GetBinContent(3) << " +/- " << hWTau_BGC_DPhi->GetBinError(3) << std::endl;
   std::cout << "  Data ctrl region                                       : " << hWTau_DataC_DPhi->GetBinContent(3) << " +/- " << hWTau_DataC_DPhi->GetBinError(3) << std::endl;
   std::cout << std::endl;
-  std::cout << "  WTau in ctrl region expected                           : " << hWTau_EstC_DPhi->GetBinContent(3) << " +/- " << hWTau_EstC_DPhi->GetBinError(3) << std::endl;
+  std::cout << "  WTau in ctrl region observed                           : " << hWTau_EstC_DPhi->GetBinContent(3) << " +/- " << hWTau_EstC_DPhi->GetBinError(3) << std::endl;
   std::cout << std::endl ;
   std::cout << "  Closure test: WTau from WMu                            : " << hWTau_Prediction_DPhi->GetBinContent(3) << " +/- " << hWTau_Prediction_DPhi->GetBinError(3) << std::endl;
   std::cout << std::endl;
@@ -325,7 +325,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Background ctrl region                                 : " << hWTau_BGC_DPhi->GetBinContent(4) << " +/- " << hWTau_BGC_DPhi->GetBinError(4) << std::endl;
   std::cout << "  Data ctrl region                                       : " << hWTau_DataC_DPhi->GetBinContent(4) << " +/- " << hWTau_DataC_DPhi->GetBinError(4) << std::endl;
   std::cout << std::endl;
-  std::cout << "  WTau in ctrl region expected                           : " << hWTau_EstC_DPhi->GetBinContent(4) << " +/- " << hWTau_EstC_DPhi->GetBinError(4) << std::endl;
+  std::cout << "  WTau in ctrl region observed                           : " << hWTau_EstC_DPhi->GetBinContent(4) << " +/- " << hWTau_EstC_DPhi->GetBinError(4) << std::endl;
   std::cout << std::endl ;
   std::cout << "  Closure test: WTau from WMu                            : " << hWTau_Prediction_DPhi->GetBinContent(4) << " +/- " << hWTau_Prediction_DPhi->GetBinError(4) << std::endl;
   
@@ -347,15 +347,19 @@ int main(int argc, char* argv[]) {
         ey1[i] = hWTau_Prediction_DPhi->GetBinError(i+1);
         y2[i]  = hWTau_EstC_DPhi->GetBinContent(i+1);  //Observed WMu
         ey2[i] = hWTau_EstC_DPhi->GetBinError(i+1);  
-        diff1[i]  = y1[i]-y2[i];
-        ediff1[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
+        // diff1[i]  = y1[i]-y2[i];
+        diff1[i]  = 1-(y2[i]/y1[i]);
+        // ediff1[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
+        ediff1[i] = sqrt(pow(ey2[i]/y1[i],2) + pow(ey1[i]*y2[i]/(y1[i]*y1[i]),2) );
         y_syst[i] = 0.;
-        e_syst[i] = 0.08*hWTau_Prediction_DPhi->GetBinContent(i+1); // 8% data/MC scale factor unc. 
+        // e_syst[i] = (0.08+0.05)*hWTau_Prediction_DPhi->GetBinContent(i+1); // 8% data/MC scale factor unc. 
+        e_syst[i] = (0.08+0.05)*y2[i]/y1[i]; // 8% data/MC scale factor unc. 
   }
+  std::cout << y1[3] << " " << y2[3] << " " << diff1[3] <<std::endl;
   TGraphErrors *gp1 = new TGraphErrors(4,x1,y1,ex1,ey1);
   TGraphErrors *gp2 = new TGraphErrors(4,x1,y2,ex1,ey2);
   TGraphErrors *gp3 = new TGraphErrors(4,x1,diff1,ex1,ediff1);
-  TGraphErrors *gp4 = new TGraphErrors(5,x1,y_syst,ex1,e_syst); // systematic error bands
+  TGraphErrors *gp4 = new TGraphErrors(4,x1,y_syst,ex1,e_syst); // systematic error bands
   TH1D *h = new TH1D("h", "", 1, 0, TMath::Pi());
 
   TCanvas canvas; 
@@ -390,8 +394,10 @@ int main(int argc, char* argv[]) {
  
   h->Draw();
   h->GetXaxis()->SetTitle("#Delta #phi_{jj}");
-  h->GetYaxis()->SetTitle("Predicted - Observed");
-  h->GetYaxis()->SetRangeUser(-50,70);
+  h->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Predicted}");
+  h->GetYaxis()->SetTitleOffset(1.2);
+  // h->GetYaxis()->SetRangeUser(-50,70);
+  h->GetYaxis()->SetRangeUser(-2,2);
   h->SetLineColor(kBlue);
   h->Draw();
   gp4->SetFillColor(4);
@@ -408,7 +414,7 @@ int main(int argc, char* argv[]) {
   TLegend leg2(0.12,0.67,0.40,0.87);
   leg2.SetBorderSize(0);
   leg2.SetFillColor(0);
-  leg2.AddEntry(f1,"pol0 fit (0 - 2.6)","l");
+  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
   leg2.AddEntry(gp4,"Systematic error","f");
   leg2.Draw();
   pdfName= options.oDir + std::string("/Wtaunu_diff.pdf");
