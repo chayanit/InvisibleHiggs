@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 
   TFile* ofile = TFile::Open((oDir+std::string("/QCD3.root")).c_str(), "RECREATE");
 
-  double metEdges[3] = { 50., 130., 1000. };
+  double metEdges[3] = { 0., 130., 1000. };
   double cjvEdges[3] = { -100., 30., 1000. };
   int metBins = 25;
   double metMax = 250.;

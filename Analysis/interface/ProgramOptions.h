@@ -15,6 +15,7 @@ class ProgramOptions{
   std::string datasetFile;
   double lumi;
   int qcdMethod;
+  int wTauMethod;
   
 };
 

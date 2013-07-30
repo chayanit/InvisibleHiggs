@@ -23,7 +23,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
     ("indir,i", po::value<std::string>(), "Input directory")
     ("datasets,f", po::value<std::string>(), "Datasets file")
     ("lumi,l", po::value<double>(), "Integrated luminosity")
-    ("qcd,q", po::value<int>(), "QCD method");
+    ("qcd,q", po::value<int>(), "QCD method")
+    ("tau,t", po::value<int>(), "W->tau method");
 
   po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
@@ -40,6 +41,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
   if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
   if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
   if (vm.count("qcd"))      qcdMethod=vm["qcd"].as<int>();
+  if (vm.count("tau"))      wTauMethod=vm["tau"].as<int>();
 
   // create output directory if it doesn't exist already
   if (oDir!="") {

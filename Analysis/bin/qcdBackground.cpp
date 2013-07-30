@@ -47,27 +47,27 @@ int main(int argc, char* argv[]) {
  
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
-  double metEdges[13] = { 0., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 120. };
+  double metEdges[14] = { 0., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 120., 10000. };
 
-  TH2D* hQCD_BG_METDPhi = new TH2D("hQCD_BG_METDPhi", "", 3, dphiEdges, 12, metEdges);  // BG in NoMET region
+  TH2D* hQCD_BG_METDPhi = new TH2D("hQCD_BG_METDPhi", "", 3, dphiEdges, 13, metEdges);  // BG in NoMET region
   TH1D* hQCD_BG_Tight_DPhi = new TH1D("hQCD_BG_Tight_DPhi", "", 3, dphiEdges);  // BG in tight region
 
-  TH2D* hQCD_WTau_METDPhi = new TH2D("hQCD_WTau_METDPhi", "", 3, dphiEdges, 12, metEdges);  // BG in NoMET region
+  TH2D* hQCD_WTau_METDPhi = new TH2D("hQCD_WTau_METDPhi", "", 3, dphiEdges, 13, metEdges);  // BG in NoMET region
   TH1D* hQCD_WTau_Tight_DPhi = new TH1D("hQCD_WTau_Tight_DPhi", "", 3, dphiEdges);  // BG in tight region
 
-  TH2D* hQCD_TTBar_METDPhi = new TH2D("hQCD_TTBar_METDPhi", "", 3, dphiEdges, 12, metEdges);  // BG in NoMET region
+  TH2D* hQCD_TTBar_METDPhi = new TH2D("hQCD_TTBar_METDPhi", "", 3, dphiEdges, 13, metEdges);  // BG in NoMET region
   TH1D* hQCD_TTBar_Tight_DPhi = new TH1D("hQCD_TTBar_Tight_DPhi", "", 3, dphiEdges);  // BG in tight region
 
-  TH2D* hQCD_SingleTSum_METDPhi = new TH2D("hQCD_SingleTSum_METDPhi", "", 3, dphiEdges, 12, metEdges);  // BG in NoMET region
+  TH2D* hQCD_SingleTSum_METDPhi = new TH2D("hQCD_SingleTSum_METDPhi", "", 3, dphiEdges, 13, metEdges);  // BG in NoMET region
   TH1D* hQCD_SingleTSum_Tight_DPhi = new TH1D("hQCD_SingleTSum_Tight_DPhi", "", 3, dphiEdges);  // BG in tight region
 
-  TH2D* hQCD_DY_METDPhi = new TH2D("hQCD_DY_METDPhi", "", 3, dphiEdges, 12, metEdges);  // BG in NoMET region
+  TH2D* hQCD_DY_METDPhi = new TH2D("hQCD_DY_METDPhi", "", 3, dphiEdges, 13, metEdges);  // BG in NoMET region
   TH1D* hQCD_DY_Tight_DPhi = new TH1D("hQCD_DY_Tight_DPhi", "", 3, dphiEdges);  // BG in tight region
 
-  TH2D* hQCD_Diboson_METDPhi = new TH2D("hQCD_Diboson_METDPhi", "", 3, dphiEdges, 12, metEdges);  // BG in NoMET region
+  TH2D* hQCD_Diboson_METDPhi = new TH2D("hQCD_Diboson_METDPhi", "", 3, dphiEdges, 13, metEdges);  // BG in NoMET region
   TH1D* hQCD_Diboson_Tight_DPhi = new TH1D("hQCD_Diboson_Tight_DPhi", "", 3, dphiEdges);  // BG in tight region
 
-  TH2D* hQCD_Data_METDPhi = new TH2D("hQCD_Data_METDPhi", "", 3, dphiEdges, 12, metEdges);  // Data in NoMET region
+  TH2D* hQCD_Data_METDPhi = new TH2D("hQCD_Data_METDPhi", "", 3, dphiEdges, 13, metEdges);  // Data in NoMET region
   TH1D* hQCD_Data_Tight_DPhi = new TH1D("hQCD_Data_Tight_DPhi", "", 3, dphiEdges);  // Data in tight region
 
   // loop over MC datasets
@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
     TCut cutWQCDTightHiDPhi = puWeight * trigCorr * cuts.wWeight() * (cuts.wTauGen() + cuts.qcdTightHiDPhi());
 
     // fill tmp histograms for BG estimation
-    TH2D* hQCD_METDPhi  = new TH2D("hQCD_METDPhi", "", 3, dphiEdges, 12, metEdges);  // 
+    TH2D* hQCD_METDPhi  = new TH2D("hQCD_METDPhi", "", 3, dphiEdges, 13, metEdges);  // 
     TH1D* hQCD_Tight_DPhi  = new TH1D("hQCD_Tight_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
 
     if (dataset.name=="WJets" ||
@@ -130,9 +130,9 @@ int main(int argc, char* argv[]) {
       hQCD_Data_METDPhi->Add(hQCD_METDPhi);
       hQCD_Data_Tight_DPhi->Add(hQCD_Tight_DPhi);
     }
-    else if (!isZvv) {	// do not include Z->vv samples we use data-driven number
+    else {
+      if (!isZvv) hQCD_BG_Tight_DPhi->Add(hQCD_Tight_DPhi); // do not include Z->vv samples we use data-driven number
       hQCD_BG_METDPhi->Add(hQCD_METDPhi);
-      hQCD_BG_Tight_DPhi->Add(hQCD_Tight_DPhi);
     }
 
     if (dataset.name=="WJets" ||
@@ -238,17 +238,17 @@ int main(int argc, char* argv[]) {
   
 
   // create output histograms
-  TH2D* hQCD_Est_METDPhi  = new TH2D("hQCD_Est_METDPhi", "", 3, dphiEdges, 12, metEdges);
+  TH2D* hQCD_Est_METDPhi  = new TH2D("hQCD_Est_METDPhi", "", 3, dphiEdges, 13, metEdges);
   TH1D* hQCD_Est_S_DPhi      = new TH1D("hQCD_Est_S_DPhi",     "", 3, dphiEdges);
 
   // do the background estimation
   hQCD_Est_METDPhi->Add(hQCD_Data_METDPhi, hQCD_BG_METDPhi, 1., -1.);
   hQCD_Est_S_DPhi->Add(hQCD_Data_Tight_DPhi, hQCD_BG_Tight_DPhi, 1., -1.);
 
-  hQCD_Est_METDPhi->Add(hQCD_Z_METDPhi, -1.);
+  //  hQCD_Est_METDPhi->Add(hQCD_Z_METDPhi, -1.);
   hQCD_Est_S_DPhi->Add(hQCD_Z_Tight_DPhi, -1.);
 
-  hQCD_Est_METDPhi->Add(hQCD_W_METDPhi, -1.);
+  //  hQCD_Est_METDPhi->Add(hQCD_W_METDPhi, -1.);
 
   hQCD_Est_S_DPhi->Add(hQCD_W_Tight_DPhi, -1.);
 
@@ -261,16 +261,16 @@ int main(int argc, char* argv[]) {
 //   double err_rLoose  = rLoose * sqrt(pow(hQCD_Est_Loose_DPhi->GetBinError(1)/hQCD_Est_Loose_DPhi->GetBinContent(1),2) + pow(hQCD_Est_Loose_DPhi->GetBinError(3)/hQCD_Est_Loose_DPhi->GetBinContent(3),2));
   
 //   // linear extrapolation using MET>80 and MET>100 bins
-//   double rTight = (50. * (rLoose - rNoMET)/20.) + rNoMET;
-//   double err_rTight = rTight * sqrt(pow(err_rNoMET/rNoMET,2) + pow(err_rLoose/rLoose,2));
+  double rTight = 0.0046;
+  double err_rTight = 0.0046 * 1.5;
 
   // predict signal
-//   double nQCD_Est_S_HiDPhi = rTight * hQCD_Est_S_DPhi->GetBinContent(3);
-//   double err_nQCD_Est_S_HiDPhi = nQCD_Est_S_HiDPhi * sqrt(pow(err_rTight/rTight,2)+pow(hQCD_Est_S_DPhi->GetBinError(3)/hQCD_Est_S_DPhi->GetBinContent(3),2));
+  double nQCD_Est_S_HiDPhi = rTight * hQCD_Est_S_DPhi->GetBinContent(3);
+  double err_nQCD_Est_S_HiDPhi = nQCD_Est_S_HiDPhi * sqrt(pow(err_rTight/rTight,2)+pow(hQCD_Est_S_DPhi->GetBinError(3)/hQCD_Est_S_DPhi->GetBinContent(3),2));
 
-//   // set bins in output histogram
-//   hQCD_Est_S_DPhi->SetBinContent(1, nQCD_Est_S_HiDPhi);
-//   hQCD_Est_S_DPhi->SetBinError(1, err_nQCD_Est_S_HiDPhi);
+  // set bins in output histogram
+  hQCD_Est_S_DPhi->SetBinContent(1, nQCD_Est_S_HiDPhi);
+  hQCD_Est_S_DPhi->SetBinError(1, err_nQCD_Est_S_HiDPhi);
 
   // print results
   std::cout << std::endl;

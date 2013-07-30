@@ -300,18 +300,23 @@ int main(int argc, char* argv[]) {
   double xsiExp[10], xsiExpM1Sig[10], xsiExpP1Sig[10], xsiExpM2Sig[10], xsiExpP2Sig[10];
 
   for (unsigned j=0; j<mH.size(); ++j) {
+
     xsExp[j]       = expLimit / (lumi * effSignal[j]);
-    xsExpM1Sig[j]  = expLimitM1Sig / (lumi * effSignal[j]);
-    xsExpP1Sig[j]  = expLimitP1Sig / (lumi * effSignal[j]);
-    xsExpM2Sig[j]  = expLimitM2Sig / (lumi * effSignal[j]);
-    xsExpP2Sig[j]  = expLimitP2Sig / (lumi * effSignal[j]);
+    xsExpM1Sig[j]  = xsExp[j] - (expLimitM1Sig / (lumi * effSignal[j]));
+    xsExpP1Sig[j]  = (expLimitP1Sig / (lumi * effSignal[j])) - xsExp[j];
+    xsExpM2Sig[j]  = xsExp[j] - (expLimitM2Sig / (lumi * effSignal[j]));
+    xsExpP2Sig[j]  = (expLimitP2Sig / (lumi * effSignal[j])) - xsExp[j];
+
     xsiExp[j]      = xsExp[j] / xsH[j];
     xsiExpM1Sig[j] = xsExpM1Sig[j] / xsH[j];
     xsiExpP1Sig[j] = xsExpP1Sig[j] / xsH[j];
     xsiExpM2Sig[j] = xsExpM2Sig[j] / xsH[j];
     xsiExpP2Sig[j] = xsExpP2Sig[j] / xsH[j];
+
     std::cout << mH[j] << " " << xsH[j] << " " << xsExp[j] << " " << xsiExp[j] << std::endl;
+
   }
+
 
   // plot xs limit
   //  TStyle* style = gStyle;

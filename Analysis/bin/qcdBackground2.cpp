@@ -55,6 +55,16 @@ int main(int argc, char* argv[]) {
   TCut cutLoDPhi = cuts.cut("dPhiJJ");
   TCut cutHiDPhi("vbfDPhi>2.6");
   TCut METLow("met<130.");
+  TCut cutsCtrl = cuts.cut("trigger")
+    + cuts.cut("metFilter")
+    + cuts.cut("EVeto")
+    + cuts.cut("MuVeto")
+    + cuts.cut("dijet")
+    + cuts.cut("sgnEtaJJ")
+    + cuts.cut("dEtaJJ")
+    + cuts.cut("Mjj")
+    + TCut("cenJetEt>30.");
+
 
   // histograms
   double metEdges_S[3]  = { 0., 130., 2000. };
@@ -70,6 +80,16 @@ int main(int argc, char* argv[]) {
   TH1D* hQCD_BG_HiDPhi_METshape   	= new TH1D("hQCD_BG_HiDPhi_METshape", "", 60, 0., 300.);
   TH1D* hQCD_BG_LoDPhi_METshape  	= new TH1D("hQCD_BG_LoDPhi_METshape", "", 60, 0., 300.);  
   TH1D* hQCD_BG_LoDPhi_METshapeFull 	= new TH1D("hQCD_BG_LoDPhi_METshapeFull", "", 60, 0., 300.);
+
+  TH1D* hQCD_Data_HiDPhiCtrl_MET  	= new TH1D("hQCD_Data_HiDPhiCtrl_MET", "", 2, metEdges_C);
+  TH1D* hQCD_Data_LoDPhiCtrl_MET 	= new TH1D("hQCD_Data_LoDPhiCtrl_MET", "", 2, metEdges_S);
+  TH1D* hQCD_Data_HiDPhiCtrl_METshape  	= new TH1D("hQCD_Data_HiDPhiCtrl_METshape", "", 60, 0., 300.);
+  TH1D* hQCD_Data_LoDPhiCtrl_METshape 	= new TH1D("hQCD_Data_LoDPhiCtrl_METshape", "", 60, 0., 300.); 
+
+  // cross-check in CJV fail region
+  TH1D* hQCD_BG_HiDPhiCtrl_MET  	= new TH1D("hQCD_BG_HiDPhiCtrl_MET", "", 2, metEdges_C);
+  TH1D* hQCD_BG_LoDPhiCtrl_MET 		= new TH1D("hQCD_BG_LoDPhiCtrl_MET", "", 2, metEdges_S);
+
 
   //BG from MC 
   TH1D* hQCD_ZNuNu_HiDPhi_MET  		= new TH1D("hQCD_ZNuNu_HiDPhi_MET", "", 2, metEdges_C);
@@ -112,6 +132,10 @@ int main(int argc, char* argv[]) {
     TCut cutQCDLoDPhi("");
     TCut cutQCDLoDPhiMET("");
 
+    TCut cutQCDHiDPhiCtrl("");
+    TCut cutQCDLoDPhiCtrl("");
+    TCut cutQCDLoDPhiMETCtrl("");
+
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" ||
         dataset.name == "W2Jets" ||
@@ -121,11 +145,16 @@ int main(int argc, char* argv[]) {
       cutQCDHiDPhi     = puWeight * trigCorrWeight * wWeight * (cutD + cuts.qcdNoMET() + cutHiDPhi);
       cutQCDLoDPhi     = puWeight * trigCorrWeight * wWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi);
       cutQCDLoDPhiMET  = puWeight * trigCorrWeight * wWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi + METLow);      
+      cutQCDHiDPhiCtrl = puWeight * trigCorrWeight * wWeight * (cutD + cutsCtrl + cutHiDPhi);
+      cutQCDLoDPhiCtrl = puWeight * trigCorrWeight * wWeight * (cutD + cutsCtrl + cutLoDPhi);
+      cutQCDLoDPhiMETCtrl  = puWeight * trigCorrWeight * wWeight * (cutD + cutsCtrl + cutLoDPhi + METLow);      
     }
     else {
       cutQCDHiDPhi     = puWeight * trigCorrWeight * (cutD + cuts.qcdNoMET() + cutHiDPhi);
       cutQCDLoDPhi     = puWeight * trigCorrWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi);
       cutQCDLoDPhiMET  = puWeight * trigCorrWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi + METLow); 
+      cutQCDHiDPhiCtrl     = puWeight * trigCorrWeight * (cutD + cutsCtrl + cutHiDPhi);
+      cutQCDLoDPhiCtrl     = puWeight * trigCorrWeight * (cutD + cutsCtrl + cutLoDPhi);
     }
 
 
@@ -136,20 +165,27 @@ int main(int argc, char* argv[]) {
     TH1D* hQCD_HiDPhi_METshape  	= new TH1D("hQCD_HiDPhi_METshape", "", 60, 0., 300.);
     TH1D* hQCD_LoDPhi_METshape  	= new TH1D("hQCD_LoDPhi_METshape", "", 60, 0., 300.);	
     TH1D* hQCD_LoDPhi_METshapeFull 	= new TH1D("hQCD_LoDPhi_METshapeFull", "", 60, 0., 300.);
+    TH1D* hQCD_HiDPhiCtrl_MET 		= new TH1D("hQCD_HiDPhiCtrl_MET", "", 2, metEdges_C);  
+    TH1D* hQCD_LoDPhiCtrl_MET 		= new TH1D("hQCD_LoDPhiCtrl_MET", "", 2, metEdges_S);    
+
   
     //for MET shape histogram
     if (dataset.isData) {
-    tree->Draw("met>>hQCD_HiDPhi_MET", cutQCDHiDPhi);
-    tree->Draw("met>>hQCD_LoDPhi_MET", cutQCDLoDPhiMET);
-    tree->Draw("met>>hQCD_HiDPhi_METshape", cutQCDHiDPhi);
-    tree->Draw("met>>hQCD_LoDPhi_METshape", cutQCDLoDPhiMET);  // MET < 130
+      tree->Draw("met>>hQCD_HiDPhi_MET", cutQCDHiDPhi);
+      tree->Draw("met>>hQCD_LoDPhi_MET", cutQCDLoDPhiMET);
+      tree->Draw("met>>hQCD_HiDPhi_METshape", cutQCDHiDPhi);
+      tree->Draw("met>>hQCD_LoDPhi_METshape", cutQCDLoDPhiMET);  // MET < 130
+      tree->Draw("met>>hQCD_HiDPhiCtrl_MET", cutQCDHiDPhiCtrl);
+      tree->Draw("met>>hQCD_LoDPhiCtrl_MET", cutQCDLoDPhiCtrl);
     }
     else {
-    tree->Draw("met>>hQCD_HiDPhi_MET", cutQCDHiDPhi);
-    tree->Draw("met>>hQCD_LoDPhi_MET", cutQCDLoDPhi);
-    tree->Draw("met>>hQCD_HiDPhi_METshape", cutQCDHiDPhi);
-    tree->Draw("met>>hQCD_LoDPhi_METshape", cutQCDLoDPhiMET);
-    tree->Draw("met>>hQCD_LoDPhi_METshapeFull", cutQCDLoDPhi);
+      tree->Draw("met>>hQCD_HiDPhi_MET", cutQCDHiDPhi);
+      tree->Draw("met>>hQCD_LoDPhi_MET", cutQCDLoDPhi);
+      tree->Draw("met>>hQCD_HiDPhi_METshape", cutQCDHiDPhi);
+      tree->Draw("met>>hQCD_LoDPhi_METshape", cutQCDLoDPhiMET);
+      tree->Draw("met>>hQCD_LoDPhi_METshapeFull", cutQCDLoDPhi);
+      tree->Draw("met>>hQCD_HiDPhiCtrl_MET", cutQCDHiDPhiCtrl);
+      tree->Draw("met>>hQCD_LoDPhiCtrl_MET", cutQCDLoDPhiCtrl);
     }
 
     // weight  to lumi
@@ -160,6 +196,8 @@ int main(int argc, char* argv[]) {
     hQCD_HiDPhi_METshape->Scale(weight);
     hQCD_LoDPhi_METshape->Scale(weight);
     hQCD_LoDPhi_METshapeFull->Scale(weight);
+    hQCD_HiDPhiCtrl_MET->Scale(weight);
+    hQCD_LoDPhiCtrl_MET->Scale(weight);
 
     // add to output histograms
     if (dataset.isData) {
@@ -167,6 +205,8 @@ int main(int argc, char* argv[]) {
         hQCD_Data_LoDPhi_MET->Add(hQCD_LoDPhi_MET);
         hQCD_Data_HiDPhi_METshape->Add(hQCD_HiDPhi_METshape);
         hQCD_Data_LoDPhi_METshape->Add(hQCD_LoDPhi_METshape);
+	hQCD_Data_HiDPhiCtrl_MET->Add(hQCD_HiDPhiCtrl_MET);
+        hQCD_Data_LoDPhiCtrl_MET->Add(hQCD_LoDPhiCtrl_MET);
     }
     else {
 	hQCD_BG_HiDPhi_MET->Add(hQCD_HiDPhi_MET);
@@ -174,6 +214,8 @@ int main(int argc, char* argv[]) {
         hQCD_BG_HiDPhi_METshape->Add(hQCD_HiDPhi_METshape);
         hQCD_BG_LoDPhi_METshape->Add(hQCD_LoDPhi_METshape);
         hQCD_BG_LoDPhi_METshapeFull->Add(hQCD_LoDPhi_METshapeFull);
+	hQCD_BG_HiDPhiCtrl_MET->Add(hQCD_HiDPhiCtrl_MET);
+	hQCD_BG_LoDPhiCtrl_MET->Add(hQCD_LoDPhiCtrl_MET);
     }
 
     if (dataset.name.compare(0,3,"Zvv")==0) {
@@ -285,6 +327,50 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "Signal region (MET>130, dphi<1.0)" << std::endl;
   std::cout << "   N QCD (est): " << hQCD_Est_S_MET->GetBinContent(2) << " +/- " << hQCD_Est_S_MET->GetBinError(2) << std::endl;
+
+
+  // do calculation for control region (CJV fail)
+  TH1D* hQCD_Est_SCtrl_MET      = new TH1D("hQCD_Est_SCtrl_MET",     "", 2, metEdges_S);
+  TH1D* hQCD_Est_CCtrl_MET      = new TH1D("hQCD_Est_CCtrl_MET",     "", 2, metEdges_C);
+
+  hQCD_Est_SCtrl_MET->Add(hQCD_Data_LoDPhiCtrl_MET,hQCD_BG_LoDPhiCtrl_MET, 1., -1.);
+  hQCD_Est_CCtrl_MET->Add(hQCD_Data_HiDPhiCtrl_MET,hQCD_BG_HiDPhiCtrl_MET, 1., -1.);
+
+  double kSCtrl     = hQCD_Est_CCtrl_MET->GetBinContent(2)/hQCD_Est_CCtrl_MET->GetBinContent(1);
+  double err_kSCtrl = kSCtrl * sqrt(pow(hQCD_Est_CCtrl_MET->GetBinError(2)/hQCD_Est_CCtrl_MET->GetBinContent(2),2) + pow(hQCD_Est_CCtrl_MET->GetBinError(1)/hQCD_Est_CCtrl_MET->GetBinContent(1),2));
+
+  double nQCD_Est_SCtrl_MET = kSCtrl * hQCD_Est_SCtrl_MET->GetBinContent(1); 
+  double err_nQCD_Est_SCtrl_MET = nQCD_Est_SCtrl_MET * sqrt(pow(err_kSCtrl/kSCtrl,2) + pow(hQCD_Est_SCtrl_MET->GetBinError(1)/hQCD_Est_SCtrl_MET->GetBinContent(1),2));
+
+  //hQCD_Est_SCtrl_MET->SetBinContent(2, nQCD_Est_SCtrl_MET);
+  //hQCD_Est_SCtrl_MET->SetBinError(2, err_nQCD_Est_SCtrl_MET);
+
+  // print results
+  std::cout << std::endl;
+  std::cout << "QCD2 Closure Test (CJV fail)" << std::endl << std::endl;
+  std::cout << std::endl;
+  std::cout << "Control region (MET>120, dphi>2.6)" << std::endl;
+  std::cout << "   N data      : " << hQCD_Data_HiDPhiCtrl_MET->GetBinContent(2) << " +/- " << hQCD_Data_HiDPhiCtrl_MET->GetBinError(2) << std::endl;
+  std::cout << "   N BG (MC)   : " << hQCD_BG_HiDPhiCtrl_MET->GetBinContent(2) << " +/- " << hQCD_BG_HiDPhiCtrl_MET->GetBinError(2) << std::endl;
+  std::cout << "   N QCD_C (MET>120)     : " << hQCD_Est_CCtrl_MET->GetBinContent(2) << " +/- " << hQCD_Est_CCtrl_MET->GetBinError(2) << std::endl;
+  std::cout << std::endl;
+  std::cout << "Control region (MET<120, dphi>2.6)" << std::endl;
+  std::cout << "   N data      : " << hQCD_Data_HiDPhiCtrl_MET->GetBinContent(1) << " +/- " << hQCD_Data_HiDPhiCtrl_MET->GetBinError(1) << std::endl;
+  std::cout << "   N BG (MC)   : " << hQCD_BG_HiDPhiCtrl_MET->GetBinContent(1) << " +/- " << hQCD_BG_HiDPhiCtrl_MET->GetBinError(1) << std::endl;
+  std::cout << "   N QCD_C (MET<120)     : " << hQCD_Est_CCtrl_MET->GetBinContent(1) << " +/- " << hQCD_Est_CCtrl_MET->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout <<" Ratio kS" << std::endl;
+  std::cout << "   kS   : " << kSCtrl << " +/- " << err_kSCtrl << std::endl;
+  std::cout << std::endl;
+  std::cout << "Low MET signal region (MET<130, dphi<1.0)" << std::endl;
+  std::cout << "   N data      : " << hQCD_Data_LoDPhiCtrl_MET->GetBinContent(1) << " +/- " << hQCD_Data_LoDPhiCtrl_MET->GetBinError(1) << std::endl;
+  std::cout << "   N BG (MC)   : " << hQCD_BG_LoDPhiCtrl_MET->GetBinContent(1) << " +/- " << hQCD_BG_LoDPhiCtrl_MET->GetBinError(1) << std::endl;
+  std::cout << "   N QCD_S (MET<130)     : " << hQCD_Est_SCtrl_MET->GetBinContent(1) << " +/- " << hQCD_Est_SCtrl_MET->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "Signal region (MET>130, dphi<1.0)" << std::endl;
+  std::cout << "   N QCD (obs): " << hQCD_Est_SCtrl_MET->GetBinContent(2) << " +/- " << hQCD_Est_SCtrl_MET->GetBinError(2) << std::endl;
+  std::cout << "   N QCD (est): " << nQCD_Est_SCtrl_MET << " +/- " <<  err_nQCD_Est_SCtrl_MET << std::endl;
+
 
   // make plot for QCD2
   // create MET shape histograms

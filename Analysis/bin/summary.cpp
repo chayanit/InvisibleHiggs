@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
   TFile* ofile = TFile::Open((oDir+std::string("/example.root")).c_str(), "RECREATE");
 
   // get Z BG info
-  std::cout << "Get data driven backgrounds" << std::endl;
+  std::cout << "Getting Z background" << std::endl;
 
   TFile* zFile    = TFile::Open((oDir+std::string("/ZBackground.root")).c_str(), "READ");
   TH1D* hZ        = (TH1D*) zFile->Get("hZ_Est_S_DPhi");
@@ -66,6 +66,8 @@ int main(int argc, char* argv[]) {
   zFile->Close();
 
   // get W BG info
+  std::cout << "Getting W background" << std::endl;
+
   TFile* wFile    = TFile::Open((oDir+std::string("/WBackground.root")).c_str(), "READ");
   TH1D* hWMu      = (TH1D*) wFile->Get("hWMu_EstS_DPhi");
   TH1D* hWMu_Syst = (TH1D*) wFile->Get("hWMu_EstS_DPhi_Syst");
@@ -74,23 +76,40 @@ int main(int argc, char* argv[]) {
 
   double nBG_WMu     = hWMu->GetBinContent(1);
   double stat_BG_WMu = hWMu->GetBinError(1);
-  double syst_BG_WMu = sqrt(pow(hWMu_Syst->GetBinError(1),2)+pow(constants::syst_WMu,2));
+  double syst_BG_WMu = sqrt(pow(hWMu_Syst->GetBinError(1),2)+pow(nBG_WMu*constants::syst_WMu,2));
 
   double nBG_WEl   = hWEl->GetBinContent(1);
   double stat_BG_WEl = hWEl->GetBinError(1);
-  double syst_BG_WEl = sqrt(pow(hWEl_Syst->GetBinError(1),2)+pow(constants::syst_WEl,2));
+  double syst_BG_WEl = sqrt(pow(hWEl_Syst->GetBinError(1),2)+pow(nBG_WEl*constants::syst_WEl,2));
 
   wFile->Close();
 
   // W-tau BG
-  double nBG_WTau     = constants::nBG_WTau;
-  double stat_BG_WTau = nBG_WTau*constants::stat_WTau;
-  double syst_BG_WTau = nBG_WTau*constants::syst_WTau;
+  std::cout << "Getting W->tau background" << std::endl;
 
-  
+  double nBG_WTau(0.), stat_BG_WTau(0.), syst_BG_WTau(0.);
+
+  if (options.wTauMethod==1) {
+    nBG_WTau     = constants::nBG_WTau;
+    stat_BG_WTau = nBG_WTau*constants::stat_WTau;
+    syst_BG_WTau = nBG_WTau*sqrt(pow(constants::stat_WTau,2)+pow(constants::syst_WTau,2));
+  }
+  else {
+    TFile* wTauFile    = TFile::Open((oDir+std::string("/WTauBackground.root")).c_str(), "READ");
+    TH1D* hWTau      = (TH1D*) wTauFile->Get("hWTau_EstS_DPhi");
+    TH1D* hWTau_Syst = (TH1D*) wTauFile->Get("hWTau_EstS_DPhi_Syst");
+    
+    nBG_WTau     = hWTau->GetBinContent(1);
+    stat_BG_WTau = hWTau->GetBinError(1);
+    syst_BG_WTau = sqrt(pow(hWTau_Syst->GetBinError(1),2)+pow(constants::syst_WTau,2));
+
+    wTauFile->Close();
+  }
+
+
   // get QCD BG info
   double nBG_QCD(0.), errBG_QCD(0.), stat_BG_QCD(0.), syst_BG_QCD(0.);
-  std::cout << "Using QCD Method " << options.qcdMethod << std::endl;
+  std::cout << "Getting QCD background with Method " << options.qcdMethod << std::endl;
   if (options.qcdMethod==1) {
     TFile* qFile = TFile::Open((oDir+std::string("/QCDBackground.root")).c_str(), "READ");
     TH1D* hQCD = (TH1D*) qFile->Get("hQCD_Est_S_DPhi");
@@ -120,38 +139,43 @@ int main(int argc, char* argv[]) {
 
   TH1D* hZNuNuMC = (TH1D*) mcFile->Get("hCutFlow_ZNuNu");
   double nBG_ZMC         = hZNuNuMC->GetBinContent(nCuts);
-  double stat_BG_ZMC     = hZNuNuMC->GetBinError(nCuts);
-  double syst_BG_ZMC     = 0.;
+  double stat_BG_ZMC     = 0.;
+  double syst_BG_ZMC     = hZNuNuMC->GetBinError(nCuts);;
 
   TH1D* hWMuMC   = (TH1D*) mcFile->Get("hCutFlow_WMuNu");
   double nBG_WMuMC       = hWMuMC->GetBinContent(nCuts);
-  double stat_BG_WMuMC   = hWMuMC->GetBinError(nCuts);
-  double syst_BG_WMuMC   = 0.;
+  double stat_BG_WMuMC   = 0.;
+  double syst_BG_WMuMC   = hWMuMC->GetBinError(nCuts);
 
   TH1D* hWElMC   = (TH1D*) mcFile->Get("hCutFlow_WElNu");
   double nBG_WElMC       = hWElMC->GetBinContent(nCuts);
-  double stat_BG_WElMC   = hWElMC->GetBinError(nCuts);
-  double syst_BG_WElMC   = 0.;
+  double stat_BG_WElMC   = 0.;
+  double syst_BG_WElMC   = hWElMC->GetBinError(nCuts);
 
   TH1D* hWTauMC  = (TH1D*) mcFile->Get("hCutFlow_WTauNu");
   double nBG_WTauMC      = hWTauMC->GetBinContent(nCuts);
-  double stat_BG_WTauMC  = hWTauMC->GetBinError(nCuts);
-  double syst_BG_WTauMC  = 0.;
+  double stat_BG_WTauMC  = 0.;
+  double syst_BG_WTauMC  = hWTauMC->GetBinError(nCuts);
 
   TH1D* hTTBar   = (TH1D*) mcFile->Get("hCutFlow_TTBar");
   double nBG_TTBar       = hTTBar->GetBinContent(nCuts);
-  double stat_BG_TTBar   = hTTBar->GetBinError(nCuts);
-  double syst_BG_TTBar   = 0.;
+  double stat_BG_TTBar   = 0.;
+  double syst_BG_TTBar   = sqrt(pow(hTTBar->GetBinError(nCuts),2)+pow(nBG_TTBar*constants::syst_TTbar,2)+pow(nBG_TTBar*constants::syst_lumi,2));
 
   TH1D* hSingleT = (TH1D*) mcFile->Get("hCutFlow_SingleTSum");
   double nBG_SingleT     = hSingleT->GetBinContent(nCuts);
-  double stat_BG_SingleT = hSingleT->GetBinError(nCuts);
-  double syst_BG_SingleT = 0.;
+  double stat_BG_SingleT = 0.;
+  double syst_BG_SingleT = sqrt(pow(hSingleT->GetBinError(nCuts),2)+pow(nBG_SingleT*constants::syst_SingleT,2)+pow(nBG_TTBar*constants::syst_lumi,2));
 
   TH1D* hDiboson = (TH1D*) mcFile->Get("hCutFlow_Diboson");
   double nBG_Diboson     = hDiboson->GetBinContent(nCuts);
-  double stat_BG_Diboson = hDiboson->GetBinError(nCuts);
-  double syst_BG_Diboson = 0.;
+  double stat_BG_Diboson = 0.;
+  double syst_BG_Diboson = sqrt(pow(hDiboson->GetBinError(nCuts),2)+pow(nBG_Diboson*constants::syst_Diboson,2)+pow(nBG_TTBar*constants::syst_lumi,2));
+
+  TH1D* hDYLL    = (TH1D*) mcFile->Get("hCutFlow_DYLL");
+  double nBG_DYLL        = hDYLL->GetBinContent(nCuts);
+  double stat_BG_DYLL    = 0.;
+  double syst_BG_DYLL    = sqrt(pow(hDYLL->GetBinError(nCuts),2)+pow(nBG_DYLL*constants::syst_DYLL,2)+pow(nBG_TTBar*constants::syst_lumi,2));
 
   mcFile->Close();
 
@@ -164,37 +188,43 @@ int main(int argc, char* argv[]) {
 		      nBG_QCD + 
 		      nBG_TTBar + 
 		      nBG_SingleT + 
-		      nBG_Diboson);
+		      nBG_Diboson + 
+		      nBG_DYLL);
 
   double stat_BG_Total = sqrt( pow(stat_BG_Z,2) +
-			     pow(stat_BG_WMu,2) +
-			     pow(stat_BG_WEl,2) +
-			     pow(stat_BG_WTau,2) +
-			     pow(stat_BG_QCD,2) +
-			     pow(stat_BG_TTBar,2) +
-			     pow(stat_BG_SingleT,2) +
-			     pow(stat_BG_Diboson,2));
+			       pow(stat_BG_WMu,2) +
+			       pow(stat_BG_WEl,2) +
+			       pow(stat_BG_WTau,2) +
+			       pow(stat_BG_QCD,2) +
+			       pow(stat_BG_TTBar,2) +
+			       pow(stat_BG_SingleT,2) +
+			       pow(stat_BG_Diboson,2) +
+			       pow(stat_BG_DYLL,2));
 
   double syst_BG_Total = sqrt( pow(syst_BG_Z,2) +
-			     pow(syst_BG_WMu,2) +
-			     pow(syst_BG_WEl,2) +
-			     pow(syst_BG_WTau,2) +
-			     pow(syst_BG_QCD,2) +
-			     pow(syst_BG_TTBar,2) +
-			     pow(syst_BG_SingleT,2) +
-			     pow(syst_BG_Diboson,2));
+			       pow(syst_BG_WMu,2) +
+			       pow(syst_BG_WEl,2) +
+			       pow(syst_BG_WTau,2) +
+			       pow(syst_BG_QCD,2) +
+			       pow(syst_BG_TTBar,2) +
+			       pow(syst_BG_SingleT,2) +
+			       pow(syst_BG_Diboson,2) +
+			       pow(syst_BG_DYLL,2));
 
   double nBG_Other = (nBG_TTBar + 
 		      nBG_SingleT + 
-		      nBG_Diboson);
+		      nBG_Diboson +
+		      nBG_DYLL);
 
   double stat_BG_Other =  sqrt( pow(stat_BG_TTBar,2) +
-			      pow(stat_BG_SingleT,2) + 
-			      pow(stat_BG_Diboson,2));
+				pow(stat_BG_SingleT,2) + 
+				pow(stat_BG_Diboson,2) +
+				pow(stat_BG_DYLL,2));
   
   double syst_BG_Other =  sqrt( pow(syst_BG_TTBar,2) +
-			      pow(syst_BG_SingleT,2) + 
-			      pow(syst_BG_Diboson,2));
+				pow(syst_BG_SingleT,2) + 
+				pow(syst_BG_Diboson,2) +
+				pow(syst_BG_DYLL,2));
   
 
   // get number of observed events
@@ -206,18 +236,19 @@ int main(int argc, char* argv[]) {
   ofstream texFile;
   texFile.open(options.oDir+std::string("/summary.tex"));
 
-  texFile << "Background \t & $N_{est}$ (data) \t & $N_{est}$ (MC) \\\\" << std::endl;
+  texFile << "Background \t & $N_{est} \\pm (stat) \\pm (syst)$ - data  \t & $N_{est} \\pm (syst)$ - MC \\\\" << std::endl;
   texFile << "\\hline";
-  texFile << "$Z \\rightarrow \\nu\\nu$ \t & $" << nBG_Z << " \\pm " << stat_BG_Z << " \\pm " << syst_BG_Z << "$ \t &  $" << nBG_ZMC << " \\pm " << stat_BG_ZMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << " \\pm " << syst_BG_WEl << "$ \t &  $" << nBG_WElMC << " \\pm " << stat_BG_WElMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << " \\pm " << syst_BG_WMu << "$ \t & $" << nBG_WMuMC << " \\pm " << stat_BG_WMuMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << " \\pm " << syst_BG_WTau << "$ \t & $" << nBG_WTauMC << " \\pm " << stat_BG_WTauMC << "$ \\\\" << std::endl;
+  texFile << "$Z \\rightarrow \\nu\\nu$ \t & $" << nBG_Z << " \\pm " << stat_BG_Z << " \\pm " << syst_BG_Z << "$ \t &  $" << nBG_ZMC << " \\pm " << syst_BG_ZMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << " \\pm " << syst_BG_WEl << "$ \t &  $" << nBG_WElMC << " \\pm " << syst_BG_WElMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << " \\pm " << syst_BG_WMu << "$ \t & $" << nBG_WMuMC << " \\pm " << syst_BG_WMuMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << " \\pm " << syst_BG_WTau << "$ \t & $" << nBG_WTauMC << " \\pm " << syst_BG_WTauMC << "$ \\\\" << std::endl;
   texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_BG_QCD << " \\pm " << syst_BG_QCD << "$ \t & - \\\\" << std::endl;
-  texFile << "$t\\bar{t}$ \t & -	\t & $" << nBG_TTBar << " \\pm << " << stat_BG_TTBar << "$ \\\\" << std::endl;
-  texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << stat_BG_SingleT << "$ \\\\" << std::endl;
-  texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << stat_BG_Diboson<< "$ \\\\" << std::endl;
+  texFile << "$t\\bar{t}$ \t & -	\t & $" << nBG_TTBar << " \\pm " << syst_BG_TTBar << "$ \\\\" << std::endl;
+  texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << syst_BG_SingleT << "$ \\\\" << std::endl;
+  texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << syst_BG_Diboson<< "$ \\\\" << std::endl;
+  texFile << "DY \t & -  \t & $" << nBG_DYLL << " \\pm " << syst_BG_DYLL << "$ \\\\" << std::endl;
   texFile << "\\hline" << std::endl;
-  texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << "\\pm" << stat_BG_Total << "$ (stat) $\\pm" << syst_BG_Total << "$ (syst)}  \\\\" << std::endl;
+  texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << "\\pm" << stat_BG_Total << "\\pm" << syst_BG_Total << "$}  \\\\" << std::endl;
   texFile << "Observed & \\multicolumn{2}{c|}{$" << nObs << "$}  \\\\" << std::endl;
 
   texFile.close();
@@ -325,7 +356,7 @@ int main(int argc, char* argv[]) {
     txtFile << "# Invisible Higgs analysis for mH=" << mH[i] << " GeV" << std::endl;
     txtFile << "imax 1" << std::endl;
     txtFile << "jmax 6  number of backgrounds" << std::endl;
-    txtFile << "kmax 8  number of nuisance parameters (sources of systematical uncertainties)" << std::endl;
+    txtFile << "kmax 9  number of nuisance parameters (sources of systematical uncertainties)" << std::endl;
     txtFile << "------------" << std::endl;
     txtFile << "# we have just one channel, in which we observe 0 events" << std::endl;
     txtFile << "bin 1" << std::endl;
@@ -345,6 +376,7 @@ int main(int argc, char* argv[]) {
     txtFile << "wel_norm  lnN     - \t - \t - \t" << fWEl << "\t - \t - \t - " << std::endl;
     txtFile << "wtau_norm lnN     - \t - \t - \t - \t" << fWTau << "\t - \t - " << std::endl;
     txtFile << "qcd_norm  lnN     - \t - \t - \t - \t - \t" << fQCD << "\t - " << std::endl;
+    txtFile << "mc_norm   lnN     - \t - \t - \t - \t - \t - \t" << fOther << std::endl;
     txtFile.close();
 
   }
