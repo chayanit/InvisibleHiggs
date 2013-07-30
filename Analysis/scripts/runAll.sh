@@ -1,11 +1,11 @@
 #!/bin/sh
 
 VER=v11
-FILEVER=v11c
+FILEVER=V11d
 LUMI=19576
 
-IDIR=/storage/phjjb/invisibleHiggs/InvHiggsInfo_$FILEVER/Central
-ODIR=InvHiggsInfo_$FILEVER
+IDIR=/storage/phjjb/invisibleHiggs/Ntuple$FILEVER/Central
+ODIR=Analysis$FILEVER
 
 echo "Deleting and recreating $ODIR"
 if [ -d "$ODIR" ]; then
@@ -41,16 +41,20 @@ echo "wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI"
 wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI > $ODIR/wBackground.log
 echo ""
 
+echo "wTauBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI"
+wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI > $ODIR/wTauBackground.log
+echo ""
+
 echo "zBackground -i $IDIR -o $ODIR -f $DATASETS_Z -l $LUMI"
 zBackground -i $IDIR -o $ODIR -f $DATASETS_Z -l $LUMI > $ODIR/zBackground.log
 echo ""
 
 echo "qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI"
-qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground.log
+#qcdBackground -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground.log
 echo ""
 
 echo "qcdBackground2 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI"
-qcdBackground2 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground2.log
+#qcdBackground2 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground2.log
 echo ""
 
 echo "qcdBackground3 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI"
@@ -58,23 +62,25 @@ qcdBackground3 -i $IDIR -o $ODIR -f $DATASETS_QCD -l $LUMI > $ODIR/qcdBackground
 echo ""
 
 echo "summary -o $ODIR $LUMI"
-summary -o $ODIR -l $LUMI > $ODIR/summary.log
-echo ""
-
-# homegrown limits
-echo "limits -o $ODIR $LUMI"
-#limits -o $ODIR -l $LUMI > $ODIR/limits.log
+summary -q 3 -o $ODIR -l $LUMI > $ODIR/summary.log
 echo ""
 
 # combine tool limits
 echo "combine -M Asymptotic $ODIR/card.txt"
-#combine -M Asymptotic $ODIR/card.txt
+cd $ODIR
+combine -M Asymptotic --run=blind -m 110 card110.txt
+combine -M Asymptotic --run=blind -m 125 card125.txt
+combine -M Asymptotic --run=blind -m 150 card150.txt
+combine -M Asymptotic --run=blind -m 200 card200.txt
+combine -M Asymptotic --run=blind -m 300 card300.txt
+combine -M Asymptotic --run=blind -m 400 card400.txt
+hadd -f combineMerge.root higgsCombineTest.Asymptotic.mH*.root
+cd ..
 
-echo "combine -M HybridNew --rule CLs --testStat LEP $ODIR/card.txt"
-echo "Not running this now because it takes forever!"
-echo "Do it by hand if you need to"
-#combine -M HybridNew --rule CLs --testStat LEP $ODIR/card.txt
-
+# make plots
+echo "limitPlots -o $ODIR $LUMI"
+limitPlots -o $ODIR -l $LUMI > $ODIR/limits.log
+echo ""
 
 # tar everything up
 echo "tar -zcvf $ODIR.tgz $ODIR/"
