@@ -269,9 +269,6 @@ int main(int argc, char* argv[]) {
     	hWEl_BGC_MET->Add(hWEl_C_MET);
     }
 
-    // debug output
-    //std::cout << "  N ctrl region (dphi<1) : " << hWMu_C_DPhi->GetBinContent(1) << " +/- " << hWMu_C_DPhi->GetBinError(1) << std::endl;
-    
     delete hWMu_GEN;
     delete hWEl_GEN;
     delete hWMu_C_DPhi;
