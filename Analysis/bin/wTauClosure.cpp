@@ -29,6 +29,9 @@
 #include <fstream>
 
 // Closure test for wTau from wMu
+//
+// Robin Aggleton 2013
+
 
 int main(int argc, char* argv[]) {
 
