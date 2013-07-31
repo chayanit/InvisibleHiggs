@@ -25,7 +25,7 @@ namespace constants {
   static const double syst_Z       = 0.203;  // 3% JES/JER + 20% MCFM/MG ratio
   static const double syst_WMu     = 0.04;   // 4% JES/JER
   static const double syst_WEl     = 0.14;   // 14% JES/JER
-  static const double syst_WTau    = 0.802;   // 8% tau ID + 2% W-e cont
+  static const double syst_WTau    = 0.27;   // 8% tau ID + 2% W-e cont
   static const double syst_QCD1    = 1.5;    // 150% uncertainty from 
   static const double syst_QCD3    = 0.35;   // 35% from MET shapes in CJV pass/fail
   static const double syst_TTbar   = 0.40;   // ???
