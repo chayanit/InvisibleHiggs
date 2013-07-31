@@ -28,6 +28,8 @@
 #include <iostream>
 #include <fstream>
 
+// Closure test for wTau from wMu
+
 int main(int argc, char* argv[]) {
 
   TH1::SetDefaultSumw2();
