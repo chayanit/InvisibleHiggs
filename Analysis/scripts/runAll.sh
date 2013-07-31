@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# script to run the whole analysis
+
 VER=v11
 FILEVER=V11d
 LUMI=19576
