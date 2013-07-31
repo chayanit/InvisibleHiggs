@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
     }
 
     // debug output
-    std::cout << "  N ctrl region (dphi<1) : " << hWMu_C_DPhi->GetBinContent(1) << " +/- " << hWMu_C_DPhi->GetBinError(1) << std::endl;
+    //std::cout << "  N ctrl region (dphi<1) : " << hWMu_C_DPhi->GetBinContent(1) << " +/- " << hWMu_C_DPhi->GetBinError(1) << std::endl;
     
     delete hWMu_C_DPhi;
     delete hWMu_S_DPhi;
