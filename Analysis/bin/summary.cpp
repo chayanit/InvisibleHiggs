@@ -1,4 +1,6 @@
 
+// this program reads backgrounds and writes a TeX files and card files for limit setting
+
 #include "InvisibleHiggs/Analysis/interface/ProgramOptions.h"
 #include "InvisibleHiggs/Analysis/interface/Cuts.h"
 #include "InvisibleHiggs/Analysis/interface/Histogrammer.h"
