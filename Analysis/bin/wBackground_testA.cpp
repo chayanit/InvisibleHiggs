@@ -421,7 +421,7 @@ int main(int argc, char* argv[]) {
   gp6->SetMarkerStyle(20);
   gp6->SetMarkerSize(0.9);
   gp6->SetMarkerColor(kGreen-2);
-  TF1 *f1 = new TF1("f1","pol0",0,2.6);
+  TF1 *f1 = new TF1("f1","pol0",0,TMath::Pi());
   gp6->Fit("f1","R");
   h->Draw();
   gp6->Draw("SAMEP");
@@ -450,7 +450,7 @@ int main(int argc, char* argv[]) {
   TLegend leg2(0.12,0.67,0.40,0.87);
   leg2.SetBorderSize(0);
   leg2.SetFillColor(0);
-  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
+  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < #pi)","l");
   leg2.AddEntry(gp8,"Systematic error","f");
   leg2.Draw();
   pdfName= oDir + std::string("/Welnu_frac.pdf");

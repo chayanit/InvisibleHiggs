@@ -608,7 +608,7 @@ int main(int argc, char* argv[]) {
   TLegend leg2(0.12,0.67,0.40,0.87);
   leg2.SetBorderSize(0);
   leg2.SetFillColor(0);
-  leg2.AddEntry(f1,"pol0 fit","l");
+  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < #pi)","l");
   leg2.AddEntry(graph5,"Systematic error","f");
   leg2.Draw();
   pdfName= oDir + std::string("/Zmumu_frac.pdf");
