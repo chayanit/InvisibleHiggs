@@ -55,7 +55,6 @@ int main(int argc, char* argv[]) {
   Cuts cuts;
 
   TCut puWeight("puWeight");
-  //TCut trigCorrWeight("trigCorrWeight");
   TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
   
   // histograms
