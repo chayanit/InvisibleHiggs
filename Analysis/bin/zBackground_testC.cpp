@@ -325,11 +325,11 @@ int main(int argc, char* argv[]) {
   //double ratioBF = 5.626;  //  MCFM + NLO
   double ratioBF = 1144./14428.;
 
-  // bins dPhi
-  TH1D* hZ_Est_ZC_DPhi = new TH1D("hZ_Est_ZC_DPhi", "", 4, dphiEdges); // estimated Z in ctrl region
+  TH1D* hZ_Est_ZC_DPhi = new TH1D("hZ_Est_ZC_DPhi", "", 4, dphiEdges); 
 
-  TH1D* hZ_Est_WC_DPhi = new TH1D("hZ_Est_WC_DPhi", "", 4, dphiEdges); // estimated Z in ctrl region
-  TH1D* hZ_Est_WS_DPhi = new TH1D("hZ_Est_WS_DPhi", "", 4, dphiEdges); // estimated Z in bkgrnd region  
+  // bins dPhi
+  TH1D* hZ_Est_WC_DPhi = new TH1D("hZ_Est_WC_DPhi", "", 4, dphiEdges); 
+  TH1D* hZ_Est_WS_DPhi = new TH1D("hZ_Est_WS_DPhi", "", 4, dphiEdges); 
   TH1D* hZ_Eff_WS_DPhi = new TH1D("hZ_Eff_WS_DPhi", "", 4, dphiEdges);
  
   TH1D* hZ_W_EffMu    = new TH1D("hZ_W_EffMu", "", 1, 0., 1.);     	// epsilon mumu
@@ -515,16 +515,18 @@ int main(int argc, char* argv[]) {
 
   double x1[4]  = {0.5, 1.4, 2.2, 2.6 + (TMath::Pi()-2.6)/2};
   double ex1[4] = {0.5, 0.4, 0.4, (TMath::Pi()-2.6)/2};
-  double y1[4],ey1[4],y2[4],ey2[4];
+  double y1[4],ey1[4],y2[4],ey2[4],y3[4],ey3[4];
   double diff[4],ediff[4];
   double frac[4],efrac[4];
   double y_syst[4],e_syst[4];
 
   for(int i=0; i<4; ++i) {
-	y1[i]  = hZ_Est_WS_DPhi->GetBinContent(i+1);
-	ey1[i] = hZ_Est_WS_DPhi->GetBinError(i+1);
-	y2[i]  = hZ_Est_ZC_DPhi->GetBinContent(i+1);
-	ey2[i] = hZ_Est_ZC_DPhi->GetBinError(i+1); 
+        y1[i]  = hZ_Est_WS_DPhi->GetBinContent(i+1);     //Prediction
+        ey1[i] = hZ_Est_WS_DPhi->GetBinError(i+1);
+        y2[i]  = hZ_Est_ZC_DPhi->GetBinContent(i+1);     //Observation
+        ey2[i] = hZ_Est_ZC_DPhi->GetBinError(i+1); 
+	y3[i]  = hZ_DY_C_DPhi->GetBinContent(i+1);       //MC Prediction
+        ey3[i] = hZ_DY_C_DPhi->GetBinError(i+1);
 
 	diff[i]  = y1[i]-y2[i];
 	ediff[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
@@ -537,6 +539,7 @@ int main(int argc, char* argv[]) {
 
   TGraphErrors *graph1 = new TGraphErrors(4,x1,y1,ex1,ey1);
   TGraphErrors *graph2 = new TGraphErrors(4,x1,y2,ex1,ey2);
+  TGraphErrors *graph6 = new TGraphErrors(4,x1,y3,ex1,ey3);
   TGraphErrors *graph3 = new TGraphErrors(4,x1,diff,ex1,ediff);
   TGraphErrors *graph4 = new TGraphErrors(4,x1,frac,ex1,efrac);
   TGraphErrors *graph5 = new TGraphErrors(4,x1,y_syst,ex1,e_syst);
@@ -545,7 +548,7 @@ int main(int argc, char* argv[]) {
   TCanvas canvas;
   canvas.SetCanvasSize(canvas.GetWindowWidth(), 1.2*canvas.GetWindowHeight());
 
-  graph1->SetTitle("W #rightarrow #mu#nu control region");
+  graph1->SetTitle("");
   graph1->SetMarkerStyle(20);
   graph1->SetMarkerSize(0.9);
   graph1->SetLineColor(kRed);
@@ -553,19 +556,25 @@ int main(int argc, char* argv[]) {
   graph1->GetXaxis()->SetTitle("#Delta #phi_{jj}");
   graph1->GetXaxis()->SetRangeUser(0,TMath::Pi());
   graph1->GetYaxis()->SetTitle("N(Z#rightarrow #mu#mu)");
-  graph1->GetYaxis()->SetRangeUser(0,30);
+  graph1->GetYaxis()->SetRangeUser(0,45);
   graph1->Draw("AP");  
   graph2->SetMarkerStyle(20);
   graph2->SetMarkerSize(0.9);
   graph2->SetLineColor(kBlue);
   graph2->SetMarkerColor(kBlue);
   graph2->Draw("P same");
+  graph6->SetMarkerStyle(20);
+  graph6->SetMarkerSize(0.9);
+  graph6->SetLineColor(kViolet);
+  graph6->SetMarkerColor(kViolet);
+  graph6->Draw("P same");
 
-  TLegend leg(0.12,0.67,0.32,0.87);
+  TLegend leg(0.12,0.67,0.37,0.88);
   leg.SetBorderSize(0);
   leg.SetFillColor(0);
-  leg.AddEntry(graph1,"predicted","P");
-  leg.AddEntry(graph2,"observed","P");
+  leg.AddEntry(graph1,"predicted (data)","P");
+  leg.AddEntry(graph2,"observed (data)","P");
+  leg.AddEntry(graph6,"predicted (MC)","P");
   leg.Draw();
 
   pdfName= oDir + std::string("/Zmumu_num.pdf");
