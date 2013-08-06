@@ -138,6 +138,7 @@ int main(int argc, char* argv[]) {
     // check it's  W+Jets
     bool isWJets = false;
     bool isEwkW  = false;
+    bool isQCD   = false;
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" || 
         dataset.name == "W2Jets" || 
@@ -237,6 +238,8 @@ int main(int argc, char* argv[]) {
     else {
       std::cout << "Analysing BG MC    : " << dataset.name << std::endl;
 
+      if (dataset.name.compare(0,3,"QCD") == 0) isQCD = true;
+
       cutWMu_C = otherCuts * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
       cutWMu_S = otherCuts * (cutD + cuts.allCutsNoDPhi());
       cutWEl_C = otherCuts * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
@@ -263,9 +266,11 @@ int main(int argc, char* argv[]) {
       //tree->Draw("met:vbfDPhi>>hWEl_C_METDPhi", cutWEl_MET0C);
       //hWMu_C_METDPhi->Scale(weight);
       //hWEl_C_METDPhi->Scale(weight);
-      
+
+      if (!isQCD) {      
       hWMu_BGC_DPhi->Add(hWMu_C_DPhi);
       hWEl_BGC_DPhi->Add(hWEl_C_DPhi);
+      }
       
       //hWMu_BGC_METDPhi->Add(hWMu_C_METDPhi);
       //hWEl_BGC_METDPhi->Add(hWEl_C_METDPhi);
