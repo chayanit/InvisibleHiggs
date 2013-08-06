@@ -59,7 +59,8 @@ int main(int argc, char* argv[]) {
   TCut cutnoMjjnoMET = cuts.cutWMu("trigger")+cuts.cutWMu("dijet")+cuts.cutWMu("dEtaJJ")+cuts.cutWMu("CJV")+cuts.cutWMu("dPhiJJ");
   
   double dphiEdges[5] = { 0., 1.0, 1.8, 2.6, TMath::Pi() };
-  double etaEdges[5]  = { -2.1, -1.0, 0.0, 1.0, +2.1 };
+  double etaEdges[5]  = { 0., 0.5, 1.0, 1.5, 2.1 };
+  //double etaEdges[5]  = { -2.1, -1.0, 0.0, 1.0, +2.1 };
   double mjjEdges[6]  = { 800., 1000., 1200., 1600., 2000., 3000. };
   double metEdges[5]  = { 100., 150., 200., 300., 500. };
 
@@ -193,10 +194,10 @@ int main(int argc, char* argv[]) {
     tree->Draw("vbfDPhi>>hWEl_C_DPhi",  cutWEl_C_noDPhi);
     tree->Draw("vbfDPhi>>hWEl_WC_DPhi", cutWEl_WC_noDPhi);
  
-    tree->Draw("wDaulEta>>hWMu_C_Eta",  cutWMu_C_noEta);
-    tree->Draw("wDaulEta>>hWMu_WC_Eta", cutWMu_WC_noEta);
-    tree->Draw("wDaulEta>>hWEl_C_Eta",  cutWEl_C_noEta);
-    tree->Draw("wDaulEta>>hWEl_WC_Eta", cutWEl_WC_noEta);
+    tree->Draw("abs(wDaulEta)>>hWMu_C_Eta",  cutWMu_C_noEta);
+    tree->Draw("abs(wDaulEta)>>hWMu_WC_Eta", cutWMu_WC_noEta);
+    tree->Draw("abs(wDaulEta)>>hWEl_C_Eta",  cutWEl_C_noEta);
+    tree->Draw("abs(wDaulEta)>>hWEl_WC_Eta", cutWEl_WC_noEta);
 
     tree->Draw("vbfM>>hWMu_C_Mjj",  cutWMu_C_noMjj);
     tree->Draw("vbfM>>hWMu_WC_Mjj", cutWMu_WC_noMjj);
@@ -419,7 +420,8 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "##### Bins W daughter rapidity #####" << std::endl;
   std::cout << std::endl;
-  std::cout << "  -2.1 < dphi < -1.0 " << std::endl;
+  //std::cout << "  -2.1 < dphi < -1.0 " << std::endl;
+  std::cout << "  0.0 < dphi < 0.5 " << std::endl;
   std::cout << std::endl;;
   std::cout << "  VBF ratio by histogram : " << hWEl_RVBF_Eta->GetBinContent(1) << " +/- " << hWEl_RVBF_Eta->GetBinError(1) << std::endl;
   std::cout << "  Total ratio            : " << hWEl_R_Eta->GetBinContent(1) << " +/- " << hWEl_R_Eta->GetBinError(1) << std::endl;
@@ -430,7 +432,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Observed WEl           : " << hWEl_EstC_Eta->GetBinContent(1) << " +/- " << hWEl_EstC_Eta->GetBinError(1) << std::endl;
   std::cout << "  MC Prediction          : " << hWEl_VBF_Eta->GetBinContent(1) << " +/- " << hWEl_VBF_Eta->GetBinError(1) << std::endl;
   std::cout << std::endl;
-  std::cout << "  -1.0 < dphi < 0.0 " << std::endl;
+  std::cout << "  0.5 < dphi < 1.0 " << std::endl;
   std::cout << std::endl;
   std::cout << "  VBF ratio by histogram : " << hWEl_RVBF_Eta->GetBinContent(2) << " +/- " << hWEl_RVBF_Eta->GetBinError(2) << std::endl;
   std::cout << "  Total ratio            : " << hWEl_R_Eta->GetBinContent(2) << " +/- " << hWEl_R_Eta->GetBinError(2) << std::endl;
@@ -441,7 +443,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Observed WEl           : " << hWEl_EstC_Eta->GetBinContent(2) << " +/- " << hWEl_EstC_Eta->GetBinError(2) << std::endl;
   std::cout << "  MC Prediction          : " << hWEl_VBF_Eta->GetBinContent(2) << " +/- " << hWEl_VBF_Eta->GetBinError(2) << std::endl;
   std::cout << std::endl;
-  std::cout << "  0.0 < dphi < 1.0 " << std::endl;
+  std::cout << "  1.0 < dphi < 1.5 " << std::endl;
   std::cout << std::endl;
   std::cout << "  VBF ratio by histogram : " << hWEl_RVBF_Eta->GetBinContent(3) << " +/- " << hWEl_RVBF_Eta->GetBinError(3) << std::endl;
   std::cout << "  Total ratio            : " << hWEl_R_Eta->GetBinContent(3) << " +/- " << hWEl_R_Eta->GetBinError(3) << std::endl;
@@ -452,7 +454,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  Observed WEl           : " << hWEl_EstC_Eta->GetBinContent(3) << " +/- " << hWEl_EstC_Eta->GetBinError(3) << std::endl;
   std::cout << "  MC Prediction          : " << hWEl_VBF_Eta->GetBinContent(3) << " +/- " << hWEl_VBF_Eta->GetBinError(3) << std::endl;
   std::cout << std::endl;
-  std::cout << "  1.0 < dphi < 2.1 " << std::endl;
+  std::cout << "  1.5 < dphi < 2.1 " << std::endl;
   std::cout << std::endl;
   std::cout << "  VBF ratio by histogram : " << hWEl_RVBF_Eta->GetBinContent(4) << " +/- " << hWEl_RVBF_Eta->GetBinError(4) << std::endl;
   std::cout << "  Total ratio            : " << hWEl_R_Eta->GetBinContent(4) << " +/- " << hWEl_R_Eta->GetBinError(4) << std::endl;
@@ -579,19 +581,21 @@ int main(int argc, char* argv[]) {
 
   double x_dPhi[4]  = {0.5, 1.4, 2.2, 2.6 + (TMath::Pi()-2.6)/2};
   double ex_dPhi[4] = {0.5, 0.4, 0.4, (TMath::Pi()-2.6)/2};
-  double x_eta[4]   = {-1.55, -0.50, +0.50, +1.55};
-  double ex_eta[4]  = {0.55, 0.5, 0.5, 0.55};
+  double x_eta[4]   = {0.25, 0.75, 1.25, 1.80};
+  double ex_eta[4]  = {0.25, 0.25, 0.25, 0.30};
+  //double x_eta[4]   = {-1.55, -0.50, +0.50, +1.55};
+  //double ex_eta[4]  = {0.55, 0.5, 0.5, 0.55};
   double x_mjj[5]   = {900., 1100., 1400., 1800., 2500.};
   double ex_mjj[5]  = {100, 100, 200, 200, 500};
   double x_met[4]   = {125., 175., 250., 400.};
   double ex_met[4]  = {25, 25, 50, 100};
 
-  double y_dPhi1[4],ey_dPhi1[4],y_dPhi2[4],ey_dPhi2[4],y_dPhi3[4],ey_dPhi3[4],frac_dPhi[4],efrac_dPhi[4];
-  double y_eta1[4],ey_eta1[4],y_eta2[4],ey_eta2[4],y_eta3[4],ey_eta3[4],frac_eta[4],efrac_eta[4];
-  double y_met1[4],ey_met1[4],y_met2[4],ey_met2[4],y_met3[4],ey_met3[4],frac_met[4],efrac_met[4];
+  double y_dPhi1[4],ey_dPhi1[4],y_dPhi2[4],ey_dPhi2[4],y_dPhi3[4],ey_dPhi3[4],frac_dPhi[4],efrac_dPhi[4],diff_dPhi[4],ediff_dPhi[4];
+  double y_eta1[4],ey_eta1[4],y_eta2[4],ey_eta2[4],y_eta3[4],ey_eta3[4],frac_eta[4],efrac_eta[4],diff_eta[4],ediff_eta[4];
+  double y_met1[4],ey_met1[4],y_met2[4],ey_met2[4],y_met3[4],ey_met3[4],frac_met[4],efrac_met[4],diff_met[4],ediff_met[4];
   double y_syst1[4],e_syst1[4];
 
-  double y_mjj1[5],ey_mjj1[5],y_mjj2[5],ey_mjj2[5],y_mjj3[5],ey_mjj3[5],frac_mjj[5],efrac_mjj[5];
+  double y_mjj1[5],ey_mjj1[5],y_mjj2[5],ey_mjj2[5],y_mjj3[5],ey_mjj3[5],frac_mjj[5],efrac_mjj[5],diff_mjj[5],ediff_mjj[5];
   double y_syst2[5],e_syst2[5];
 
   for(int i=0; i<4; ++i) {
@@ -607,6 +611,8 @@ int main(int argc, char* argv[]) {
 
     if(y_dPhi2[i] > 0) frac_dPhi[i]  = (y_dPhi1[i] - y_dPhi2[i])/y_dPhi2[i];
     efrac_dPhi[i] = sqrt(pow(ey_dPhi1[i]/y_dPhi1[i],2) + pow(ey_dPhi2[i]/y_dPhi2[i],2));
+    //diff_dPhi[i]  = y_dPhi3[i]-y_dPhi1[i];
+    //ediff_dPhi[i] = 
 
     y_eta1[i]  = hWEl_EstS_Eta->GetBinContent(i+1);	//Predicted WEl
     ey_eta1[i] = hWEl_EstS_Eta->GetBinError(i+1);	
@@ -645,12 +651,14 @@ int main(int argc, char* argv[]) {
   }
 
   TH1D *h1 = new TH1D("h1", "", 1, 0, TMath::Pi());
-  TH1D *h2 = new TH1D("h2", "", 1, -2.1, +2.1);
+  TH1D *h2 = new TH1D("h2", "", 1, 0., +2.1);
+  //TH1D *h2 = new TH1D("h2", "", 1, -2.1, +2.1);
   TH1D *h3 = new TH1D("h3", "", 1, 800., 3000.);
   TH1D *h4 = new TH1D("h4", "", 1, 100., 500.);
 
   TF1 *f1 = new TF1("f1","pol0",0,TMath::Pi()); 
-  TF1 *f2 = new TF1("f2","pol0",-2.1, +2.1); 
+  TF1 *f2 = new TF1("f2","pol0",0., +2.1);
+  //TF1 *f2 = new TF1("f2","pol0",-2.1, +2.1); 
   TF1 *f3 = new TF1("f3","pol0",800., 3000.); 
   TF1 *f4 = new TF1("f4","pol0",100., 500.); 
 
@@ -746,7 +754,7 @@ int main(int argc, char* argv[]) {
   gp_eta1->SetMarkerSize(0.9);
   gp_eta1->SetLineColor(kRed);
   gp_eta1->SetMarkerColor(kRed);
-  gp_eta1->GetXaxis()->SetTitle("#eta^{l}");
+  gp_eta1->GetXaxis()->SetTitle("|#eta^{l}|");
   gp_eta1->GetXaxis()->SetRangeUser(-2.1,+2.1);
   gp_eta1->GetYaxis()->SetTitle("N(W#rightarrow e#nu)");
   gp_eta1->GetYaxis()->SetRangeUser(0,40);
@@ -766,7 +774,7 @@ int main(int argc, char* argv[]) {
   pdfName= oDir + std::string("/Eta_Welnu_num.pdf");
   canvas.Print(pdfName.c_str());
  
-  h2->GetXaxis()->SetTitle("#eta^{l}");
+  h2->GetXaxis()->SetTitle("|#eta^{l}|");
   h2->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
   h2->GetYaxis()->SetRangeUser(-1.5,3.0);
   h2->SetLineColor(kBlue);
