@@ -380,8 +380,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     }
 
     hData->Draw("ep");
-    hData->SetMaximum(2.);
-    hData->SetMinimum(-2.);
+    hData->SetMaximum(1.);
+    hData->SetMinimum(-1.);
 
     int NBins = hMC->GetNbinsX();
     TGraphErrors * Erreff = new TGraphErrors(NBins);
