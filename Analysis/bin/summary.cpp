@@ -49,7 +49,21 @@ int main(int argc, char* argv[]) {
   Cuts cuts;
   int nCuts = cuts.nCuts();
 
-  TFile* ofile = TFile::Open((oDir+std::string("/example.root")).c_str(), "RECREATE");
+  TFile* ofile = TFile::Open((oDir+std::string("/summary.root")).c_str(), "RECREATE");
+
+  // get number of observed events
+  std::cout << "Getting Z background" << std::endl;
+  int nObs = 0;
+  
+  TFile* sigFile    = TFile::Open((oDir+std::string("/Search.root")).c_str(), "READ");
+  if (sigFile!=0) {
+    TH1D* hCounts = (TH1D*) sigFile->Get("hCounts");
+    nObs          = hCounts->GetBinContent(1);
+    sigFile->Close();
+  }
+  
+  std::cout << "Observed events : " << nObs << std::endl;
+
 
   // get Z BG info
   std::cout << "Getting Z background" << std::endl;
@@ -229,8 +243,6 @@ int main(int argc, char* argv[]) {
 				pow(syst_BG_DYLL,2));
   
 
-  // get number of observed events
-  int nObs = 0;
 
   // write background summary table
   std::cout << "Writing BG summary TeX file" << std::endl;

@@ -105,6 +105,7 @@ int main(int argc, char* argv[]) {
   // create arrays
   std::vector<double> massH, lim2SigM, lim1SigM, limExp, lim1SigP, lim2SigP;
   std::vector<double> xs2SigM, xs1SigM, xsExp, xs1SigP, xs2SigP;
+  std::vector<double> limObs, xsObs;
 
   // loop over points
   double oldMass;
@@ -113,6 +114,7 @@ int main(int argc, char* argv[]) {
 
     //    std::cout << "Entry :  m=" << mass << ", quantile=" << quant << ", limit=" << limit << std::endl;
 
+    if (fabs(quant+1)<0.001) limObs.push_back(limit);
     if (fabs(quant-0.025)<0.001) lim2SigM.push_back(limit);
     if (fabs(quant-0.16)<0.001) lim1SigM.push_back(limit);
     if (fabs(quant-0.5)<0.001) limExp.push_back(limit);
@@ -127,7 +129,28 @@ int main(int argc, char* argv[]) {
   }
 
   // std:cout << massH.size() << " : " << limExp.size() << std::endl;
-  
+
+  bool doObs=false;
+  if (limObs.size()>0) doObs=true;
+
+  if (doObs) {
+    std::cout << "Observed" << std::endl;
+    std::cout << "mH  : lim" << std::endl;
+    for (unsigned i=0; i<limObs.size(); ++i) {
+      std::cout << massH.at(i) << " : " << limObs.at(i) << std::endl;
+    }
+  }
+  else {
+    std::cout << "Running blind" << std::endl;
+  }
+  std::cout << std::endl;
+
+  // calculate observed XS limit
+  for (unsigned i=0; i<limObs.size(); ++i) {
+    xsObs.push_back(limObs.at(i) * constants::xsH[i]);
+  }
+
+  std::cout << "Expected" << std::endl;
   std::cout << "mH  : -2sig, -1sig, median, +1sig, +2sig" << std::endl;
   for (unsigned i=0; i<massH.size(); ++i) {
     std::cout << massH.at(i) << " : " << lim2SigM.at(i) << ", " << lim1SigM.at(i) << ", " << limExp.at(i) << ", " << lim1SigP.at(i) << ", " << lim2SigP.at(i) << std::endl;
@@ -182,12 +205,21 @@ int main(int argc, char* argv[]) {
   gXS.SetLineStyle(2);
   gXS.Draw("L");
 
+  TGraph gXSObs;
+  if (doObs) {
+    gXSObs = TGraph(massH.size(), &massH[0], &xsObs[0]);
+    gXSObs.SetLineColor(kBlack);
+    gXSObs.SetLineStyle(1);
+    gXSObs.Draw("L");
+  }
+
   TGraph gXSProd(constants::nM, &constants::mH[0], &constants::xsH[0]);
   gXSProd.SetLineColor(kBlue);
   gXSProd.Draw("L");
 
   TLegend leg(0.5, 0.65, 0.75, 0.85, "95% CL limits", "NDC");
   leg.SetFillColor(0);
+  if (doObs) leg.AddEntry(&gXSObs, "Observed limit", "L");
   leg.AddEntry(&gXS, "Expected limit", "L");
   leg.AddEntry(&gXS1Sig, "Expected limit (1 #sigma)", "F");
   leg.AddEntry(&gXS2Sig, "Expected limit (2 #sigma)", "F");
@@ -225,12 +257,17 @@ int main(int argc, char* argv[]) {
   gLimit.SetLineStyle(2);
   gLimit.Draw("L");
 
-//   TGraph gXSProd(mH.size(), &mH[0], &xsH[0]);
-//   gXSProd.SetLineColor(kBlue);
-//   gXSProd.Draw("L");
+  TGraph gLimitObs;
+  if (doObs) {
+    gLimitObs = TGraph(massH.size(), &massH[0], &limObs[0]);
+    gLimitObs.SetLineColor(kBlack);
+    gLimitObs.SetLineStyle(1);
+    gLimitObs.Draw("L");
+  }
 
   TLegend leg2(0.5, 0.65, 0.75, 0.85, "95% CL limits", "NDC");
   leg2.SetFillColor(0);
+  if (doObs) leg2.AddEntry(&gLimitObs, "Observed limit", "L");
   leg2.AddEntry(&gLimit, "Expected limit", "L");
   leg2.AddEntry(&gLimit1Sig, "Expected limit (1 #sigma)", "F");
   leg2.AddEntry(&gLimit2Sig, "Expected limit (2 #sigma)", "F");
