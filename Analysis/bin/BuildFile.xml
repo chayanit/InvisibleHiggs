@@ -41,3 +41,5 @@
 <bin name="limitPlots" file="limitPlots.cpp"/>
 
 <bin name="writeLeptonWeights" file="writeLeptonWeights.cpp"/>
+
+<bin name="search" file="search.cpp"/>
