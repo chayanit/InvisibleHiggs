@@ -523,7 +523,8 @@ int main(int argc, char* argv[]) {
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir_Plot);
-  plots.setLegPos(0.62,0.62,0.89,0.89);
+  plots.setLegPos(0.70,0.60,0.93,0.89);
+  //plots.setLegPos(0.62,0.62,0.89,0.89);
 
   plots.addDataset("DiBoson", kViolet-6, 0);
   plots.addDataset("SingleT+TTbar", kAzure-2, 0);
