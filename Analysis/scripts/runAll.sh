@@ -5,6 +5,7 @@
 VER=v11
 FILEVER=V11d
 LUMI=19576
+RUN=blind     # use either blind or both
 
 IDIR=/storage/phjjb/invisibleHiggs/Ntuple$FILEVER/Central
 ODIR=Analysis$FILEVER
@@ -44,7 +45,7 @@ wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI > $ODIR/wBackground.log
 echo ""
 
 echo "wTauBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI"
-wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI > $ODIR/wTauBackground.log
+wTauBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI > $ODIR/wTauBackground.log
 echo ""
 
 echo "zBackground -i $IDIR -o $ODIR -f $DATASETS_Z -l $LUMI"
@@ -68,16 +69,7 @@ summary -q 3 -o $ODIR -l $LUMI > $ODIR/summary.log
 echo ""
 
 # combine tool limits
-echo "combine -M Asymptotic $ODIR/card.txt"
-cd $ODIR
-combine -M Asymptotic --run=blind -m 110 card110.txt
-combine -M Asymptotic --run=blind -m 125 card125.txt
-combine -M Asymptotic --run=blind -m 150 card150.txt
-combine -M Asymptotic --run=blind -m 200 card200.txt
-combine -M Asymptotic --run=blind -m 300 card300.txt
-combine -M Asymptotic --run=blind -m 400 card400.txt
-hadd -f combineMerge.root higgsCombineTest.Asymptotic.mH*.root
-cd ..
+runLimits $ODIR $RUN
 
 # make plots
 echo "limitPlots -o $ODIR $LUMI"
