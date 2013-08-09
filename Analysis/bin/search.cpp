@@ -30,6 +30,15 @@ int main(int argc, char* argv[]) {
   std::string iDir = options.iDir;
   std::string oDir = options.oDir+std::string("/Signal");
 
+  if (oDir!="") {
+    boost::filesystem::path opath(oDir);
+    if (!exists(opath)) {
+      std::cout << "Creating output directory : " << oDir << std::endl;
+      boost::filesystem::create_directory(opath);
+    }
+    std::cout << "Writing results to " << oDir << std::endl;
+  }
+
   Datasets datasets(iDir);
   datasets.readFile(options.datasetFile);
 
