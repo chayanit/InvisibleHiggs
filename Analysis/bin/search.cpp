@@ -63,6 +63,7 @@ int main(int argc, char* argv[]) {
   }
 
   std::cout << "Yield in signal region : " << hCounts->GetBinContent(1);
+  std::cout << std::endl;
 
   // write out histograms
   ofile->cd();

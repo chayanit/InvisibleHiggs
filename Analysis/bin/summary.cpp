@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Getting Z background" << std::endl;
   int nObs = 0;
   
-  TFile* sigFile    = TFile::Open((oDir+std::string("/Search.root")).c_str(), "READ");
+  TFile* sigFile    = TFile::Open((oDir+std::string("/Signal/Search.root")).c_str(), "READ");
   if (sigFile!=0) {
     TH1D* hCounts = (TH1D*) sigFile->Get("hCounts");
     nObs          = hCounts->GetBinContent(1);
