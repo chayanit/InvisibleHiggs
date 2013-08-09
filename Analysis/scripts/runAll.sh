@@ -18,6 +18,7 @@ mkdir $ODIR
 
 DATASETS=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_$VER.txt
 DATASETS_W=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_W_$VER.txt
+DATASETS_WTau=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_WTau_$VER.txt
 DATASETS_Z=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_Z_$VER.txt
 DATASETS_QCD=$CMSSW_BASE/src/InvisibleHiggs/Analysis/data/datasets_QCD_$VER.txt
 
@@ -44,8 +45,8 @@ echo "wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI"
 wBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI > $ODIR/wBackground.log
 echo ""
 
-echo "wTauBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI"
-wTauBackground -i $IDIR -o $ODIR -f $DATASETS_W -l $LUMI > $ODIR/wTauBackground.log
+echo "wTauBackground -i $IDIR -o $ODIR -f $DATASETS_WTau -l $LUMI"
+wTauBackground -i $IDIR -o $ODIR -f $DATASETS_WTau -l $LUMI > $ODIR/wTauBackground.log
 echo ""
 
 echo "zBackground -i $IDIR -o $ODIR -f $DATASETS_Z -l $LUMI"
