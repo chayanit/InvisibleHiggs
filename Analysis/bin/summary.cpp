@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
     
     nBG_WTau     = hWTau->GetBinContent(1);
     stat_BG_WTau = hWTau->GetBinError(1);
-    syst_BG_WTau = sqrt(pow(hWTau_Syst->GetBinError(1),2)+pow(constants::syst_WTau,2));
+    syst_BG_WTau = sqrt(pow(hWTau_Syst->GetBinError(1),2)+pow(nBG_WTau*constants::syst_WTau,2));
 
     wTauFile->Close();
   }
