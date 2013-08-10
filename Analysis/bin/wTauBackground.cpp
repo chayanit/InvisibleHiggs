@@ -432,7 +432,7 @@ int main(int argc, char* argv[]) {
   
   // Syst hists - data/mc ID
   TH1D* hWTau_TauIDEff_Dphi_SystID = new TH1D("hWTau_TauIDEff_Dphi_SystID",   "", 3, dphiEdges); // tau ID eff
-  TH1D* hWTau_EstC_DPhi_SystID     = new TH1D("hWTau_EstC_DPhi_Syst",  "", 3, dphiEdges); // n^data - n^BG in Anne Marie's AN (syst)
+  TH1D* hWTau_EstC_DPhi_SystID     = new TH1D("hWTau_EstC_DPhi_SystID",  "", 3, dphiEdges); // n^data - n^BG in Anne Marie's AN (syst)
   TH1D* hWTau_EstS_DPhi_SystID     = new TH1D("hWTau_EstS_DPhi_SystID",  "", 3, dphiEdges); // Final number of tau estimate (syst)
   TH1D* hWTau_R_DPhi_SystID        = new TH1D("hWTau_R_DPhi_SystID",     "", 3, dphiEdges); // ratio of sngl/ctrl
 
@@ -455,6 +455,7 @@ int main(int argc, char* argv[]) {
   hWTau_EstS_DPhi_Syst->Multiply(hWTau_EstC_DPhi_Syst, hWTau_R_DPhi_Syst, 1., 1.); 
 
   // Systematics on data/mc tau ID 
+  // This could probably be streamlined...
   double scaleFactor = 0.08;
   hWTau_TauIDEff_Dphi_SystID->Add(hWTau_TauIDEff_DPhi,1.);
   for (int i=1; i<=hWTau_TauIDEff_Dphi_SystID->GetNbinsX(); ++i) hWTau_TauIDEff_Dphi_SystID->SetBinError(i,scaleFactor*hWTau_TauIDEff_Dphi_SystID->GetBinContent(i));
@@ -478,7 +479,7 @@ int main(int argc, char* argv[]) {
   std::cout << "  eff_tauID                                              : " << hWTau_TauIDEff_DPhi->GetBinContent(1) << " +/- " << hWTau_TauIDEff_DPhi->GetBinError(1) << " +/- " << hWTau_TauIDEff_Dphi_SystID->GetBinError(1) << std::endl;
   std::cout << "  eff_CJV                                                : " << hWTau_CJVEff_DPhi->GetBinContent(1) << " +/- " << hWTau_CJVEff_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl << std::endl;
-  std::cout << "  W in sgnl region                                       : " << hWTau_EstS_DPhi->GetBinContent(1) << " +/- " << hWTau_EstS_DPhi->GetBinError(1) << " (stat from data) +/- " << hWTau_EstS_DPhi_SystID->GetBinError(1) << " (syst, data/mc ID scale) +/- " << hWTau_EstS_DPhi_Syst->GetBinError(1) << " (syst from MC stats)" << std::endl;
+  std::cout << "  W in sgnl region                                       : " << hWTau_EstS_DPhi->GetBinContent(1) << " +/- " << hWTau_EstS_DPhi->GetBinError(1) << " (stat from data) +/- " << 0.08*hWTau_EstS_DPhi->GetBinContent(1) << " (syst, data/mc ID scale) +/- " << hWTau_EstS_DPhi_Syst->GetBinError(1) << " (syst from MC stats) +/- " << 0.05*hWTau_EstS_DPhi->GetBinContent(1) << " (w->e contamination" << std::endl;
 
 
   // write the cutflow table
