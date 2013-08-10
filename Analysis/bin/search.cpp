@@ -58,8 +58,11 @@ int main(int argc, char* argv[]) {
     TFile* ifile = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) ifile->Get("invHiggsInfo/InvHiggsInfo");
 
-    tree->Draw("0.5>>hCounts", cuts.allCuts());
+    TH1D* hTmp = new TH1D("hTmp", "", 1, 0., 1.);
 
+    tree->Draw("0.5>>hTmp", cuts.allCuts());
+
+    hCounts->Add(hTmp);
   }
 
   std::cout << "Yield in signal region : " << hCounts->GetBinContent(1);
