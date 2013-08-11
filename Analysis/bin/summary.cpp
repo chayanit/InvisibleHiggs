@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 
   double nBG_Z       = hZ->GetBinContent(1);
   double stat_BG_Z   = hZ->GetBinError(1);
-  double syst_BG_Z   = sqrt(pow(hZ_Syst->GetBinError(1),2)+pow(constants::syst_Z,2)); //hZ_Syst->GetBinError(1);
+  double syst_BG_Z   = sqrt(pow(hZ_Syst->GetBinError(1),2)+pow(nBG_Z*constants::syst_Z,2)); //hZ_Syst->GetBinError(1);
 
   TH1D* zCtrl = (TH1D*) zFile->Get("hZ_Data_C_DPhi");
   int nCtrlZ = zCtrl->GetBinContent(1);    /// counts in ctrl region for limits
