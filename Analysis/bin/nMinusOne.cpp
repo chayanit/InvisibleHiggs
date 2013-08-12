@@ -40,7 +40,9 @@ int main(int argc, char* argv[]) {
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
-  TCut trigCorr("trigCorrWeight");
+  //TCut trigCorr("trigCorrWeight");
+  TCut trigCorr("(trigCorrWeight>0) ? trigCorrWeight : 1.");
+
   TCut trig      = cuts.nMinusOneCuts("trigger");
   TCut metFilt   = cuts.nMinusOneCuts("metFilter");
   TCut eVeto     = cuts.nMinusOneCuts("EVeto");
@@ -58,7 +60,7 @@ int main(int argc, char* argv[]) {
 
     Dataset dataset = datasets.getDataset(i);
 
-    if (dataset.isData) continue;
+    //if (dataset.isData) continue;
 
     TFile* ifile = datasets.getTFile(dataset.name);
 
@@ -271,7 +273,7 @@ int main(int argc, char* argv[]) {
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
-  plots.setLegPos(0.69,0.72,0.98,0.97);
+  plots.setLegPos(0.69,0.70,0.98,0.97);
 
   plots.addDataset("Diboson", kViolet-6, 0);
   plots.addDataset("DYJets+EWK", kPink-4,0);
@@ -280,6 +282,7 @@ int main(int argc, char* argv[]) {
   plots.addDataset("ZJets+EWK", kOrange-2, 0);
   plots.addDataset("WNJets+EWK", kGreen-3, 0);
   plots.addDataset("SignalM125_POWHEG", kRed, 2);
+  plots.addDataset("METABCD",    kBlack, 1);
 
   plots.draw("hTrigNM1", "", "");
   plots.draw("hMETFiltNM1", "", "");

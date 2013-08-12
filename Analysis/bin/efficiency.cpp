@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 
     Dataset dataset = datasets.getDataset(i);
 
-    if (dataset.isData) continue;
+    //if (dataset.isData) continue;
 
     std::cout << "Cut flow for " << dataset.name << std::endl;
 
@@ -207,8 +207,9 @@ int main(int argc, char* argv[]) {
   ofstream texFile;
   texFile.open(options.oDir+std::string("/cutflow.tex"));
  
-  texFile << "Cut & N($Z\\rightarrow\\nu\\nu$) & N($W\\rightarrow \\mu\\nu$) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV \\\\" << std::endl;
+  texFile << "Cut & N(Data) & N($Z\\rightarrow\\nu\\nu$) & N($W\\rightarrow \\mu\\nu$) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV \\\\" << std::endl;
 
+  TH1D* hData   = (TH1D*) ofile->Get("hCutFlow_METABCD");
   TH1D* hZEWK   = (TH1D*) ofile->Get("hCutFlow_EWK_ZvvFake");
   TH1D* hTTbar  = (TH1D*) ofile->Get("hCutFlow_TTBar");
   TH1D* hSignal = (TH1D*) ofile->Get("hCutFlow_SignalM125_POWHEG");
@@ -217,6 +218,7 @@ int main(int argc, char* argv[]) {
   for (unsigned i=0; i<nCuts; ++i) {
 
     texFile << cuts.cutName(i) << " & ";
+    texFile << "$" << hData->GetBinContent(i+1) << " \\pm " << hData->GetBinError(i+1) << "$ & ";
     texFile << "$" << hZNuNu->GetBinContent(i+1) << " \\pm " << hZNuNu->GetBinError(i+1) << "$ & ";
     //texFile << "$" << hZEWK->GetBinContent(i+1) << " \\pm " << hZEWK->GetBinError(i+1) << "$ & ";
     texFile << "$" << hWLNu->GetBinContent(i+1) << " \\pm " << hWLNu->GetBinError(i+1) << "$ & ";
