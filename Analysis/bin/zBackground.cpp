@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
-  double metEdges[13] = { 0., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 120. };
+  //double metEdges[13] = { 0., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 120. };
 
   // signal MET>130
   TH1D* hZ_DY_C_DPhi = new TH1D("hZ_DY_C_DPhi", "", 3, dphiEdges);  // Z+jets MC ctrl region
@@ -72,14 +72,14 @@ int main(int argc, char* argv[]) {
 
 
   // 2D mET vs dphi
-  TH2D* hZ_DY_C_METDPhi = new TH2D("hZ_DY_C_METDPhi", "", 3, dphiEdges, 12, metEdges);  // Z+jets MC ctrl region
-  TH2D* hZ_BG_C_METDPhi = new TH2D("hZ_BG_C_METDPhi", "", 3, dphiEdges, 12, metEdges);  // background MC ctrl region
-  TH2D* hZ_Data_C_METDPhi = new TH2D("hZ_Data_C_METDPhi", "", 3, dphiEdges, 12, metEdges);  // Data ctrl region
+  //TH2D* hZ_DY_C_METDPhi = new TH2D("hZ_DY_C_METDPhi", "", 3, dphiEdges, 12, metEdges);  // Z+jets MC ctrl region
+  //TH2D* hZ_BG_C_METDPhi = new TH2D("hZ_BG_C_METDPhi", "", 3, dphiEdges, 12, metEdges);  // background MC ctrl region
+  //TH2D* hZ_Data_C_METDPhi = new TH2D("hZ_Data_C_METDPhi", "", 3, dphiEdges, 12, metEdges);  // Data ctrl region
 
-  TH1D* hZ_DY_EffVBFS_MET0_N = new TH1D("hZ_DY_EffVBFS_MET0_N", "", 12, metEdges);
-  TH1D* hZ_DY_EffVBFS_MET0_D = new TH1D("hZ_DY_EffVBFS_MET0_D", "", 12, metEdges);
-  TH1D* hZ_DY_EffVBFC_MET0_N = new TH1D("hZ_DY_EffVBFC_MET0_N", "", 12, metEdges);
-  TH1D* hZ_DY_EffVBFC_MET0_D = new TH1D("hZ_DY_EffVBFC_MET0_D", "", 12, metEdges);
+  //TH1D* hZ_DY_EffVBFS_MET0_N = new TH1D("hZ_DY_EffVBFS_MET0_N", "", 12, metEdges);
+  //TH1D* hZ_DY_EffVBFS_MET0_D = new TH1D("hZ_DY_EffVBFS_MET0_D", "", 12, metEdges);
+  //TH1D* hZ_DY_EffVBFC_MET0_N = new TH1D("hZ_DY_EffVBFC_MET0_N", "", 12, metEdges);
+  //TH1D* hZ_DY_EffVBFC_MET0_D = new TH1D("hZ_DY_EffVBFC_MET0_D", "", 12, metEdges);
 
   // cutflow histograms
   TH1D* hZ_CutFlow_Data       = new TH1D("hZ_CutFlow_Data", "", nCutsZMuMu, 0., nCutsZMuMu);
@@ -94,11 +94,19 @@ int main(int argc, char* argv[]) {
     Dataset dataset = datasets.getDataset(i);
     
     TCut cutD = cuts.cutDataset(dataset.name);
+    TCut yStarWeight("");
+    TCut mjjWeight("");
 
     // check if it's DYJets
     bool isDY = false;
     if (dataset.name.compare(0,2,"DY")==0) {
       isDY = true;
+ 
+      if (dataset.name == "DYJetsToLL_PtZ-100_NoTrig" || dataset.name == "DYJetsToLL_NoTrig") {
+      	TCut yStarWeight("8.49667e-01 + (1.49687e-01*(zEta - 0.5(jet1Eta - jet2Eta)))");
+      	TCut mjjWeight("3.92568e-01 + (1.20734e-01*log(vbfM)) - (2.55622e-04*vbfM)");
+	std::cout << "Analysing QCD DY->ll MC : " << dataset.name << std::endl;
+      }
       std::cout << "Analysing DY->ll MC : " << dataset.name << std::endl;
     }
     else if (dataset.isData) {
@@ -108,27 +116,29 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing BG MC     : " << dataset.name << std::endl;
     }
 
+    TCut otherWeight = puWeight * yStarWeight * mjjWeight;
+
     // get file & tree
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
 
     // set up cuts
-    TCut cutZMuMu_C    = puWeight * trigCorr * (cutD + cuts.zMuMuVBF() + METNo2Muon130);
+    TCut cutZMuMu_C    = otherWeight * trigCorr * (cutD + cuts.zMuMuVBF() + METNo2Muon130);
     
-    TCut cutEfficiencyMuMu_D    = puWeight * (cutD + cuts.zMuMuGen());
-    TCut cutEfficiencyMuMu_N    = puWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
+    TCut cutEfficiencyMuMu_D    = otherWeight * (cutD + cuts.zMuMuGen());
+    TCut cutEfficiencyMuMu_N    = otherWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
  
-    TCut cutEfficiencyVBFS_D    = puWeight * (cutD + cuts.zMuMuGenMass());
-    TCut cutEfficiencyVBFS_N    = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130 + cutLoDPhi);
+    TCut cutEfficiencyVBFS_D    = otherWeight * (cutD + cuts.zMuMuGenMass());
+    TCut cutEfficiencyVBFS_N    = otherWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130 + cutLoDPhi);
     
-    TCut cutEfficiencyVBFC_D    = puWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
-    TCut cutEfficiencyVBFC_N    = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon130 + cutLoDPhi);
+    TCut cutEfficiencyVBFC_D    = otherWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
+    TCut cutEfficiencyVBFC_N    = otherWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon130 + cutLoDPhi);
 
     // cuts for 2D
-    TCut cutZMuMu_MET0_C    = puWeight * trigCorr * (cutD + cuts.zMuMuVBF());
+    //TCut cutZMuMu_MET0_C    = puWeight * trigCorr * (cutD + cuts.zMuMuVBF());
 
-    TCut cutEfficiencyVBFS_MET0_N  = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf());
-    TCut cutEfficiencyVBFC_MET0_N  = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf());
+    //TCut cutEfficiencyVBFS_MET0_N  = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf());
+    //TCut cutEfficiencyVBFC_MET0_N  = puWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf());
     
     // fill tmp histograms for BG estimation
     TH1D* hZ_C_DPhi  = new TH1D("hZ_C_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
@@ -141,11 +151,11 @@ int main(int argc, char* argv[]) {
     TH1D* hZ_EffVBFC_N  = new TH1D("hZ_EffVBFC_N", "", 1, 0., 1.);
 
     // 2D calculation
-    TH2D* hZ_C_METDPhi       = new TH2D("hZ_C_METDPhi", "", 3, dphiEdges, 12, metEdges);
-    TH1D* hZ_EffVBFS_MET0_N  = new TH1D("hZ_EffVBFS_MET0_N", "", 12, metEdges);
-    TH1D* hZ_EffVBFS_MET0_D  = new TH1D("hZ_EffVBFS_MET0_D", "", 12, metEdges);
-    TH1D* hZ_EffVBFC_MET0_N  = new TH1D("hZ_EffVBFC_MET0_N", "", 12, metEdges);
-    TH1D* hZ_EffVBFC_MET0_D  = new TH1D("hZ_EffVBFC_MET0_D", "", 12, metEdges);
+    //TH2D* hZ_C_METDPhi       = new TH2D("hZ_C_METDPhi", "", 3, dphiEdges, 12, metEdges);
+    //TH1D* hZ_EffVBFS_MET0_N  = new TH1D("hZ_EffVBFS_MET0_N", "", 12, metEdges);
+    //TH1D* hZ_EffVBFS_MET0_D  = new TH1D("hZ_EffVBFS_MET0_D", "", 12, metEdges);
+    //TH1D* hZ_EffVBFC_MET0_N  = new TH1D("hZ_EffVBFC_MET0_N", "", 12, metEdges);
+    //TH1D* hZ_EffVBFC_MET0_D  = new TH1D("hZ_EffVBFC_MET0_D", "", 12, metEdges);
 
     if (isDY) {
       tree->Draw("vbfDPhi>>hZ_C_DPhi", cutZMuMu_C);
@@ -156,17 +166,17 @@ int main(int argc, char* argv[]) {
       tree->Draw("0.5>>hZ_EffVBFC_D",     cutEfficiencyVBFC_D);
       tree->Draw("0.5>>hZ_EffVBFC_N",  cutEfficiencyVBFC_N);
 
-      tree->Draw("met:vbfDPhi>>hZ_C_METDPhi", cutZMuMu_MET0_C);
-      tree->Draw("met>>hZ_EffVBFS_MET0_N",   cutEfficiencyVBFS_MET0_N);
-      tree->Draw("met>>hZ_EffVBFS_MET0_D",   cutEfficiencyVBFS_D);
-      tree->Draw("met>>hZ_EffVBFC_MET0_N",   cutEfficiencyVBFC_MET0_N);
-      tree->Draw("met>>hZ_EffVBFC_MET0_D",   cutEfficiencyVBFC_D);
+      //tree->Draw("met:vbfDPhi>>hZ_C_METDPhi", cutZMuMu_MET0_C);
+      //tree->Draw("met>>hZ_EffVBFS_MET0_N",   cutEfficiencyVBFS_MET0_N);
+      //tree->Draw("met>>hZ_EffVBFS_MET0_D",   cutEfficiencyVBFS_D);
+      //tree->Draw("met>>hZ_EffVBFC_MET0_N",   cutEfficiencyVBFC_MET0_N);
+      //tree->Draw("met>>hZ_EffVBFC_MET0_D",   cutEfficiencyVBFC_D);
 
     }
     else {
       tree->Draw("vbfDPhi>>hZ_C_DPhi", cutZMuMu_C);
-
-      tree->Draw("met:vbfDPhi>>hZ_C_METDPhi",  cutZMuMu_MET0_C);
+ 
+      //tree->Draw("met:vbfDPhi>>hZ_C_METDPhi",  cutZMuMu_MET0_C);
     }
 
     // weight  to lumi
@@ -180,17 +190,17 @@ int main(int argc, char* argv[]) {
     hZ_EffMuMu_D->Scale(weight);
     hZ_EffMuMu_N->Scale(weight);
 
-    hZ_C_METDPhi->Scale(weight);
-    hZ_EffVBFS_MET0_N->Scale(weight);
-    hZ_EffVBFS_MET0_D->Scale(weight);
-    hZ_EffVBFC_MET0_N->Scale(weight);
-    hZ_EffVBFC_MET0_D->Scale(weight);
+    //hZ_C_METDPhi->Scale(weight);
+    //hZ_EffVBFS_MET0_N->Scale(weight);
+    //hZ_EffVBFS_MET0_D->Scale(weight);
+    //hZ_EffVBFC_MET0_N->Scale(weight);
+    //hZ_EffVBFC_MET0_D->Scale(weight);
 
 
     // add to output histograms
     if (dataset.isData) {
       hZ_Data_C_DPhi->Add(hZ_C_DPhi);
-      hZ_Data_C_METDPhi->Add(hZ_C_METDPhi);
+      //hZ_Data_C_METDPhi->Add(hZ_C_METDPhi);
     }
     else if (isDY) {
       hZ_DY_C_DPhi->Add(hZ_C_DPhi);
@@ -201,15 +211,15 @@ int main(int argc, char* argv[]) {
       hZ_DY_EffMuMu_D->Add(hZ_EffMuMu_D);
       hZ_DY_EffMuMu_N->Add(hZ_EffMuMu_N);
 
-      hZ_DY_C_METDPhi->Add(hZ_C_METDPhi);
-      hZ_DY_EffVBFS_MET0_N->Add(hZ_EffVBFS_MET0_N);
-      hZ_DY_EffVBFS_MET0_D->Add(hZ_EffVBFS_MET0_D);
-      hZ_DY_EffVBFC_MET0_N->Add(hZ_EffVBFC_MET0_N);
-      hZ_DY_EffVBFC_MET0_D->Add(hZ_EffVBFC_MET0_D);
+      //hZ_DY_C_METDPhi->Add(hZ_C_METDPhi);
+      //hZ_DY_EffVBFS_MET0_N->Add(hZ_EffVBFS_MET0_N);
+      //hZ_DY_EffVBFS_MET0_D->Add(hZ_EffVBFS_MET0_D);
+      //hZ_DY_EffVBFC_MET0_N->Add(hZ_EffVBFC_MET0_N);
+      //hZ_DY_EffVBFC_MET0_D->Add(hZ_EffVBFC_MET0_D);
     }
     else {
       hZ_BG_C_DPhi->Add(hZ_C_DPhi);
-      hZ_BG_C_METDPhi->Add(hZ_C_METDPhi);
+      //hZ_BG_C_METDPhi->Add(hZ_C_METDPhi);
     }
 
     std::cout << "  N ctrl (dphi<1.0) : " << hZ_C_DPhi->GetBinContent(1) << " +/- " << hZ_C_DPhi->GetBinError(1) << std::endl;  
@@ -223,11 +233,11 @@ int main(int argc, char* argv[]) {
     delete hZ_EffVBFC_D;
     delete hZ_EffVBFC_N;
 
-    delete hZ_C_METDPhi;
-    delete hZ_EffVBFS_MET0_N;
-    delete hZ_EffVBFS_MET0_D;
-    delete hZ_EffVBFC_MET0_N;
-    delete hZ_EffVBFC_MET0_D;
+    //delete hZ_C_METDPhi;
+    //delete hZ_EffVBFS_MET0_N;
+    //delete hZ_EffVBFS_MET0_D;
+    //delete hZ_EffVBFC_MET0_N;
+    //delete hZ_EffVBFC_MET0_D;
 
     ofile->cd();
 
@@ -239,8 +249,8 @@ int main(int argc, char* argv[]) {
 
       TCut cut;
 
-      if(c == nCutsZMuMu-1) cut = puWeight * trigCorr * (cutD + cuts.cutflowZMuMu(c));
-      else cut = puWeight * (cutD + cuts.cutflowZMuMu(c));
+      if(c == nCutsZMuMu-1) cut = otherWeight * trigCorr * (cutD + cuts.cutflowZMuMu(c));
+      else cut = otherWeight * (cutD + cuts.cutflowZMuMu(c));
 
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
@@ -263,8 +273,8 @@ int main(int argc, char* argv[]) {
       hZ_CutFlow_SingleTSum->Add(hZ_CutFlow);
     }
     if (dataset.name.compare(0,2,"WW")==0 ||
-  dataset.name.compare(0,2,"WZ")==0 ||
-  dataset.name.compare(0,2,"ZZ")==0 ) {
+  	dataset.name.compare(0,2,"WZ")==0 ||
+  	dataset.name.compare(0,2,"ZZ")==0 ) {
       hZ_CutFlow_Diboson->Add(hZ_CutFlow);
     }
 
@@ -273,7 +283,7 @@ int main(int argc, char* argv[]) {
     delete hZ_CutFlow;
 
     // Z control plots
-    TCut cutPlots = puWeight * trigCorr * (cutD + cuts.zMuMuVBFLoose());
+    TCut cutPlots = otherWeight * trigCorr * (cutD + cuts.zMuMuVBFLoose());
  
     TFile* ofile_Plot = TFile::Open( (oDir_Plot+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
@@ -575,7 +585,6 @@ int main(int argc, char* argv[]) {
 //   hZ_Est_C_METDPhi->Write("",TObject::kOverwrite);
 //   hZ_Est_S_METDPhi->Write("",TObject::kOverwrite);
 //   hZ_Eff_S_METDPhi->Write("",TObject::kOverwrite);
-
 
   hZ_CutFlow_Data->Write("",TObject::kOverwrite);
   hZ_CutFlow_DY->Write("",TObject::kOverwrite);
