@@ -57,12 +57,14 @@ int main(int argc, char* argv[]) {
   TCut puWeight("puWeight"); 
   TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
   TCut cutnoMjjnoMET = cuts.cutWMu("trigger")+cuts.cutWMu("dijet")+cuts.cutWMu("dEtaJJ")+cuts.cutWMu("CJV")+cuts.cutWMu("dPhiJJ");
+  TCut cutnoMETnoCJV = cuts.cutWMu("trigger")+cuts.cutWMu("dijet")+cuts.cutWMu("dEtaJJ")+cuts.cutWMu("Mjj")+cuts.cutWMu("dPhiJJ");
   
   double dphiEdges[5] = { 0., 1.0, 1.8, 2.6, TMath::Pi() };
   double etaEdges[5]  = { 0., 0.5, 1.0, 1.5, 2.1 };
   //double etaEdges[5]  = { -2.1, -1.0, 0.0, 1.0, +2.1 };
   double mjjEdges[6]  = { 800., 1000., 1200., 1600., 2000., 3000. };
   double metEdges[5]  = { 100., 150., 200., 300., 500. };
+  double cjvEdges[5]  = { 10., 30., 60., 100., 150.}; 
 
   TH1D* hWMu_WC_GEN   = new TH1D("hWMu_WC_GEN", "", 1, 0., 1.);   
   TH1D* hWEl_WC_GEN   = new TH1D("hWEl_WC_GEN", "", 1, 0., 1.);
@@ -99,7 +101,14 @@ int main(int argc, char* argv[]) {
   TH1D* hWEl_VBF_MET   = new TH1D("hWEl_VBF_MET", "", 4, metEdges);
   TH1D* hWEl_BGC_MET   = new TH1D("hWEl_BGC_MET", "", 4, metEdges);
   TH1D* hWEl_DataC_MET = new TH1D("hWEl_DataC_MET", "", 4, metEdges);
+  // bins of Central Jet Et
+  TH1D* hWMu_VBF_CJV   = new TH1D("hWMu_VBF_CJV", "", 4, cjvEdges);
+  TH1D* hWMu_BGC_CJV   = new TH1D("hWMu_BGC_CJV", "", 4, cjvEdges);
+  TH1D* hWMu_DataC_CJV = new TH1D("hWMu_DataC_CJV", "", 4, cjvEdges);
 
+  TH1D* hWEl_VBF_CJV   = new TH1D("hWEl_VBF_CJV", "", 4, cjvEdges);
+  TH1D* hWEl_BGC_CJV   = new TH1D("hWEl_BGC_CJV", "", 4, cjvEdges);
+  TH1D* hWEl_DataC_CJV = new TH1D("hWEl_DataC_CJV", "", 4, cjvEdges);
   // loop over MC datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
 
@@ -162,6 +171,12 @@ int main(int argc, char* argv[]) {
     TH1D* hWMu_WC_MET = new TH1D("hWMu_WC_MET", "", 4, metEdges);  
     TH1D* hWEl_C_MET  = new TH1D("hWEl_C_MET", "",  4, metEdges); 
     TH1D* hWEl_WC_MET = new TH1D("hWEl_WC_MET", "", 4, metEdges);  
+
+    TH1D* hWMu_C_CJV  = new TH1D("hWMu_C_CJV", "",  4, cjvEdges);  
+    TH1D* hWMu_WC_CJV = new TH1D("hWMu_WC_CJV", "", 4, cjvEdges);  
+    TH1D* hWEl_C_CJV  = new TH1D("hWEl_C_CJV", "",  4, cjvEdges); 
+    TH1D* hWEl_WC_CJV = new TH1D("hWEl_WC_CJV", "", 4, cjvEdges);
+
     // Cut 
     TCut cutWMu_GEN  = otherCuts * cuts.wMuGen();
     TCut cutWEl_GEN  = otherCuts * cuts.wElGen();
@@ -186,6 +201,11 @@ int main(int argc, char* argv[]) {
     TCut cutWEl_C_noMET  = otherCuts * (cutD + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("Mjj"));
     TCut cutWEl_WC_noMET = otherCuts * (cuts.wElGen() + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("Mjj"));
 
+    TCut cutWMu_C_noCJV  = otherCuts * (cutD + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMETnoCJV + cuts.cutWMu("MET"));
+    TCut cutWMu_WC_noCJV = otherCuts * (cuts.wMuGen() + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMETnoCJV + cuts.cutWMu("MET"));
+    TCut cutWEl_C_noCJV  = otherCuts * (cutD + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMETnoCJV + cuts.cutWEl("MET"));
+    TCut cutWEl_WC_noCJV = otherCuts * (cuts.wElGen() + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMETnoCJV + cuts.cutWEl("MET"));
+
     tree->Draw("0.5>>hWMu_GEN", cutWMu_GEN);
     tree->Draw("0.5>>hWEl_GEN", cutWEl_GEN);
 
@@ -208,6 +228,11 @@ int main(int argc, char* argv[]) {
     tree->Draw("metNoWLepton>>hWMu_WC_MET", cutWMu_WC_noMET);
     tree->Draw("met>>hWEl_C_MET",  cutWEl_C_noMET);
     tree->Draw("met>>hWEl_WC_MET", cutWEl_WC_noMET);
+
+    tree->Draw("cenJetEt>>hWMu_C_CJV",  cutWMu_C_noCJV);
+    tree->Draw("cenJetEt>>hWMu_WC_CJV", cutWMu_WC_noCJV);
+    tree->Draw("cenJetEt>>hWEl_C_CJV",  cutWEl_C_noCJV);
+    tree->Draw("cenJetEt>>hWEl_WC_CJV", cutWEl_WC_noCJV);
 
     double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents;
     std::cout << "  weight : " << weight << std::endl;
@@ -235,6 +260,11 @@ int main(int argc, char* argv[]) {
     hWEl_C_MET->Scale(weight);
     hWEl_WC_MET->Scale(weight);
 
+    hWMu_C_CJV->Scale(weight);
+    hWMu_WC_CJV->Scale(weight);
+    hWEl_C_CJV->Scale(weight);
+    hWEl_WC_CJV->Scale(weight);
+
     // add to final histogram
     if (isWJets || isEwkW) {
     	hWMu_WC_GEN->Add(hWMu_GEN);
@@ -248,6 +278,8 @@ int main(int argc, char* argv[]) {
     	hWEl_VBF_Mjj->Add(hWEl_WC_Mjj);
     	hWMu_VBF_MET->Add(hWMu_WC_MET);
     	hWEl_VBF_MET->Add(hWEl_WC_MET);
+    	hWMu_VBF_CJV->Add(hWMu_WC_CJV);
+    	hWEl_VBF_CJV->Add(hWEl_WC_CJV);
     }
     else if (dataset.isData) {
     	hWMu_DataC_DPhi->Add(hWMu_C_DPhi);
@@ -258,6 +290,8 @@ int main(int argc, char* argv[]) {
     	hWEl_DataC_Mjj->Add(hWEl_C_Mjj);
     	hWMu_DataC_MET->Add(hWMu_C_MET);
     	hWEl_DataC_MET->Add(hWEl_C_MET);
+    	hWMu_DataC_CJV->Add(hWMu_C_CJV);
+    	hWEl_DataC_CJV->Add(hWEl_C_CJV);
     }
     else {
     	hWMu_BGC_DPhi->Add(hWMu_C_DPhi);
@@ -268,6 +302,8 @@ int main(int argc, char* argv[]) {
     	hWEl_BGC_Mjj->Add(hWEl_C_Mjj);
     	hWMu_BGC_MET->Add(hWMu_C_MET);
     	hWEl_BGC_MET->Add(hWEl_C_MET);
+    	hWMu_BGC_CJV->Add(hWMu_C_CJV);
+    	hWEl_BGC_CJV->Add(hWEl_C_CJV);
     }
 
     // debug output
@@ -291,6 +327,10 @@ int main(int argc, char* argv[]) {
     delete hWMu_WC_MET;
     delete hWEl_C_MET;
     delete hWEl_WC_MET;
+    delete hWMu_C_CJV;
+    delete hWMu_WC_CJV;
+    delete hWEl_C_CJV;
+    delete hWEl_WC_CJV;
 
     delete tree;
     file->Close();
@@ -365,6 +405,22 @@ int main(int argc, char* argv[]) {
   hWMu_EstC_MET->Add(hWMu_DataC_MET, hWMu_BGC_MET, 1., -1.);
   hWEl_EstS_MET->Multiply(hWMu_EstC_MET, hWEl_R_MET, 1., 1.);       
   hWEl_EstC_MET->Add(hWEl_DataC_MET, hWEl_BGC_MET, 1., -1.); 
+
+  // bins CJV
+  TH1D* hWEl_RVBF_CJV = new TH1D("hWEl_RVBF_CJV", "", 4, cjvEdges);  
+  TH1D* hWEl_R_CJV    = new TH1D("hWEl_R_CJV", "", 4, cjvEdges);
+  TH1D* hWMu_EstC_CJV = new TH1D("hWMu_EstC_CJV", "", 4, cjvEdges);
+  TH1D* hWEl_EstS_CJV = new TH1D("hWEl_EstS_CJV", "", 4, cjvEdges);
+  TH1D* hWEl_EstC_CJV = new TH1D("hWEl_EstC_CJV", "", 4, cjvEdges);
+
+  hWEl_RVBF_CJV->Divide(hWEl_VBF_CJV, hWMu_VBF_CJV, 1., 1.);
+  for(int ibin = 1; ibin <= hWEl_R_CJV->GetNbinsX(); ++ibin) {
+        hWEl_R_CJV->SetBinContent(ibin, hWEl_RVBF_CJV->GetBinContent(ibin) * hWEl_RGEN->GetBinContent(1));
+        hWEl_R_CJV->SetBinError(ibin, hWEl_R_CJV->GetBinContent(ibin) * sqrt(pow(hWEl_RVBF_CJV->GetBinError(ibin)/hWEl_RVBF_CJV->GetBinContent(ibin),2) + pow(hWEl_RGEN->GetBinError(1)/hWEl_RGEN->GetBinContent(1),2)));
+  }
+  hWMu_EstC_CJV->Add(hWMu_DataC_CJV, hWMu_BGC_CJV, 1., -1.);
+  hWEl_EstS_CJV->Multiply(hWMu_EstC_CJV, hWEl_R_CJV, 1., 1.);       
+  hWEl_EstC_CJV->Add(hWEl_DataC_CJV, hWEl_BGC_CJV, 1., -1.);
  
   std::cout << std::endl;
   std::cout << "##################################### Closure test WMu-WEl control region #####################################" << std::endl;
@@ -570,6 +626,52 @@ int main(int argc, char* argv[]) {
   std::cout << "  Observed WEl           : " << hWEl_EstC_MET->GetBinContent(4) << " +/- " << hWEl_EstC_MET->GetBinError(4) << std::endl;
   std::cout << "  MC Prediction          : " << hWEl_VBF_MET->GetBinContent(4) << " +/- " << hWEl_VBF_MET->GetBinError(4) << std::endl;
   std::cout << std::endl;
+  std::cout << "##### Bins CJV #####" << std::endl;
+  std::cout << std::endl;
+  std::cout << "  10 < CJV < 30 " << std::endl;
+  std::cout << std::endl;;
+  std::cout << "  VBF ratio by histogram : " << hWEl_RVBF_CJV->GetBinContent(1) << " +/- " << hWEl_RVBF_CJV->GetBinError(1) << std::endl;
+  std::cout << "  Total ratio            : " << hWEl_R_CJV->GetBinContent(1) << " +/- " << hWEl_R_CJV->GetBinError(1) << std::endl;
+  std::cout << "  Data WMu ctrl region   : " << hWMu_DataC_CJV->GetBinContent(1) << " +/- " << hWMu_DataC_CJV->GetBinError(1) << std::endl;
+  std::cout << "  Background WMu ctrl    : " << hWMu_BGC_CJV->GetBinContent(1) << " +/- " << hWMu_BGC_CJV->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Predicted WEl from WMu : " << hWEl_EstS_CJV->GetBinContent(1) << " +/- " << hWEl_EstS_CJV->GetBinError(1) << std::endl;
+  std::cout << "  Observed WEl           : " << hWEl_EstC_CJV->GetBinContent(1) << " +/- " << hWEl_EstC_CJV->GetBinError(1) << std::endl;
+  std::cout << "  MC Prediction          : " << hWEl_VBF_CJV->GetBinContent(1) << " +/- " << hWEl_VBF_CJV->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  30 < CJV < 60 " << std::endl;
+  std::cout << std::endl;
+  std::cout << "  VBF ratio by histogram : " << hWEl_RVBF_CJV->GetBinContent(2) << " +/- " << hWEl_RVBF_CJV->GetBinError(2) << std::endl;
+  std::cout << "  Total ratio            : " << hWEl_R_CJV->GetBinContent(2) << " +/- " << hWEl_R_CJV->GetBinError(2) << std::endl;
+  std::cout << "  Data WMu ctrl region   : " << hWMu_DataC_CJV->GetBinContent(2) << " +/- " << hWMu_DataC_CJV->GetBinError(2) << std::endl;
+  std::cout << "  Background WMu ctrl    : " << hWMu_BGC_CJV->GetBinContent(2) << " +/- " << hWMu_BGC_CJV->GetBinError(2) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Predicted WEl from WMu : " << hWEl_EstS_CJV->GetBinContent(2) << " +/- " << hWEl_EstS_CJV->GetBinError(2) << std::endl;
+  std::cout << "  Observed WEl           : " << hWEl_EstC_CJV->GetBinContent(2) << " +/- " << hWEl_EstC_CJV->GetBinError(2) << std::endl;
+  std::cout << "  MC Prediction          : " << hWEl_VBF_CJV->GetBinContent(2) << " +/- " << hWEl_VBF_CJV->GetBinError(2) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  60 < CJV < 100 " << std::endl;
+  std::cout << std::endl;
+  std::cout << "  VBF ratio by histogram : " << hWEl_RVBF_CJV->GetBinContent(3) << " +/- " << hWEl_RVBF_CJV->GetBinError(3) << std::endl;
+  std::cout << "  Total ratio            : " << hWEl_R_CJV->GetBinContent(3) << " +/- " << hWEl_R_CJV->GetBinError(3) << std::endl;
+  std::cout << "  Data WMu ctrl region   : " << hWMu_DataC_CJV->GetBinContent(3) << " +/- " << hWMu_DataC_CJV->GetBinError(3) << std::endl;
+  std::cout << "  Background WMu ctrl    : " << hWMu_BGC_CJV->GetBinContent(3) << " +/- " << hWMu_BGC_CJV->GetBinError(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Predicted WEl from WMu : " << hWEl_EstS_CJV->GetBinContent(3) << " +/- " << hWEl_EstS_CJV->GetBinError(3) << std::endl;
+  std::cout << "  Observed WEl           : " << hWEl_EstC_CJV->GetBinContent(3) << " +/- " << hWEl_EstC_CJV->GetBinError(3) << std::endl;
+  std::cout << "  MC Prediction          : " << hWEl_VBF_CJV->GetBinContent(3) << " +/- " << hWEl_VBF_CJV->GetBinError(3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  100 < CJV < 150 " << std::endl;
+  std::cout << std::endl;
+  std::cout << "  VBF ratio by histogram : " << hWEl_RVBF_CJV->GetBinContent(4) << " +/- " << hWEl_RVBF_CJV->GetBinError(4) << std::endl;
+  std::cout << "  Total ratio            : " << hWEl_R_CJV->GetBinContent(4) << " +/- " << hWEl_R_CJV->GetBinError(4) << std::endl;
+  std::cout << "  Data WMu ctrl region   : " << hWMu_DataC_CJV->GetBinContent(4) << " +/- " << hWMu_DataC_CJV->GetBinError(4) << std::endl;
+  std::cout << "  Background WMu ctrl    : " << hWMu_BGC_CJV->GetBinContent(4) << " +/- " << hWMu_BGC_CJV->GetBinError(4) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Predicted WEl from WMu : " << hWEl_EstS_CJV->GetBinContent(4) << " +/- " << hWEl_EstS_CJV->GetBinError(4) << std::endl;
+  std::cout << "  Observed WEl           : " << hWEl_EstC_CJV->GetBinContent(4) << " +/- " << hWEl_EstC_CJV->GetBinError(4) << std::endl;
+  std::cout << "  MC Prediction          : " << hWEl_VBF_CJV->GetBinContent(4) << " +/- " << hWEl_VBF_CJV->GetBinError(4) << std::endl;
+  std::cout << std::endl;
   std::cout << "###############################################################################################################" << std::endl;
   std::cout << std::endl;
 
@@ -589,10 +691,13 @@ int main(int argc, char* argv[]) {
   double ex_mjj[5]  = {100, 100, 200, 200, 500};
   double x_met[4]   = {125., 175., 250., 400.};
   double ex_met[4]  = {25, 25, 50, 100};
+  double x_cjv[4]   = {20., 45., 80., 125.};
+  double ex_cjv[4]  = {10, 15, 20, 25};
 
   double y_dPhi1[4],ey_dPhi1[4],y_dPhi2[4],ey_dPhi2[4],y_dPhi3[4],ey_dPhi3[4],frac_dPhi[4],efrac_dPhi[4],diff_dPhi[4],ediff_dPhi[4];
   double y_eta1[4],ey_eta1[4],y_eta2[4],ey_eta2[4],y_eta3[4],ey_eta3[4],frac_eta[4],efrac_eta[4],diff_eta[4],ediff_eta[4];
   double y_met1[4],ey_met1[4],y_met2[4],ey_met2[4],y_met3[4],ey_met3[4],frac_met[4],efrac_met[4],diff_met[4],ediff_met[4];
+  double y_cjv1[4],ey_cjv1[4],y_cjv2[4],ey_cjv2[4],y_cjv3[4],ey_cjv3[4],frac_cjv[4],efrac_cjv[4],diff_cjv[4],ediff_cjv[4];
   double y_syst1[4],e_syst1[4];
 
   double y_mjj1[5],ey_mjj1[5],y_mjj2[5],ey_mjj2[5],y_mjj3[5],ey_mjj3[5],frac_mjj[5],efrac_mjj[5],diff_mjj[5],ediff_mjj[5];
@@ -610,7 +715,7 @@ int main(int argc, char* argv[]) {
     ey_dPhi3[i] = hWEl_VBF_DPhi->GetBinError(i+1); 
 
     if(y_dPhi2[i] > 0) frac_dPhi[i]  = (y_dPhi1[i] - y_dPhi2[i])/y_dPhi2[i];
-    efrac_dPhi[i] = sqrt(pow(ey_dPhi1[i]/y_dPhi1[i],2) + pow(ey_dPhi2[i]/y_dPhi2[i],2));
+    efrac_dPhi[i] = (y_dPhi1[i]/y_dPhi2[i]) * sqrt(pow(ey_dPhi1[i]/y_dPhi1[i],2) + pow(ey_dPhi2[i]/y_dPhi2[i],2));
     //diff_dPhi[i]  = y_dPhi3[i]-y_dPhi1[i];
     //ediff_dPhi[i] = 
 
@@ -622,7 +727,7 @@ int main(int argc, char* argv[]) {
     ey_eta3[i] = hWEl_VBF_Eta->GetBinError(i+1); 
 
     if(y_eta2[i] > 0) frac_eta[i]  = (y_eta1[i] - y_eta2[i])/y_eta2[i];
-    efrac_eta[i] = sqrt(pow(ey_eta1[i]/y_eta1[i],2) + pow(ey_eta2[i]/y_eta2[i],2));
+    efrac_eta[i] = (y_eta1[i]/y_eta2[i]) * sqrt(pow(ey_eta1[i]/y_eta1[i],2) + pow(ey_eta2[i]/y_eta2[i],2));
 
     y_met1[i]  = hWEl_EstS_MET->GetBinContent(i+1);	//Predicted WEl
     ey_met1[i] = hWEl_EstS_MET->GetBinError(i+1);	
@@ -632,7 +737,17 @@ int main(int argc, char* argv[]) {
     ey_met3[i] = hWEl_VBF_MET->GetBinError(i+1); 
 
     if(y_met2[i] > 0) frac_met[i]  = (y_met1[i] - y_met2[i])/y_met2[i];
-    efrac_met[i] = sqrt(pow(ey_met1[i]/y_met1[i],2) + pow(ey_met2[i]/y_met2[i],2));
+    efrac_met[i] = (y_met1[i]/y_met2[i]) * sqrt(pow(ey_met1[i]/y_met1[i],2) + pow(ey_met2[i]/y_met2[i],2));
+
+    y_cjv1[i]  = hWEl_EstS_CJV->GetBinContent(i+1);	//Predicted WEl
+    ey_cjv1[i] = hWEl_EstS_CJV->GetBinError(i+1);	
+    y_cjv2[i]  = hWEl_EstC_CJV->GetBinContent(i+1);	//Observed WEl
+    ey_cjv2[i] = hWEl_EstC_CJV->GetBinError(i+1);
+    y_cjv3[i]  = hWEl_VBF_CJV->GetBinContent(i+1);      //MC Prediction
+    ey_cjv3[i] = hWEl_VBF_CJV->GetBinError(i+1); 
+
+    if(y_cjv2[i] > 0) frac_cjv[i]  = (y_cjv1[i] - y_cjv2[i])/y_cjv2[i];
+    efrac_cjv[i] = (y_cjv1[i]/y_cjv2[i]) * sqrt(pow(ey_cjv1[i]/y_cjv1[i],2) + pow(ey_cjv2[i]/y_cjv2[i],2));
   }
 
   for(int i=0; i<5; ++i) {
@@ -647,7 +762,7 @@ int main(int argc, char* argv[]) {
     ey_mjj3[i] = hWEl_VBF_Mjj->GetBinError(i+1); 
 
     if(y_mjj2[i] > 0) frac_mjj[i]  = (y_mjj1[i] - y_mjj2[i])/y_mjj2[i];
-    efrac_mjj[i] = sqrt(pow(ey_mjj1[i]/y_mjj1[i],2) + pow(ey_mjj2[i]/y_mjj2[i],2));
+    efrac_mjj[i] = (y_mjj1[i]/y_mjj2[i]) * sqrt(pow(ey_mjj1[i]/y_mjj1[i],2) + pow(ey_mjj2[i]/y_mjj2[i],2));
   }
 
   TH1D *h1 = new TH1D("h1", "", 1, 0, TMath::Pi());
@@ -655,12 +770,15 @@ int main(int argc, char* argv[]) {
   //TH1D *h2 = new TH1D("h2", "", 1, -2.1, +2.1);
   TH1D *h3 = new TH1D("h3", "", 1, 800., 3000.);
   TH1D *h4 = new TH1D("h4", "", 1, 100., 500.);
+  TH1D *h5 = new TH1D("h5", "", 1, 10., 150.);
 
-  TF1 *f1 = new TF1("f1","pol0",0,TMath::Pi()); 
+  //TF1 *f1 = new TF1("f1","pol0",0,TMath::Pi());  	// fit 4 bins
+  TF1 *f1 = new TF1("f1","pol0",0, 2.6); 		// fit 3 bins
   TF1 *f2 = new TF1("f2","pol0",0., +2.1);
   //TF1 *f2 = new TF1("f2","pol0",-2.1, +2.1); 
   TF1 *f3 = new TF1("f3","pol0",800., 3000.); 
   TF1 *f4 = new TF1("f4","pol0",100., 500.); 
+  TF1 *f5 = new TF1("f5","pol0",10., 150.); 
 
   TGraphErrors *gp_dPhi1  = new TGraphErrors(4,x_dPhi,y_dPhi1,ex_dPhi,ey_dPhi1);
   TGraphErrors *gp_dPhi2  = new TGraphErrors(4,x_dPhi,y_dPhi2,ex_dPhi,ey_dPhi2);
@@ -685,6 +803,12 @@ int main(int argc, char* argv[]) {
   TGraphErrors *gp_met3  = new TGraphErrors(4,x_met,y_met3,ex_met,ey_met3);
   TGraphErrors *gp_metS  = new TGraphErrors(4,x_met,y_syst1,ex_met,e_syst1);
   TGraphErrors *gp_metF  = new TGraphErrors(4,x_met,frac_met,ex_met,efrac_met);
+
+  TGraphErrors *gp_cjv1  = new TGraphErrors(4,x_cjv,y_cjv1,ex_cjv,ey_cjv1);
+  TGraphErrors *gp_cjv2  = new TGraphErrors(4,x_cjv,y_cjv2,ex_cjv,ey_cjv2);
+  TGraphErrors *gp_cjv3  = new TGraphErrors(4,x_cjv,y_cjv3,ex_cjv,ey_cjv3);
+  TGraphErrors *gp_cjvS  = new TGraphErrors(4,x_cjv,y_syst1,ex_cjv,e_syst1);
+  TGraphErrors *gp_cjvF  = new TGraphErrors(4,x_cjv,frac_cjv,ex_cjv,efrac_cjv);
 
   TCanvas canvas; 
   canvas.SetCanvasSize(canvas.GetWindowWidth(), 1.2*canvas.GetWindowHeight());
@@ -742,7 +866,8 @@ int main(int argc, char* argv[]) {
   TLegend leg2(0.12,0.67,0.40,0.87);
   leg2.SetBorderSize(0);
   leg2.SetFillColor(0);
-  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < #pi)","l");
+  //leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < #pi)","l");
+  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
   leg2.AddEntry(gp_dPhiS,"Systematic error","f");
   leg2.Draw();
 
@@ -904,5 +1029,66 @@ int main(int argc, char* argv[]) {
   leg5.Draw();
   pdfName= oDir + std::string("/MET_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
+
+  TLegend leg7(0.52,0.57,0.77,0.78);
+  leg7.SetBorderSize(0);
+  leg7.SetFillColor(0);
+  leg7.AddEntry(gp_dPhi1,"predicted (data)","P");
+  leg7.AddEntry(gp_dPhi2,"observed (data)","P");
+  leg7.AddEntry(gp_dPhi3,"predicted (MC)","P");
+  leg7.Draw();
+
+  gp_cjv1->SetTitle("");
+  gp_cjv1->SetMarkerStyle(20);
+  gp_cjv1->SetMarkerSize(0.9);
+  gp_cjv1->SetLineColor(kRed);
+  gp_cjv1->SetMarkerColor(kRed);
+  gp_cjv1->GetXaxis()->SetTitle("Central Jet E_{T} [GeV]");
+  gp_cjv1->GetXaxis()->SetRangeUser(10.,150.);
+  gp_cjv1->GetYaxis()->SetTitle("N(W#rightarrow e#nu)");
+  gp_cjv1->GetYaxis()->SetRangeUser(0,90);
+  gp_cjv1->Draw("AP");
+  gp_cjv2->SetMarkerStyle(20);
+  gp_cjv2->SetMarkerSize(0.9);
+  gp_cjv2->SetLineColor(kBlue);
+  gp_cjv2->SetMarkerColor(kBlue);
+  gp_cjv2->Draw("P same");
+  gp_cjv3->SetMarkerStyle(20);
+  gp_cjv3->SetMarkerSize(0.9);
+  gp_cjv3->SetLineColor(kViolet);
+  gp_cjv3->SetMarkerColor(kViolet);
+  gp_cjv3->Draw("P same");
+  leg7.Draw();
+
+  pdfName= oDir + std::string("/CJV_Welnu_num.pdf");
+  canvas.Print(pdfName.c_str());
+
+  h5->GetXaxis()->SetTitle("Central Jet E_{T} [GeV]");
+  h5->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
+  h5->GetYaxis()->SetRangeUser(-2.0,3.0);
+  h5->SetLineColor(kBlue);
+  h5->SetLineWidth(2);
+  h5->Draw();
+  gp_cjvS->SetLineColor(kGray+2);
+  gp_cjvS->SetLineWidth(0);
+  gp_cjvS->SetFillColor(kGray+2);
+  gp_cjvS->SetFillStyle(3002);
+  gp_cjvF->SetMarkerStyle(20);
+  gp_cjvF->SetMarkerSize(1.2);
+  gp_cjvF->SetMarkerColor(kGreen-2);
+  gp_cjvF->Fit("f5","R");
+  h5->Draw();
+  gp_cjvS->Draw("2 same");
+  gp_cjvF->Draw("P same");
+
+  TLegend leg6(0.12,0.67,0.40,0.87);
+  leg6.SetBorderSize(0);
+  leg6.SetFillColor(0);
+  leg6.AddEntry(f5,"pol0 fit","l");
+  leg6.AddEntry(gp_cjvS,"Systematic error","f");
+  leg6.Draw();
+  pdfName= oDir + std::string("/CJV_Welnu_frac.pdf");
+  canvas.Print(pdfName.c_str());
+
 
 }

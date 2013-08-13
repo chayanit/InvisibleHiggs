@@ -534,7 +534,7 @@ int main(int argc, char* argv[]) {
         e_syst[i] = 0.04;
 
 	if(y1[i] > 0) frac[i]  = (y1[i]-y2[i])/y2[i];
-	efrac[i] = sqrt(pow(ey1[i]/y1[i],2) + pow(ey2[i]/y2[i],2));
+	efrac[i] = (y1[i]/y2[i])*sqrt(pow(ey1[i]/y1[i],2) + pow(ey2[i]/y2[i],2));
   }
 
   TGraphErrors *graph1 = new TGraphErrors(4,x1,y1,ex1,ey1);
