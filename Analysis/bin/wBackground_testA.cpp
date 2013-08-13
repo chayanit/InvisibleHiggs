@@ -705,7 +705,7 @@ int main(int argc, char* argv[]) {
 
   for(int i=0; i<4; ++i) {
     y_syst1[i] = 0.;
-    e_syst1[i] = 0.14;
+    e_syst1[i] = 0.23;
 
     y_dPhi1[i]  = hWEl_EstS_DPhi->GetBinContent(i+1);	//Predicted WEl
     ey_dPhi1[i] = hWEl_EstS_DPhi->GetBinError(i+1);	
@@ -752,7 +752,7 @@ int main(int argc, char* argv[]) {
 
   for(int i=0; i<5; ++i) {
     y_syst2[i] = 0.;
-    e_syst2[i] = 0.14;
+    e_syst2[i] = 0.23;
 
     y_mjj1[i]  = hWEl_EstS_Mjj->GetBinContent(i+1);	//Predicted WEl
     ey_mjj1[i] = hWEl_EstS_Mjj->GetBinError(i+1);	
@@ -772,8 +772,8 @@ int main(int argc, char* argv[]) {
   TH1D *h4 = new TH1D("h4", "", 1, 100., 500.);
   TH1D *h5 = new TH1D("h5", "", 1, 10., 150.);
 
-  //TF1 *f1 = new TF1("f1","pol0",0,TMath::Pi());  	// fit 4 bins
-  TF1 *f1 = new TF1("f1","pol0",0, 2.6); 		// fit 3 bins
+  TF1 *f1 = new TF1("f1","pol0",0,TMath::Pi());  	// fit 4 bins
+  //TF1 *f1 = new TF1("f1","pol0",0, 2.6); 		// fit 3 bins
   TF1 *f2 = new TF1("f2","pol0",0., +2.1);
   //TF1 *f2 = new TF1("f2","pol0",-2.1, +2.1); 
   TF1 *f3 = new TF1("f3","pol0",800., 3000.); 
@@ -866,8 +866,8 @@ int main(int argc, char* argv[]) {
   TLegend leg2(0.12,0.67,0.40,0.87);
   leg2.SetBorderSize(0);
   leg2.SetFillColor(0);
-  //leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < #pi)","l");
-  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
+  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < #pi)","l");
+  //leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
   leg2.AddEntry(gp_dPhiS,"Systematic error","f");
   leg2.Draw();
 

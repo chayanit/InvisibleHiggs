@@ -531,7 +531,7 @@ int main(int argc, char* argv[]) {
 	diff[i]  = y1[i]-y2[i];
 	ediff[i] = sqrt(ey1[i]*ey1[i] + ey2[i]*ey2[i]);
         y_syst[i] = 0.;
-        e_syst[i] = 0.04;
+        e_syst[i] = 0.21;
 
 	if(y1[i] > 0) frac[i]  = (y1[i]-y2[i])/y2[i];
 	efrac[i] = (y1[i]/y2[i])*sqrt(pow(ey1[i]/y1[i],2) + pow(ey2[i]/y2[i],2));
