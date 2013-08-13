@@ -288,6 +288,12 @@ private:
   math::XYZTLorentzVector tagJet2_;
   double tagJetEtaMin_;
   double tagJetEtaMax_;
+
+  math::XYZTLorentzVector genJet1_;
+  math::XYZTLorentzVector genJet2_;
+  double genJetEtaMin_;
+  double genJetEtaMax_;
+
 };
 
 
@@ -1048,6 +1054,12 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
   tagJetEtaMin_ = 0.;
   tagJetEtaMax_ = 0.;
 
+  genJet1_.SetXYZT(0., 0., 0., 0.);
+  genJet2_.SetXYZT(0., 0., 0., 0.);
+  genJetEtaMin_ = 0.;
+  genJetEtaMax_ = 0.;
+  
+
   // To calculate normalized variable of leading two jets
   double sumJet1 = 0.;
   double sumJet2 = 0.;
@@ -1088,7 +1100,14 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	  info_->jet1M      = jets->at(i).mass();
 	  info_->jet1PUMVA  = (*puJetIdMVAs)[jets->refAt(i)];
 	  info_->jet1PUFlag = (*puJetIdFlags)[jets->refAt(i)];
-	 
+	  
+	  if (jets->at(i).genJet() != 0) {
+	    genJet1_             = jets->at(i).genJet()->p4();    
+	    info_->genJet1Pt     = jets->at(i).genJet()->pt();    
+	    info_->genJet1Eta    = jets->at(i).genJet()->eta();    
+	    info_->genJet1Phi    = jets->at(i).genJet()->phi();    	    
+	  }
+
 	  JecUnc->setJetEta(jets->at(i).eta());
 	  JecUnc->setJetPt(jets->at(i).pt());
 	  info_->jet1unc    = JecUnc->getUncertainty(true);
@@ -1132,6 +1151,13 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
 	  info_->jet2M      = jets->at(j).mass();
 	  info_->jet2PUMVA  = (*puJetIdMVAs)[jets->refAt(j)];
 	  info_->jet2PUFlag = (*puJetIdFlags)[jets->refAt(j)];
+
+	  if (jets->at(j).genJet() != 0) {
+	    genJet2_             = jets->at(j).genJet()->p4();    
+	    info_->genJet2Pt     = jets->at(j).genJet()->pt();    
+	    info_->genJet2Eta    = jets->at(j).genJet()->eta();    
+	    info_->genJet2Phi    = jets->at(j).genJet()->phi();    	    
+	  }
 	 
 	  JecUnc->setJetEta(jets->at(j).eta());
 	  JecUnc->setJetPt(jets->at(j).pt());
@@ -1192,7 +1218,20 @@ void InvHiggsInfoProducer::doJets(edm::Handle<edm::View<pat::Jet> > jets,
   info_->vbfM    = vbfp4.M();
   info_->vbfDEta = fabs(tagJet1_.eta() - tagJet2_.eta());
   info_->vbfDPhi = fabs(fabs(fabs(tagJet1_.phi()-tagJet2_.phi())-TMath::Pi())-TMath::Pi());
-  
+ 
+  genJetEtaMin_ = std::min(genJet1_.eta(), genJet2_.eta());
+  genJetEtaMax_ = std::max(genJet1_.eta(), genJet2_.eta());
+
+  if (genJet1_.pt() > 0. && genJet2_.pt() > 0.) {
+    math::XYZTLorentzVector genvbfp4=genJet1_ + genJet2_;
+    info_->genVBFEt   = genvbfp4.Pt();
+    info_->genVBFEta  = genvbfp4.Eta();
+    info_->genVBFPhi  = genvbfp4.Phi();
+    info_->genVBFM    = genvbfp4.M();
+    info_->genVBFDEta = fabs(genJet1_.eta() - genJet2_.eta());
+    info_->genVBFDPhi = fabs(fabs(fabs(genJet1_.phi()-genJet2_.phi())-TMath::Pi())-TMath::Pi());
+  }
+
 }
 
 

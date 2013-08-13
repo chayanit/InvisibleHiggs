@@ -230,6 +230,22 @@ class InvHiggsInfo { //: public TObject {
   // MC corrections
   Double_t trigCorrWeight;
 
+  // MC jets
+  Double_t genJet1Pt;
+  Double_t genJet1Eta;
+  Double_t genJet1Phi;
+
+  Double_t genJet2Pt;
+  Double_t genJet2Eta;
+  Double_t genJet2Phi;
+
+  Double_t genVBFEt;
+  Double_t genVBFEta;
+  Double_t genVBFPhi;
+  Double_t genVBFM;
+  Double_t genVBFDEta;
+  Double_t genVBFDPhi;
+
   // MC info -- Higgs
   Double_t mcHiggsMass;
   Double_t mcHiggsPt;
