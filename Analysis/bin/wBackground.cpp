@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
   TCut puWeight("puWeight");
   TCut elWeight("");//el1Weight");
   TCut muWeight("");//mu1Weight");
-  TCut wWeight = cuts.wWeight();
+  //TCut wWeight = cuts.wWeight();
   TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
 
   TCut cutSignalNoMETNoDPhi = cuts.HLTandMETFilters() + cuts.leptonVeto() + cuts.vbf();
@@ -115,7 +115,10 @@ int main(int argc, char* argv[]) {
     // setup cuts
     TCut cutD = cuts.cutDataset(dataset.name);
     TCut otherCuts = puWeight * trigCorr;
+    // special cut for QCD W+jets and DY
     TCut wWeight("");
+    TCut yStarWeight("");
+    TCut mjjWeight("");
 
     TCut cutWMu_C(""), cutWMu_S(""), cutWEl_C(""), cutWEl_S("");
     //TCut cutWMu_MET0C(""), cutWMu_MET0S(""), cutWEl_MET0C(""), cutWEl_MET0S("");    
@@ -151,9 +154,12 @@ int main(int argc, char* argv[]) {
 
       if (dataset.name == "EWK_Wp2Jets" || dataset.name == "EWK_Wm2Jets") isEwkW = true;
       else isWJets = true;
-
-      if(isWJets) wWeight =  cuts.wWeight();
-
+ 
+      if(isWJets) {
+        yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(wgenmass*wgenmass + wgenpt*wgenpt*cosh(wgeneta)*cosh(wgeneta)) + wgenpt*sinh(wgeneta))/(sqrt(wgenmass*wgenmass + wgenpt*wgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+        mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
+	wWeight     = yStarWeight * mjjWeight * cuts.wWeight();
+      }
 
       cutWMu_C = otherCuts * wWeight * (cuts.wMuVBF() + cuts.cutWMu("MET"));
       cutWMu_S = otherCuts * wWeight * (cuts.wMuGen() + cuts.allCutsNoDPhi());
@@ -239,6 +245,13 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing BG MC    : " << dataset.name << std::endl;
 
       if (dataset.name.compare(0,3,"QCD") == 0) isQCD = true;
+
+      if (dataset.name == "DYJetsToLL_PtZ-100" || dataset.name == "DYJetsToLL") {
+        yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/(sqrt(zgenmass*zgenmass + zgenpt*zgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+        mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
+      }
+
+      otherCuts  *= yStarWeight * mjjWeight;
 
       cutWMu_C = otherCuts * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
       cutWMu_S = otherCuts * (cutD + cuts.allCutsNoDPhi());

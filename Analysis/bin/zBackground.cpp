@@ -104,9 +104,8 @@ int main(int argc, char* argv[]) {
  
       if (dataset.name == "DYJetsToLL_PtZ-100_NoTrig" || dataset.name == "DYJetsToLL_NoTrig") {
  
-      	yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zMass*zMass + zPt*zPt*cosh(zEta)*cosh(zEta))+zPt*sinh(zEta))/(sqrt(zMass*zMass + zPt*zPt)))) - 0.5*(jet1Eta + jet2Eta)))");
-      	mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(vbfM)) - (2.55622e-04*vbfM)");
-
+      	yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/(sqrt(zgenmass*zgenmass + zgenpt*zgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+      	mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
       }
       std::cout << "Analysing DY->ll MC : " << dataset.name << std::endl;
     }
