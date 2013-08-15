@@ -273,7 +273,8 @@ int main(int argc, char* argv[]) {
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
-  plots.setLegPos(0.69,0.70,0.98,0.97);
+  // plots.setLegPos(0.69,0.70,0.98,0.97);
+  plots.setLegPos(0.65,0.60,0.93,0.89);
 
   plots.addDataset("Diboson", kViolet-6, 0);
   plots.addDataset("DYJets+EWK", kPink-4,0);
@@ -286,16 +287,21 @@ int main(int argc, char* argv[]) {
 
   plots.draw("hTrigNM1", "", "");
   plots.draw("hMETFiltNM1", "", "");
-  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "N_{events}");
-  // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "N_{events}");
-  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "N_{events}");
-  plots.draw("hMjjNM1", "M_{jj} [GeV]", "N_{events}");
-  plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "N_{events}");
-  plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}");
-  plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}");
-  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "N_{events}");
-  plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "N_{events}");
-  plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}");
+  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "N_{events}",1,1);
+  // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "N_{events}",1,1);
+  plots.setYMax(5E4);
+  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "N_{events}",1,1);
+  plots.setYMax(-1); // resets plot to automate maximum
+  plots.draw("hMjjNM1", "M_{jj} [GeV]", "N_{events}",1,1);
+  plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "N_{events}",1,1);
+  plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,1);
+  plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,1);
+  plots.setYMax(5E5);
+  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "N_{events}",1,1);
+  plots.setYMax(1E5);
+  plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "N_{events}",1,1);
+  plots.setYMax(-1); // resets plot to automate maximum
+  plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}",1,1);
 
   plots.setYMin(1e-1);
   // plots.setYMax(1e2);
