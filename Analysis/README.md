@@ -35,15 +35,16 @@ The program source files are stored in `Analysis/bin`. If you edit a program fil
 
 Always check for the latest pushes by other people by updating your local version:
     
+    git status
     git pull
 
 If you want to commit your changes to the remote repository (not just your local one!) then do:
     
-    git add <folder/filename> # You need to tell git to start tracking a file before you can commit
-    git commit -m "Your message here!" # This will commit changes in **tracked** files to your *local* branch
+    git add <folder/filename> # You need to tell git to stage a file before you can commit
+    git commit -m "Your message here!" # This will commit changes in **staged** files to your *local* branch
     git push origin master # This will push your changes to the remote master branch
 
-To understand git's workflow (which is somewhat different to CVS!), read the first few chapters of the [ProGit book](http://git-scm.com/book). 
+To understand git's workflow (which is somewhat different to CVS!), read the first few chapters of the [ProGit book](http://git-scm.com/book). Also handy are these cheatsheets: [PDF cheatsheet](https://na1.salesforce.com/help/doc/en/salesforce_git_developer_cheatsheet.pdf) and [interactive reminder](http://ndpsoftware.com/git-cheatsheet.html). The git website offers lots of help and tutorials.
 
 ## Folder structure/purpose
 
