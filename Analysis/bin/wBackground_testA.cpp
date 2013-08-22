@@ -18,6 +18,7 @@
 #include "TGraphErrors.h"
 #include "TStyle.h"
 #include "TAxis.h"
+#include "TPaveText.h"
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -678,8 +679,8 @@ int main(int argc, char* argv[]) {
   // draw control plots
   std::string pdfName;
 
-  gStyle->SetOptStat(0);
-  gStyle->SetOptFit(111111111);
+  //gStyle->SetOptStat(0);
+  //gStyle->SetOptFit(111111111);
 
   double x_dPhi[4]  = {0.5, 1.4, 2.2, 2.6 + (TMath::Pi()-2.6)/2};
   double ex_dPhi[4] = {0.5, 0.4, 0.4, (TMath::Pi()-2.6)/2};
@@ -810,6 +811,17 @@ int main(int argc, char* argv[]) {
   TGraphErrors *gp_cjvS  = new TGraphErrors(4,x_cjv,y_syst1,ex_cjv,e_syst1);
   TGraphErrors *gp_cjvF  = new TGraphErrors(4,x_cjv,frac_cjv,ex_cjv,efrac_cjv);
 
+  TPaveText *cms = new TPaveText(0.12, 0.68, 0.45, 0.9, "NDC");
+  cms->SetFillColor(0);
+  cms->SetFillStyle(4000);
+  cms->SetBorderSize(0);
+  cms->SetLineColor(0);
+  cms->SetTextAlign(12);
+  cms->AddText("CMS Preliminary 2012");
+  cms->AddText("");
+  cms->AddText("#int L = 19.6 fb^{-1}");
+  cms->AddText("");
+
   TCanvas canvas; 
   canvas.SetCanvasSize(canvas.GetWindowWidth(), 1.2*canvas.GetWindowHeight());
 
@@ -848,6 +860,7 @@ int main(int argc, char* argv[]) {
   h1->GetXaxis()->SetTitle("#Delta #phi_{jj}");
   h1->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
   h1->GetYaxis()->SetRangeUser(-2,2);
+  h1->SetStats(kFALSE);
   h1->SetLineColor(kBlue);
   h1->SetLineWidth(2);
   h1->Draw();
@@ -863,13 +876,14 @@ int main(int argc, char* argv[]) {
   gp_dPhiS->Draw("2 same");
   gp_dPhiF->Draw("P same");
 
-  TLegend leg2(0.12,0.67,0.40,0.87);
+  TLegend leg2(0.62,0.67,0.88,0.87);
   leg2.SetBorderSize(0);
   leg2.SetFillColor(0);
-  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < #pi)","l");
+  leg2.AddEntry(f1,"Fit","l");
   //leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
   leg2.AddEntry(gp_dPhiS,"Systematic error","f");
   leg2.Draw();
+  cms->Draw();
 
   pdfName= oDir + std::string("/DPhi_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
@@ -902,6 +916,7 @@ int main(int argc, char* argv[]) {
   h2->GetXaxis()->SetTitle("|#eta^{l}|");
   h2->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
   h2->GetYaxis()->SetRangeUser(-1.5,3.0);
+  h2->SetStats(kFALSE);
   h2->SetLineColor(kBlue);
   h2->SetLineWidth(2);
   h2->Draw();
@@ -917,12 +932,14 @@ int main(int argc, char* argv[]) {
   gp_etaS->Draw("2 same");
   gp_etaF->Draw("P same");
 
-  TLegend leg3(0.12,0.67,0.40,0.87);
+  TLegend leg3(0.62,0.67,0.88,0.87);
   leg3.SetBorderSize(0);
   leg3.SetFillColor(0);
-  leg3.AddEntry(f2,"pol0 fit","l");
+  leg3.AddEntry(f2,"Fit","l");
   leg3.AddEntry(gp_etaS,"Systematic error","f");
   leg3.Draw();
+  cms->Draw();
+
   pdfName= oDir + std::string("/Eta_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
 
@@ -953,7 +970,9 @@ int main(int argc, char* argv[]) {
 
   h3->GetXaxis()->SetTitle("M_{jj} [GeV]");
   h3->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
-  h3->GetYaxis()->SetRangeUser(-2,2);
+  h3->GetYaxis()->SetTitleOffset(1.20);
+  h3->SetStats(kFALSE);
+  h3->GetYaxis()->SetRangeUser(-1.0,2.0);
   h3->SetLineColor(kBlue);
   h3->SetLineWidth(2);
   h3->Draw();
@@ -969,12 +988,13 @@ int main(int argc, char* argv[]) {
   gp_mjjS->Draw("2 same");
   gp_mjjF->Draw("P same");
 
-  TLegend leg4(0.12,0.67,0.40,0.87);
+  TLegend leg4(0.62,0.67,0.88,0.87);
   leg4.SetBorderSize(0);
   leg4.SetFillColor(0);
-  leg4.AddEntry(f3,"pol0 fit","l");
+  leg4.AddEntry(f3,"Fit","l");
   leg4.AddEntry(gp_mjjS,"Systematic error","f");
   leg4.Draw();
+  cms->Draw();
   pdfName= oDir + std::string("/MJJ_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
 
@@ -1005,7 +1025,9 @@ int main(int argc, char* argv[]) {
 
   h4->GetXaxis()->SetTitle("E_{T}^{miss} [GeV]");
   h4->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
-  h4->GetYaxis()->SetRangeUser(-1.5,3.0);
+  h4->GetYaxis()->SetTitleOffset(1.20);
+  h4->SetStats(kFALSE);
+  h4->GetYaxis()->SetRangeUser(-1.0,2.0);
   h4->SetLineColor(kBlue);
   h4->SetLineWidth(2);
   h4->Draw();
@@ -1021,12 +1043,13 @@ int main(int argc, char* argv[]) {
   gp_metS->Draw("2 same");
   gp_metF->Draw("P same");
 
-  TLegend leg5(0.12,0.67,0.40,0.87);
+  TLegend leg5(0.62,0.67,0.88,0.87);
   leg5.SetBorderSize(0);
   leg5.SetFillColor(0);
-  leg5.AddEntry(f4,"pol0 fit","l");
+  leg5.AddEntry(f4,"Fit","l");
   leg5.AddEntry(gp_metS,"Systematic error","f");
   leg5.Draw();
+  cms->Draw();
   pdfName= oDir + std::string("/MET_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
 
@@ -1066,6 +1089,7 @@ int main(int argc, char* argv[]) {
   h5->GetXaxis()->SetTitle("Central Jet E_{T} [GeV]");
   h5->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
   h5->GetYaxis()->SetRangeUser(-2.0,3.0);
+  h5->SetStats(kFALSE);
   h5->SetLineColor(kBlue);
   h5->SetLineWidth(2);
   h5->Draw();
@@ -1081,12 +1105,13 @@ int main(int argc, char* argv[]) {
   gp_cjvS->Draw("2 same");
   gp_cjvF->Draw("P same");
 
-  TLegend leg6(0.12,0.67,0.40,0.87);
+  TLegend leg6(0.62,0.67,0.88,0.87);
   leg6.SetBorderSize(0);
   leg6.SetFillColor(0);
-  leg6.AddEntry(f5,"pol0 fit","l");
+  leg6.AddEntry(f5,"Fit","l");
   leg6.AddEntry(gp_cjvS,"Systematic error","f");
   leg6.Draw();
+  cms->Draw();
   pdfName= oDir + std::string("/CJV_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
 

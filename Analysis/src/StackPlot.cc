@@ -85,6 +85,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   leg.SetFillColor(0);
 
   bool drawStack=false;
+  bool nMinusOne=false;
 
   std::vector<TLegendEntry*> entries; // To hold legend entries, so can draw in proper order
 
@@ -134,7 +135,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       break;
     }
 
-    if (styles_.at(i) == 0) {
+    if (styles_.at(i) == 0 || styles_.at(i) == 3) {
       if (h->GetEntries()==0) {
       	std::cout << "No entries in histogram " << labels_.at(i) << std::endl;
       	continue;
@@ -145,7 +146,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       // h->SetLineWidth(0);
       h->SetLineColor(kBlack);
       h->SetFillColor(cols_.at(i));
-
+      if(styles_.at(i) == 3) nMinusOne=true;
+ 
       stack.Add(h);
       TLegendEntry *legE = new TLegendEntry(h, labels_.at(i).c_str(), "F");
       entries.push_back(legE);
@@ -167,6 +169,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   {
     // skip first object since it's used by creating the histogram                               
     if(obj == histList->First()) continue;
+    if(nMinusOne && obj == histList->Last())  continue; //don't account signal histogram
     hMC -> Add((TH1*)obj);
   }
 
@@ -261,6 +264,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     }
 
     // signal
+    
     if (styles_.at(i) == 2) {
       h->SetLineStyle(1);
       h->SetLineWidth(3);
@@ -269,6 +273,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       entries.push_back(legE);
       h->Draw("HISTE SAME");
     }
+    
 
   }
 
@@ -280,8 +285,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   double cutVal = 0.;
   if (!hname.compare("hDijetNM1")) cutVal = 50.;
   else if (!hname.compare("hDEtaJJNM1")) cutVal = 4.2;
-  else if (!hname.compare("hMjjNM1")) cutVal = 1100.;
-  else if (!hname.compare("hMETNM1")) cutVal = 130.;
+  //else if (!hname.compare("hMjjNM1")) cutVal = 1100.;
+  //else if (!hname.compare("hMETNM1")) cutVal = 130.;
   else if (!hname.compare("hDPhiJJNM1")) cutVal = 1.0;
   else if (!hname.compare("hCenEtNM1")) cutVal = 30.0;
 
