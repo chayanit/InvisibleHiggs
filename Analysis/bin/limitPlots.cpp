@@ -14,6 +14,7 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TGraph.h"
+#include "TPaveText.h"
 #include "TGraphAsymmErrors.h"
 
 #include <boost/program_options.hpp>
@@ -219,12 +220,23 @@ int main(int argc, char* argv[]) {
 
   TLegend leg(0.5, 0.65, 0.75, 0.85, "95% CL limits", "NDC");
   leg.SetFillColor(0);
+  leg.SetLineColor(0);
   if (doObs) leg.AddEntry(&gXSObs, "Observed limit", "L");
   leg.AddEntry(&gXS, "Expected limit", "L");
   leg.AddEntry(&gXS1Sig, "Expected limit (1 #sigma)", "F");
   leg.AddEntry(&gXS2Sig, "Expected limit (2 #sigma)", "F");
   leg.AddEntry(&gXSProd, "#sigma_{VBF} (SM)", "L");
   leg.Draw();
+
+  TPaveText* cms = new TPaveText(0.12, 0.68, 0.35, 0.9, "NDC");
+  cms->SetFillColor(0);
+  cms->SetFillStyle(4000);
+  cms->SetBorderSize(0);
+  cms->SetLineColor(0);
+  cms->SetTextAlign(12);
+  cms->AddText("CMS Preliminary 2012");
+  cms->AddText("#int L = 19.6 fb^{-1}");
+  cms->Draw();
 
   canvas.Print( (oDir+std::string("/XSLimit.pdf")).c_str() );
 
@@ -265,14 +277,17 @@ int main(int argc, char* argv[]) {
     gLimitObs.Draw("L");
   }
 
-  TLegend leg2(0.5, 0.65, 0.75, 0.85, "95% CL limits", "NDC");
+  TLegend leg2(0.37, 0.65, 0.61, 0.85, "95% CL limits", "NDC");
   leg2.SetFillColor(0);
+  leg2.SetLineColor(0);
   if (doObs) leg2.AddEntry(&gLimitObs, "Observed limit", "L");
   leg2.AddEntry(&gLimit, "Expected limit", "L");
   leg2.AddEntry(&gLimit1Sig, "Expected limit (1 #sigma)", "F");
   leg2.AddEntry(&gLimit2Sig, "Expected limit (2 #sigma)", "F");
   //  leg2.AddEntry(&gXSProd, "#sigma_{VBF} (SM)", "L");
   leg2.Draw();
+
+  cms->Draw();
 
   canvas.Print( (oDir+std::string("/xsiLimit.pdf")).c_str() );
 
