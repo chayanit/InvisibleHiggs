@@ -307,11 +307,16 @@ int main(int argc, char* argv[]) {
   other.push_back("DYJetsToLL_EWK");
   SumDatasets(oDir, other, hists, "OtherSM");
 
+  // Signal
+  std::vector<std::string> signal;
+  signal.push_back("SignalM125_POWHEG");
+  SumDatasets(oDir, signal, hists, "Signal");
+
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
   // plots.setLegPos(0.69,0.70,0.98,0.97);
-  plots.setLegPos(0.65,0.60,0.93,0.89);
+  plots.setLegPos(0.70,0.65,0.93,0.89);
 
   //plots.addDataset("Diboson", kViolet-6, 0);
   //plots.addDataset("DYJets+EWK", kPink-4,0);
@@ -321,7 +326,7 @@ int main(int argc, char* argv[]) {
   //plots.addDataset("WNJets+EWK", kGreen-3, 0);
   plots.addDataset("OtherSM", kAzure-2, 0);
   plots.addDataset("V+jets", kPink-4,0);
-  plots.addDataset("SignalM125_POWHEG", kOrange-2, 3);
+  plots.addDataset("Signal", kRed, 3);
   plots.addDataset("METABCD",    kBlack, 1);
 
   plots.draw("hTrigNM1", "", "");

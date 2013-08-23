@@ -146,10 +146,18 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       // h->SetLineWidth(0);
       h->SetLineColor(kBlack);
       h->SetFillColor(cols_.at(i));
-      if(styles_.at(i) == 3) nMinusOne=true;
- 
+      if(styles_.at(i) == 3) {
+	nMinusOne=true;
+        h->SetLineStyle(1);
+        h->SetLineWidth(3);
+        h->SetLineColor(cols_.at(i));
+	h->SetFillColor(0);
+      } 
+
       stack.Add(h);
-      TLegendEntry *legE = new TLegendEntry(h, labels_.at(i).c_str(), "F");
+      TLegendEntry *legE;
+      if(styles_.at(i) == 3) 	legE = new TLegendEntry(h, labels_.at(i).c_str(), "L");
+      else 			legE = new TLegendEntry(h, labels_.at(i).c_str(), "F");
       entries.push_back(legE);
       
     }
@@ -312,7 +320,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   TPaveText *cms = 0;
   if(drawRatioPlot){
     // Optimised for ratio plots
-    cms = new TPaveText(0.18, 0.68, 0.51, 0.9, "NDC");
+    cms = new TPaveText(0.18, 0.68, 0.60, 0.9, "NDC");
   } else {
     // Optimised for N-1
     cms = new TPaveText(0.12, 0.68, 0.45, 0.9, "NDC");
@@ -322,7 +330,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     cms->SetBorderSize(0);
     cms->SetLineColor(0);
     cms->SetTextAlign(12);
-    cms->AddText("CMS Preliminary 2012");
+    cms->AddText("CMS Preliminary #sqrt{s} = 8 TeV");
     cms->AddText("");
     cms->AddText("#int L = 19.6 fb^{-1}");
     cms->AddText("");

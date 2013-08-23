@@ -817,7 +817,7 @@ int main(int argc, char* argv[]) {
   cms->SetBorderSize(0);
   cms->SetLineColor(0);
   cms->SetTextAlign(12);
-  cms->AddText("CMS Preliminary 2012");
+  cms->AddText("CMS Preliminary #sqrt{s} = 8 TeV");
   cms->AddText("");
   cms->AddText("#int L = 19.6 fb^{-1}");
   cms->AddText("");
