@@ -181,8 +181,16 @@ int main(int argc, char* argv[]) {
   TH1D* h = new TH1D("", "", 1, 100., 410.);
   h->SetMaximum(3.);
   h->SetMinimum(0.);
+  h->GetXaxis()->SetTitleSize(0.04);
+  h->GetXaxis()->SetTitleOffset(1.00);
+  h->GetYaxis()->SetTitleSize(0.05);
+  h->GetYaxis()->SetTitleOffset(0.85);
+  h->GetXaxis()->SetLabelSize(0.05);
+  //  h->GetXaxis()->SetLabelOffset(0.1);
+  h->GetYaxis()->SetLabelSize(0.04);
+  //  h->GetYaxis()->SetLabelOffset(0.15);
   h->GetXaxis()->SetTitle("m_{H} [GeV]");
-  h->GetYaxis()->SetTitle("#sigma #times BF(H #rightarrow inv)");
+  h->GetYaxis()->SetTitle("#sigma #times BF(H #rightarrow inv) [pb]");
   h->Draw();
 
   TGraphAsymmErrors gXS2Sig(massH.size(), &massH[0], &xsExp[0], 0, 0, &xs2SigM[0], &xs2SigP[0]);
@@ -218,7 +226,7 @@ int main(int argc, char* argv[]) {
   gXSProd.SetLineColor(kBlue);
   gXSProd.Draw("L");
 
-  TLegend leg(0.5, 0.65, 0.75, 0.85, "95% CL limits", "NDC");
+  TLegend leg(0.5, 0.58, 0.78, 0.88, "95% CL limits", "NDC");
   leg.SetFillColor(0);
   leg.SetLineColor(0);
   if (doObs) leg.AddEntry(&gXSObs, "Observed limit", "L");
@@ -228,22 +236,30 @@ int main(int argc, char* argv[]) {
   leg.AddEntry(&gXSProd, "#sigma_{VBF} (SM)", "L");
   leg.Draw();
 
-  TPaveText* cms = new TPaveText(0.12, 0.68, 0.35, 0.9, "NDC");
+  TPaveText* cms = new TPaveText(0.12, 0.75, 0.45, 0.9, "NDC");
   cms->SetFillColor(0);
   cms->SetFillStyle(4000);
   cms->SetBorderSize(0);
   cms->SetLineColor(0);
   cms->SetTextAlign(12);
-  cms->AddText("CMS Preliminary 2012");
-  cms->AddText("#int L = 19.6 fb^{-1}");
+  cms->AddText("CMS Preliminary");
+  cms->AddText("#sqrt{s} = 8 TeV  L = 19.6 fb^{-1}");
   cms->Draw();
 
   canvas.Print( (oDir+std::string("/XSLimit.pdf")).c_str() );
 
 
   // BF limit
-  h->SetMaximum(3.);
+  h->SetMaximum(3.5);
   h->SetMinimum(0.);
+  h->GetXaxis()->SetTitleSize(0.04);
+  h->GetXaxis()->SetTitleOffset(1.00);
+  h->GetYaxis()->SetTitleSize(0.05);
+  h->GetYaxis()->SetTitleOffset(0.85);
+  h->GetXaxis()->SetLabelSize(0.05);
+  //  h->GetXaxis()->SetLabelOffset(0.1);
+  h->GetYaxis()->SetLabelSize(0.04);
+  //  h->GetYaxis()->SetLabelOffset(0.15);
   h->GetXaxis()->SetTitle("m_{H} [GeV]");
   h->GetYaxis()->SetTitle("#sigma #times BF(H #rightarrow inv) / #sigma_{VBF}(SM)");
   h->Draw();
@@ -277,7 +293,7 @@ int main(int argc, char* argv[]) {
     gLimitObs.Draw("L");
   }
 
-  TLegend leg2(0.37, 0.65, 0.61, 0.85, "95% CL limits", "NDC");
+  TLegend leg2(0.15, 0.58, 0.43, 0.88, "95% CL limits", "NDC");
   leg2.SetFillColor(0);
   leg2.SetLineColor(0);
   if (doObs) leg2.AddEntry(&gLimitObs, "Observed limit", "L");
@@ -287,7 +303,15 @@ int main(int argc, char* argv[]) {
   //  leg2.AddEntry(&gXSProd, "#sigma_{VBF} (SM)", "L");
   leg2.Draw();
 
-  cms->Draw();
+  TPaveText* cms2 = new TPaveText(0.52, 0.75, 0.85, 0.9, "NDC");
+  cms2->SetFillColor(0);
+  cms2->SetFillStyle(4000);
+  cms2->SetBorderSize(0);
+  cms2->SetLineColor(0);
+  cms2->SetTextAlign(12);
+  cms2->AddText("CMS Preliminary");
+  cms2->AddText("#sqrt{s} = 8 TeV  L = 19.6 fb^{-1}");
+  cms2->Draw();
 
   canvas.Print( (oDir+std::string("/xsiLimit.pdf")).c_str() );
 
