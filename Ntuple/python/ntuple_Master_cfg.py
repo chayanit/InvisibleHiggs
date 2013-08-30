@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="MET", iMCSignal=False, iFile='/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/04BCEC26-AA02-E211-A81D-003048CF99BA.root', iMaxEvent=100):
+def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter="MET", iMCSignal=False, iFile='/store/data/Run2012C/VBF1Parked/AOD/22Jan2013-v1/20000/40F56410-D979-E211-9843-002618943849.root', iMaxEvent=100):
     
     ###--------------------------------------------------------------
     ### Load PAT, because it insists on defining the process for you
@@ -18,9 +18,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     ###--------------------------------------------------------------
     ### GlobalTag
     if iRunOnData == True:
-        process.GlobalTag.globaltag = "FT_53_V21_AN4::All"
+        process.GlobalTag.globaltag = "FT53_V21A_AN6::All"
     else:
-        process.GlobalTag.globaltag = "START53_V22::All"
+        process.GlobalTag.globaltag = "START53_V27::All"
     ###--------------------------------------------------------------
 
     
@@ -36,6 +36,13 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
 
     ###--------------------------------------------------------------
+    ### L1 Trigger
+    process.load('L1Trigger.Skimmer.l1Filter_cfi')
+    process.l1Filter.algorithms = cms.vstring('L1_ETM40')
+    ###--------------------------------------------------------------
+
+
+    ###--------------------------------------------------------------
     ### HLT Trigger(s)
     # If it's MC signal, no trigger will be applied
     if iRunOnData == False and iMCSignal == True:
@@ -46,39 +53,58 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.hltHighLevel.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
     process.hltHighLevel.throw = cms.bool(False)  # Tolerate if triggers not available
     process.hltHighLevel.andOr = cms.bool(True)   # True = OR, False = AND
-    if (iHLTFilter.find("MET")==0):
+    if (iRunOnData == True and iHLTFilter.find("MET")==0):
         process.hltHighLevel.HLTPaths = cms.vstring(
             #"HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
-            "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
+            #"HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
+	    "HLT_DiJet35_MJJ700_AllJets_DEta3p5_VBF_v*",
+	    "HLT_DiJet30_MJJ700_AllJets_DEta3p5_VBF_v*"
             )
-    elif (iHLTFilter.find("SingleMu")==0):
-        process.hltHighLevel.HLTPaths = cms.vstring("HLT_IsoMu24_eta2p1_v*","HLT_Mu40_eta2p1_v*")
-    elif (iHLTFilter.find("DoubleMu")==0):
-        process.hltHighLevel.HLTPaths = cms.vstring("HLT_Mu17_Mu8_v*")
-    elif (iHLTFilter.find("SingleElectron")==0):
-        process.hltHighLevel.HLTPaths = cms.vstring("HLT_Ele27_WP80_v*")
-    elif (iHLTFilter.find("DoubleElectron")==0):
-        process.hltHighLevel.HLTPaths = cms.vstring("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")
+    #elif (iHLTFilter.find("SingleMu")==0):
+    #    process.hltHighLevel.HLTPaths = cms.vstring("HLT_IsoMu24_eta2p1_v*","HLT_Mu40_eta2p1_v*")
+    #elif (iHLTFilter.find("DoubleMu")==0):
+    #    process.hltHighLevel.HLTPaths = cms.vstring("HLT_Mu17_Mu8_v*")
+    #elif (iHLTFilter.find("SingleElectron")==0):
+    #    process.hltHighLevel.HLTPaths = cms.vstring("HLT_Ele27_WP80_v*")
+    #elif (iHLTFilter.find("DoubleElectron")==0):
+    #    process.hltHighLevel.HLTPaths = cms.vstring("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*")
     elif (iHLTFilter.find("NoTrig")==0):
         process.hltHighLevel.HLTPaths = cms.vstring("*")
     else:
         process.hltHighLevel.HLTPaths = cms.vstring(
             #"HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v*",
-            "HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
+            #"HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v*"
+            "HLT_DiJet35_MJJ700_AllJets_DEta3p5_VBF_v*",
+            "HLT_DiJet30_MJJ700_AllJets_DEta3p5_VBF_v*"
             )
-    ###--------------------------------------------------------------
 
+    ### VBF filter for MC Background
+    process.vbfFilter = cms.EDFilter(
+        "HLTPFJetVBFFilter",
+        saveTags = cms.bool(True),
+        triggerType = cms.int32(85),
+        inputTag = cms.InputTag("ak5PFJets"),
+        leadingJetOnly = cms.bool(False),
+        minPtHigh = cms.double(25.0),
+        minPtLow = cms.double(25.0),
+        maxEta = cms.double(5.0),
+        etaOpposite = cms.bool(True),
+        minDeltaEta = cms.double(3.0),
+        minInvMass = cms.double(500.0)
+    )
+
+    ###--------------------------------------------------------------
 
     ###--------------------------------------------------------------
     print "-----------------------------------------------"
-    print "INVISIBLE HIGGS: Ntuple V10"
+    print "INVISIBLE HIGGS: Ntuple V12 for Parked Data"
     print "-----------------------------------------------"
     print "RunOnData = ", iRunOnData
     if iRunOnData == True:
         print "Dataset = ", iData
     else:
         if iMCSignal == True:
-            print "Dataset = MC Signal"
+            print "Dataset = MC Signal or DYNoTrig"
         else:
             print "Dataset = MC Background"
     print "GlobalTag = ", process.GlobalTag.globaltag
@@ -358,7 +384,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
         # PU re-weighting
         process.invHiggsInfo.puMCFile    = cms.untracked.string("PUHistS10.root")
-        process.invHiggsInfo.puDataFile  = cms.untracked.string("PUHistRun2012All_forV9.root")
+        process.invHiggsInfo.puDataFile  = cms.untracked.string("PUHistRun2012All_forParked.root")
         process.invHiggsInfo.puMCHist    = cms.untracked.string("pileup")
         process.invHiggsInfo.puDataHist  = cms.untracked.string("pileup")
         process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
@@ -425,13 +451,14 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     if iRunOnData == True:
     	process.p = cms.Path(    
         	# Trigger filter
-        	process.hltHighLevel *
+		process.l1Filter *
+        	#process.hltHighLevel *
         
         	# Basic filters
         	process.noscraping *
         	process.primaryVertexFilter *
         	
-        	# MET filters (Move to be flags)
+        	# MET filters (Move to be flagged)
         
         	# MET Correction
         	process.type0PFMEtCorrection *
@@ -450,10 +477,10 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                 process.ZSequence *
                 process.invHiggsInfo
 		)
-    else:
+    elif (iMCSignal == True):
         process.p = cms.Path(
                 # Trigger filter
-                process.hltHighLevel *
+                #process.hltHighLevel *
 
                 # Basic filters
                 process.noscraping *
@@ -488,6 +515,45 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                 process.ZSequence *
                 process.invHiggsInfo
         	)
+    else :
+        process.p = cms.Path(
+                # Trigger filter
+                #process.hltHighLevel *
+		process.vbfFilter * 
+
+                # Basic filters
+                process.noscraping *
+                process.primaryVertexFilter *
+
+                # MET filters (Move to be flags)
+
+                # MET Correction
+                process.type0PFMEtCorrection *
+
+                # Tau
+                process.recoTauClassicHPSSequence *
+
+                # Generate PAT
+                process.pfParticleSelectionSequence *
+                process.patDefaultSequence *
+                process.goodPatJets *
+                process.PhysicsObjectSequence *
+                process.metUncertaintySequence *
+                process.puJetIdSqeuence *
+                process.puJetIdSmeared *
+                process.puJetMvaSmeared *
+                process.puJetIdResUp *
+                process.puJetMvaResUp *
+                process.puJetIdResDown *
+                process.puJetMvaResDown *
+                process.puJetIdEnUp *
+                process.puJetMvaEnUp *
+                process.puJetIdEnDown *
+                process.puJetMvaEnDown *
+                process.WSequence *
+                process.ZSequence *
+                process.invHiggsInfo
+                )
     ###--------------------------------------------------------------
 
 

@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PAT")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/BE502377-92D1-E111-B1B6-0025B3E0656C.root')
+    fileNames = cms.untracked.vstring('/store/data/Run2012C/VBF1Parked/AOD/22Jan2013-v1/20000/40F56410-D979-E211-9843-002618943849.root')
 )
 process.PFCandAssoMap = cms.EDProducer("PFCand_AssoMap",
     ConversionsCollection = cms.InputTag("allConversions"),
@@ -13986,9 +13986,9 @@ process.patElectrons = cms.EDProducer("PATElectronProducer",
         eidRobustHighEnergy = cms.InputTag("eidRobustHighEnergy"),
         eidRobustLoose = cms.InputTag("eidRobustLoose")
     ),
-    genParticleMatch = cms.InputTag("electronMatch"),
+    genParticleMatch = cms.InputTag(""),
     beamLineSrc = cms.InputTag("offlineBeamSpot"),
-    addGenMatch = cms.bool(True),
+    addGenMatch = cms.bool(False),
     addResolutions = cms.bool(False),
     isoDeposits = cms.PSet(
         pfNeutralHadrons = cms.InputTag("elPFIsoDepositNeutralPFIso"),
@@ -13997,7 +13997,7 @@ process.patElectrons = cms.EDProducer("PATElectronProducer",
         pfPhotons = cms.InputTag("elPFIsoDepositGammaPFIso"),
         pfChargedHadrons = cms.InputTag("elPFIsoDepositChargedPFIso")
     ),
-    embedGenMatch = cms.bool(True),
+    embedGenMatch = cms.bool(False),
     embedBasicClusters = cms.bool(True),
     isolationValues = cms.PSet(
         pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03PFIdPFIso"),
@@ -14051,7 +14051,8 @@ process.patJetCorrFactors = cms.EDProducer("JetCorrFactorsProducer",
     primaryVertices = cms.InputTag("offlinePrimaryVertices"),
     levels = cms.vstring('L1FastJet', 
         'L2Relative', 
-        'L3Absolute'),
+        'L3Absolute', 
+        'L2L3Residual'),
     useNPV = cms.bool(True),
     rho = cms.InputTag("kt6PFJets","rho"),
     useRho = cms.bool(True),
@@ -14108,24 +14109,24 @@ process.patJetPartons = cms.EDProducer("PartonSelector",
 
 process.patJets = cms.EDProducer("PATJetProducer",
     addJetCharge = cms.bool(True),
-    addGenJetMatch = cms.bool(True),
+    addGenJetMatch = cms.bool(False),
     embedPFCandidates = cms.bool(True),
     embedGenJetMatch = cms.bool(True),
     addAssociatedTracks = cms.bool(True),
     partonJetSource = cms.InputTag("NOT_IMPLEMENTED"),
-    addGenPartonMatch = cms.bool(True),
-    JetPartonMapSource = cms.InputTag("patJetFlavourAssociation"),
+    addGenPartonMatch = cms.bool(False),
+    JetPartonMapSource = cms.InputTag(""),
     resolutions = cms.PSet(
 
     ),
-    genPartonMatch = cms.InputTag("patJetPartonMatch"),
+    genPartonMatch = cms.InputTag(""),
     addTagInfos = cms.bool(False),
     addPartonJetMatch = cms.bool(False),
-    embedGenPartonMatch = cms.bool(True),
+    embedGenPartonMatch = cms.bool(False),
     efficiencies = cms.PSet(
 
     ),
-    genJetMatch = cms.InputTag("patJetGenJetMatch"),
+    genJetMatch = cms.InputTag(""),
     userData = cms.PSet(
         userCands = cms.PSet(
             src = cms.VInputTag("")
@@ -14153,7 +14154,7 @@ process.patJets = cms.EDProducer("PATJetProducer",
     addBTagInfo = cms.bool(False),
     embedCaloTowers = cms.bool(True),
     addResolutions = cms.bool(False),
-    getJetMCFlavour = cms.bool(True),
+    getJetMCFlavour = cms.bool(False),
     addDiscriminators = cms.bool(True),
     jetChargeSource = cms.InputTag("patJetCharge"),
     addJetCorrFactors = cms.bool(True),
@@ -14182,11 +14183,11 @@ process.patMETs = cms.EDProducer("PATMETProducer",
     ),
     addResolutions = cms.bool(False),
     addEfficiencies = cms.bool(False),
-    genMETSource = cms.InputTag("genMetTrue"),
+    genMETSource = cms.InputTag(""),
     efficiencies = cms.PSet(
 
     ),
-    addGenMET = cms.bool(True),
+    addGenMET = cms.bool(False),
     addMuonCorrections = cms.bool(False),
     muonSource = cms.InputTag("muons"),
     resolutions = cms.PSet(
@@ -14216,11 +14217,11 @@ process.patMETsPF = cms.EDProducer("PATMETProducer",
     addResolutions = cms.bool(False),
     muonSource = cms.InputTag("muons"),
     addEfficiencies = cms.bool(False),
-    genMETSource = cms.InputTag("genMetTrue"),
+    genMETSource = cms.InputTag(""),
     efficiencies = cms.PSet(
 
     ),
-    addGenMET = cms.bool(True),
+    addGenMET = cms.bool(False),
     addMuonCorrections = cms.bool(False),
     resolutions = cms.PSet(
 
@@ -14304,14 +14305,14 @@ process.patMuons = cms.EDProducer("PATMuonProducer",
     embedMuonBestTrack = cms.bool(True),
     muonSource = cms.InputTag("muons"),
     embedCombinedMuon = cms.bool(True),
-    genParticleMatch = cms.InputTag("muonMatch"),
+    genParticleMatch = cms.InputTag(""),
     beamLineSrc = cms.InputTag("offlineBeamSpot"),
-    addGenMatch = cms.bool(True),
+    addGenMatch = cms.bool(False),
     addResolutions = cms.bool(False),
     isoDeposits = cms.PSet(
 
     ),
-    embedGenMatch = cms.bool(True),
+    embedGenMatch = cms.bool(False),
     tcMETMuonCorrs = cms.InputTag("muonTCMETValueMapProducer","muCorrData"),
     embedPickyMuon = cms.bool(True),
     isolationValues = cms.PSet(
@@ -14328,7 +14329,7 @@ process.patPFJetMETtype1p2Corr = cms.EDProducer("PATPFJetMETcorrInputProducer",
     offsetCorrLabel = cms.string('L1FastJet'),
     skipMuons = cms.bool(True),
     skipMuonSelection = cms.string('isGlobalMuon | isStandAloneMuon'),
-    jetCorrLabel = cms.string('L3Absolute')
+    jetCorrLabel = cms.string('L2L3Residual')
 )
 
 
@@ -14366,7 +14367,7 @@ process.patPFJetMETtype2Corr = cms.EDProducer("PATPFJetMETcorrInputProducer",
     offsetCorrLabel = cms.string('L1FastJet'),
     skipMuons = cms.bool(True),
     skipMuonSelection = cms.string('isGlobalMuon | isStandAloneMuon'),
-    jetCorrLabel = cms.string('L3Absolute')
+    jetCorrLabel = cms.string('L2L3Residual')
 )
 
 
@@ -14409,32 +14410,14 @@ process.patPFMETcorrElectronEnUp = cms.EDProducer("ShiftedParticleMETcorrInputPr
 
 
 process.patPFMETcorrJetEnDown = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("smearedGoodPatJets"),
+    srcOriginal = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     srcShifted = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt")
 )
 
 
 process.patPFMETcorrJetEnUp = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("smearedGoodPatJets"),
-    srcShifted = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
-)
-
-
-process.patPFMETcorrJetResDown = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("smearedGoodPatJets"),
-    srcShifted = cms.InputTag("smearedGoodPatJetsResDown")
-)
-
-
-process.patPFMETcorrJetResUp = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
-    srcOriginal = cms.InputTag("smearedGoodPatJets"),
-    srcShifted = cms.InputTag("smearedGoodPatJetsResUp")
-)
-
-
-process.patPFMETcorrJetSmearing = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
     srcOriginal = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
-    srcShifted = cms.InputTag("smearedGoodPatJets")
+    srcShifted = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
 )
 
 
@@ -14464,31 +14447,7 @@ process.patPFMETtype0Corr = cms.EDProducer("Type0PFMETcorrInputProducer",
 )
 
 
-process.patPFMet = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
-    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetSmearing")),
-    applyType1Corrections = cms.bool(True),
-    src = cms.InputTag("patPFMetForMEtUncertainty")
-)
-
-
-process.patPFMetElectronEnDown = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
-    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrElectronEnDown")),
-    applyType1Corrections = cms.bool(True),
-    src = cms.InputTag("patPFMet")
-)
-
-
-process.patPFMetElectronEnUp = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
-    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrElectronEnUp")),
-    src = cms.InputTag("patPFMet"),
-    applyType1Corrections = cms.bool(True)
-)
-
-
-process.patPFMetForMEtUncertainty = cms.EDProducer("PATMETProducer",
+process.patPFMet = cms.EDProducer("PATMETProducer",
     metSource = cms.InputTag("pfMet"),
     userData = cms.PSet(
         userCands = cms.PSet(
@@ -14507,12 +14466,82 @@ process.patPFMetForMEtUncertainty = cms.EDProducer("PATMETProducer",
         userFunctions = cms.vstring()
     ),
     addResolutions = cms.bool(False),
+    muonSource = cms.InputTag("muons"),
     addEfficiencies = cms.bool(False),
     genMETSource = cms.InputTag("genMetTrue"),
     efficiencies = cms.PSet(
 
     ),
-    addGenMET = cms.bool(True),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetElectronEnDown = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    muonSource = cms.InputTag("muons"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrElectronEnDown")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetElectronEnUp = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrElectronEnUp")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
     addMuonCorrections = cms.bool(False),
     muonSource = cms.InputTag("muons"),
     resolutions = cms.PSet(
@@ -14521,51 +14550,143 @@ process.patPFMetForMEtUncertainty = cms.EDProducer("PATMETProducer",
 )
 
 
-process.patPFMetJetEnDown = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
+process.patPFMetJetEnDown = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    muonSource = cms.InputTag("muons"),
     srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetEnDown")),
-    applyType1Corrections = cms.bool(True),
-    src = cms.InputTag("patPFMet")
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    resolutions = cms.PSet(
+
+    )
 )
 
 
-process.patPFMetJetEnUp = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
+process.patPFMetJetEnUp = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
+    src = cms.InputTag("patPFMet"),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
     srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetEnUp")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    muonSource = cms.InputTag("muons"),
+    resolutions = cms.PSet(
+
+    )
+)
+
+
+process.patPFMetMuonEnDown = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
     src = cms.InputTag("patPFMet"),
-    applyType1Corrections = cms.bool(True)
-)
-
-
-process.patPFMetJetResDown = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
-    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetResDown")),
-    applyType1Corrections = cms.bool(True),
-    src = cms.InputTag("patPFMet")
-)
-
-
-process.patPFMetJetResUp = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
-    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetResUp")),
-    src = cms.InputTag("patPFMet"),
-    applyType1Corrections = cms.bool(True)
-)
-
-
-process.patPFMetMuonEnDown = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    muonSource = cms.InputTag("muons"),
     srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrMuonEnDown")),
-    applyType1Corrections = cms.bool(True),
-    src = cms.InputTag("patPFMet")
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    resolutions = cms.PSet(
+
+    )
 )
 
 
-process.patPFMetMuonEnUp = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
-    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrMuonEnUp")),
+process.patPFMetMuonEnUp = cms.EDProducer("PATMETProducer",
+    metSource = cms.InputTag("pfMet"),
+    userData = cms.PSet(
+        userCands = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userInts = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFloats = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userClasses = cms.PSet(
+            src = cms.VInputTag("")
+        ),
+        userFunctionLabels = cms.vstring(),
+        userFunctions = cms.vstring()
+    ),
+    addResolutions = cms.bool(False),
     src = cms.InputTag("patPFMet"),
-    applyType1Corrections = cms.bool(True)
+    addEfficiencies = cms.bool(False),
+    genMETSource = cms.InputTag("genMetTrue"),
+    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrMuonEnUp")),
+    efficiencies = cms.PSet(
+
+    ),
+    addGenMET = cms.bool(False),
+    addMuonCorrections = cms.bool(False),
+    muonSource = cms.InputTag("muons"),
+    resolutions = cms.PSet(
+
+    )
 )
 
 
@@ -14593,7 +14714,7 @@ process.patPFMetOriginalReserved = cms.EDProducer("PATMETProducer",
     efficiencies = cms.PSet(
 
     ),
-    addGenMET = cms.bool(True),
+    addGenMET = cms.bool(False),
     addMuonCorrections = cms.bool(False),
     muonSource = cms.InputTag("muons"),
     resolutions = cms.PSet(
@@ -14635,7 +14756,7 @@ process.patPhotons = cms.EDProducer("PATPhotonProducer",
         userFunctionLabels = cms.vstring(),
         userFunctions = cms.vstring()
     ),
-    addGenMatch = cms.bool(True),
+    addGenMatch = cms.bool(False),
     addResolutions = cms.bool(False),
     addEfficiencies = cms.bool(False),
     photonIDSources = cms.PSet(
@@ -14649,7 +14770,7 @@ process.patPhotons = cms.EDProducer("PATPhotonProducer",
 
     ),
     embedSuperCluster = cms.bool(True),
-    embedGenMatch = cms.bool(True),
+    embedGenMatch = cms.bool(False),
     resolutions = cms.PSet(
 
     ),
@@ -14658,7 +14779,7 @@ process.patPhotons = cms.EDProducer("PATPhotonProducer",
     userIsolation = cms.PSet(
 
     ),
-    genParticleMatch = cms.InputTag("photonMatch")
+    genParticleMatch = cms.InputTag("")
 )
 
 
@@ -14699,8 +14820,8 @@ process.patTaus = cms.EDProducer("PATTauProducer",
         byTightCombinedIsolationDeltaBetaCorr3Hits = cms.InputTag("hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr3Hits"),
         decayModeFinding = cms.InputTag("hpsPFTauDiscriminationByDecayModeFinding")
     ),
-    addGenJetMatch = cms.bool(True),
-    embedGenJetMatch = cms.bool(True),
+    addGenJetMatch = cms.bool(False),
+    embedGenJetMatch = cms.bool(False),
     embedLeadTrack = cms.bool(False),
     embedLeadPFCand = cms.bool(False),
     embedSignalPFChargedHadrCands = cms.bool(False),
@@ -14735,7 +14856,7 @@ process.patTaus = cms.EDProducer("PATTauProducer",
     efficiencies = cms.PSet(
 
     ),
-    genJetMatch = cms.InputTag("tauGenJetMatch"),
+    genJetMatch = cms.InputTag(""),
     embedIsolationPFCands = cms.bool(False),
     userData = cms.PSet(
         userCands = cms.PSet(
@@ -14760,8 +14881,8 @@ process.patTaus = cms.EDProducer("PATTauProducer",
     tauJetCorrFactorsSource = cms.VInputTag(cms.InputTag("patTauJetCorrFactors")),
     embedIsolationPFNeutralHadrCands = cms.bool(False),
     addTauID = cms.bool(True),
-    genParticleMatch = cms.InputTag("tauMatch"),
-    addGenMatch = cms.bool(True),
+    genParticleMatch = cms.InputTag(""),
+    addGenMatch = cms.bool(False),
     addResolutions = cms.bool(False),
     embedIsolationPFChargedHadrCands = cms.bool(False),
     embedIsolationTracks = cms.bool(False),
@@ -14773,7 +14894,7 @@ process.patTaus = cms.EDProducer("PATTauProducer",
         pfGamma = cms.InputTag("tauIsoDepositPFGammas")
     ),
     embedLeadPFChargedHadrCand = cms.bool(False),
-    embedGenMatch = cms.bool(True),
+    embedGenMatch = cms.bool(False),
     embedLeadPFNeutralCand = cms.bool(False)
 )
 
@@ -14813,22 +14934,6 @@ process.patType1CorrectedPFMetJetEnDown = cms.EDProducer("CorrectedPATMETProduce
 process.patType1CorrectedPFMetJetEnUp = cms.EDProducer("CorrectedPATMETProducer",
     applyType2Corrections = cms.bool(False),
     srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetEnUp")),
-    applyType1Corrections = cms.bool(True),
-    src = cms.InputTag("patType1CorrectedPFMet")
-)
-
-
-process.patType1CorrectedPFMetJetResDown = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
-    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetResDown")),
-    src = cms.InputTag("patType1CorrectedPFMet"),
-    applyType1Corrections = cms.bool(True)
-)
-
-
-process.patType1CorrectedPFMetJetResUp = cms.EDProducer("CorrectedPATMETProducer",
-    applyType2Corrections = cms.bool(False),
-    srcType1Corrections = cms.VInputTag(cms.InputTag("patPFMETcorrJetResUp")),
     applyType1Corrections = cms.bool(True),
     src = cms.InputTag("patType1CorrectedPFMet")
 )
@@ -16745,236 +16850,6 @@ process.puJetIdChs = cms.EDProducer("PileupJetIdProducer",
 )
 
 
-process.puJetIdEnDown = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(True),
-    runMvas = cms.bool(False),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag(""),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt"),
-    algos = cms.VPSet(cms.PSet(
-        cutBased = cms.bool(True),
-        JetIdParams = cms.PSet(
-            Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-            Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-            Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-            Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-        ),
-        impactParTkThreshold = cms.double(1.0),
-        label = cms.string('cutbased')
-    ))
-)
-
-
-process.puJetIdEnUp = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(True),
-    runMvas = cms.bool(False),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag(""),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt"),
-    algos = cms.VPSet(cms.PSet(
-        cutBased = cms.bool(True),
-        JetIdParams = cms.PSet(
-            Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-            Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-            Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-            Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-        ),
-        impactParTkThreshold = cms.double(1.0),
-        label = cms.string('cutbased')
-    ))
-)
-
-
-process.puJetIdResDown = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(True),
-    runMvas = cms.bool(False),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag(""),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("smearedGoodPatJetsResDown"),
-    algos = cms.VPSet(cms.PSet(
-        cutBased = cms.bool(True),
-        JetIdParams = cms.PSet(
-            Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-            Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-            Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-            Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-        ),
-        impactParTkThreshold = cms.double(1.0),
-        label = cms.string('cutbased')
-    ))
-)
-
-
-process.puJetIdResUp = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(True),
-    runMvas = cms.bool(False),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag(""),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("smearedGoodPatJetsResUp"),
-    algos = cms.VPSet(cms.PSet(
-        cutBased = cms.bool(True),
-        JetIdParams = cms.PSet(
-            Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-            Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-            Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-            Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-        ),
-        impactParTkThreshold = cms.double(1.0),
-        label = cms.string('cutbased')
-    ))
-)
-
-
-process.puJetIdSmeared = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(True),
-    runMvas = cms.bool(False),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag(""),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("smearedGoodPatJets"),
-    algos = cms.VPSet(cms.PSet(
-        cutBased = cms.bool(True),
-        JetIdParams = cms.PSet(
-            Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-            Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-            Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-            Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-            Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-            Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-            Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-            Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-            Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-        ),
-        impactParTkThreshold = cms.double(1.0),
-        label = cms.string('cutbased')
-    ))
-)
-
-
 process.puJetMva = cms.EDProducer("PileupJetIdProducer",
     residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
     runMvas = cms.bool(True),
@@ -17110,446 +16985,6 @@ process.puJetMvaChs = cms.EDProducer("PileupJetIdProducer",
             Pt010_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
             Pt3050_Loose = cms.vdouble(-0.15, -0.26, -0.16, -0.16),
             Pt3050_Tight = cms.vdouble(0.78, 0.5, 0.17, 0.17)
-        ),
-        impactParTkThreshold = cms.double(1.0)
-    ), 
-        cms.PSet(
-            cutBased = cms.bool(True),
-            JetIdParams = cms.PSet(
-                Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-                Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-                Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-                Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-            ),
-            impactParTkThreshold = cms.double(1.0),
-            label = cms.string('cutbased')
-        ))
-)
-
-
-process.puJetMvaEnDown = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(False),
-    runMvas = cms.bool(True),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag("puJetIdEnDown"),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt"),
-    algos = cms.VPSet(cms.PSet(
-        tmvaVariables = cms.vstring('nvtx', 
-            'dZ', 
-            'beta', 
-            'betaStar', 
-            'nCharged', 
-            'nNeutrals', 
-            'dR2Mean', 
-            'ptD', 
-            'frac01', 
-            'frac02', 
-            'frac03', 
-            'frac04', 
-            'frac05'),
-        tmvaMethod = cms.string('JetIDMVAHighPt'),
-        cutBased = cms.bool(False),
-        tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml'),
-        tmvaSpectators = cms.vstring('jetPt', 
-            'jetEta', 
-            'jetPhi'),
-        label = cms.string('full53x'),
-        version = cms.int32(-1),
-        JetIdParams = cms.PSet(
-            Pt2030_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42),
-            Pt2030_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt1020_MET = cms.vdouble(0.3, -0.2, -0.4, -0.4),
-            Pt2030_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt010_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt1020_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt3050_MET = cms.vdouble(0.0, 0.0, -0.1, -0.2),
-            Pt010_MET = cms.vdouble(0.0, -0.6, -0.4, -0.4),
-            Pt1020_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt010_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt1020_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt2030_MET = cms.vdouble(0.0, 0.0, 0.0, 0.0),
-            Pt010_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt3050_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42)
-        ),
-        impactParTkThreshold = cms.double(1.0)
-    ), 
-        cms.PSet(
-            cutBased = cms.bool(True),
-            JetIdParams = cms.PSet(
-                Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-                Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-                Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-                Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-            ),
-            impactParTkThreshold = cms.double(1.0),
-            label = cms.string('cutbased')
-        ))
-)
-
-
-process.puJetMvaEnUp = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(False),
-    runMvas = cms.bool(True),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag("puJetIdEnUp"),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt"),
-    algos = cms.VPSet(cms.PSet(
-        tmvaVariables = cms.vstring('nvtx', 
-            'dZ', 
-            'beta', 
-            'betaStar', 
-            'nCharged', 
-            'nNeutrals', 
-            'dR2Mean', 
-            'ptD', 
-            'frac01', 
-            'frac02', 
-            'frac03', 
-            'frac04', 
-            'frac05'),
-        tmvaMethod = cms.string('JetIDMVAHighPt'),
-        cutBased = cms.bool(False),
-        tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml'),
-        tmvaSpectators = cms.vstring('jetPt', 
-            'jetEta', 
-            'jetPhi'),
-        label = cms.string('full53x'),
-        version = cms.int32(-1),
-        JetIdParams = cms.PSet(
-            Pt2030_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42),
-            Pt2030_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt1020_MET = cms.vdouble(0.3, -0.2, -0.4, -0.4),
-            Pt2030_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt010_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt1020_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt3050_MET = cms.vdouble(0.0, 0.0, -0.1, -0.2),
-            Pt010_MET = cms.vdouble(0.0, -0.6, -0.4, -0.4),
-            Pt1020_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt010_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt1020_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt2030_MET = cms.vdouble(0.0, 0.0, 0.0, 0.0),
-            Pt010_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt3050_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42)
-        ),
-        impactParTkThreshold = cms.double(1.0)
-    ), 
-        cms.PSet(
-            cutBased = cms.bool(True),
-            JetIdParams = cms.PSet(
-                Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-                Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-                Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-                Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-            ),
-            impactParTkThreshold = cms.double(1.0),
-            label = cms.string('cutbased')
-        ))
-)
-
-
-process.puJetMvaResDown = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(False),
-    runMvas = cms.bool(True),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag("puJetIdResDown"),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("smearedGoodPatJetsResDown"),
-    algos = cms.VPSet(cms.PSet(
-        tmvaVariables = cms.vstring('nvtx', 
-            'dZ', 
-            'beta', 
-            'betaStar', 
-            'nCharged', 
-            'nNeutrals', 
-            'dR2Mean', 
-            'ptD', 
-            'frac01', 
-            'frac02', 
-            'frac03', 
-            'frac04', 
-            'frac05'),
-        tmvaMethod = cms.string('JetIDMVAHighPt'),
-        cutBased = cms.bool(False),
-        tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml'),
-        tmvaSpectators = cms.vstring('jetPt', 
-            'jetEta', 
-            'jetPhi'),
-        label = cms.string('full53x'),
-        version = cms.int32(-1),
-        JetIdParams = cms.PSet(
-            Pt2030_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42),
-            Pt2030_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt1020_MET = cms.vdouble(0.3, -0.2, -0.4, -0.4),
-            Pt2030_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt010_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt1020_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt3050_MET = cms.vdouble(0.0, 0.0, -0.1, -0.2),
-            Pt010_MET = cms.vdouble(0.0, -0.6, -0.4, -0.4),
-            Pt1020_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt010_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt1020_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt2030_MET = cms.vdouble(0.0, 0.0, 0.0, 0.0),
-            Pt010_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt3050_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42)
-        ),
-        impactParTkThreshold = cms.double(1.0)
-    ), 
-        cms.PSet(
-            cutBased = cms.bool(True),
-            JetIdParams = cms.PSet(
-                Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-                Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-                Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-                Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-            ),
-            impactParTkThreshold = cms.double(1.0),
-            label = cms.string('cutbased')
-        ))
-)
-
-
-process.puJetMvaResUp = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(False),
-    runMvas = cms.bool(True),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag("puJetIdResUp"),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("smearedGoodPatJetsResUp"),
-    algos = cms.VPSet(cms.PSet(
-        tmvaVariables = cms.vstring('nvtx', 
-            'dZ', 
-            'beta', 
-            'betaStar', 
-            'nCharged', 
-            'nNeutrals', 
-            'dR2Mean', 
-            'ptD', 
-            'frac01', 
-            'frac02', 
-            'frac03', 
-            'frac04', 
-            'frac05'),
-        tmvaMethod = cms.string('JetIDMVAHighPt'),
-        cutBased = cms.bool(False),
-        tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml'),
-        tmvaSpectators = cms.vstring('jetPt', 
-            'jetEta', 
-            'jetPhi'),
-        label = cms.string('full53x'),
-        version = cms.int32(-1),
-        JetIdParams = cms.PSet(
-            Pt2030_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42),
-            Pt2030_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt1020_MET = cms.vdouble(0.3, -0.2, -0.4, -0.4),
-            Pt2030_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt010_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt1020_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt3050_MET = cms.vdouble(0.0, 0.0, -0.1, -0.2),
-            Pt010_MET = cms.vdouble(0.0, -0.6, -0.4, -0.4),
-            Pt1020_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt010_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt1020_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt2030_MET = cms.vdouble(0.0, 0.0, 0.0, 0.0),
-            Pt010_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt3050_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42)
-        ),
-        impactParTkThreshold = cms.double(1.0)
-    ), 
-        cms.PSet(
-            cutBased = cms.bool(True),
-            JetIdParams = cms.PSet(
-                Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
-                Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
-                Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
-                Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
-                Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
-                Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
-                Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
-                Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
-                Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
-            ),
-            impactParTkThreshold = cms.double(1.0),
-            label = cms.string('cutbased')
-        ))
-)
-
-
-process.puJetMvaSmeared = cms.EDProducer("PileupJetIdProducer",
-    produceJetIds = cms.bool(False),
-    runMvas = cms.bool(True),
-    inputIsCorrected = cms.bool(True),
-    vertexes = cms.InputTag("offlinePrimaryVertices"),
-    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
-    jec = cms.string('AK5PF'),
-    residualsFromTxt = cms.bool(False),
-    applyJec = cms.bool(False),
-    jetids = cms.InputTag("puJetIdSmeared"),
-    rho = cms.InputTag("kt6PFJets","rho"),
-    jets = cms.InputTag("smearedGoodPatJets"),
-    algos = cms.VPSet(cms.PSet(
-        tmvaVariables = cms.vstring('nvtx', 
-            'dZ', 
-            'beta', 
-            'betaStar', 
-            'nCharged', 
-            'nNeutrals', 
-            'dR2Mean', 
-            'ptD', 
-            'frac01', 
-            'frac02', 
-            'frac03', 
-            'frac04', 
-            'frac05'),
-        tmvaMethod = cms.string('JetIDMVAHighPt'),
-        cutBased = cms.bool(False),
-        tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml'),
-        tmvaSpectators = cms.vstring('jetPt', 
-            'jetEta', 
-            'jetPhi'),
-        label = cms.string('full53x'),
-        version = cms.int32(-1),
-        JetIdParams = cms.PSet(
-            Pt2030_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42),
-            Pt2030_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt1020_MET = cms.vdouble(0.3, -0.2, -0.4, -0.4),
-            Pt2030_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
-            Pt010_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt1020_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
-            Pt3050_MET = cms.vdouble(0.0, 0.0, -0.1, -0.2),
-            Pt010_MET = cms.vdouble(0.0, -0.6, -0.4, -0.4),
-            Pt1020_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt010_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt1020_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
-            Pt2030_MET = cms.vdouble(0.0, 0.0, 0.0, 0.0),
-            Pt010_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
-            Pt3050_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
-            Pt3050_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42)
         ),
         impactParTkThreshold = cms.double(1.0)
     ), 
@@ -17759,7 +17194,7 @@ process.selectVetoElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
 process.selectedPatJetsForMETtype1p2CorrEnDown = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(False),
     src = cms.InputTag("selectedPatJetsForMETtype1p2Corr"),
-    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt'),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V4_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(-1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
     jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
@@ -17770,7 +17205,7 @@ process.selectedPatJetsForMETtype1p2CorrEnDown = cms.EDProducer("ShiftedPATJetPr
 process.selectedPatJetsForMETtype1p2CorrEnUp = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(False),
     src = cms.InputTag("selectedPatJetsForMETtype1p2Corr"),
-    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt'),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V4_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
     jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
@@ -17778,178 +17213,10 @@ process.selectedPatJetsForMETtype1p2CorrEnUp = cms.EDProducer("ShiftedPATJetProd
 )
 
 
-process.selectedPatJetsForMETtype1p2CorrResDown = cms.EDProducer("SmearedPATJetProducer",
-    jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
-        HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
-        EE_PhiResPar = cms.vdouble(0.02511),
-        jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
-            1.981, 1.972, 2.875, 3.923, 7.51),
-        jdpt8 = cms.vdouble(0.889, 0.939, 1.166, 1.365, 1.553, 
-            1.805, 2.06, 2.22, 2.268, 2.247),
-        jdpt7 = cms.vdouble(1.094, 1.139, 1.436, 1.672, 1.831, 
-            2.05, 2.267, 2.549, 2.785, 2.86),
-        jdpt6 = cms.vdouble(1.213, 1.298, 1.716, 2.015, 2.191, 
-            2.612, 2.863, 2.879, 2.925, 2.902),
-        jdpt5 = cms.vdouble(1.049, 1.149, 1.607, 1.869, 2.012, 
-            2.219, 2.289, 2.412, 2.695, 2.865),
-        jdpt4 = cms.vdouble(0.85, 0.961, 1.337, 1.593, 1.854, 
-            2.005, 2.209, 2.533, 2.812, 3.047),
-        jdpt3 = cms.vdouble(0.929, 1.04, 1.46, 1.74, 2.042, 
-            2.289, 2.639, 2.837, 2.946, 2.971),
-        jdpt2 = cms.vdouble(0.841, 0.937, 1.316, 1.605, 1.919, 
-            2.295, 2.562, 2.722, 2.943, 3.293),
-        jdpt1 = cms.vdouble(0.718, 0.813, 1.133, 1.384, 1.588, 
-            1.841, 2.115, 2.379, 2.508, 2.772),
-        jdpt0 = cms.vdouble(0.749, 0.829, 1.099, 1.355, 1.584, 
-            1.807, 2.035, 2.217, 2.378, 2.591),
-        HE_EtResPar = cms.vdouble(0.0, 1.3, 0.05),
-        HF_PhiResPar = cms.vdouble(0.05022),
-        PF_PhiResType7 = cms.vdouble(0.02511),
-        HE_PhiResPar = cms.vdouble(0.02511),
-        EE_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        PF_PhiResType2 = cms.vdouble(0.002),
-        PF_PhiResType3 = cms.vdouble(0.002),
-        HF_EtResPar = cms.vdouble(0.0, 1.82, 0.09),
-        resolutionsAlgo = cms.string('AK5PF'),
-        PF_PhiResType6 = cms.vdouble(0.02511),
-        HB_PhiResPar = cms.vdouble(0.02511),
-        PF_PhiResType4 = cms.vdouble(0.0028, 0.0, 0.0022),
-        PF_PhiResType5 = cms.vdouble(0.1, 0.1, 0.13),
-        ptresolthreshold = cms.double(10.0),
-        EB_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        jdphi8 = cms.vdouble(0.059, 0.057, 0.051, 0.044, 0.038, 
-            0.035, 0.037, 0.032, 0.028, 0.028),
-        EB_PhiResPar = cms.vdouble(0.00502),
-        jdphi9 = cms.vdouble(0.062, 0.059, 0.053, 0.047, 0.042, 
-            0.045, 0.036, 0.032, 0.034, 0.044),
-        PF_PhiResType1 = cms.vdouble(0.002),
-        jdphi4 = cms.vdouble(0.042, 0.042, 0.043, 0.042, 0.038, 
-            0.036, 0.036, 0.033, 0.031, 0.031),
-        HO_PhiResPar = cms.vdouble(0.02511),
-        jdphi2 = cms.vdouble(0.04, 0.04, 0.04, 0.04, 0.04, 
-            0.038, 0.036, 0.035, 0.034, 0.033),
-        jdphi1 = cms.vdouble(0.034, 0.035, 0.035, 0.035, 0.035, 
-            0.034, 0.031, 0.03, 0.029, 0.027),
-        jdphi0 = cms.vdouble(0.034, 0.034, 0.034, 0.034, 0.032, 
-            0.031, 0.028, 0.027, 0.027, 0.027),
-        jdphi7 = cms.vdouble(0.077, 0.072, 0.059, 0.05, 0.045, 
-            0.042, 0.039, 0.039, 0.037, 0.031),
-        jdphi6 = cms.vdouble(0.084, 0.08, 0.072, 0.065, 0.066, 
-            0.06, 0.051, 0.049, 0.045, 0.045),
-        jdphi5 = cms.vdouble(0.069, 0.069, 0.064, 0.058, 0.053, 
-            0.049, 0.049, 0.043, 0.039, 0.04),
-        HO_EtResPar = cms.vdouble(0.0, 1.3, 0.005),
-        jdphi3 = cms.vdouble(0.042, 0.043, 0.044, 0.043, 0.041, 
-            0.039, 0.039, 0.036, 0.034, 0.031),
-        PF_EtResType5 = cms.vdouble(0.41, 0.52, 0.25),
-        PF_EtResType4 = cms.vdouble(0.042, 0.1, 0.0),
-        PF_EtResType7 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType6 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType1 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType3 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType2 = cms.vdouble(0.05, 0, 0)
-    ),
-    src = cms.InputTag("selectedPatJetsForMETtype1p2Corr"),
-    skipCorrJetPtThreshold = cms.double(0.01),
-    skipRawJetPtThreshold = cms.double(10.0),
-    shiftBy = cms.double(1.0),
-    inputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/pfJetResolutionMCtoDataCorrLUT.root'),
-    skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
-    dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
-    lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
-)
-
-
-process.selectedPatJetsForMETtype1p2CorrResUp = cms.EDProducer("SmearedPATJetProducer",
-    jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
-        HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
-        EE_PhiResPar = cms.vdouble(0.02511),
-        jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
-            1.981, 1.972, 2.875, 3.923, 7.51),
-        jdpt8 = cms.vdouble(0.889, 0.939, 1.166, 1.365, 1.553, 
-            1.805, 2.06, 2.22, 2.268, 2.247),
-        jdpt7 = cms.vdouble(1.094, 1.139, 1.436, 1.672, 1.831, 
-            2.05, 2.267, 2.549, 2.785, 2.86),
-        jdpt6 = cms.vdouble(1.213, 1.298, 1.716, 2.015, 2.191, 
-            2.612, 2.863, 2.879, 2.925, 2.902),
-        jdpt5 = cms.vdouble(1.049, 1.149, 1.607, 1.869, 2.012, 
-            2.219, 2.289, 2.412, 2.695, 2.865),
-        jdpt4 = cms.vdouble(0.85, 0.961, 1.337, 1.593, 1.854, 
-            2.005, 2.209, 2.533, 2.812, 3.047),
-        jdpt3 = cms.vdouble(0.929, 1.04, 1.46, 1.74, 2.042, 
-            2.289, 2.639, 2.837, 2.946, 2.971),
-        jdpt2 = cms.vdouble(0.841, 0.937, 1.316, 1.605, 1.919, 
-            2.295, 2.562, 2.722, 2.943, 3.293),
-        jdpt1 = cms.vdouble(0.718, 0.813, 1.133, 1.384, 1.588, 
-            1.841, 2.115, 2.379, 2.508, 2.772),
-        jdpt0 = cms.vdouble(0.749, 0.829, 1.099, 1.355, 1.584, 
-            1.807, 2.035, 2.217, 2.378, 2.591),
-        HE_EtResPar = cms.vdouble(0.0, 1.3, 0.05),
-        HF_PhiResPar = cms.vdouble(0.05022),
-        PF_PhiResType7 = cms.vdouble(0.02511),
-        HE_PhiResPar = cms.vdouble(0.02511),
-        EE_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        PF_PhiResType2 = cms.vdouble(0.002),
-        PF_PhiResType3 = cms.vdouble(0.002),
-        HF_EtResPar = cms.vdouble(0.0, 1.82, 0.09),
-        resolutionsAlgo = cms.string('AK5PF'),
-        PF_PhiResType6 = cms.vdouble(0.02511),
-        HB_PhiResPar = cms.vdouble(0.02511),
-        PF_PhiResType4 = cms.vdouble(0.0028, 0.0, 0.0022),
-        PF_PhiResType5 = cms.vdouble(0.1, 0.1, 0.13),
-        ptresolthreshold = cms.double(10.0),
-        EB_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        jdphi8 = cms.vdouble(0.059, 0.057, 0.051, 0.044, 0.038, 
-            0.035, 0.037, 0.032, 0.028, 0.028),
-        EB_PhiResPar = cms.vdouble(0.00502),
-        jdphi9 = cms.vdouble(0.062, 0.059, 0.053, 0.047, 0.042, 
-            0.045, 0.036, 0.032, 0.034, 0.044),
-        PF_PhiResType1 = cms.vdouble(0.002),
-        jdphi4 = cms.vdouble(0.042, 0.042, 0.043, 0.042, 0.038, 
-            0.036, 0.036, 0.033, 0.031, 0.031),
-        HO_PhiResPar = cms.vdouble(0.02511),
-        jdphi2 = cms.vdouble(0.04, 0.04, 0.04, 0.04, 0.04, 
-            0.038, 0.036, 0.035, 0.034, 0.033),
-        jdphi1 = cms.vdouble(0.034, 0.035, 0.035, 0.035, 0.035, 
-            0.034, 0.031, 0.03, 0.029, 0.027),
-        jdphi0 = cms.vdouble(0.034, 0.034, 0.034, 0.034, 0.032, 
-            0.031, 0.028, 0.027, 0.027, 0.027),
-        jdphi7 = cms.vdouble(0.077, 0.072, 0.059, 0.05, 0.045, 
-            0.042, 0.039, 0.039, 0.037, 0.031),
-        jdphi6 = cms.vdouble(0.084, 0.08, 0.072, 0.065, 0.066, 
-            0.06, 0.051, 0.049, 0.045, 0.045),
-        jdphi5 = cms.vdouble(0.069, 0.069, 0.064, 0.058, 0.053, 
-            0.049, 0.049, 0.043, 0.039, 0.04),
-        HO_EtResPar = cms.vdouble(0.0, 1.3, 0.005),
-        jdphi3 = cms.vdouble(0.042, 0.043, 0.044, 0.043, 0.041, 
-            0.039, 0.039, 0.036, 0.034, 0.031),
-        PF_EtResType5 = cms.vdouble(0.41, 0.52, 0.25),
-        PF_EtResType4 = cms.vdouble(0.042, 0.1, 0.0),
-        PF_EtResType7 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType6 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType1 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType3 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType2 = cms.vdouble(0.05, 0, 0)
-    ),
-    src = cms.InputTag("selectedPatJetsForMETtype1p2Corr"),
-    skipCorrJetPtThreshold = cms.double(0.01),
-    skipRawJetPtThreshold = cms.double(10.0),
-    shiftBy = cms.double(-1.0),
-    inputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/pfJetResolutionMCtoDataCorrLUT.root'),
-    skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
-    dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
-    lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
-)
-
-
 process.shiftedGoodPatJetsEnDownForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(False),
-    src = cms.InputTag("smearedGoodPatJets"),
-    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt'),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V4_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(-1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
     jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
@@ -17959,8 +17226,8 @@ process.shiftedGoodPatJetsEnDownForCorrMEt = cms.EDProducer("ShiftedPATJetProduc
 
 process.shiftedGoodPatJetsEnDownForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(True),
-    src = cms.InputTag("smearedGoodPatJets"),
-    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt'),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V4_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(-1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
     jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
@@ -17970,8 +17237,8 @@ process.shiftedGoodPatJetsEnDownForRawMEt = cms.EDProducer("ShiftedPATJetProduce
 
 process.shiftedGoodPatJetsEnUpForCorrMEt = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(False),
-    src = cms.InputTag("smearedGoodPatJets"),
-    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt'),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V4_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
     jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
@@ -17981,8 +17248,8 @@ process.shiftedGoodPatJetsEnUpForCorrMEt = cms.EDProducer("ShiftedPATJetProducer
 
 process.shiftedGoodPatJetsEnUpForRawMEt = cms.EDProducer("ShiftedPATJetProducer",
     addResidualJES = cms.bool(True),
-    src = cms.InputTag("smearedGoodPatJets"),
-    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt'),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
+    jetCorrInputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/Summer13_V4_DATA_UncertaintySources_AK5PF.txt'),
     shiftBy = cms.double(1.0),
     jetCorrUncertaintyTag = cms.string('SubTotalMC'),
     jetCorrLabelUpToL3Res = cms.string('ak5PFL1FastL2L3Residual'),
@@ -18934,257 +18201,6 @@ process.sisCone7GenJetsNoNu = cms.EDProducer("FastjetJetProducer",
     maxProblematicEcalCells = cms.uint32(9999999),
     doPUOffsetCorr = cms.bool(False),
     inputEMin = cms.double(0.0)
-)
-
-
-process.smearedGoodPatJets = cms.EDProducer("SmearedPATJetProducer",
-    jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
-        HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
-        EE_PhiResPar = cms.vdouble(0.02511),
-        jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
-            1.981, 1.972, 2.875, 3.923, 7.51),
-        jdpt8 = cms.vdouble(0.889, 0.939, 1.166, 1.365, 1.553, 
-            1.805, 2.06, 2.22, 2.268, 2.247),
-        jdpt7 = cms.vdouble(1.094, 1.139, 1.436, 1.672, 1.831, 
-            2.05, 2.267, 2.549, 2.785, 2.86),
-        jdpt6 = cms.vdouble(1.213, 1.298, 1.716, 2.015, 2.191, 
-            2.612, 2.863, 2.879, 2.925, 2.902),
-        jdpt5 = cms.vdouble(1.049, 1.149, 1.607, 1.869, 2.012, 
-            2.219, 2.289, 2.412, 2.695, 2.865),
-        jdpt4 = cms.vdouble(0.85, 0.961, 1.337, 1.593, 1.854, 
-            2.005, 2.209, 2.533, 2.812, 3.047),
-        jdpt3 = cms.vdouble(0.929, 1.04, 1.46, 1.74, 2.042, 
-            2.289, 2.639, 2.837, 2.946, 2.971),
-        jdpt2 = cms.vdouble(0.841, 0.937, 1.316, 1.605, 1.919, 
-            2.295, 2.562, 2.722, 2.943, 3.293),
-        jdpt1 = cms.vdouble(0.718, 0.813, 1.133, 1.384, 1.588, 
-            1.841, 2.115, 2.379, 2.508, 2.772),
-        jdpt0 = cms.vdouble(0.749, 0.829, 1.099, 1.355, 1.584, 
-            1.807, 2.035, 2.217, 2.378, 2.591),
-        HE_EtResPar = cms.vdouble(0.0, 1.3, 0.05),
-        HF_PhiResPar = cms.vdouble(0.05022),
-        PF_PhiResType7 = cms.vdouble(0.02511),
-        HE_PhiResPar = cms.vdouble(0.02511),
-        EE_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        PF_PhiResType2 = cms.vdouble(0.002),
-        PF_PhiResType3 = cms.vdouble(0.002),
-        HF_EtResPar = cms.vdouble(0.0, 1.82, 0.09),
-        resolutionsAlgo = cms.string('AK5PF'),
-        PF_PhiResType6 = cms.vdouble(0.02511),
-        HB_PhiResPar = cms.vdouble(0.02511),
-        PF_PhiResType4 = cms.vdouble(0.0028, 0.0, 0.0022),
-        PF_PhiResType5 = cms.vdouble(0.1, 0.1, 0.13),
-        ptresolthreshold = cms.double(10.0),
-        EB_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        jdphi8 = cms.vdouble(0.059, 0.057, 0.051, 0.044, 0.038, 
-            0.035, 0.037, 0.032, 0.028, 0.028),
-        EB_PhiResPar = cms.vdouble(0.00502),
-        jdphi9 = cms.vdouble(0.062, 0.059, 0.053, 0.047, 0.042, 
-            0.045, 0.036, 0.032, 0.034, 0.044),
-        PF_PhiResType1 = cms.vdouble(0.002),
-        jdphi4 = cms.vdouble(0.042, 0.042, 0.043, 0.042, 0.038, 
-            0.036, 0.036, 0.033, 0.031, 0.031),
-        HO_PhiResPar = cms.vdouble(0.02511),
-        jdphi2 = cms.vdouble(0.04, 0.04, 0.04, 0.04, 0.04, 
-            0.038, 0.036, 0.035, 0.034, 0.033),
-        jdphi1 = cms.vdouble(0.034, 0.035, 0.035, 0.035, 0.035, 
-            0.034, 0.031, 0.03, 0.029, 0.027),
-        jdphi0 = cms.vdouble(0.034, 0.034, 0.034, 0.034, 0.032, 
-            0.031, 0.028, 0.027, 0.027, 0.027),
-        jdphi7 = cms.vdouble(0.077, 0.072, 0.059, 0.05, 0.045, 
-            0.042, 0.039, 0.039, 0.037, 0.031),
-        jdphi6 = cms.vdouble(0.084, 0.08, 0.072, 0.065, 0.066, 
-            0.06, 0.051, 0.049, 0.045, 0.045),
-        jdphi5 = cms.vdouble(0.069, 0.069, 0.064, 0.058, 0.053, 
-            0.049, 0.049, 0.043, 0.039, 0.04),
-        HO_EtResPar = cms.vdouble(0.0, 1.3, 0.005),
-        jdphi3 = cms.vdouble(0.042, 0.043, 0.044, 0.043, 0.041, 
-            0.039, 0.039, 0.036, 0.034, 0.031),
-        PF_EtResType5 = cms.vdouble(0.41, 0.52, 0.25),
-        PF_EtResType4 = cms.vdouble(0.042, 0.1, 0.0),
-        PF_EtResType7 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType6 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType1 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType3 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType2 = cms.vdouble(0.05, 0, 0)
-    ),
-    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
-    skipCorrJetPtThreshold = cms.double(0.01),
-    skipRawJetPtThreshold = cms.double(10.0),
-    inputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/pfJetResolutionMCtoDataCorrLUT.root'),
-    skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
-    dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
-    lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
-)
-
-
-process.smearedGoodPatJetsResDown = cms.EDProducer("SmearedPATJetProducer",
-    jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
-        HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
-        EE_PhiResPar = cms.vdouble(0.02511),
-        jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
-            1.981, 1.972, 2.875, 3.923, 7.51),
-        jdpt8 = cms.vdouble(0.889, 0.939, 1.166, 1.365, 1.553, 
-            1.805, 2.06, 2.22, 2.268, 2.247),
-        jdpt7 = cms.vdouble(1.094, 1.139, 1.436, 1.672, 1.831, 
-            2.05, 2.267, 2.549, 2.785, 2.86),
-        jdpt6 = cms.vdouble(1.213, 1.298, 1.716, 2.015, 2.191, 
-            2.612, 2.863, 2.879, 2.925, 2.902),
-        jdpt5 = cms.vdouble(1.049, 1.149, 1.607, 1.869, 2.012, 
-            2.219, 2.289, 2.412, 2.695, 2.865),
-        jdpt4 = cms.vdouble(0.85, 0.961, 1.337, 1.593, 1.854, 
-            2.005, 2.209, 2.533, 2.812, 3.047),
-        jdpt3 = cms.vdouble(0.929, 1.04, 1.46, 1.74, 2.042, 
-            2.289, 2.639, 2.837, 2.946, 2.971),
-        jdpt2 = cms.vdouble(0.841, 0.937, 1.316, 1.605, 1.919, 
-            2.295, 2.562, 2.722, 2.943, 3.293),
-        jdpt1 = cms.vdouble(0.718, 0.813, 1.133, 1.384, 1.588, 
-            1.841, 2.115, 2.379, 2.508, 2.772),
-        jdpt0 = cms.vdouble(0.749, 0.829, 1.099, 1.355, 1.584, 
-            1.807, 2.035, 2.217, 2.378, 2.591),
-        HE_EtResPar = cms.vdouble(0.0, 1.3, 0.05),
-        HF_PhiResPar = cms.vdouble(0.05022),
-        PF_PhiResType7 = cms.vdouble(0.02511),
-        HE_PhiResPar = cms.vdouble(0.02511),
-        EE_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        PF_PhiResType2 = cms.vdouble(0.002),
-        PF_PhiResType3 = cms.vdouble(0.002),
-        HF_EtResPar = cms.vdouble(0.0, 1.82, 0.09),
-        resolutionsAlgo = cms.string('AK5PF'),
-        PF_PhiResType6 = cms.vdouble(0.02511),
-        HB_PhiResPar = cms.vdouble(0.02511),
-        PF_PhiResType4 = cms.vdouble(0.0028, 0.0, 0.0022),
-        PF_PhiResType5 = cms.vdouble(0.1, 0.1, 0.13),
-        ptresolthreshold = cms.double(10.0),
-        EB_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        jdphi8 = cms.vdouble(0.059, 0.057, 0.051, 0.044, 0.038, 
-            0.035, 0.037, 0.032, 0.028, 0.028),
-        EB_PhiResPar = cms.vdouble(0.00502),
-        jdphi9 = cms.vdouble(0.062, 0.059, 0.053, 0.047, 0.042, 
-            0.045, 0.036, 0.032, 0.034, 0.044),
-        PF_PhiResType1 = cms.vdouble(0.002),
-        jdphi4 = cms.vdouble(0.042, 0.042, 0.043, 0.042, 0.038, 
-            0.036, 0.036, 0.033, 0.031, 0.031),
-        HO_PhiResPar = cms.vdouble(0.02511),
-        jdphi2 = cms.vdouble(0.04, 0.04, 0.04, 0.04, 0.04, 
-            0.038, 0.036, 0.035, 0.034, 0.033),
-        jdphi1 = cms.vdouble(0.034, 0.035, 0.035, 0.035, 0.035, 
-            0.034, 0.031, 0.03, 0.029, 0.027),
-        jdphi0 = cms.vdouble(0.034, 0.034, 0.034, 0.034, 0.032, 
-            0.031, 0.028, 0.027, 0.027, 0.027),
-        jdphi7 = cms.vdouble(0.077, 0.072, 0.059, 0.05, 0.045, 
-            0.042, 0.039, 0.039, 0.037, 0.031),
-        jdphi6 = cms.vdouble(0.084, 0.08, 0.072, 0.065, 0.066, 
-            0.06, 0.051, 0.049, 0.045, 0.045),
-        jdphi5 = cms.vdouble(0.069, 0.069, 0.064, 0.058, 0.053, 
-            0.049, 0.049, 0.043, 0.039, 0.04),
-        HO_EtResPar = cms.vdouble(0.0, 1.3, 0.005),
-        jdphi3 = cms.vdouble(0.042, 0.043, 0.044, 0.043, 0.041, 
-            0.039, 0.039, 0.036, 0.034, 0.031),
-        PF_EtResType5 = cms.vdouble(0.41, 0.52, 0.25),
-        PF_EtResType4 = cms.vdouble(0.042, 0.1, 0.0),
-        PF_EtResType7 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType6 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType1 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType3 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType2 = cms.vdouble(0.05, 0, 0)
-    ),
-    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
-    skipCorrJetPtThreshold = cms.double(0.01),
-    skipRawJetPtThreshold = cms.double(10.0),
-    inputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/pfJetResolutionMCtoDataCorrLUT.root'),
-    skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
-    dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
-    lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0),
-    shiftBy = cms.double(1.0)
-)
-
-
-process.smearedGoodPatJetsResUp = cms.EDProducer("SmearedPATJetProducer",
-    jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
-        HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
-        EE_PhiResPar = cms.vdouble(0.02511),
-        jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
-            1.981, 1.972, 2.875, 3.923, 7.51),
-        jdpt8 = cms.vdouble(0.889, 0.939, 1.166, 1.365, 1.553, 
-            1.805, 2.06, 2.22, 2.268, 2.247),
-        jdpt7 = cms.vdouble(1.094, 1.139, 1.436, 1.672, 1.831, 
-            2.05, 2.267, 2.549, 2.785, 2.86),
-        jdpt6 = cms.vdouble(1.213, 1.298, 1.716, 2.015, 2.191, 
-            2.612, 2.863, 2.879, 2.925, 2.902),
-        jdpt5 = cms.vdouble(1.049, 1.149, 1.607, 1.869, 2.012, 
-            2.219, 2.289, 2.412, 2.695, 2.865),
-        jdpt4 = cms.vdouble(0.85, 0.961, 1.337, 1.593, 1.854, 
-            2.005, 2.209, 2.533, 2.812, 3.047),
-        jdpt3 = cms.vdouble(0.929, 1.04, 1.46, 1.74, 2.042, 
-            2.289, 2.639, 2.837, 2.946, 2.971),
-        jdpt2 = cms.vdouble(0.841, 0.937, 1.316, 1.605, 1.919, 
-            2.295, 2.562, 2.722, 2.943, 3.293),
-        jdpt1 = cms.vdouble(0.718, 0.813, 1.133, 1.384, 1.588, 
-            1.841, 2.115, 2.379, 2.508, 2.772),
-        jdpt0 = cms.vdouble(0.749, 0.829, 1.099, 1.355, 1.584, 
-            1.807, 2.035, 2.217, 2.378, 2.591),
-        HE_EtResPar = cms.vdouble(0.0, 1.3, 0.05),
-        HF_PhiResPar = cms.vdouble(0.05022),
-        PF_PhiResType7 = cms.vdouble(0.02511),
-        HE_PhiResPar = cms.vdouble(0.02511),
-        EE_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        PF_PhiResType2 = cms.vdouble(0.002),
-        PF_PhiResType3 = cms.vdouble(0.002),
-        HF_EtResPar = cms.vdouble(0.0, 1.82, 0.09),
-        resolutionsAlgo = cms.string('AK5PF'),
-        PF_PhiResType6 = cms.vdouble(0.02511),
-        HB_PhiResPar = cms.vdouble(0.02511),
-        PF_PhiResType4 = cms.vdouble(0.0028, 0.0, 0.0022),
-        PF_PhiResType5 = cms.vdouble(0.1, 0.1, 0.13),
-        ptresolthreshold = cms.double(10.0),
-        EB_EtResPar = cms.vdouble(0.2, 0.03, 0.005),
-        jdphi8 = cms.vdouble(0.059, 0.057, 0.051, 0.044, 0.038, 
-            0.035, 0.037, 0.032, 0.028, 0.028),
-        EB_PhiResPar = cms.vdouble(0.00502),
-        jdphi9 = cms.vdouble(0.062, 0.059, 0.053, 0.047, 0.042, 
-            0.045, 0.036, 0.032, 0.034, 0.044),
-        PF_PhiResType1 = cms.vdouble(0.002),
-        jdphi4 = cms.vdouble(0.042, 0.042, 0.043, 0.042, 0.038, 
-            0.036, 0.036, 0.033, 0.031, 0.031),
-        HO_PhiResPar = cms.vdouble(0.02511),
-        jdphi2 = cms.vdouble(0.04, 0.04, 0.04, 0.04, 0.04, 
-            0.038, 0.036, 0.035, 0.034, 0.033),
-        jdphi1 = cms.vdouble(0.034, 0.035, 0.035, 0.035, 0.035, 
-            0.034, 0.031, 0.03, 0.029, 0.027),
-        jdphi0 = cms.vdouble(0.034, 0.034, 0.034, 0.034, 0.032, 
-            0.031, 0.028, 0.027, 0.027, 0.027),
-        jdphi7 = cms.vdouble(0.077, 0.072, 0.059, 0.05, 0.045, 
-            0.042, 0.039, 0.039, 0.037, 0.031),
-        jdphi6 = cms.vdouble(0.084, 0.08, 0.072, 0.065, 0.066, 
-            0.06, 0.051, 0.049, 0.045, 0.045),
-        jdphi5 = cms.vdouble(0.069, 0.069, 0.064, 0.058, 0.053, 
-            0.049, 0.049, 0.043, 0.039, 0.04),
-        HO_EtResPar = cms.vdouble(0.0, 1.3, 0.005),
-        jdphi3 = cms.vdouble(0.042, 0.043, 0.044, 0.043, 0.041, 
-            0.039, 0.039, 0.036, 0.034, 0.031),
-        PF_EtResType5 = cms.vdouble(0.41, 0.52, 0.25),
-        PF_EtResType4 = cms.vdouble(0.042, 0.1, 0.0),
-        PF_EtResType7 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType6 = cms.vdouble(0.0, 1.22, 0.05),
-        PF_EtResType1 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType3 = cms.vdouble(0.05, 0, 0),
-        PF_EtResType2 = cms.vdouble(0.05, 0, 0)
-    ),
-    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
-    skipCorrJetPtThreshold = cms.double(0.01),
-    skipRawJetPtThreshold = cms.double(10.0),
-    inputFileName = cms.FileInPath('PhysicsTools/PatUtils/data/pfJetResolutionMCtoDataCorrLUT.root'),
-    skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
-    dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
-    lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0),
-    shiftBy = cms.double(-1.0)
 )
 
 
@@ -20287,7 +19303,8 @@ process.hcalfilter = cms.EDFilter("HLTHighLevel",
 process.hltHighLevel = cms.EDFilter("HLTHighLevel",
     eventSetupPathsKey = cms.string(''),
     TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-    HLTPaths = cms.vstring('*'),
+    HLTPaths = cms.vstring('HLT_DiJet35_MJJ700_AllJets_DEta3p5_VBF_v*', 
+        'HLT_DiJet30_MJJ700_AllJets_DEta3p5_VBF_v*'),
     throw = cms.bool(False),
     andOr = cms.bool(True)
 )
@@ -20620,7 +19637,7 @@ process.selectedPatJets = cms.EDFilter("PATJetSelector",
 
 process.selectedPatJetsForMETtype1p2Corr = cms.EDFilter("PATJetSelector",
     filter = cms.bool(False),
-    src = cms.InputTag("smearedGoodPatJets"),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     cut = cms.string('abs(eta) < 9.9')
 )
 
@@ -20634,7 +19651,7 @@ process.selectedPatJetsForMETtype1p2CorrOriginalReserved = cms.EDFilter("PATJetS
 
 process.selectedPatJetsForMETtype2Corr = cms.EDFilter("PATJetSelector",
     filter = cms.bool(False),
-    src = cms.InputTag("smearedGoodPatJets"),
+    src = cms.InputTag("goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty"),
     cut = cms.string('abs(eta) > 9.9')
 )
 
@@ -20761,36 +19778,36 @@ process.cleanPatCandidateSummary = cms.EDAnalyzer("CandidateSummaryTable",
 
 
 process.invHiggsInfo = cms.EDAnalyzer("InvHiggsInfoProducer",
-    puJetIdTag = cms.untracked.InputTag("puJetMvaSmeared","full53xId"),
-    trigCorrFile = cms.untracked.string('DataMCWeight_53X_v1.root'),
+    puJetIdTag = cms.untracked.InputTag("puJetMva","full53xId"),
+    trigCorrFile = cms.untracked.string(''),
     mcPYTHIA = cms.untracked.bool(True),
     wMuTag = cms.untracked.InputTag("bestWMuNu"),
-    jetTag = cms.untracked.InputTag("smearedGoodPatJets"),
+    jetTag = cms.untracked.InputTag("goodPatJets"),
     hltPath1Name = cms.untracked.string('HLT_DiPFJet40_PFMETnoMu65_MJJ600VBF_LeadingJets_v'),
     hltResultsTag = cms.untracked.InputTag("TriggerResults","","HLT"),
-    puMCFile = cms.untracked.string('PUHistS10.root'),
+    puMCFile = cms.untracked.string(''),
     zElTag = cms.untracked.InputTag("bestZEE"),
     wElTag = cms.untracked.InputTag("bestWENu"),
     muonTag = cms.untracked.InputTag("selectMuons"),
     L1ExtraEtMissMHT = cms.untracked.InputTag("l1extraParticles","MHT"),
-    metTag = cms.untracked.InputTag("patType1CorrectedPFMet"),
-    puMCHist = cms.untracked.string('pileup'),
+    metTag = cms.untracked.InputTag("patMETs"),
+    puMCHist = cms.untracked.string(''),
     metResultsTag = cms.untracked.InputTag("TriggerResults","","PAT"),
     genParticleTag = cms.untracked.InputTag("genParticles","","SIM"),
     hltPath2Name = cms.untracked.string('HLT_DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets_v'),
     zMuTag = cms.untracked.InputTag("bestZMuMu"),
-    puDataFile = cms.untracked.string('PUHistRun2012All_forParked.root'),
+    puDataFile = cms.untracked.string(''),
     useLeadingJets = cms.untracked.bool(True),
     L1ExtraEtMissMET = cms.untracked.InputTag("l1extraParticles","MET"),
     hltPath3Name = cms.untracked.string('HLT_DiJet35_MJJ700_AllJets_DEta3p5_VBF_v'),
-    puJetMvaTag = cms.untracked.InputTag("puJetMvaSmeared","full53xDiscriminant"),
+    puJetMvaTag = cms.untracked.InputTag("puJetMva","full53xDiscriminant"),
     looseElectronTag = cms.untracked.InputTag("selectVetoElectrons"),
     electronTag = cms.untracked.InputTag("selectElectrons"),
     tauTag = cms.untracked.InputTag("cleanPatTaus"),
     looseMuonTag = cms.untracked.InputTag("selectLooseMuons"),
     genEvtTag = cms.untracked.InputTag("generator","","SIM"),
     hltPath4Name = cms.untracked.string('HLT_DiJet30_MJJ700_AllJets_DEta3p5_VBF_v'),
-    puDataHist = cms.untracked.string('pileup'),
+    puDataHist = cms.untracked.string(''),
     mhtTag = cms.untracked.InputTag("patMHTs")
 )
 
@@ -20892,13 +19909,10 @@ process.RunTanc = cms.Sequence(process.shrinkingConePFTauDiscriminationByTaNCfrO
 process.produceHPSPFTaus = cms.Sequence(process.hpsSelectionDiscriminator+process.hpsPFTauProducerSansRefs+process.hpsPFTauProducer)
 
 
-process.smearedPatPFMetSequence = cms.Sequence(process.patPFMetForMEtUncertainty+process.patPFMETcorrJetSmearing+process.patPFMet)
-
-
 process.patElectronEcalIsolation = cms.Sequence(process.eleIsoDepositEcalFromHits+process.eleIsoFromDepsEcalFromHitsByCrystal)
 
 
-process.patPhotonTrackIsolation = cms.Sequence(process.gamIsoDepositTk+process.gamIsoFromDepsTk)
+process.pfJetSequence = cms.Sequence(process.pfJets)
 
 
 process.hpsPFTauDiscriminationByChargedIsolationSeq = cms.Sequence(process.hpsPFTauDiscriminationByVLooseChargedIsolation+process.hpsPFTauDiscriminationByLooseChargedIsolation+process.hpsPFTauDiscriminationByMediumChargedIsolation+process.hpsPFTauDiscriminationByTightChargedIsolation)
@@ -20994,6 +20008,9 @@ process.CSCHaloFilterDigiOrTriggerLevel = cms.Sequence(process.CSCHaloFilterDigi
 process.recoTauClassicFixedConeSequence = cms.Sequence(process.recoTauCommonSequence+process.ak5PFJetsRecoTauPiZeros+process.produceAndDiscriminateFixedConePFTaus)
 
 
+process.patPhotonTrackIsolation = cms.Sequence(process.gamIsoDepositTk+process.gamIsoFromDepsTk)
+
+
 process.pfTausBaseSequence = cms.Sequence(process.pfTausProducerSansRefs+process.pfTausProducer+process.pfTausDiscriminationByLeadingTrackFinding+process.pfTausDiscriminationByLeadingPionPtCut+process.pfTausDiscriminationByIsolation)
 
 
@@ -21022,9 +20039,6 @@ process.patFixedConePFTauDiscrimination = cms.Sequence()
 
 
 process.pfPhotonSequence = cms.Sequence(process.pfSelectedPhotons+process.pfPhotonIsolationSequence+process.pfIsolatedPhotons)
-
-
-process.pfJetSequence = cms.Sequence(process.pfJets)
 
 
 process.pfTauSequence = cms.Sequence(process.pfTausPreSequence+process.pfTausBaseSequence+process.pfTaus)
@@ -21072,7 +20086,7 @@ process.makePatMETs = cms.Sequence(process.patMETCorrections+process.patMETs)
 process.recoTauClassicShrinkingConeSequence = cms.Sequence(process.recoTauCommonSequence+process.ak5PFJetsRecoTauPiZeros+process.produceAndDiscriminateShrinkingConePFTaus)
 
 
-process.producePatPFMETCorrections = cms.Sequence(process.smearedPatPFMetSequence+process.pfCandsNotInJet+process.selectedPatJetsForMETtype1p2Corr+process.selectedPatJetsForMETtype2Corr+process.patPFJetMETtype1p2Corr+process.patPFJetMETtype2Corr+process.type0PFMEtCorrectionPFCandToVertexAssociation+process.patPFMETtype0Corr+process.pfCandMETcorr+process.patType1CorrectedPFMet+process.patType1p2CorrectedPFMet)
+process.producePatPFMETCorrections = cms.Sequence(process.patPFMet+process.pfCandsNotInJet+process.selectedPatJetsForMETtype1p2Corr+process.selectedPatJetsForMETtype2Corr+process.patPFJetMETtype1p2Corr+process.patPFJetMETtype2Corr+process.type0PFMEtCorrectionPFCandToVertexAssociation+process.patPFMETtype0Corr+process.pfCandMETcorr+process.patType1CorrectedPFMet+process.patType1p2CorrectedPFMet)
 
 
 process.muonPFIsolationSequence = cms.Sequence(process.muonPFIsolationDepositsSequence+process.muPFIsoValueCharged03+process.muPFIsoValueChargedAll03+process.muPFIsoValueGamma03+process.muPFIsoValueNeutral03+process.muPFIsoValueGammaHighThreshold03+process.muPFIsoValueNeutralHighThreshold03+process.muPFIsoValuePU03+process.muPFIsoValueCharged04+process.muPFIsoValueChargedAll04+process.muPFIsoValueGamma04+process.muPFIsoValueNeutral04+process.muPFIsoValueGammaHighThreshold04+process.muPFIsoValueNeutralHighThreshold04+process.muPFIsoValuePU04)
@@ -21120,7 +20134,7 @@ process.pfElectronIsolationSequence = cms.Sequence(process.electronPFIsolationDe
 process.pfElectronSequence = cms.Sequence(process.pfAllElectrons+process.pfElectronsFromVertex+process.pfSelectedElectrons+process.pfElectronIsolationSequence+process.pfIsolatedElectrons+process.pfElectrons)
 
 
-process.metUncertaintySequence = cms.Sequence(process.goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty+process.smearedGoodPatJets+process.smearedGoodPatJetsResUp+process.smearedGoodPatJetsResDown+process.shiftedParticlesForMEtUncertainties+process.producePatPFMETCorrections+process.selectedPatJetsForMETtype1p2CorrEnUp+process.selectedPatJetsForMETtype1p2CorrEnDown+process.selectedPatJetsForMETtype1p2CorrResUp+process.selectedPatJetsForMETtype1p2CorrResDown+process.smearedPatPFMetSequence+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patPFMetJetEnUp+process.patPFMetJetEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patType1CorrectedPFMetJetEnUp+process.patType1CorrectedPFMetJetEnDown+process.patPFMETcorrJetResUp+process.patPFMETcorrJetResDown+process.patPFMetJetResUp+process.patPFMetJetResDown+process.patPFMETcorrJetResUp+process.patPFMETcorrJetResDown+process.patType1CorrectedPFMetJetResUp+process.patType1CorrectedPFMetJetResDown+process.pfCandMETcorrUnclusteredEnUp+process.pfCandMETcorrUnclusteredEnDown+process.patPFJetMETtype1p2CorrUnclusteredEnUp+process.patPFJetMETtype1p2CorrUnclusteredEnDown+process.patPFJetMETtype2CorrUnclusteredEnUp+process.patPFJetMETtype2CorrUnclusteredEnDown+process.patPFMetUnclusteredEnUp+process.patPFMetUnclusteredEnDown+process.patType1CorrectedPFMetUnclusteredEnUp+process.patType1CorrectedPFMetUnclusteredEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patPFMetElectronEnUp+process.patPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patPFMetMuonEnUp+process.patPFMetMuonEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patType1CorrectedPFMetElectronEnUp+process.patType1CorrectedPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patType1CorrectedPFMetMuonEnUp+process.patType1CorrectedPFMetMuonEnDown)
+process.metUncertaintySequence = cms.Sequence(process.goodPatJetsNotOverlappingWithLeptonsForMEtUncertainty+process.shiftedParticlesForMEtUncertainties+process.producePatPFMETCorrections+process.selectedPatJetsForMETtype1p2CorrEnUp+process.selectedPatJetsForMETtype1p2CorrEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patPFMetJetEnUp+process.patPFMetJetEnDown+process.patPFMETcorrJetEnUp+process.patPFMETcorrJetEnDown+process.patType1CorrectedPFMetJetEnUp+process.patType1CorrectedPFMetJetEnDown+process.pfCandMETcorrUnclusteredEnUp+process.pfCandMETcorrUnclusteredEnDown+process.patPFJetMETtype1p2CorrUnclusteredEnUp+process.patPFJetMETtype1p2CorrUnclusteredEnDown+process.patPFJetMETtype2CorrUnclusteredEnUp+process.patPFJetMETtype2CorrUnclusteredEnDown+process.patPFMetUnclusteredEnUp+process.patPFMetUnclusteredEnDown+process.patType1CorrectedPFMetUnclusteredEnUp+process.patType1CorrectedPFMetUnclusteredEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patPFMetElectronEnUp+process.patPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patPFMetMuonEnUp+process.patPFMetMuonEnDown+process.patPFMETcorrElectronEnUp+process.patPFMETcorrElectronEnDown+process.patType1CorrectedPFMetElectronEnUp+process.patType1CorrectedPFMetElectronEnDown+process.patPFMETcorrMuonEnUp+process.patPFMETcorrMuonEnDown+process.patType1CorrectedPFMetMuonEnUp+process.patType1CorrectedPFMetMuonEnDown)
 
 
 process.pfMuonSequence = cms.Sequence(process.pfAllMuons+process.pfMuonsFromVertex+process.pfSelectedMuons+process.pfMuonIsolationSequence+process.pfIsolatedMuons+process.pfMuons)
@@ -21150,7 +20164,7 @@ process.patCandidates = cms.Sequence(process.makePatElectrons+process.makePatMuo
 process.PFBRECO = cms.Sequence(process.pfNoPileUpSequence+process.pfParticleSelectionSequence+process.pfPhotonSequence+process.pfMuonSequence+process.pfNoMuon+process.pfElectronSequence+process.pfNoElectron+process.pfJetSequence+process.pfNoJet+process.pfTauSequence+process.pfNoTau+process.pfMET)
 
 
-process.patDefaultSequence = cms.Sequence(process.electronMatch+process.eleIsoSequence+process.patElectrons+process.makePatMuons+process.makePatTaus+process.makePatPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.patJetCharge+process.patJetPartonMatch+process.patJetGenJetMatch+process.patJetFlavourId+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates)
+process.patDefaultSequence = cms.Sequence(process.eleIsoSequence+process.patElectrons+process.patMuons+process.patHPSPFTauDiscriminationUpdate+process.patPFCandidateIsoDepositSelection+process.patPFTauIsolation+process.patTaus+process.patPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.patJetCharge+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates)
 
 
 process.p0 = cms.Path(process.HBHENoiseFilter)
@@ -21177,10 +20191,10 @@ process.p6 = cms.Path(process.goodVertices+process.trackingFailureFilter)
 process.p7 = cms.Path(process.trkPOGFilters)
 
 
-process.p8 = cms.Path(process.primaryVertexFilter)
+process.p8 = cms.Path(process.hcalfilter)
 
 
-process.p = cms.Path(process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.patDefaultSequence+process.goodPatJets+process.PhysicsObjectSequence+process.metUncertaintySequence+process.puJetIdSqeuence+process.puJetIdSmeared+process.puJetMvaSmeared+process.puJetIdResUp+process.puJetMvaResUp+process.puJetIdResDown+process.puJetMvaResDown+process.puJetIdEnUp+process.puJetMvaEnUp+process.puJetIdEnDown+process.puJetMvaEnDown+process.WSequence+process.ZSequence+process.invHiggsInfo)
+process.p = cms.Path(process.l1Filter+process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.patDefaultSequence+process.goodPatJets+process.PhysicsObjectSequence+process.metUncertaintySequence+process.puJetIdSqeuence+process.WSequence+process.ZSequence+process.invHiggsInfo)
 
 
 process.MessageLogger = cms.Service("MessageLogger",
@@ -21278,7 +20292,8 @@ process.TFileService = cms.Service("TFileService",
 process.AK5PFCombinedCorrector = cms.ESProducer("JetCorrectionESChain",
     correctors = cms.vstring('AK5PFL1FastJet', 
         'AK5PFL2Relative', 
-        'AK5PFL3Absolute')
+        'AK5PFL3Absolute', 
+        'AK5PFL2L3Residual')
 )
 
 
@@ -22823,7 +21838,7 @@ process.GlobalTag = cms.ESSource("PoolDBESSource",
     BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService'),
     toGet = cms.VPSet(),
     connect = cms.string('frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'),
-    globaltag = cms.string('START53_V27::All')
+    globaltag = cms.string('FT53_V21A_AN6::All')
 )
 
 
