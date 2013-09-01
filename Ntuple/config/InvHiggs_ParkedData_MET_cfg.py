@@ -20194,7 +20194,7 @@ process.p7 = cms.Path(process.trkPOGFilters)
 process.p8 = cms.Path(process.hcalfilter)
 
 
-process.p = cms.Path(process.l1Filter+process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.patDefaultSequence+process.goodPatJets+process.PhysicsObjectSequence+process.metUncertaintySequence+process.puJetIdSqeuence+process.WSequence+process.ZSequence+process.invHiggsInfo)
+process.p = cms.Path(process.l1Filter+process.hltHighLevel+process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.patDefaultSequence+process.goodPatJets+process.PhysicsObjectSequence+process.metUncertaintySequence+process.puJetIdSqeuence+process.WSequence+process.ZSequence+process.invHiggsInfo)
 
 
 process.MessageLogger = cms.Service("MessageLogger",

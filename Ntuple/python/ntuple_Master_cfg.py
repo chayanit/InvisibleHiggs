@@ -452,7 +452,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
     	process.p = cms.Path(    
         	# Trigger filter
 		process.l1Filter *
-        	#process.hltHighLevel *
+        	process.hltHighLevel *
         
         	# Basic filters
         	process.noscraping *

@@ -11,7 +11,7 @@ iRunOnData  = False
 
 #iData Jul13, Aug06, Aug24, PromptC2, PromptD, Dec11
 #No meaning if iRunData = False
-iData       = "Dec11" 
+iData       = "ParkedData" 
 
 #MET, SingleMuon, DoubleMuon, SingleElectron, DoubleElectron, NoTrig
 #(If iMCSignal = True, trigger will be set to NoTrig automatically)
@@ -21,7 +21,7 @@ iHLTFilter  = "MET"
 #No meaning if iRunData = True
 iMCSignal   = True  
 
-iFile       = '/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/04BCEC26-AA02-E211-A81D-003048CF99BA.root'
+iFile       = '/store/data/Run2012C/VBF1Parked/AOD/22Jan2013-v1/20000/40F56410-D979-E211-9843-002618943849.root'
 
 iMaxEvent   = 10000
 
@@ -36,20 +36,20 @@ if iMCSignal == True:
     iHLTFilter  = "NoTrig"
 addInvHiggsProcess(process, iRunOnData, iData, iHLTFilter, iMCSignal, iFile, iMaxEvent)
 
-# Dump
 if iDump == True:
     iFileName = "InvHiggs"
     if iRunOnData == True:
-        iFileName += "_DATA_"
+        #iFileName += "_DATA_"
+        iFileName += "_"
         iFileName += iData
         iFileName += "_"
     else:
-        if iMCSignal == True:
-            iFileName += "_MCSignal_"
-        else:
-            iFileName += "_MC_"
+        iFileName += "_MC_"
     iFileName += iHLTFilter
-    iFileName += "_cfg.py"
+    if iRunOnData == False:
+        iFileName += "_Central_cfg.py"
+    else: 
+        iFileName += "_cfg.py"
     file = open(iFileName,'w')
     file.write(str(process.dumpPython()))
     file.close()

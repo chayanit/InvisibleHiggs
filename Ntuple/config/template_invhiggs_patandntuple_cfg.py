@@ -7,7 +7,7 @@ from InvisibleHiggs.Ntuple.ntuple_Master_cfg import addInvHiggsProcess
 
 ###--------------------------------------------------------------
 ### Set these parameters
-iRunOnData  = False
+iRunOnData  = True
 
 #iData Jul13, Aug06, Aug24, PromptC2, PromptD, Dec11
 #No meaning if iRunData = False
@@ -21,8 +21,8 @@ iHLTFilter  = "MET"
 #No meaning if iRunData = True
 iMCSignal   = False
  
-iFile       = '/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/BE502377-92D1-E111-B1B6-0025B3E0656C.root'
-#iFile	    = '/store/data/Run2012C/VBF1Parked/AOD/22Jan2013-v1/20000/40F56410-D979-E211-9843-002618943849.root'
+#iFile       = '/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/BE502377-92D1-E111-B1B6-0025B3E0656C.root'
+iFile	    = '/store/data/Run2012C/VBF1Parked/AOD/22Jan2013-v1/20000/40F56410-D979-E211-9843-002618943849.root'
 
 iMaxEvent   = 500
 
