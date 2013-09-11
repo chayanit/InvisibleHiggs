@@ -8,19 +8,18 @@
 #include "InvisibleHiggs/Analysis/interface/LeptonWeights.h"
 #include "InvisibleHiggs/Analysis/interface/Constants.h"
 
-#include "TTree.h"
+#include "TTree.h" 
 #include "TMath.h"
+#include "TF1.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TCanvas.h"
-#include "TCanvas.h"
+#include "TPad.h"
 #include "TLegend.h"
 #include "TGraphErrors.h"
-#include "TGraphAsymmErrors.h"
 #include "TStyle.h"
 #include "TAxis.h"
-#include "TF1.h"
-
+#include "TPaveText.h"
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -321,14 +320,14 @@ int main(int argc, char* argv[]) {
    
   } // end of datasets loop
 
-  for (int i=1; i<=hWTau_BGC_DPhi->GetNbinsX(); ++i) hWTau_BGC_DPhi->SetBinError(i,0.); // no stat error from mc
-  for (int i=1; i<=hWMu_BGC_DPhi->GetNbinsX(); ++i) hWMu_BGC_DPhi->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=hWTau_BGC_DPhi->GetNbinsX(); ++i) hWTau_BGC_DPhi->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=hWMu_BGC_DPhi->GetNbinsX(); ++i) hWMu_BGC_DPhi->SetBinError(i,0.); // no stat error from mc
 
-  for (int i=1; i<=hWTau_BGC_MET->GetNbinsX(); ++i) hWTau_BGC_MET->SetBinError(i,0.); // no stat error from mc
-  for (int i=1; i<=hWMu_BGC_MET->GetNbinsX(); ++i) hWMu_BGC_MET->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=hWTau_BGC_MET->GetNbinsX(); ++i) hWTau_BGC_MET->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=hWMu_BGC_MET->GetNbinsX(); ++i) hWMu_BGC_MET->SetBinError(i,0.); // no stat error from mc
 
-  for (int i=1; i<=hWTau_BGC_CenJetEt->GetNbinsX(); ++i) hWTau_BGC_CenJetEt->SetBinError(i,0.); // no stat error from mc
-  for (int i=1; i<=hWMu_BGC_CenJetEt->GetNbinsX(); ++i) hWMu_BGC_CenJetEt->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=hWTau_BGC_CenJetEt->GetNbinsX(); ++i) hWTau_BGC_CenJetEt->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=hWMu_BGC_CenJetEt->GetNbinsX(); ++i) hWMu_BGC_CenJetEt->SetBinError(i,0.); // no stat error from mc
 
   // W->mu
   TH1D* hWMu_EstC_DPhi = new TH1D("hWMu_EstC_DPhi", "", 4, dphiEdges); // n_data - n_bg in WMu control
@@ -356,26 +355,29 @@ int main(int argc, char* argv[]) {
   TH1D* h_RVBF_CenJetEt = new TH1D("h_RVBF_CenJetEt","",4,CenJetEtEdges);
   h_RVBF_CenJetEt->Divide(hWTau_MCC_CenJetEt,hWMu_MCC_CenJetEt,1.,1.);
 
-  for (int i=1; i<=h_RGEN->GetNbinsX(); ++i)h_RGEN->SetBinError(i,0.); // no stat error from mc
-  for (int i=1; i<=h_RVBF_DPhi->GetNbinsX(); ++i) h_RVBF_DPhi->SetBinError(i,0.); // no stat error from mc
-  for (int i=1; i<=h_RVBF_MET->GetNbinsX(); ++i) h_RVBF_MET->SetBinError(i,0.); // no stat error from mc
-  for (int i=1; i<=h_RVBF_CenJetEt->GetNbinsX(); ++i) h_RVBF_CenJetEt->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=h_RGEN->GetNbinsX(); ++i)h_RGEN->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=h_RVBF_DPhi->GetNbinsX(); ++i) h_RVBF_DPhi->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=h_RVBF_MET->GetNbinsX(); ++i) h_RVBF_MET->SetBinError(i,0.); // no stat error from mc
+  //for (int i=1; i<=h_RVBF_CenJetEt->GetNbinsX(); ++i) h_RVBF_CenJetEt->SetBinError(i,0.); // no stat error from mc
   
   TH1D* h_R_DPhi     = new TH1D("h_R_DPhi","",4,dphiEdges);
   TH1D* h_R_MET      = new TH1D("h_R_MET","",4,METEdges);
   TH1D* h_R_CenJetEt = new TH1D("h_R_CenJetEt","",4,CenJetEtEdges);
-
-  for (int ibin = 1; ibin <= h_RVBF_DPhi->GetNbinsX(); ++ibin){
+ 
+  for (int ibin = 1; ibin <= h_R_DPhi->GetNbinsX(); ++ibin){
     h_R_DPhi->SetBinContent(ibin, h_RVBF_DPhi->GetBinContent(ibin) * h_RGEN->GetBinContent(1));
-    h_R_DPhi->SetBinError(ibin, 0);//pow(h_RVBF_DPhi->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_DPhi->GetBinContent(ibin) * h_RGEN->GetBinError(1),2) );
+    //h_R_DPhi->SetBinError(ibin, 0);//pow(h_RVBF_DPhi->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_DPhi->GetBinContent(ibin) * h_RGEN->GetBinError(1),2) );
+    h_R_DPhi->SetBinError(ibin, h_R_DPhi->GetBinContent(ibin) * sqrt(pow(h_RVBF_DPhi->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_DPhi->GetBinContent(ibin) * h_RGEN->GetBinError(1),2)));
   }
-  for (int ibin = 1; ibin <= h_RVBF_MET->GetNbinsX(); ++ibin){
+  for (int ibin = 1; ibin <= h_R_MET->GetNbinsX(); ++ibin){
     h_R_MET->SetBinContent(ibin, h_RVBF_MET->GetBinContent(ibin) * h_RGEN->GetBinContent(1));
-    h_R_MET->SetBinError(ibin, 0);//pow(h_RVBF_MET->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_MET->GetBinContent(ibin) * h_RGEN->GetBinError(1),2) );
+    //h_R_MET->SetBinError(ibin, 0);//pow(h_RVBF_MET->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_MET->GetBinContent(ibin) * h_RGEN->GetBinError(1),2) );
+    h_R_MET->SetBinError(ibin, h_R_MET->GetBinContent(ibin) * sqrt(pow(h_RVBF_MET->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_MET->GetBinContent(ibin) * h_RGEN->GetBinError(1),2)));
   }
-  for (int ibin = 1; ibin <= h_RVBF_CenJetEt->GetNbinsX(); ++ibin){
+  for (int ibin = 1; ibin <= h_R_CenJetEt->GetNbinsX(); ++ibin){
     h_R_CenJetEt->SetBinContent(ibin, h_RVBF_CenJetEt->GetBinContent(ibin) * h_RGEN->GetBinContent(1));
-    h_R_CenJetEt->SetBinError(ibin, 0);//pow(h_RVBF_CenJetEt->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_CenJetEt->GetBinContent(ibin) * h_RGEN->GetBinError(1),2) );
+    //h_R_CenJetEt->SetBinError(ibin, 0);//pow(h_RVBF_CenJetEt->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_CenJetEt->GetBinContent(ibin) * h_RGEN->GetBinError(1),2) );
+    h_R_CenJetEt->SetBinError(ibin, h_R_CenJetEt->GetBinContent(ibin) * sqrt(pow(h_RVBF_CenJetEt->GetBinError(ibin) * h_RGEN->GetBinContent(1),2) + pow(h_RVBF_CenJetEt->GetBinContent(ibin) * h_RGEN->GetBinError(1),2)));
   }
 
   // lets calculate some stuff
@@ -496,7 +498,8 @@ int main(int argc, char* argv[]) {
 
   for(int i=0; i<4; ++i) {
         y_syst[i] = 0.;
-        e_syst[i] = sqrt( pow(0.2,2) + pow(constants::syst_WTau,2) ); // 20% from MC stats, plus whatever the current value of Tau syst from TAU ID, w-e contamination, JER etc
+        //e_syst[i] = sqrt( pow(0.2,2) + pow(constants::syst_WTau,2) ); // 20% from MC stats, plus whatever the current value of Tau syst from TAU ID, w-e contamination, JER etc
+	e_syst[i] = constants::syst_WTau;
 
         y_dPhi1[i]  = hWTau_Prediction_DPhi->GetBinContent(i+1);  //Predicted WMu
         ey_dPhi1[i] = hWTau_Prediction_DPhi->GetBinError(i+1);
@@ -548,6 +551,17 @@ int main(int argc, char* argv[]) {
   TH1D *h_dPhi     = new TH1D("h_dPhi", "", 1, 0, TMath::Pi()); // For axes
   TH1D *h_MET      = new TH1D("h_MET", "", 1, 100, 500); // For axes
   TH1D *h_CenJetEt = new TH1D("h_CenJetEt", "", 1, 10, 150); // For axes
+
+  TPaveText *cms = new TPaveText(0.12, 0.68, 0.58 , 0.88, "NDC");
+  cms->SetFillColor(0);
+  cms->SetFillStyle(4000);
+  cms->SetBorderSize(0);
+  cms->SetLineColor(0);
+  cms->SetTextAlign(12);
+  cms->AddText("CMS Preliminary");
+  cms->AddText("");
+  cms->AddText("#sqrt{s} = 8 TeV L = 19.6 fb^{-1}");
+  cms->AddText("");
 
   TCanvas canvas; 
   canvas.SetCanvasSize(canvas.GetWindowWidth(), 1.2*canvas.GetWindowHeight());
@@ -632,7 +646,7 @@ int main(int argc, char* argv[]) {
   gp_MET1->GetXaxis()->SetRangeUser(100,500);
   gp_MET1->GetYaxis()->SetTitle("N(W#rightarrow #tau#nu)");
   gp_MET1->GetYaxis()->SetTitleOffset(1.2);
-  gp_MET1->GetYaxis()->SetRangeUser(0,60);
+  gp_MET1->GetYaxis()->SetRangeUser(-50,60);
   gp_MET1->Draw("AP");
   gp_MET2->SetMarkerStyle(20);
   gp_MET2->SetMarkerSize(0.9);

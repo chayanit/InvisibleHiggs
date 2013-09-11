@@ -14,6 +14,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TCanvas.h"
+#include "TPad.h"
 #include "TLegend.h"
 #include "TGraphErrors.h"
 #include "TStyle.h"
@@ -811,20 +812,22 @@ int main(int argc, char* argv[]) {
   TGraphErrors *gp_cjvS  = new TGraphErrors(4,x_cjv,y_syst1,ex_cjv,e_syst1);
   TGraphErrors *gp_cjvF  = new TGraphErrors(4,x_cjv,frac_cjv,ex_cjv,efrac_cjv);
 
-  TPaveText *cms = new TPaveText(0.12, 0.68, 0.45, 0.9, "NDC");
+  TPaveText *cms = new TPaveText(0.12, 0.68, 0.58 , 0.88, "NDC");
   cms->SetFillColor(0);
   cms->SetFillStyle(4000);
   cms->SetBorderSize(0);
   cms->SetLineColor(0);
   cms->SetTextAlign(12);
-  cms->AddText("CMS Preliminary #sqrt{s} = 8 TeV");
+  cms->AddText("CMS Preliminary");
   cms->AddText("");
-  cms->AddText("#int L = 19.6 fb^{-1}");
+  cms->AddText("#sqrt{s} = 8 TeV L = 19.6 fb^{-1}");
   cms->AddText("");
 
   TCanvas canvas; 
   canvas.SetCanvasSize(canvas.GetWindowWidth(), 1.2*canvas.GetWindowHeight());
-
+  TPad *pad = (TPad *)canvas.cd(1);
+  pad->SetPad("pad","pad",0.05,0.05,.97,.97,kWhite,0,0);
+  
   gp_dPhi1->SetTitle("");
   gp_dPhi1->SetMarkerStyle(20);
   gp_dPhi1->SetMarkerSize(0.9);
@@ -864,13 +867,13 @@ int main(int argc, char* argv[]) {
   h1->SetLineColor(kBlue);
   h1->SetLineWidth(2);
   h1->Draw();
-  gp_dPhiS->SetLineColor(kGray+2);
+  gp_dPhiS->SetLineColor(kGray);
   gp_dPhiS->SetLineWidth(0);
-  gp_dPhiS->SetFillColor(kGray+2);
-  gp_dPhiS->SetFillStyle(3002);
+  gp_dPhiS->SetFillColor(kGray);
+  gp_dPhiS->SetFillStyle(3001);
   gp_dPhiF->SetMarkerStyle(20);
-  gp_dPhiF->SetMarkerSize(1.2);
-  gp_dPhiF->SetMarkerColor(kGreen-2);
+  gp_dPhiF->SetMarkerSize(1.5);
+  gp_dPhiF->SetMarkerColor(kBlue);
   gp_dPhiF->Fit("f1","R");
   h1->Draw();
   gp_dPhiS->Draw("2 same");
@@ -920,13 +923,13 @@ int main(int argc, char* argv[]) {
   h2->SetLineColor(kBlue);
   h2->SetLineWidth(2);
   h2->Draw();
-  gp_etaS->SetLineColor(kGray+2);
+  gp_etaS->SetLineColor(kGray);
   gp_etaS->SetLineWidth(0);
-  gp_etaS->SetFillColor(kGray+2);
-  gp_etaS->SetFillStyle(3002);
+  gp_etaS->SetFillColor(kGray);
+  gp_etaS->SetFillStyle(3001);
   gp_etaF->SetMarkerStyle(20);
-  gp_etaF->SetMarkerSize(1.2);
-  gp_etaF->SetMarkerColor(kGreen-2);
+  gp_etaF->SetMarkerSize(1.5);
+  gp_etaF->SetMarkerColor(kBlue);
   gp_etaF->Fit("f2","R");
   h2->Draw();
   gp_etaS->Draw("2 same");
@@ -967,32 +970,38 @@ int main(int argc, char* argv[]) {
 
   pdfName= oDir + std::string("/MJJ_Welnu_num.pdf");
   canvas.Print(pdfName.c_str());
+  
 
   h3->GetXaxis()->SetTitle("M_{jj} [GeV]");
-  h3->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
-  h3->GetYaxis()->SetTitleOffset(1.20);
-  h3->SetStats(kFALSE);
+  h3->GetXaxis()->SetTitleSize(0.053);
+  h3->GetXaxis()->SetTitleOffset(0.85);
+  h3->GetYaxis()->SetTitle("(Predicted - Observed)/Observed");
+  h3->GetYaxis()->SetTitleSize(0.050);
+  h3->GetYaxis()->SetTitleOffset(0.85);
   h3->GetYaxis()->SetRangeUser(-1.0,2.0);
-  h3->SetLineColor(kBlue);
+  h3->SetStats(kFALSE);
+  h3->SetLineColor(kBlack);
+  h3->SetLineStyle(7);
   h3->SetLineWidth(2);
   h3->Draw();
-  gp_mjjS->SetLineColor(kGray+2);
+  gp_mjjS->SetLineColor(kGray);
   gp_mjjS->SetLineWidth(0);
-  gp_mjjS->SetFillColor(kGray+2);
-  gp_mjjS->SetFillStyle(3002);
+  gp_mjjS->SetFillColor(kGray);
+  gp_mjjS->SetFillStyle(3001);
   gp_mjjF->SetMarkerStyle(20);
-  gp_mjjF->SetMarkerSize(1.2);
-  gp_mjjF->SetMarkerColor(kGreen-2);
+  gp_mjjF->SetMarkerSize(1.4);
+  gp_mjjF->SetMarkerColor(kBlue);
+  gp_mjjF->SetLineWidth(2);
   gp_mjjF->Fit("f3","R");
   h3->Draw();
   gp_mjjS->Draw("2 same");
   gp_mjjF->Draw("P same");
 
-  TLegend leg4(0.62,0.67,0.88,0.87);
+  TLegend leg4(0.65,0.67,0.88,0.87);
   leg4.SetBorderSize(0);
   leg4.SetFillColor(0);
   leg4.AddEntry(f3,"Fit","l");
-  leg4.AddEntry(gp_mjjS,"Systematic error","f");
+  leg4.AddEntry(gp_mjjS,"Syst. error","f");
   leg4.Draw();
   cms->Draw();
   pdfName= oDir + std::string("/MJJ_Welnu_frac.pdf");
@@ -1024,35 +1033,41 @@ int main(int argc, char* argv[]) {
   canvas.Print(pdfName.c_str());
 
   h4->GetXaxis()->SetTitle("E_{T}^{miss} [GeV]");
-  h4->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
-  h4->GetYaxis()->SetTitleOffset(1.20);
-  h4->SetStats(kFALSE);
+  h4->GetXaxis()->SetTitleSize(0.053);
+  h4->GetXaxis()->SetTitleOffset(0.85);
+  h4->GetYaxis()->SetTitle("(Predicted - Observed)/Observed");
+  h4->GetYaxis()->SetTitleSize(0.050);
+  h4->GetYaxis()->SetTitleOffset(0.85);
   h4->GetYaxis()->SetRangeUser(-1.0,2.0);
-  h4->SetLineColor(kBlue);
+  h4->SetStats(kFALSE);
+  h4->SetLineColor(kBlack);
+  h4->SetLineStyle(7);
   h4->SetLineWidth(2);
   h4->Draw();
-  gp_metS->SetLineColor(kGray+2);
+  gp_metS->SetLineColor(kGray);
   gp_metS->SetLineWidth(0);
-  gp_metS->SetFillColor(kGray+2);
-  gp_metS->SetFillStyle(3002);
+  gp_metS->SetFillColor(kGray);
+  gp_metS->SetFillStyle(3001);
   gp_metF->SetMarkerStyle(20);
-  gp_metF->SetMarkerSize(1.2);
-  gp_metF->SetMarkerColor(kGreen-2);
+  gp_metF->SetMarkerSize(1.4);
+  gp_metF->SetMarkerColor(kBlue);
+  gp_metF->SetLineWidth(2);
   gp_metF->Fit("f4","R");
   h4->Draw();
   gp_metS->Draw("2 same");
   gp_metF->Draw("P same");
 
-  TLegend leg5(0.62,0.67,0.88,0.87);
+  TLegend leg5(0.65,0.67,0.88,0.87);
   leg5.SetBorderSize(0);
   leg5.SetFillColor(0);
   leg5.AddEntry(f4,"Fit","l");
-  leg5.AddEntry(gp_metS,"Systematic error","f");
+  leg5.AddEntry(gp_metS,"Syst. error","f");
   leg5.Draw();
   cms->Draw();
   pdfName= oDir + std::string("/MET_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
 
+  
   TLegend leg7(0.52,0.57,0.77,0.78);
   leg7.SetBorderSize(0);
   leg7.SetFillColor(0);
@@ -1093,13 +1108,13 @@ int main(int argc, char* argv[]) {
   h5->SetLineColor(kBlue);
   h5->SetLineWidth(2);
   h5->Draw();
-  gp_cjvS->SetLineColor(kGray+2);
+  gp_cjvS->SetLineColor(kGray);
   gp_cjvS->SetLineWidth(0);
-  gp_cjvS->SetFillColor(kGray+2);
-  gp_cjvS->SetFillStyle(3002);
+  gp_cjvS->SetFillColor(kGray);
+  gp_cjvS->SetFillStyle(3001);
   gp_cjvF->SetMarkerStyle(20);
-  gp_cjvF->SetMarkerSize(1.2);
-  gp_cjvF->SetMarkerColor(kGreen-2);
+  gp_cjvF->SetMarkerSize(1.5);
+  gp_cjvF->SetMarkerColor(kBlue);
   gp_cjvF->Fit("f5","R");
   h5->Draw();
   gp_cjvS->Draw("2 same");
@@ -1114,6 +1129,6 @@ int main(int argc, char* argv[]) {
   cms->Draw();
   pdfName= oDir + std::string("/CJV_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
-
+  
 
 }
