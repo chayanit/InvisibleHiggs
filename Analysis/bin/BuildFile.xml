@@ -28,6 +28,8 @@
 
 <bin name="wTauBackground" file="wTauBackground.cpp"/>
 
+<bin name="wTauClosure" file="wTauClosure.cpp"/>
+
 <bin name="qcdBackground" file="qcdBackground.cpp"/>
 
 <bin name="qcdBackground2" file="qcdBackground2.cpp"/>
