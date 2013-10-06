@@ -60,8 +60,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
 	    "HLT_DiJet35_MJJ700_AllJets_DEta3p5_VBF_v*",
 	    "HLT_DiJet30_MJJ700_AllJets_DEta3p5_VBF_v*"
             )
-    #elif (iHLTFilter.find("SingleMu")==0):
-    #    process.hltHighLevel.HLTPaths = cms.vstring("HLT_IsoMu24_eta2p1_v*","HLT_Mu40_eta2p1_v*")
+    elif (iHLTFilter.find("SingleMu")==0):
+        process.hltHighLevel.HLTPaths = cms.vstring("HLT_IsoMu24_eta2p1_v*","HLT_Mu40_eta2p1_v*")
     #elif (iHLTFilter.find("DoubleMu")==0):
     #    process.hltHighLevel.HLTPaths = cms.vstring("HLT_Mu17_Mu8_v*")
     #elif (iHLTFilter.find("SingleElectron")==0):
