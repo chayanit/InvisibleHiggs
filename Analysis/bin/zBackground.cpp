@@ -19,6 +19,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <sys/stat.h>
+
 int main(int argc, char* argv[]) {
 
   TH1::SetDefaultSumw2();
@@ -482,15 +484,14 @@ int main(int argc, char* argv[]) {
 
   // check whether we have NoTrig histograms or normal
   bool noTrig = false;
-  std::string dyJetsName = oDir_Plot+std::string("/DYJetsToLL");
-  std::string dyJetsPtZName = oDir_Plot+std::string("/DYJetsToLL_PtZ-100");
-  if (gDirectory->FindKey("DYJetsToLL_NoTrig")!=0) {
+  std::string dyJetsName = oDir_Plot+std::string("/DYJetsToLL.root");
+  std::string dyJetsPtZName = oDir_Plot+std::string("/DYJetsToLL_PtZ-100.root");
+  struct stat buffer; 
+  if (stat (dyJetsName.c_str(), &buffer) != 0) {
     noTrig = true;
-    dyJetsName += std::string("_NoTrig");
-    dyJetsPtZName += std::string("_NoTrig");
+    dyJetsName = oDir_Plot+std::string("/DYJetsToLL_NoTrig.root");
+    dyJetsPtZName = oDir_Plot+std::string("/DYJetsToLL_PtZ-100_NoTrig.root");
   }
-  dyJetsName += std::string(".root");
-  dyJetsPtZName += std::string(".root");
 
   std::cout << "Getting histograms for plots from " << dyJetsName << " and " << dyJetsPtZName << std::endl;
 
