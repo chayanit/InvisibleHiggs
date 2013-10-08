@@ -273,8 +273,8 @@ int main(int argc, char* argv[]) {
     TH1D* ZCtrlJet2Eta  = new TH1D("ZCtrlJet2Eta",  "", 50, -5., 5.);
     TH1D* ZCtrlCenJetpT = new TH1D("ZCtrlCenJetpT", "", 50, 0.,  400.);
     TH1D* ZCtrlDEtajj   = new TH1D("ZCtrlDEtajj",   "", 50, 0.,  8.);
-    TH1D* ZCtrlMjj      = new TH1D("ZCtrlMjj",      "", 50, 0.,  4000.);
-    TH1D* ZCtrlMET      = new TH1D("ZCtrlMET",      "", 50, 0.,  500.);
+    TH1D* ZCtrlMjj      = new TH1D("ZCtrlMjj",      "", 30, 0.,  3000.);
+    TH1D* ZCtrlMET      = new TH1D("ZCtrlMET",      "", 25, 10.,  510.);
     TH1D* ZCtrlDPhijj   = new TH1D("ZCtrlDPhijj",   "", 50, 0.,  TMath::Pi());
     
     yStarWeight = TCut("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))");
@@ -488,13 +488,11 @@ int main(int argc, char* argv[]) {
     noTrig = true;
     dyJetsName += std::string("_NoTrig");
     dyJetsPtZName += std::string("_NoTrig");
-    std::cout << "Using NoTrig DY histograms" << std::endl;
-  }
-  else {
-    std::cout << "Using normal DY histograms" << std::endl;
   }
   dyJetsName += std::string(".root");
   dyJetsPtZName += std::string(".root");
+
+  std::cout << "Getting histograms for plots from " << dyJetsName << " and " << dyJetsPtZName << std::endl;
 
   // re-scale QCD DY histograms
   TFile* qcdDYFile = TFile::Open(dyJetsName.c_str(), "UPDATE");
@@ -528,7 +526,7 @@ int main(int argc, char* argv[]) {
     DYDatasets.push_back(std::string("DYJetsToLL_PtZ-100"));
     DYDatasets.push_back(std::string("DYJetsToLL_EWK"));
   }
-  SumDatasets(oDir_Plot, DYDatasets, hists, "DYJets+EWK");
+  SumDatasets(oDir_Plot, DYDatasets, hists, "DY+jets");
 
   // sum single top datasets
   std::vector<std::string> topDatasets;
@@ -548,15 +546,29 @@ int main(int argc, char* argv[]) {
   dibDatasets.push_back(std::string("ZZ"));
   SumDatasets(oDir_Plot, dibDatasets, hists, "DiBoson");
 
+  // sum SM backgrounds
+  std::vector<std::string> bgDatasets;
+  bgDatasets.push_back(std::string("WW"));
+  bgDatasets.push_back(std::string("WZ"));
+  bgDatasets.push_back(std::string("ZZ"));
+  bgDatasets.push_back(std::string("SingleT_t"));
+  bgDatasets.push_back(std::string("SingleTbar_t"));
+  bgDatasets.push_back(std::string("SingleT_s"));
+  bgDatasets.push_back(std::string("SingleTbar_s"));
+  bgDatasets.push_back(std::string("SingleT_tW"));
+  bgDatasets.push_back(std::string("SingleTbar_tW"));
+  bgDatasets.push_back(std::string("TTBar"));
+  SumDatasets(oDir_Plot, topDatasets, hists, "tt+VV"); 
+
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir_Plot);
   plots.setLegPos(0.70,0.60,0.93,0.89);
   //plots.setLegPos(0.62,0.62,0.89,0.89);
 
-  plots.addDataset("DiBoson", kViolet-6, 0);
-  plots.addDataset("SingleT+TTbar", kAzure-2, 0);
-  plots.addDataset("DYJets+EWK", kPink-4,0);
+  //  plots.addDataset("DiBoson", kViolet-6, 0);
+  plots.addDataset("tt+VV", kAzure-2, 0);
+  plots.addDataset("DY+jets", kPink-4,0);
   plots.addDataset("METABCD", kBlack, 1);
 
   plots.draw("ZCtrlZpT",	"Z_p_{T} [GeV]",		"N_{events}"	,1,1);
@@ -566,12 +578,14 @@ int main(int argc, char* argv[]) {
   plots.draw("ZCtrlJet2Eta",    "Sub-leading jet #eta",         "N_{events}"	,1,1);
   plots.draw("ZCtrlCenJetpT",	"Central jet p_{T} [GeV]",	"N_{events}"    ,1,1);
   plots.draw("ZCtrlDEtajj",	"#Delta #eta_{jj}",		"N_{events}"	,1,1);
-  plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"N_{events}"	,1,1);
-  plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"N_{events}"	,1,1);
-  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj}",		"N_{events}"	,1,1);
-  plots.setYMax(90.);
+  plots.setYMax(3.e2);
+  plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"Events / 100 GeV"	,1,1);
+  plots.setYMax(3.e2);
+  plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"Events / 20 GeV"	,1,1);
+  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj}",		"Events"	,1,1);
+  plots.setYMax(80.);
   plots.setYMin(0.);
-  plots.draw("ZCtrlZMass",      "M_{#mu#mu}  [GeV/c^{2}]",      "N_{events}"    ,0,1);
+  plots.draw("ZCtrlZMass",      "M_{#mu#mu}  [GeV]",      "Events / 5 GeV"    ,0,1);
 
   //store histograms
   ofile->cd();
