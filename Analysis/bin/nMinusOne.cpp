@@ -83,8 +83,8 @@ int main(int argc, char* argv[]) {
     TH1D* hDijet                = new TH1D("hDijetNM1",                  "", 50,  0.,  250.);
     TH1D* hSgnEtaJJ             = new TH1D("hSgnEtaJJNM1",               "", 2,   -1., 1.);
     TH1D* hDEtaJJ               = new TH1D("hDEtaJJNM1",                 "", 50,  0.,  8.);
-    TH1D* hMjj                  = new TH1D("hMjjNM1",                    "", 25,  0.,  4000.);
-    TH1D* hMET                  = new TH1D("hMETNM1",                    "", 25,  0.,  500.);
+    TH1D* hMjj                  = new TH1D("hMjjNM1",                    "", 35,  0.,  3500.);
+    TH1D* hMET                  = new TH1D("hMETNM1",                    "", 25,  10.,  510.);
     TH1D* hDPhiJMet             = new TH1D("hDPhiJMetNM1",               "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNoDPhiJJ     = new TH1D("hDPhiJMetNM1NoDPhiJJ",       "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNorm         = new TH1D("hDPhiJMetNormNM1",           "", 50,  0.,  200);
@@ -305,18 +305,18 @@ int main(int argc, char* argv[]) {
   other.push_back("DYJetsToLL");
   other.push_back("DYJetsToLL_PtZ-100");
   other.push_back("DYJetsToLL_EWK");
-  SumDatasets(oDir, other, hists, "OtherSM");
+  SumDatasets(oDir, other, hists, "tt+DY+VV");
 
   // Signal
   std::vector<std::string> signal;
   signal.push_back("SignalM125_POWHEG");
-  SumDatasets(oDir, signal, hists, "Signal");
+  SumDatasets(oDir, signal, hists, "Signal 100%BR");
 
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
   // plots.setLegPos(0.69,0.70,0.98,0.97);
-  plots.setLegPos(0.70,0.65,0.93,0.89);
+  plots.setLegPos(0.63,0.63,0.93,0.89);
 
   //plots.addDataset("Diboson", kViolet-6, 0);
   //plots.addDataset("DYJets+EWK", kPink-4,0);
@@ -324,9 +324,9 @@ int main(int argc, char* argv[]) {
   //plots.addDataset("QCD", kGreen+3, 0);
   //plots.addDataset("ZJets+EWK", kOrange-2, 0);
   //plots.addDataset("WNJets+EWK", kGreen-3, 0);
-  plots.addDataset("OtherSM", kAzure-2, 0);
+  plots.addDataset("tt+DY+VV", kAzure-2, 0);
   plots.addDataset("V+jets", kPink-4,0);
-  plots.addDataset("Signal", kRed, 3);
+  plots.addDataset("Signal 100%BR", kRed, 3);
   plots.addDataset("METABCD",    kBlack, 1);
 
   plots.draw("hTrigNM1", "", "");
@@ -336,12 +336,12 @@ int main(int argc, char* argv[]) {
   plots.setYMax(5E4);
   plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "N_{events}",1,1);
   plots.setYMax(-1); // resets plot to automate maximum
-  plots.draw("hMjjNM1", "M_{jj} [GeV]", "N_{events}",1,1);
-  plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "N_{events}",1,1);
+  plots.draw("hMjjNM1", "M_{jj} [GeV]", "Events / 100 GeV",1,1);
+  plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "Events / 20 GeV",1,1);
   plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,1);
   plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,1);
   plots.setYMax(5E5);
-  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "N_{events}",1,1);
+  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "Events",1,1);
   plots.setYMax(1E5);
   plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "N_{events}",1,1);
   plots.setYMax(-1); // resets plot to automate maximum

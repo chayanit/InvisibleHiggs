@@ -351,7 +351,32 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
     process.patPFMETtype0Corr.correction.par1 = cms.double(-0.703151)
     process.patPFMETtype0Corr.correction.par0 = cms.double(0.0)
     ###--------------------------------------------------------------
+ 
+    # PAT/ntuples one step
+    # Z and W candidates
+    process.load('InvisibleHiggs/Ntuple/WCandidates_cff')
+    process.load('InvisibleHiggs/Ntuple/ZCandidates_cff')
+    # Ntuple producer
+    process.load('InvisibleHiggs/Ntuple/invHiggsInfo_cfi')
+    if iRunOnData == False:
+	# Jet/MET uncertainty
+	process.invHiggsInfo.jetTag      = cms.untracked.InputTag("smearedGoodPatJets")
+	process.invHiggsInfo.metTag      = cms.untracked.InputTag("patType1CorrectedPFMet")
+	process.invHiggsInfo.puJetMvaTag = cms.untracked.InputTag("puJetMvaSmeared", "fullDiscriminant")
+	process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMvaSmeared", "fullId")
 
+	# PU re-weighting
+	process.invHiggsInfo.puMCFile    = cms.untracked.string("PUHistS10.root")
+	process.invHiggsInfo.puDataFile  = cms.untracked.string("PUHistRun2012All_forV9.root")
+	process.invHiggsInfo.puMCHist    = cms.untracked.string("pileup")
+	process.invHiggsInfo.puDataHist  = cms.untracked.string("pileup")
+	process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
+
+	process.invHiggsInfo.trigCorrFile   = cms.untracked.string("DataMCWeight_53X_v1.root")
+    # TTree output file
+    process.load("CommonTools.UtilAlgos.TFileService_cfi")
+    process.TFileService.fileName = cms.string('invHiggsInfo.root')
+    ###--------------------------------------------------------------
 
     ###--------------------------------------------------------------
     ### Tau
@@ -420,12 +445,15 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         	process.recoTauClassicHPSSequence *
         
         	# Generate PAT
-        	process.pfParticleSelectionSequence *
+        	#process.pfParticleSelectionSequence *
         	process.patDefaultSequence *
         	process.goodPatJets *
 		process.PhysicsObjectSequence *
 		process.metUncertaintySequence *
-        	process.puJetIdSqeuence
+        	process.puJetIdSqeuence *
+		process.WSequence *
+                process.ZSequence *
+                process.invHiggsInfo
 		)
     else:
         process.p = cms.Path(
@@ -445,7 +473,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                 process.recoTauClassicHPSSequence *
 
                 # Generate PAT
-                process.pfParticleSelectionSequence *
+                #process.pfParticleSelectionSequence *
                 process.patDefaultSequence *
                 process.goodPatJets *
                 process.PhysicsObjectSequence *
@@ -460,7 +488,10 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         	process.puJetIdEnUp *
         	process.puJetMvaEnUp *
         	process.puJetIdEnDown *
-        	process.puJetMvaEnDown
+        	process.puJetMvaEnDown *
+		process.WSequence *
+		process.ZSequence *
+		process.invHiggsInfo
         	)
     ###--------------------------------------------------------------
 
@@ -495,5 +526,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                                        ]
         
     process.out.fileName = 'patTuple.root'
+
+    del(process.out)
+    del(process.outpath)
     ###--------------------------------------------------------------
 

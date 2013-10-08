@@ -5,12 +5,12 @@ from InvisibleHiggs.Ntuple.invHiggsInfo_Master_cfg import *
 # Jet/MET uncertainty
 process.invHiggsInfo.jetTag      = cms.untracked.InputTag("smearedGoodPatJetsResDown")
 process.invHiggsInfo.metTag      = cms.untracked.InputTag("patType1CorrectedPFMetJetResDown")
-process.invHiggsInfo.puJetMvaTag = cms.untracked.InputTag("puJetMvaResDown", "full53xDiscriminant")
-process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMvaResDown", "full53xId")
+process.invHiggsInfo.puJetMvaTag = cms.untracked.InputTag("puJetMvaResDown", "fullDiscriminant")
+process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMvaResDown", "fullId")
  
 # PU re-weighting
 process.invHiggsInfo.puMCFile    = cms.untracked.string("PUHistS10.root")
-process.invHiggsInfo.puDataFile  = cms.untracked.string("PUHistRun2012All_forV12.root")
+process.invHiggsInfo.puDataFile  = cms.untracked.string("PUHistRun2012All_forV9.root")
 process.invHiggsInfo.puMCHist    = cms.untracked.string("pileup")
 process.invHiggsInfo.puDataHist  = cms.untracked.string("pileup")
 process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
@@ -23,7 +23,7 @@ process.TFileService.fileName = cms.string('invHiggsInfo_MC.root')
 ### THINGS TO EDIT BELOW ###
 
 # change Global Tag
-process.GlobalTag.globaltag = 'START53_V22::All'
+process.GlobalTag.globaltag = 'START53_V7G::All'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
