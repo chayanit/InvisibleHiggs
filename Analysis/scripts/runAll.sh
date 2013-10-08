@@ -2,8 +2,8 @@
 
 # script to run the whole analysis
 
-VER=v11
-FILEVER=V11d
+VER=v12
+FILEVER=V12
 LUMI=19576
 RUN=blind     # use either blind or both
 
