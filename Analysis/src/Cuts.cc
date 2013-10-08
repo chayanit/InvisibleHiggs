@@ -12,6 +12,7 @@ Cuts::Cuts() {
   addCut("dEtaJJ",     "vbfDEta>4.2");
   addCut("MET",        "met>130.");
   addCut("Mjj",        "vbfM>1100.");
+  //addCut("Mjj",        "vbfM>900.&&vbfM<1100");
   addCut("CJV",        "cenJetEt<30.");
   addCut("dPhiJJ",     "vbfDPhi<1.0");
 
@@ -22,26 +23,29 @@ Cuts::Cuts() {
   addZMuMuCut("dEtaJJ",    "vbfDEta>4.2");
   addZMuMuCut("MET",       "metNo2Muon>130.");
   addZMuMuCut("Mjj",       "vbfM>1100.");
+  //addZMuMuCut("Mjj",       "vbfM>900.&&vbfM<1100.");
   addZMuMuCut("CJV",       "cenJetEt<30.");
   addZMuMuCut("dPhiJJ",    "vbfDPhi<1.0");
 
   addWMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
-  addWMuCut("wMu",       "nW>0 && wChannel==1");
+  addWMuCut("wMu",       "nW>0 && wChannel==1"); // && wMt>40.");
   addWMuCut("lVeto",     "ele1Pt<10. && mu2Pt<10.");
   addWMuCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addWMuCut("dEtaJJ",    "vbfDEta>4.2");
   addWMuCut("MET",       "metNoWLepton>130.");
   addWMuCut("Mjj",       "vbfM>1100.");
+  //addWMuCut("Mjj",       "vbfM>900.&&vbfM<1100.");
   addWMuCut("CJV",       "cenJetEt<30.");
   addWMuCut("dPhiJJ",    "vbfDPhi<1.0");
 
   addWElCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
-  addWElCut("wEl",       "nW>0 && wChannel==2");
+  addWElCut("wEl",       "nW>0 && wChannel==2"); // && wMt>40.");
   addWElCut("lVeto",     "ele2Pt<10. && mu1Pt<10.");
   addWElCut("dijet",     "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7 && (jet1Eta*jet2Eta)<0.");
   addWElCut("dEtaJJ",    "vbfDEta>4.2");
   addWElCut("MET",       "met>130.");
   addWElCut("Mjj",       "vbfM>1100.");
+  //addWElCut("Mjj",       "vbfM>900.&&vbfM<1100.");
   addWElCut("CJV",       "cenJetEt<30.");
   addWElCut("dPhiJJ",    "vbfDPhi<1.0");
 
@@ -52,6 +56,7 @@ Cuts::Cuts() {
   addWTauCut("dEtaJJ",    "vbfDEta>4.2");
   addWTauCut("MET",       "met>130.");
   addWTauCut("Mjj",       "vbfM>1100.");
+  //addWTauCut("Mjj",       "vbfM>900.&&vbfM<1100.");
   addWTauCut("dPhiJJ",    "vbfDPhi<1.0");
   addWTauCut("CJV",       "cenJetEt<30."); // Different order to above as our control region is without CJV
 }
