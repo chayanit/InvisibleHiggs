@@ -46,6 +46,8 @@ int main(int argc, char* argv[]) {
   else std::cout << "Writing plots results to " << oDirPlots << std::endl;
   std::vector<std::string> hnames; // to hold hist names for control plots
 
+  if (options.doMCFMWeights) std::cout << "Going to apply MCFM weights" << std::endl;
+
   /////////////////////////
   // Define general cuts //
   /////////////////////////
@@ -153,6 +155,8 @@ int main(int argc, char* argv[]) {
     bool isEwkW  = false;
 
     TCut wWeight(""); // do inside dataset loop to avoid it affecting EWK samples!
+    TCut yStarWeight("");
+    TCut mjjWeight("");
 
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" || 
@@ -165,7 +169,16 @@ int main(int argc, char* argv[]) {
       if (dataset.name == "EWK_Wp2Jets" || dataset.name == "EWK_Wm2Jets") isEwkW = true;
       else isWJets = true;
     
-      if(isWJets) wWeight =  cuts.wWeight();
+      if(isWJets) {
+	if (options.doMCFMWeights) {
+	  yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(wgenmass*wgenmass + wgenpt*wgenpt*cosh(wgeneta)*cosh(wgeneta)) + wgenpt*sinh(wgeneta))/(sqrt(wgenmass*wgenmass + wgenpt*wgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+	  mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
+	  wWeight     = yStarWeight * mjjWeight * cuts.wWeight();
+	}
+	else {
+	  wWeight     = cuts.wWeight();
+	}
+      }
 
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
       std::cout << "  weight : " << weight << std::endl;
