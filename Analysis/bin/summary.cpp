@@ -184,11 +184,11 @@ int main(int argc, char* argv[]) {
     TH1D* hQCD = (TH1D*) qFile->Get("hQCD_Est_S_DPhi");
     nBG_QCD   = hQCD->GetBinContent(1);
     stat_BG_QCD = hQCD->GetBinError(1);
-    syst_BG_QCD_p = sqrt(nBG_QCD*constants::syst_QCD1
+    syst_BG_QCD_p = sqrt( pow(nBG_QCD*constants::syst_QCD1,2)
 			 +pow(nBG_QCD*constants::syst_QCD1_JES_p,2)
 			 +pow(nBG_QCD*constants::syst_QCD1_JER_p,2)
 			 +pow(nBG_QCD*constants::syst_QCD1_UES_p,2));
-    syst_BG_QCD_m = sqrt(nBG_QCD*constants::syst_QCD1
+    syst_BG_QCD_m = sqrt( pow(nBG_QCD*constants::syst_QCD1,2)
 			 +pow(nBG_QCD*constants::syst_QCD1_JES_m,2)
 			 +pow(nBG_QCD*constants::syst_QCD1_JER_m,2)
 			 +pow(nBG_QCD*constants::syst_QCD1_UES_m,2));
@@ -207,13 +207,13 @@ int main(int argc, char* argv[]) {
       exit(1);
     }
     TH2D* hQCD = (TH2D*) qFile->Get("hEst_METCJV");
-    nBG_QCD   = hQCD->GetBinContent(2,1);
+    nBG_QCD     = hQCD->GetBinContent(2,1);
     stat_BG_QCD = hQCD->GetBinError(2,1);
-    syst_BG_QCD_p = sqrt(nBG_QCD*constants::syst_QCD3
+    syst_BG_QCD_p = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JES_p,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JER_p,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_UES_p,2));
-    syst_BG_QCD_m = sqrt(nBG_QCD*constants::syst_QCD3
+    syst_BG_QCD_m = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JES_m,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JER_m,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_UES_m,2));
@@ -387,17 +387,17 @@ int main(int argc, char* argv[]) {
 
   texFile << "Background \t & $N_{est} \\pm (stat) \\pm (syst)$ - data  \t & $N_{est} \\pm (syst)$ - MC \\\\" << std::endl;
   texFile << "\\hline";
-  texFile << "$Z \\rightarrow \\nu\\nu$ \t & $" << nBG_Z << " \\pm " << stat_BG_Z << " \\pm " << syst_BG_Z_p << "$ \t &  $" << nBG_ZMC << " \\pm " << syst_BG_ZMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << " \\pm " << syst_BG_WEl_p << "$ \t &  $" << nBG_WElMC << " \\pm " << syst_BG_WElMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << " \\pm " << syst_BG_WMu_p << "$ \t & $" << nBG_WMuMC << " \\pm " << syst_BG_WMuMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << " \\pm " << syst_BG_WTau_p << "$ \t & $" << nBG_WTauMC << " \\pm " << syst_BG_WTauMC << "$ \\\\" << std::endl;
-  texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_BG_QCD << " \\pm " << syst_BG_QCD_p << "$ \t & - \\\\" << std::endl;
-  texFile << "$t\\bar{t}$ \t & -	\t & $" << nBG_TTbar << " \\pm " << syst_BG_TTbar_p << "$ \\\\" << std::endl;
-  texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << syst_BG_SingleT_p << "$ \\\\" << std::endl;
-  texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << syst_BG_Diboson_p << "$ \\\\" << std::endl;
-  texFile << "DY \t & -  \t & $" << nBG_DYLL << " \\pm " << syst_BG_DYLL_p << "$ \\\\" << std::endl;
+  texFile << "$Z \\rightarrow \\nu\\nu$ \t & $" << nBG_Z << " \\pm " << stat_BG_Z << " \\pm " << syst_BG_Z_m << "/" << syst_BG_Z_p  << "$ \t &  $" << nBG_ZMC << " \\pm " << syst_BG_ZMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << " \\pm " << syst_BG_WEl_m << "/" << syst_BG_WEl_p  << "$ \t &  $" << nBG_WElMC << " \\pm " << syst_BG_WElMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << " \\pm " << syst_BG_WMu_m << "/" << syst_BG_WMu_p  << "$ \t & $" << nBG_WMuMC << " \\pm " << syst_BG_WMuMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << " \\pm " << syst_BG_WTau_m << "/" << syst_BG_WTau_p  << "$ \t & $" << nBG_WTauMC << " \\pm " << syst_BG_WTauMC << "$ \\\\" << std::endl;
+  texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_BG_QCD << " \\pm " << syst_BG_QCD_m << "/" << syst_BG_QCD_p  << "$ \t & - \\\\" << std::endl;
+  texFile << "$t\\bar{t}$ \t & -	\t & $" << nBG_TTbar << " \\pm " << syst_BG_TTbar_m << "/" << syst_BG_TTbar_p << "$ \\\\" << std::endl;
+  texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << syst_BG_SingleT_m << "/" << syst_BG_SingleT_p << "$ \\\\" << std::endl;
+  texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << syst_BG_Diboson_m << "/" << syst_BG_Diboson_p << "$ \\\\" << std::endl;
+  texFile << "DY \t & -  \t & $" << nBG_DYLL << " \\pm " << syst_BG_DYLL_m << "/" << syst_BG_DYLL_p << "$ \\\\" << std::endl;
   texFile << "\\hline" << std::endl;
-  texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << "\\pm" << stat_BG_Total << "\\pm" << syst_BG_Total_p << "$}  \\\\" << std::endl;
+  texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << "\\pm" << stat_BG_Total << "\\pm" << syst_BG_Total_m << "/" << syst_BG_Total_p << "$}  \\\\" << std::endl;
   texFile << "Observed & \\multicolumn{2}{c|}{$" << nObs << "$}  \\\\" << std::endl;
 
   texFile.close();
@@ -590,9 +590,9 @@ int main(int argc, char* argv[]) {
     txtFile << "rate            " << nSig.at(i) << "\t" << nBG_Z << "\t" << nBG_WMu << "\t" << nBG_WEl << "\t" << nBG_WTau << "\t" << nBG_QCD << "\t" << nBG_Other << std::endl;
     txtFile << "------------" << std::endl;
     txtFile << "CMS_lumi      lnN   " << fLum << "\t - \t - \t - \t - \t - \t" << fLum << std::endl;
-    txtFile << "CMS_scale_j   lnN   " << fSigJESm << "/" << fSigJESp << "\t" << fZJESm << "/" << fZJESp << "\t" << fWMuJESm << "/" << fWMuJESp << "\t" << fWElJESm << "/" << fWElJESp << "\t" << fWTauJESm << "/" << fWTauJESp << "\t - \t" << fOtherJESm << "/" << fOtherJESp << std::endl;
-    txtFile << "CMS_res_j     lnN   " << fSigJERm << "/" << fSigJERp << "\t" << fZJERm << "/" << fZJERp << "\t" << fWMuJERm << "/" << fWMuJERp << "\t" << fWElJERm << "/" << fWElJERp << "\t" << fWTauJERm << "/" << fWTauJERp << "\t - \t" << fOtherJERm << "/" << fOtherJERp << std::endl;
-    txtFile << "CMS_scale_met lnN   " << fSigUESm << "/" << fSigUESp << "\t" << fZUESm << "/" << fZUESp << "\t" << fWMuUESm << "/" << fWMuUESp << "\t" << fWElUESm << "/" << fWElUESp << "\t" << fWTauUESm << "/" << fWTauUESp << "\t - \t" << fOtherUESm << "/" << fOtherUESp << std::endl;
+    txtFile << "CMS_scale_j   lnN   " << fSigJESm << "/" << fSigJESp << "\t" << fZJESm << "/" << fZJESp << "\t" << fWMuJESm << "/" << fWMuJESp << "\t" << fWElJESm << "/" << fWElJESp << "\t" << fWTauJESm << "/" << fWTauJESp << "\t" << fQCDJESm << "/" << fQCDJESp << "\t" << fOtherJESm << "/" << fOtherJESp << std::endl;
+    txtFile << "CMS_res_j     lnN   " << fSigJERm << "/" << fSigJERp << "\t" << fZJERm << "/" << fZJERp << "\t" << fWMuJERm << "/" << fWMuJERp << "\t" << fWElJERm << "/" << fWElJERp << "\t" << fWTauJERm << "/" << fWTauJERp << "\t" << fQCDJERm << "/" << fQCDJERp << "\t" << fOtherJERm << "/" << fOtherJERp << std::endl;
+    txtFile << "CMS_scale_met lnN   " << fSigUESm << "/" << fSigUESp << "\t" << fZUESm << "/" << fZUESp << "\t" << fWMuUESm << "/" << fWMuUESp << "\t" << fWElUESm << "/" << fWElUESp << "\t" << fWTauUESm << "/" << fWTauUESp << "\t" << fQCDUESm << "/" << fQCDUESp << "\t" << fOtherUESm << "/" << fOtherUESp << std::endl;
     txtFile << "pdf_qqbar     lnN   " << fSigPDF  << "\t - \t - \t - \t - \t - \t - \t" << std::endl;
     txtFile << "QCD_qqH       lnN   " << fSigQCD  << "\t - \t - \t - \t - \t - \t - \t" << std::endl;
     txtFile << "CMS_VBFHinv_zvv_stat      gmN " << nCtrlZ << "  -\t" << aZ << "\t - \t - \t - \t - \t - " << std::endl;
