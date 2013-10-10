@@ -101,8 +101,10 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing DY->ll MC : " << dataset.name << std::endl; 
       // check if it's QCD
       if ( !(dataset.name.length()>11 && dataset.name.compare(11,14,"EWK")==0) ) {
-      	yStarWeight = TCut("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))");
-      	mjjWeight   = TCut("0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM)");
+	if (options.doMCFMWeights) {
+	  yStarWeight = TCut("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))");
+	  mjjWeight   = TCut("0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM)");
+	}
 	std::cout << "Analysing QCD DY MC " << std::endl;
       }
 
@@ -279,9 +281,11 @@ int main(int argc, char* argv[]) {
     TH1D* ZCtrlMET      = new TH1D("ZCtrlMET",      "", 25, 10.,  510.);
     TH1D* ZCtrlDPhijj   = new TH1D("ZCtrlDPhijj",   "", 50, 0.,  TMath::Pi());
     
-    yStarWeight = TCut("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))");
-    mjjWeight   = TCut("0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM)");
-    
+    if (options.doMCFMWeights) {
+      yStarWeight = TCut("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))");
+      mjjWeight   = TCut("0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM)");
+    }
+
     TH1D* ZCtrlYStar    = new TH1D("ZCtrlYStar",    "", 50, 0., 5.);
     TH1D* ZCtrlYStarWt  = new TH1D("ZCtrlYStarWt",  "", 50, 0., 2.);
     TH1D* ZCtrlMjjWt    = new TH1D("ZCtrlMjjWt",    "", 50, 0., 2.);
