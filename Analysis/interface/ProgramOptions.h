@@ -16,6 +16,7 @@ class ProgramOptions{
   double lumi;
   int qcdMethod;
   int wTauMethod;
+  bool doMCFMWeights;
   
 };
 

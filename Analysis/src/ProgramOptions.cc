@@ -10,7 +10,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
   oDir(""),
   datasetFile(""),
   lumi(0.),
-  qcdMethod(1)
+  qcdMethod(1),
+  doMCFMWeights(false)
  {
 
   namespace po = boost::program_options;
@@ -24,7 +25,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
     ("datasets,f", po::value<std::string>(), "Datasets file")
     ("lumi,l", po::value<double>(), "Integrated luminosity")
     ("qcd,q", po::value<int>(), "QCD method")
-    ("tau,t", po::value<int>(), "W->tau method");
+    ("tau,t", po::value<int>(), "W->tau method")
+    ("mcfmWeights,m", po::value<bool>(), "apply MCFM re-weighting");
 
   po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
@@ -36,12 +38,13 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
     std::exit(1);
   }
   
-  if (vm.count("outdir"))   oDir = vm["outdir"].as<std::string>();
-  if (vm.count("indir"))    iDir=vm["indir"].as<std::string>();
-  if (vm.count("datasets")) datasetFile=vm["datasets"].as<std::string>();
-  if (vm.count("lumi"))     lumi=vm["lumi"].as<double>();
-  if (vm.count("qcd"))      qcdMethod=vm["qcd"].as<int>();
-  if (vm.count("tau"))      wTauMethod=vm["tau"].as<int>();
+  if (vm.count("outdir"))     oDir = vm["outdir"].as<std::string>();
+  if (vm.count("indir"))      iDir=vm["indir"].as<std::string>();
+  if (vm.count("datasets"))   datasetFile=vm["datasets"].as<std::string>();
+  if (vm.count("lumi"))       lumi=vm["lumi"].as<double>();
+  if (vm.count("qcd"))        qcdMethod=vm["qcd"].as<int>();
+  if (vm.count("tau"))        wTauMethod=vm["tau"].as<int>();
+  if (vm.count("mcfmWeights")) doMCFMWeights=vm["mcfmWeights"].as<bool>();
 
   // create output directory if it doesn't exist already
   if (oDir!="") {
