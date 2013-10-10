@@ -485,7 +485,7 @@ int main(int argc, char* argv[]) {
   // calculate factors for combine tool
   double fLum  = 1 + constants::syst_lumi;
 
-  double fZ      = 1 + constants::syst_Z;
+  double fZ      = 1 + sqrt(pow(constants::syst_Z,2) + pow(hZ_Syst->GetBinError(1),2));
   double fZJESp = 1 + constants::syst_Z_JES_p;
   double fZJESm = 1 + constants::syst_Z_JES_m;
   double fZJERp = 1 + constants::syst_Z_JER_p;
@@ -493,7 +493,7 @@ int main(int argc, char* argv[]) {
   double fZUESp = 1 + constants::syst_Z_UES_p;
   double fZUESm = 1 + constants::syst_Z_UES_m;
 
-  double fWMu      = 1 + sqrt(pow(constants::syst_WMu,2) + pow(stat_BG_WMu/nBG_WMu,2));
+  double fWMu      = 1 + sqrt(pow(constants::syst_WMu,2) + pow(hWMu_Syst->GetBinError(1),2) + pow(stat_BG_WMu/nBG_WMu,2));
   double fWMuJESp = 1 + constants::syst_WMu_JES_p;
   double fWMuJESm = 1 + constants::syst_WMu_JES_m;
   double fWMuJERp = 1 + constants::syst_WMu_JER_p;
@@ -501,7 +501,7 @@ int main(int argc, char* argv[]) {
   double fWMuUESp = 1 + constants::syst_WMu_UES_p;
   double fWMuUESm = 1 + constants::syst_WMu_UES_m;
 
-  double fWEl      = 1 + sqrt(pow(constants::syst_WEl,2) + pow(stat_BG_WEl/nBG_WEl,2));
+  double fWEl      = 1 + sqrt(pow(constants::syst_WEl,2) + pow(hWEl_Syst->GetBinError(1),2) + pow(stat_BG_WEl/nBG_WEl,2));
   double fWElJESp = 1 + constants::syst_WEl_JES_p;
   double fWElJESm = 1 + constants::syst_WEl_JES_m;
   double fWElJERp = 1 + constants::syst_WEl_JER_p;
@@ -509,7 +509,7 @@ int main(int argc, char* argv[]) {
   double fWElUESp = 1 + constants::syst_WEl_UES_p;
   double fWElUESm = 1 + constants::syst_WEl_UES_m;
 
-  double fWTau      = 1 + sqrt(pow(constants::syst_WTau,2) + pow(stat_BG_WTau/nBG_WTau,2));
+  double fWTau      = 1 + sqrt(pow(constants::syst_WTau,2) + pow(hWTau_Syst->GetBinError(1),2) + pow(stat_BG_WTau/nBG_WTau,2));
   double fWTauJESp = 1 + constants::syst_WTau_JES_p;
   double fWTauJESm = 1 + constants::syst_WTau_JES_m;
   double fWTauJERp = 1 + constants::syst_WTau_JER_p;
@@ -525,10 +525,10 @@ int main(int argc, char* argv[]) {
   double fQCDUESp = 1 + constants::syst_QCD3_UES_p;
   double fQCDUESm = 1 + constants::syst_QCD3_UES_m;
 
-  double fOther      = 1 + sqrt(pow(nBG_TTbar*constants::syst_TTbar,2)
-				+pow(nBG_SingleT*constants::syst_SingleT,2)
-				+pow(nBG_Diboson*constants::syst_Diboson,2)
-				+pow(nBG_DYLL*constants::syst_DYLL,2));
+  double fOther      = 1 + sqrt( pow(hTTbar->GetBinError(nCuts),2) 	+ pow(nBG_TTbar*constants::syst_TTbar,2)
+				+pow(hSingleT->GetBinError(nCuts),2) 	+ pow(nBG_SingleT*constants::syst_SingleT,2)
+				+pow(hDiboson->GetBinError(nCuts),2)	+ pow(nBG_Diboson*constants::syst_Diboson,2)
+				+pow(hDYLL->GetBinError(nCuts),2)	+ pow(nBG_DYLL*constants::syst_DYLL,2));
   double fOtherJESp = 1 + sqrt(pow(nBG_TTbar*constants::syst_TTbar_JES_p,2)
 			       +pow(nBG_SingleT*constants::syst_SingleT_JES_p,2)
 			       +pow(nBG_Diboson*constants::syst_Diboson_JES_p,2)
