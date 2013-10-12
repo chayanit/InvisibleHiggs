@@ -78,16 +78,6 @@ int main(int argc, char* argv[]) {
   TH1D* hWEl_BGC_DPhi = new TH1D("hWEl_BGC_DPhi", "", 3, dphiEdges);  // background MC ctrl region
   TH1D* hWEl_DataC_DPhi = new TH1D("hWEl_DataC_DPhi", "", 3, dphiEdges);  // Data ctrl region
 
-  //TH2D* hWMu_MCC_METDPhi = new TH2D("hWMu_MCC_METDPhi", "", 3, dphiEdges, 12, metEdges);  // W+jets MC ctrl region
-  //TH2D* hWMu_MCS_METDPhi = new TH2D("hWMu_MCS_METDPhi", "", 3, dphiEdges, 12, metEdges);  // W+jets MC sgnl region
-  //TH2D* hWMu_BGC_METDPhi = new TH2D("hWMu_BGC_METDPhi", "", 3, dphiEdges, 12, metEdges);  // background MC ctrl region
-  //TH2D* hWMu_DataC_METDPhi = new TH2D("hWMu_DataC_METDPhi", "", 3, dphiEdges, 12, metEdges);  // Data ctrl region
-
-  //TH2D* hWEl_MCC_METDPhi = new TH2D("hWEl_MCC_METDPhi", "", 3, dphiEdges, 12, metEdges);  // W+jets MC ctrl region
-  //TH2D* hWEl_MCS_METDPhi = new TH2D("hWEl_MCS_METDPhi", "", 3, dphiEdges, 12, metEdges);  // W+jets MC sgnl region
-  //TH2D* hWEl_BGC_METDPhi = new TH2D("hWEl_BGC_METDPhi", "", 3, dphiEdges, 12, metEdges);  // background MC ctrl region
-  //TH2D* hWEl_DataC_METDPhi = new TH2D("hWEl_DataC_METDPhi", "", 3, dphiEdges, 12, metEdges);  // Data ctrl region
-
   // cutflow histograms
   TH1D* hDataWMu    = new TH1D("hWMu_CutFlow_Data", "", nCutsWMu, 0., nCutsWMu);
   TH1D* hWLNuWMu    = new TH1D("hWMu_CutFlow_WToLNu", "", nCutsWMu, 0., nCutsWMu);
@@ -123,7 +113,6 @@ int main(int argc, char* argv[]) {
     TCut mjjWeight("");
 
     TCut cutWMu_C(""), cutWMu_S(""), cutWEl_C(""), cutWEl_S("");
-    //TCut cutWMu_MET0C(""), cutWMu_MET0S(""), cutWEl_MET0C(""), cutWEl_MET0S("");    
     TCut cutWMuControlPlot("");
     TCut cutWElControlPlot("");
 
@@ -132,11 +121,6 @@ int main(int argc, char* argv[]) {
     TH1D* hWMu_S_DPhi = new TH1D("hWMu_S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
     TH1D* hWEl_C_DPhi = new TH1D("hWEl_C_DPhi", "", 3, dphiEdges);  // W+jets MC ctrl region
     TH1D* hWEl_S_DPhi = new TH1D("hWEl_S_DPhi", "", 3, dphiEdges);  // W+jets MC sgnl region
-
-    //TH2D* hWMu_C_METDPhi = new TH2D("hWMu_C_METDPhi", "", 3, dphiEdges, 12, metEdges);  // W+jets MC ctrl region
-    //TH2D* hWMu_S_METDPhi = new TH2D("hWMu_S_METDPhi", "", 3, dphiEdges, 12, metEdges);  // W+jets MC sgnl region
-    //TH2D* hWEl_C_METDPhi = new TH2D("hWEl_C_METDPhi", "", 3, dphiEdges, 12, metEdges);  // W+jets MC ctrl region
-    //TH2D* hWEl_S_METDPhi = new TH2D("hWEl_S_METDPhi", "", 3, dphiEdges, 12, metEdges);  // W+jets MC sgnl region
 
     double weight = 1.;
 
@@ -173,11 +157,6 @@ int main(int argc, char* argv[]) {
       cutWEl_C = otherCuts * wWeight * (cuts.wElVBF() + cuts.cutWEl("MET"));
       cutWEl_S = otherCuts * wWeight * (cuts.wElGen() + cuts.allCutsNoDPhi());
 
-      //cutWMu_MET0C = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.wMuVBF());
-      //cutWMu_MET0S = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.wMuGen() + cutSignalNoMETNoDPhi);
-      //cutWEl_MET0C = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.wElVBF());
-      //cutWEl_MET0S = puWeight * trigCorrWeight2 * wWeight * (cutD + cuts.wElGen() + cutSignalNoMETNoDPhi);
-
       cutWMuControlPlot = otherCuts * wWeight * (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
       cutWElControlPlot = otherCuts * wWeight * (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
 
@@ -194,26 +173,11 @@ int main(int argc, char* argv[]) {
       hWEl_C_DPhi->Scale(weight);
       hWEl_S_DPhi->Scale(weight);
       
-      //tree->Draw("met:vbfDPhi>>hWMu_C_METDPhi", cutWMu_MET0C);
-      //tree->Draw("met:vbfDPhi>>hWMu_S_METDPhi", cutWMu_MET0S);
-      //tree->Draw("met:vbfDPhi>>hWEl_C_METDPhi", cutWEl_MET0C);
-      //tree->Draw("met:vbfDPhi>>hWEl_S_METDPhi", cutWEl_MET0S);
-      //hWMu_C_METDPhi->Scale(weight);
-      //hWMu_S_METDPhi->Scale(weight);
-      //hWEl_C_METDPhi->Scale(weight);
-      //hWEl_S_METDPhi->Scale(weight);
-
       // add to final histogram
       hWMu_MCC_DPhi->Add(hWMu_C_DPhi);
       hWMu_MCS_DPhi->Add(hWMu_S_DPhi);
       hWEl_MCC_DPhi->Add(hWEl_C_DPhi);
       hWEl_MCS_DPhi->Add(hWEl_S_DPhi);
-
-      //hWMu_MCC_METDPhi->Add(hWMu_C_METDPhi);
-      //hWMu_MCS_METDPhi->Add(hWMu_S_METDPhi);
-      //hWEl_MCC_METDPhi->Add(hWEl_C_METDPhi);
-      //hWEl_MCS_METDPhi->Add(hWEl_S_METDPhi);
-      
     }
     else if (dataset.isData) {
       std::cout << "Analysing Data     : " << dataset.name << std::endl;
@@ -223,26 +187,13 @@ int main(int argc, char* argv[]) {
       cutWEl_C = (cuts.wElVBF() + cuts.cutWEl("MET"));
       cutWEl_S = cuts.allCutsNoDPhi();
 
-      //cutWMu_MET0C = puWeight * (cutD + cuts.wMuVBF());
-      //cutWMu_MET0S = puWeight * (cutD + cutSignalNoMETNoDPhi);
-      //cutWEl_MET0C = puWeight * (cutD + cuts.wElVBF());
-      //cutWEl_MET0S = puWeight * (cutD + cutSignalNoMETNoDPhi);
-
       tree->Draw("vbfDPhi>>hWMu_C_DPhi", cutWMu_C);
       tree->Draw("vbfDPhi>>hWMu_S_DPhi", cutWMu_S);
       tree->Draw("vbfDPhi>>hWEl_C_DPhi", cutWEl_C);
       tree->Draw("vbfDPhi>>hWEl_S_DPhi", cutWEl_S);
       
-      //tree->Draw("met:vbfDPhi>>hWMu_C_METDPhi", cutWMu_MET0C);
-      //tree->Draw("met:vbfDPhi>>hWMu_S_METDPhi", cutWMu_MET0S);
-      //tree->Draw("met:vbfDPhi>>hWEl_C_METDPhi", cutWEl_MET0C);
-      //tree->Draw("met:vbfDPhi>>hWEl_S_METDPhi", cutWEl_MET0S);
-
       hWMu_DataC_DPhi->Add(hWMu_C_DPhi);
       hWEl_DataC_DPhi->Add(hWEl_C_DPhi);
-
-      //hWMu_DataC_METDPhi->Add(hWMu_C_METDPhi);
-      //hWEl_DataC_METDPhi->Add(hWEl_C_METDPhi); 
 
       cutWMuControlPlot = (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
       cutWElControlPlot = (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
@@ -267,11 +218,6 @@ int main(int argc, char* argv[]) {
       cutWEl_C = otherCuts * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
       cutWEl_S = otherCuts * (cutD + cuts.allCutsNoDPhi());
 
-      //cutWMu_MET0C = puWeight * trigCorrWeight2 * (cutD + cuts.wMuVBF());
-      //cutWMu_MET0S = puWeight * trigCorrWeight2 * (cutD + cutSignalNoMETNoDPhi);
-      //cutWEl_MET0C = puWeight * trigCorrWeight2 * (cutD + cuts.wElVBF());
-      //cutWEl_MET0S = puWeight * trigCorrWeight2 * (cutD + cutSignalNoMETNoDPhi);
-
       cutWMuControlPlot = otherCuts * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
       cutWElControlPlot = otherCuts * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
 
@@ -284,18 +230,11 @@ int main(int argc, char* argv[]) {
       hWMu_C_DPhi->Scale(weight);
       hWEl_C_DPhi->Scale(weight);
       
-      //tree->Draw("met:vbfDPhi>>hWMu_C_METDPhi", cutWMu_MET0C);
-      //tree->Draw("met:vbfDPhi>>hWEl_C_METDPhi", cutWEl_MET0C);
-      //hWMu_C_METDPhi->Scale(weight);
-      //hWEl_C_METDPhi->Scale(weight);
-
       if (!isQCD) {      
       hWMu_BGC_DPhi->Add(hWMu_C_DPhi);
       hWEl_BGC_DPhi->Add(hWEl_C_DPhi);
       }
       
-      //hWMu_BGC_METDPhi->Add(hWMu_C_METDPhi);
-      //hWEl_BGC_METDPhi->Add(hWEl_C_METDPhi);
     }
         
     // debug output
@@ -308,10 +247,6 @@ int main(int argc, char* argv[]) {
     delete hWMu_S_DPhi;
     delete hWEl_C_DPhi;
     delete hWEl_S_DPhi;
-    //delete hWMu_C_METDPhi;
-    //delete hWMu_S_METDPhi;
-    //delete hWEl_C_METDPhi;
-    //delete hWEl_S_METDPhi;
     
     // per-dataset control plots (just an example, add more later)
     ofile->cd();
@@ -325,14 +260,14 @@ int main(int argc, char* argv[]) {
     for (unsigned c=0; c<nCutsWMu; ++c) {
 
       TCut cut;
-      if(c == nCutsWMu-1)
+      if(c == nCutsWMu-1) //apply trigger correction
         {
 	  cut = otherCuts * (cutD + cuts.cutflowWMu(c));
           if(isWJets) cut = otherCuts * wWeight * (cuts.cutflowWMu(c));
         }
       else
         {
-	  cut = puWeight * (cutD + cuts.cutflowWMu(c));
+	  cut = puWeight * yStarWeight * mjjWeight * (cutD + cuts.cutflowWMu(c));
           if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
         }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
@@ -347,14 +282,14 @@ int main(int argc, char* argv[]) {
     for (unsigned c=0; c<nCutsWEl; ++c) {
 
       TCut cut;
-      if(c == nCutsWEl-1)
+      if(c == nCutsWEl-1) //apply trigger correction
         {
 	  cut = otherCuts * (cutD + cuts.cutflowWEl(c));
           if(isWJets) cut = otherCuts * wWeight * (cuts.cutflowWEl(c));
         }
       else
         {
-	  cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+	  cut = puWeight * yStarWeight * mjjWeight * (cuts.cutflowWEl(c));
           if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
         }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
@@ -563,24 +498,6 @@ int main(int argc, char* argv[]) {
   hWEl_R_DPhi_Syst->Divide(hWEl_MCS_DPhi, hWEl_MCC_DPhi, 1., 1.);
   hWEl_EstC_DPhi_Syst->Add(hWEl_DataC_DPhi_Syst, hWEl_BGC_DPhi_Syst, 1., -1.);
   hWEl_EstS_DPhi_Syst->Multiply(hWEl_EstC_DPhi_Syst, hWEl_R_DPhi_Syst, 1., 1.);
-
-  // create 2D histograms with the background estimate
-  //TH2D* hWMu_R_METDPhi    = new TH2D("hWMu_R_METDPhi", "", 3, dphiEdges, 12, metEdges);  // ratio of sngl/ctrl
-  //TH2D* hWMu_EstC_METDPhi = new TH2D("hWMu_EstC_METDPhi", "", 3, dphiEdges, 12, metEdges); // estimated W in ctrl region
-  //TH2D* hWMu_EstS_METDPhi = new TH2D("hWMu_EstS_METDPhi", "", 3, dphiEdges, 12, metEdges); // estimated W in signal region
-
-  //TH2D* hWEl_R_METDPhi    = new TH2D("hWEl_R_METDPhi", "", 3, dphiEdges, 12, metEdges);
-  //TH2D* hWEl_EstC_METDPhi = new TH2D("hWEl_EstC_METDPhi", "", 3, dphiEdges, 12, metEdges);
-  //TH2D* hWEl_EstS_METDPhi = new TH2D("hWEl_EstS_METDPhi", "", 3, dphiEdges, 12, metEdges);
-
-  //hWMu_R_METDPhi->Divide(hWMu_MCS_METDPhi, hWMu_MCC_METDPhi, 1., 1.);
-  //hWMu_EstC_METDPhi->Add(hWMu_DataC_METDPhi, hWMu_BGC_METDPhi, 1., -1.);
-  //hWMu_EstS_METDPhi->Multiply(hWMu_EstC_METDPhi, hWMu_R_METDPhi, 1., 1.);
-
-  //hWEl_R_METDPhi->Divide(hWEl_MCS_METDPhi, hWEl_MCC_METDPhi, 1., 1.);
-  //hWEl_EstC_METDPhi->Add(hWEl_DataC_METDPhi, hWEl_BGC_METDPhi, 1., -1.);
-  //hWEl_EstS_METDPhi->Multiply(hWEl_EstC_METDPhi, hWEl_R_METDPhi, 1., 1.);
-
 
 
   std::cout << std::endl;

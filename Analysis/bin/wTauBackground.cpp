@@ -55,10 +55,7 @@ int main(int argc, char* argv[]) {
   unsigned nCutsWTau = cuts.nCutsWTau();
 
   TCut puWeight("puWeight");
-  // TCut puWeight("1.");
-  // TCut trigCorrWeight("trigCorrWeight");
   TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
-  // TCut trigCorrWeight( "1." );
 
   // Cuts for control plots
   // Get puWeight etc added below if necessary
@@ -157,6 +154,7 @@ int main(int argc, char* argv[]) {
     TCut wWeight(""); // do inside dataset loop to avoid it affecting EWK samples!
     TCut yStarWeight("");
     TCut mjjWeight("");
+    TCut otherCuts = puWeight * trigCorrWeight;
 
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" || 
@@ -184,13 +182,13 @@ int main(int argc, char* argv[]) {
       std::cout << "  weight : " << weight << std::endl;
 
       // W->enu contamination
-      tree->Draw("vbfDPhi>>hWTau_MCEl_DPhi_tmp", puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.cutWTau("wTau") + cutTightMjj_basic));
+      tree->Draw("vbfDPhi>>hWTau_MCEl_DPhi_tmp", otherCuts * wWeight * (cutD + cuts.wElGen() + cuts.cutWTau("wTau") + cutTightMjj_basic));
       hWTau_MCEl_DPhi_tmp->Scale(weight);
       hWTau_MCEl_DPhi->Add(hWTau_MCEl_DPhi_tmp);
 
       // Do Tau ID eff
-      cutWTau_MCC_NoCJV = puWeight * trigCorrWeight * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic + cuts.cutWTau("wTau"));
-      cutWTau_MCS_NoCJV = puWeight * trigCorrWeight * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic);
+      cutWTau_MCC_NoCJV = otherCuts * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic + cuts.cutWTau("wTau"));
+      cutWTau_MCS_NoCJV = otherCuts * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic);
 
       tree->Draw("vbfDPhi>>hWTau_MCC_NoCJV_DPhi_tmp", cutWTau_MCC_NoCJV);
       tree->Draw("vbfDPhi>>hWTau_MCS_NoCJV_DPhi_tmp", cutWTau_MCS_NoCJV); 
@@ -202,10 +200,10 @@ int main(int argc, char* argv[]) {
       hWTau_MCS_NoCJV_DPhi->Add(hWTau_MCS_NoCJV_DPhi_tmp);
 
       // Do CJV eff
-      cutWTau_MC_CJV   = puWeight * trigCorrWeight * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic + cuts.cutWTau("CJV"));
-      cutWTau_MC_NoCJV = puWeight * trigCorrWeight * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic);
+      cutWTau_MC_CJV   = otherCuts * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic + cuts.cutWTau("CJV"));
+      cutWTau_MC_NoCJV = otherCuts * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic);
 
-      cutWTau_MCC_CJV   = puWeight * trigCorrWeight * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic + cuts.cutWTau("CJV") + cuts.cutWTau("wTau"));
+      cutWTau_MCC_CJV   = otherCuts * wWeight * (cuts.wTauGen() + cutDPhiSignalNoCJV_basic + cuts.cutWTau("CJV") + cuts.cutWTau("wTau"));
 
       tree->Draw("vbfDPhi>>hWTau_MC_CJV_DPhi_tmp", cutWTau_MC_CJV);
       tree->Draw("vbfDPhi>>hWTau_MC_NoCJV_DPhi_tmp", cutWTau_MC_NoCJV); 
@@ -220,8 +218,8 @@ int main(int argc, char* argv[]) {
       hWTau_MCC_CJV_DPhi->Add(hWTau_MCC_CJV_DPhi_tmp);
       
       // Setup control plot cuts
-      cutTightMjj        = puWeight * trigCorrWeight * wWeight * cutTightMjj_basic;
-      cutDPhiSignalNoCJV = puWeight * trigCorrWeight * wWeight * cutDPhiSignalNoCJV_basic;
+      cutTightMjj        = otherCuts * wWeight * cutTightMjj_basic;
+      cutDPhiSignalNoCJV = otherCuts * wWeight * cutDPhiSignalNoCJV_basic;
     
       // Debug output  
       std::cout << "  N ctrl region (dphi<1, standard selection, no CJV, tau reco) : " << hWTau_MCC_NoCJV_DPhi_tmp->GetBinContent(1) << " +/- " << hWTau_MCC_NoCJV_DPhi_tmp->GetBinError(1) << std::endl;// debug output
@@ -249,18 +247,27 @@ int main(int argc, char* argv[]) {
       std::cout << "  N ctrl region (dphi<1) : " << hWTau_DataC_DPhi->GetBinContent(1) << " +/- " << hWTau_DataC_DPhi->GetBinError(1) << std::endl;
 
     } else { // All MC _BUT_ WJets. Need to go into hWTau_BGC_DPhi
-
-      // Setup control plot cuts
-      cutTightMjj        = puWeight * trigCorrWeight * (cutD + cutTightMjj_basic);
-      cutDPhiSignalNoCJV = puWeight * trigCorrWeight * (cutD + cutDPhiSignalNoCJV_basic);
-      
+ 
       if (dataset.name.compare(0,17,"SignalM125_POWHEG")!=0) {
 
         std::cout << "Analysing BG MC    : " << dataset.name << std::endl;
         std::cout << "  weight : " << weight << std::endl;
 
+        if (dataset.name == "DYJetsToLL_PtZ-100" || dataset.name == "DYJetsToLL") {
+        	if (options.doMCFMWeights) {
+          	yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/(sqrt(zgenmass*zgenmass + zgenpt*zgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+          	mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
+		}
+        }
+
+	otherCuts *= yStarWeight * mjjWeight;
+
+	// Setup control plot cuts 
+      	cutTightMjj        = otherCuts * (cutD + cutTightMjj_basic);
+      	cutDPhiSignalNoCJV = otherCuts * (cutD + cutDPhiSignalNoCJV_basic);
+
         // Count number of tau in control region in bg
-        cutWTau_C = puWeight * trigCorrWeight * (cutD  && cuts.cutWTau("wTau") && cutDPhiSignalNoCJV_basic);
+        cutWTau_C = otherCuts * (cutD  && cuts.cutWTau("wTau") && cutDPhiSignalNoCJV_basic);
         tree->Draw("vbfDPhi>>hWTau_BGC_DPhi_tmp", cutWTau_C);
         
         hWTau_BGC_DPhi_tmp->Scale(weight);
@@ -295,10 +302,10 @@ int main(int argc, char* argv[]) {
 
       TCut cut;
       if(c == (nCutsWTau-2)) {
-          cut = puWeight * trigCorrWeight * (cutD + cuts.cutflowWTau(c));
-          if(isWJets) cut = puWeight * trigCorrWeight * wWeight * ( cuts.cutflowWTau(c));
+          cut = otherCuts * (cutD + cuts.cutflowWTau(c));
+          if(isWJets) cut = otherCuts * wWeight * ( cuts.cutflowWTau(c));
       } else {
-          cut = puWeight * (cutD + cuts.cutflowWTau(c));
+          cut = puWeight * yStarWeight * mjjWeight * (cutD + cuts.cutflowWTau(c));
           if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWTau(c));
       }
       TH1D* h = new TH1D("h","", 1, 0., 1.);

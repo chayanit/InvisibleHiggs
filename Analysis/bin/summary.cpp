@@ -78,11 +78,12 @@ int main(int argc, char* argv[]) {
 
   double nBG_Z       = hZ->GetBinContent(1);
   double stat_BG_Z   = hZ->GetBinError(1);
-  double syst_BG_Z_p = sqrt(pow(hZ_Syst->GetBinError(1),2)
+  double syst_BG_Z   = sqrt(pow(hZ_Syst->GetBinError(1),2)
+			    +pow(nBG_Z*constants::syst_Z,2)); // for combine tool
+  double syst_BG_Z_p = sqrt(pow(hZ_Syst->GetBinError(1),2)    // for summary table
 			    +pow(nBG_Z*constants::syst_Z,2)
 			    +pow(nBG_Z*constants::syst_Z_JES_p,2)
-			    +pow(nBG_Z*constants::syst_Z_JER_p,2)
-			    +pow(nBG_Z*constants::syst_Z_UES_p,2));
+			    +pow(nBG_Z*constants::syst_Z_JER_p,2));
   double syst_BG_Z_m = sqrt(pow(hZ_Syst->GetBinError(1),2)
 			    +pow(nBG_Z*constants::syst_Z,2)
 			    +pow(nBG_Z*constants::syst_Z_JES_m,2)
@@ -109,36 +110,37 @@ int main(int argc, char* argv[]) {
 
   double nBG_WMu     = hWMu->GetBinContent(1);
   double stat_BG_WMu = hWMu->GetBinError(1);
+  double syst_BG_WMu = sqrt(pow(hWMu_Syst->GetBinError(1),2)
+			      +pow(nBG_WMu*constants::syst_WMu,2)); // for combine tool
   double syst_BG_WMu_p = sqrt(pow(hWMu_Syst->GetBinError(1),2)
 			      +pow(nBG_WMu*constants::syst_WMu,2)
-			      +pow(nBG_WMu*constants::syst_WMu_JES_p,2)
 			      +pow(nBG_WMu*constants::syst_WMu_JER_p,2)
-			      +pow(nBG_WMu*constants::syst_WMu_UES_p,2));
+			      +pow(nBG_WMu*constants::syst_WMu_UES_m,2));
   double syst_BG_WMu_m = sqrt(pow(hWMu_Syst->GetBinError(1),2)
 			      +pow(nBG_WMu*constants::syst_WMu,2)
-			      +pow(nBG_WMu*constants::syst_WMu_JES_m,2)
-			      +pow(nBG_WMu*constants::syst_WMu_JER_m,2)
-			      +pow(nBG_WMu*constants::syst_WMu_UES_m,2));
+			      +pow(nBG_WMu*constants::syst_WMu_JES_p,2)
+			      +pow(nBG_WMu*constants::syst_WMu_JER_m,2));
 
   double nBG_WEl   = hWEl->GetBinContent(1);
   double stat_BG_WEl = hWEl->GetBinError(1);
+  double syst_BG_WEl = sqrt(pow(hWEl_Syst->GetBinError(1),2) 
+			      +pow(nBG_WEl*constants::syst_WEl,2)); // for combine tool
   double syst_BG_WEl_p = sqrt(pow(hWEl_Syst->GetBinError(1),2)
 			      +pow(nBG_WEl*constants::syst_WEl,2)
-			      +pow(nBG_WEl*constants::syst_WEl_JES_p,2)
+			      +pow(nBG_WEl*constants::syst_WEl_JES_m,2)
 			      +pow(nBG_WEl*constants::syst_WEl_JER_p,2)
-			      +pow(nBG_WEl*constants::syst_WEl_UES_p,2));
+			      +pow(nBG_WEl*constants::syst_WEl_UES_m,2));
   double syst_BG_WEl_m = sqrt(pow(hWEl_Syst->GetBinError(1),2)
 			      +pow(nBG_WEl*constants::syst_WEl,2)
-			      +pow(nBG_WEl*constants::syst_WEl_JES_m,2)
-			      +pow(nBG_WEl*constants::syst_WEl_JER_m,2)
-			      +pow(nBG_WEl*constants::syst_WEl_UES_m,2));
+			      +pow(nBG_WEl*constants::syst_WEl_JES_p,2)
+			      +pow(nBG_WEl*constants::syst_WEl_UES_p,2));
   
   wFile->Close();
 
   // W-tau BG
   std::cout << "Getting W->tau background with method " << options.wTauMethod << std::endl;
 
-  double nBG_WTau(0.), stat_BG_WTau(0.), syst_BG_WTau_p(0.), syst_BG_WTau_m(0.);
+  double nBG_WTau(0.), stat_BG_WTau(0.), syst_BG_WTau(0.), syst_BG_WTau_p(0.), syst_BG_WTau_m(0.);
 
   if (options.wTauMethod==1) {
     nBG_WTau       = constants::nBG_WTau;
@@ -158,15 +160,15 @@ int main(int argc, char* argv[]) {
     
     nBG_WTau     = hWTau->GetBinContent(1);
     stat_BG_WTau = hWTau->GetBinError(1);
+    syst_BG_WTau = sqrt(pow(hWTau_Syst->GetBinError(1),2)
+			+pow(nBG_WTau*constants::syst_WTau,2)); // for combine tool
     syst_BG_WTau_p = sqrt(pow(hWTau_Syst->GetBinError(1),2)
-			+pow(nBG_WTau*constants::syst_WTau,2)
-			+pow(nBG_WTau*constants::syst_WTau_JES_p,2)
-			+pow(nBG_WTau*constants::syst_WTau_JER_p,2)
-			+pow(nBG_WTau*constants::syst_WTau_UES_p,2));
-    syst_BG_WTau_m = sqrt(pow(hWTau_Syst->GetBinError(1),2)
 			+pow(nBG_WTau*constants::syst_WTau,2)
 			+pow(nBG_WTau*constants::syst_WTau_JES_m,2)
 			+pow(nBG_WTau*constants::syst_WTau_JER_m,2)
+			+pow(nBG_WTau*constants::syst_WTau_UES_p,2));
+    syst_BG_WTau_m = sqrt(pow(hWTau_Syst->GetBinError(1),2)
+			+pow(nBG_WTau*constants::syst_WTau,2)
 			+pow(nBG_WTau*constants::syst_WTau_UES_m,2));
     wTauFile->Close();
   }
@@ -210,12 +212,11 @@ int main(int argc, char* argv[]) {
     nBG_QCD     = hQCD->GetBinContent(2,1);
     stat_BG_QCD = hQCD->GetBinError(2,1);
     syst_BG_QCD_p = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
+			 +pow(nBG_QCD*constants::syst_QCD3_JES_m,2)
+			 +pow(nBG_QCD*constants::syst_QCD3_JER_m,2));
+    syst_BG_QCD_m = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JES_p,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JER_p,2)
-			 +pow(nBG_QCD*constants::syst_QCD3_UES_p,2));
-    syst_BG_QCD_m = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
-			 +pow(nBG_QCD*constants::syst_QCD3_JES_m,2)
-			 +pow(nBG_QCD*constants::syst_QCD3_JER_m,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_UES_m,2));
     qFile->Close();
   }
@@ -251,47 +252,47 @@ int main(int argc, char* argv[]) {
   TH1D* hTTbar   = (TH1D*) mcFile->Get("hCutFlow_TTBar");
   double nBG_TTbar       = hTTbar->GetBinContent(nCuts);
   double stat_BG_TTbar   = 0.;
+  double syst_BG_TTbar   = sqrt(pow(hTTbar->GetBinError(nCuts),2)
+				  +pow(nBG_TTbar*constants::syst_TTbar,2)); // for combine tool
   double syst_BG_TTbar_p   = sqrt(pow(hTTbar->GetBinError(nCuts),2)
 				  +pow(nBG_TTbar*constants::syst_lumi,2)
-				  +pow(nBG_TTbar*constants::syst_TTbar,2)
-				  +pow(nBG_TTbar*constants::syst_TTbar_JES_p,2)
-				  +pow(nBG_TTbar*constants::syst_TTbar_JER_p,2)
-				  +pow(nBG_TTbar*constants::syst_TTbar_UES_p,2));
+				  +pow(nBG_TTbar*constants::syst_TTbar,2));
   double syst_BG_TTbar_m   = sqrt(pow(hTTbar->GetBinError(nCuts),2)
 				  +pow(nBG_TTbar*constants::syst_lumi,2)
 				  +pow(nBG_TTbar*constants::syst_TTbar,2)
 				  +pow(nBG_TTbar*constants::syst_TTbar_JES_m,2)
-				  +pow(nBG_TTbar*constants::syst_TTbar_JER_m,2)
-				  +pow(nBG_TTbar*constants::syst_TTbar_UES_m,2));
+				  +pow(nBG_TTbar*constants::syst_TTbar_JER_m,2));
 
   TH1D* hSingleT = (TH1D*) mcFile->Get("hCutFlow_SingleTSum");
   double nBG_SingleT     = hSingleT->GetBinContent(nCuts);
   double stat_BG_SingleT = 0.;
+  double syst_BG_SingleT = sqrt(pow(hSingleT->GetBinError(nCuts),2)
+				  +pow(nBG_SingleT*constants::syst_SingleT,2)); // for combine tool
   double syst_BG_SingleT_p = sqrt(pow(hSingleT->GetBinError(nCuts),2)
-				  +pow(nBG_TTbar*constants::syst_lumi,2)
+				  +pow(nBG_SingleT*constants::syst_lumi,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT_JES_p,2)
-				  +pow(nBG_SingleT*constants::syst_SingleT_JER_p,2)
-				  +pow(nBG_SingleT*constants::syst_SingleT_UES_p,2));
+				  +pow(nBG_SingleT*constants::syst_SingleT_JER_p,2));
   double syst_BG_SingleT_m = sqrt(pow(hSingleT->GetBinError(nCuts),2)
-				  +pow(nBG_TTbar*constants::syst_lumi,2)
+				  +pow(nBG_SingleT*constants::syst_lumi,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT_JES_m,2)
-				  +pow(nBG_SingleT*constants::syst_SingleT_JER_m,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT_UES_m,2));
 
 
   TH1D* hDiboson = (TH1D*) mcFile->Get("hCutFlow_Diboson");
   double nBG_Diboson     = hDiboson->GetBinContent(nCuts);
   double stat_BG_Diboson = 0.;
+  double syst_BG_Diboson = sqrt(pow(hDiboson->GetBinError(nCuts),2)
+				  +pow(nBG_Diboson*constants::syst_Diboson,2)); // for combine tool
   double syst_BG_Diboson_p = sqrt(pow(hDiboson->GetBinError(nCuts),2)
-				  +pow(nBG_TTbar*constants::syst_lumi,2)
+				  +pow(nBG_Diboson*constants::syst_lumi,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson_JES_p,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson_JER_p,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson_UES_p,2));
   double syst_BG_Diboson_m = sqrt(pow(hDiboson->GetBinError(nCuts),2)
-				  +pow(nBG_TTbar*constants::syst_lumi,2)
+				  +pow(nBG_Diboson*constants::syst_lumi,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson_JES_m,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson_JER_m,2)
@@ -300,14 +301,15 @@ int main(int argc, char* argv[]) {
   TH1D* hDYLL    = (TH1D*) mcFile->Get("hCutFlow_DYLL");
   double nBG_DYLL        = hDYLL->GetBinContent(nCuts);
   double stat_BG_DYLL    = 0.;
+  double syst_BG_DYLL    = sqrt(pow(hDYLL->GetBinError(nCuts),2)
+				+pow(nBG_DYLL*constants::syst_DYLL,2)); // for combine tool
   double syst_BG_DYLL_p  = sqrt(pow(hDYLL->GetBinError(nCuts),2)
-				+pow(nBG_TTbar*constants::syst_lumi,2)
+				+pow(nBG_DYLL*constants::syst_lumi,2)
 				+pow(nBG_DYLL*constants::syst_DYLL,2)
 				+pow(nBG_DYLL*constants::syst_DYLL_JES_p,2)
-				+pow(nBG_DYLL*constants::syst_DYLL_JER_p,2)
-				+pow(nBG_DYLL*constants::syst_DYLL_UES_p,2));
+				+pow(nBG_DYLL*constants::syst_DYLL_JER_p,2));
   double syst_BG_DYLL_m  = sqrt(pow(hDYLL->GetBinError(nCuts),2)
-				+pow(nBG_TTbar*constants::syst_lumi,2)
+				+pow(nBG_DYLL*constants::syst_lumi,2)
 				+pow(nBG_DYLL*constants::syst_DYLL,2)
 				+pow(nBG_DYLL*constants::syst_DYLL_JES_m,2)
 				+pow(nBG_DYLL*constants::syst_DYLL_JER_m,2)
@@ -376,7 +378,6 @@ int main(int argc, char* argv[]) {
 				  pow(syst_BG_SingleT_m,2) + 
 				  pow(syst_BG_Diboson_m,2) +
 				  pow(syst_BG_DYLL_m,2));
-  
 
 
   // write background summary table
@@ -396,6 +397,7 @@ int main(int argc, char* argv[]) {
   texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << syst_BG_SingleT_m << "/" << syst_BG_SingleT_p << "$ \\\\" << std::endl;
   texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << syst_BG_Diboson_m << "/" << syst_BG_Diboson_p << "$ \\\\" << std::endl;
   texFile << "DY \t & -  \t & $" << nBG_DYLL << " \\pm " << syst_BG_DYLL_m << "/" << syst_BG_DYLL_p << "$ \\\\" << std::endl;
+  texFile << "Sum other BGs \t & -  \t & $" << nBG_Other << " \\pm " << syst_BG_Other_m << "/" << syst_BG_Other_p << "$ \\\\" << std::endl;
   texFile << "\\hline" << std::endl;
   texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << "\\pm" << stat_BG_Total << "\\pm" << syst_BG_Total_m << "/" << syst_BG_Total_p << "$}  \\\\" << std::endl;
   texFile << "Observed & \\multicolumn{2}{c|}{$" << nObs << "$}  \\\\" << std::endl;
@@ -485,7 +487,7 @@ int main(int argc, char* argv[]) {
   // calculate factors for combine tool
   double fLum  = 1 + constants::syst_lumi;
 
-  double fZ      = 1 + sqrt(pow(constants::syst_Z,2) + pow(hZ_Syst->GetBinError(1),2));
+  double fZ     = 1 + syst_BG_Z/nBG_Z;
   double fZJESp = 1 + constants::syst_Z_JES_p;
   double fZJESm = 1 + constants::syst_Z_JES_m;
   double fZJERp = 1 + constants::syst_Z_JER_p;
@@ -493,7 +495,7 @@ int main(int argc, char* argv[]) {
   double fZUESp = 1 + constants::syst_Z_UES_p;
   double fZUESm = 1 + constants::syst_Z_UES_m;
 
-  double fWMu      = 1 + sqrt(pow(constants::syst_WMu,2) + pow(hWMu_Syst->GetBinError(1),2) + pow(stat_BG_WMu/nBG_WMu,2));
+  double fWMu     = 1 + sqrt(pow(syst_BG_WMu/nBG_WMu,2) + pow(stat_BG_WMu/nBG_WMu,2));
   double fWMuJESp = 1 + constants::syst_WMu_JES_p;
   double fWMuJESm = 1 + constants::syst_WMu_JES_m;
   double fWMuJERp = 1 + constants::syst_WMu_JER_p;
@@ -501,7 +503,7 @@ int main(int argc, char* argv[]) {
   double fWMuUESp = 1 + constants::syst_WMu_UES_p;
   double fWMuUESm = 1 + constants::syst_WMu_UES_m;
 
-  double fWEl      = 1 + sqrt(pow(constants::syst_WEl,2) + pow(hWEl_Syst->GetBinError(1),2) + pow(stat_BG_WEl/nBG_WEl,2));
+  double fWEl     = 1 + sqrt(pow(syst_BG_WEl/nBG_WEl,2) + pow(stat_BG_WEl/nBG_WEl,2));
   double fWElJESp = 1 + constants::syst_WEl_JES_p;
   double fWElJESm = 1 + constants::syst_WEl_JES_m;
   double fWElJERp = 1 + constants::syst_WEl_JER_p;
@@ -509,7 +511,7 @@ int main(int argc, char* argv[]) {
   double fWElUESp = 1 + constants::syst_WEl_UES_p;
   double fWElUESm = 1 + constants::syst_WEl_UES_m;
 
-  double fWTau      = 1 + sqrt(pow(constants::syst_WTau,2) + pow(hWTau_Syst->GetBinError(1),2) + pow(stat_BG_WTau/nBG_WTau,2));
+  double fWTau     = 1 + sqrt(pow(syst_BG_WTau/nBG_WTau,2) + pow(stat_BG_WTau/nBG_WTau,2));
   double fWTauJESp = 1 + constants::syst_WTau_JES_p;
   double fWTauJESm = 1 + constants::syst_WTau_JES_m;
   double fWTauJERp = 1 + constants::syst_WTau_JER_p;
@@ -517,42 +519,21 @@ int main(int argc, char* argv[]) {
   double fWTauUESp = 1 + constants::syst_WTau_UES_p;
   double fWTauUESm = 1 + constants::syst_WTau_UES_m;
 
-  double fQCD      = 1 + sqrt(pow(constants::syst_QCD3,2) + pow(stat_BG_QCD/nBG_QCD,2));
+  double fQCD     = 1 + sqrt(pow(constants::syst_QCD3,2) + pow(stat_BG_QCD/nBG_QCD,2));
   double fQCDJESp = 1 + constants::syst_QCD3_JES_p;
   double fQCDJESm = 1 + constants::syst_QCD3_JES_m;
   double fQCDJERp = 1 + constants::syst_QCD3_JER_p;
   double fQCDJERm = 1 + constants::syst_QCD3_JER_m;
   double fQCDUESp = 1 + constants::syst_QCD3_UES_p;
   double fQCDUESm = 1 + constants::syst_QCD3_UES_m;
-
-  double fOther      = 1 + sqrt( pow(hTTbar->GetBinError(nCuts),2) 	+ pow(nBG_TTbar*constants::syst_TTbar,2)
-				+pow(hSingleT->GetBinError(nCuts),2) 	+ pow(nBG_SingleT*constants::syst_SingleT,2)
-				+pow(hDiboson->GetBinError(nCuts),2)	+ pow(nBG_Diboson*constants::syst_Diboson,2)
-				+pow(hDYLL->GetBinError(nCuts),2)	+ pow(nBG_DYLL*constants::syst_DYLL,2));
-  double fOtherJESp = 1 + sqrt(pow(nBG_TTbar*constants::syst_TTbar_JES_p,2)
-			       +pow(nBG_SingleT*constants::syst_SingleT_JES_p,2)
-			       +pow(nBG_Diboson*constants::syst_Diboson_JES_p,2)
-			       +pow(nBG_DYLL*constants::syst_DYLL_JES_p,2));
-  double fOtherJESm = 1 + sqrt(pow(nBG_TTbar*constants::syst_TTbar_JES_m,2)
-			       +pow(nBG_SingleT*constants::syst_SingleT_JES_m,2)
-			       +pow(nBG_Diboson*constants::syst_Diboson_JES_m,2)
-			       +pow(nBG_DYLL*constants::syst_DYLL_JES_m,2));
-  double fOtherJERp = 1 + sqrt(pow(nBG_TTbar*constants::syst_TTbar_JER_p,2)
-			       +pow(nBG_SingleT*constants::syst_SingleT_JER_p,2)
-			       +pow(nBG_Diboson*constants::syst_Diboson_JER_p,2)
-			       +pow(nBG_DYLL*constants::syst_DYLL_JER_p,2));
-  double fOtherJERm = 1 + sqrt(pow(nBG_TTbar*constants::syst_TTbar_JER_m,2)
-			       +pow(nBG_SingleT*constants::syst_SingleT_JER_m,2)
-			       +pow(nBG_Diboson*constants::syst_Diboson_JER_m,2)
-			       +pow(nBG_DYLL*constants::syst_DYLL_JER_m,2));
-  double fOtherUESp = 1 + sqrt(pow(nBG_TTbar*constants::syst_TTbar_UES_p,2)
-			       +pow(nBG_SingleT*constants::syst_SingleT_UES_p,2)
-			       +pow(nBG_Diboson*constants::syst_Diboson_UES_p,2)
-			       +pow(nBG_DYLL*constants::syst_DYLL_UES_p,2));
-  double fOtherUESm = 1 + sqrt(pow(nBG_TTbar*constants::syst_TTbar_UES_m,2)
-			       +pow(nBG_SingleT*constants::syst_SingleT_UES_m,2)
-			       +pow(nBG_Diboson*constants::syst_Diboson_UES_m,2)
-			       +pow(nBG_DYLL*constants::syst_DYLL_UES_m,2));
+ 
+  double fOther     = 1 + (sqrt(pow(syst_BG_TTbar,2) + pow(syst_BG_SingleT,2) + pow(syst_BG_Diboson,2) + pow(syst_BG_DYLL,2))/nBG_Other);
+  double fOtherJESp = 1 + constants::syst_Other_JES_p;
+  double fOtherJESm = 1 + constants::syst_Other_JES_m;
+  double fOtherJERp = 1 + constants::syst_Other_JER_p;
+  double fOtherJERm = 1 + constants::syst_Other_JER_m;
+  double fOtherUESp = 1 + constants::syst_Other_UES_p;
+  double fOtherUESm = 1 + constants::syst_Other_UES_m;
 
   double aZ    = nBG_Z / nCtrlZ;
 

@@ -40,6 +40,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Creating output directory : " << oDir_Plot << std::endl;
     boost::filesystem::create_directory(opath);
   }
+ 
+  if (options.doMCFMWeights) std::cout << "Going to apply MCFM weights" << std::endl;
 
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/ZBackground.root")).c_str(), "RECREATE");
@@ -83,8 +85,6 @@ int main(int argc, char* argv[]) {
   TH1D* hZ_DY_NoVBFNoWeight = new TH1D("hZ_DY_NoVBFNoWeight","", 1, 0., 1.); // DY MC yield after dimuon and dijet selection without y* and mjj weighting
   TH1D* hZ_DY_NoVBFWeight   = new TH1D("hZ_DY_NoVBFWeight",  "", 1, 0., 1.); // DY MC yield after dimuon and dijet selection with y* and mjj weighting
 
-
-
   // loop over MC datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
 
@@ -107,7 +107,6 @@ int main(int argc, char* argv[]) {
 	}
 	std::cout << "Analysing QCD DY MC " << std::endl;
       }
-
     }
     else if (dataset.isData) {
       std::cout << "Analysing Data      : " << dataset.name << std::endl;
@@ -146,7 +145,7 @@ int main(int argc, char* argv[]) {
 
     // re-weighting
     TCut cutDYNoVBFNoWeight = puWeight * trigCorr * (cutD  + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.cutZMuMu("dijet"));
-    TCut cutDYNoVBFWeight   = puWeight * yStarWeight * mjjWeight * trigCorr * (cutD  + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.cutZMuMu("dijet"));
+    TCut cutDYNoVBFWeight   = otherWeight * trigCorr * (cutD  + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.cutZMuMu("dijet"));
 
     TH1D* hZ_DY_NoWeight = new TH1D("hZ_DY_NoWeight", "", 1, 0, 1);
     TH1D* hZ_DY_Weight   = new TH1D("hZ_DY_Weight",   "", 1, 0, 1);
@@ -280,17 +279,11 @@ int main(int argc, char* argv[]) {
     TH1D* ZCtrlMjj      = new TH1D("ZCtrlMjj",      "", 30, 0.,  3000.);
     TH1D* ZCtrlMET      = new TH1D("ZCtrlMET",      "", 25, 10.,  510.);
     TH1D* ZCtrlDPhijj   = new TH1D("ZCtrlDPhijj",   "", 50, 0.,  TMath::Pi());
-    
-    if (options.doMCFMWeights) {
-      yStarWeight = TCut("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))");
-      mjjWeight   = TCut("0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM)");
-    }
 
     TH1D* ZCtrlYStar    = new TH1D("ZCtrlYStar",    "", 50, 0., 5.);
     TH1D* ZCtrlYStarWt  = new TH1D("ZCtrlYStarWt",  "", 50, 0., 2.);
     TH1D* ZCtrlMjjWt    = new TH1D("ZCtrlMjjWt",    "", 50, 0., 2.);
-    TH1D* ZCtrlYStarMjjWt    = new TH1D("ZCtrlYStarMjjWt",    "", 50, -1., 5.);
-
+    TH1D* ZCtrlYStarMjjWt    = new TH1D("ZCtrlYStarMjjWt",    "", 50, -1., 5.);    
 
     tree->Draw("zMass>>ZCtrlZMass"	    , cutPlots);
     tree->Draw("zPt>>ZCtrlZpT"		      , cutPlots);
@@ -303,10 +296,15 @@ int main(int argc, char* argv[]) {
     tree->Draw("vbfM>>ZCtrlMjj"		      , cutPlots);
     tree->Draw("metNo2Muon>>ZCtrlMET"	  , cutPlots);
     tree->Draw("vbfDPhi>>ZCtrlDPhijj"	  , cutPlots);
+
+    if (options.doMCFMWeights) {
+
     tree->Draw("abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))>>ZCtrlYStar"	  , cutPlots);
     tree->Draw("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))>>ZCtrlYStarWt", cutPlots);
     tree->Draw("(0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM))>>ZCtrlMjjWt", cutPlots);
     tree->Draw("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))*(0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM))>>ZCtrlYStarMjjWt", cutPlots);
+
+    }
 
     if (!dataset.isData) {
       ZCtrlZMass->Scale(weight);
@@ -351,13 +349,12 @@ int main(int argc, char* argv[]) {
    
   }
 
-  // re-weighting
+  // re-weighting : will be 1 if re-weighting is off
   TH1D* hZ_DYNorm = new TH1D("hZ_DYNorm", "", 1, 0, 1); 
   hZ_DYNorm->Add(hZ_DY_NoVBFNoWeight);
   hZ_DYNorm->Divide(hZ_DY_NoVBFWeight);
   
   double dyNorm = hZ_DYNorm->GetBinContent(1);
-
 
   // numbers - calculate these from MC in this program later!
   double ratioBF = constants::ratioZToNuNuZToLL;
