@@ -7,11 +7,11 @@ from InvisibleHiggs.Ntuple.patTuple_Master_cfg import addInvHiggsProcess
 
 ###--------------------------------------------------------------
 ### Set these parameters
-iRunOnData  = False 
+iRunOnData  = False
 
 #iData Jul13, Aug06, Aug24, PromptC2, PromptD, Dec11
 #No meaning if iRunData = False
-iData       = "Dec11" 
+iData       = "PromptC2" 
 
 #MET, SingleMuon, DoubleMuon, SingleElectron, DoubleElectron, NoTrig
 #(If iMCSignal = True, trigger will be set to NoTrig automatically)
@@ -19,7 +19,7 @@ iHLTFilter  = "MET"
 
 #MCSignal or Background if True, PDF will be collected (Not applied yet)
 #No meaning if iRunData = True
-iMCSignal   = False  
+iMCSignal   = False
 
 iFile       = '/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/04BCEC26-AA02-E211-A81D-003048CF99BA.root'
 
@@ -32,7 +32,7 @@ iDump       = True
 
 ###--------------------------------------------------------------
 ### Create the configuration and dump
-if iMCSignal == True:
+if iMCSignal == True and iRunOnData == False:
     iHLTFilter  = "NoTrig"
 addInvHiggsProcess(process, iRunOnData, iData, iHLTFilter, iMCSignal, iFile, iMaxEvent)
 

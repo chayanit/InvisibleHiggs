@@ -181,10 +181,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         switchJetCollection(process, 
                             cms.InputTag('ak5PFJets'),   
                             doJTA            = True,            
-                            doBTagging       = False,            
+                            doBTagging       = True,            
                             jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']),
                             doType1MET       = True,            
-                            genJetCollection = cms.InputTag("ak5GenJets"),
                             doJetID          = False,
                             jetIdLabel       = "ak5"
                             )
@@ -192,10 +191,10 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         switchJetCollection(process, 
                             cms.InputTag('ak5PFJets'),   
                             doJTA            = True,            
-                            doBTagging       = False,            
+                            doBTagging       = True,            
                             jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute']),
                             doType1MET       = True,            
-                            genJetCollection = cms.InputTag("ak5GenJets"),
+                            genJetCollection = cms.InputTag("ak5GenJetsNoNu"),
                             doJetID          = False,
                             jetIdLabel       = "ak5"
                             )
@@ -267,25 +266,57 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         process.puJetMvaEnDown 		= process.puJetMva.clone()
         process.puJetIdEnDown  		= process.puJetId.clone()
 
-        process.puJetIdSmeared.jets     = cms.InputTag("smearedGoodPatJets")
+        process.puJetIdSmeared.jets     = cms.InputTag("smearedGoodPatJetsWithGaussian")
         process.puJetMvaSmeared.jetids  = cms.InputTag("puJetIdSmeared")
-        process.puJetMvaSmeared.jets    = cms.InputTag("smearedGoodPatJets")
+        process.puJetMvaSmeared.jets    = cms.InputTag("smearedGoodPatJetsWithGaussian")
 
-	process.puJetIdResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
+	process.puJetIdResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUpWithGaussian")
 	process.puJetMvaResUp.jetids 	= cms.InputTag("puJetIdResUp")
-	process.puJetMvaResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUp")
+	process.puJetMvaResUp.jets 	= cms.InputTag("smearedGoodPatJetsResUpWithGaussian")
 
-        process.puJetIdResDown.jets     = cms.InputTag("smearedGoodPatJetsResDown")
+        process.puJetIdResDown.jets     = cms.InputTag("smearedGoodPatJetsResDownWithGaussian")
         process.puJetMvaResDown.jetids  = cms.InputTag("puJetIdResDown")
-        process.puJetMvaResDown.jets    = cms.InputTag("smearedGoodPatJetsResDown")
+        process.puJetMvaResDown.jets    = cms.InputTag("smearedGoodPatJetsResDownWithGaussian")
 
-        process.puJetIdEnUp.jets        = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
+        process.puJetIdEnUp.jets        = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEtWithGaussian")
         process.puJetMvaEnUp.jetids     = cms.InputTag("puJetIdEnUp")
-        process.puJetMvaEnUp.jets       = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
+        process.puJetMvaEnUp.jets       = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEtWithGaussian")
 
-        process.puJetIdEnDown.jets      = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt")
+        process.puJetIdEnDown.jets      = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEtWithGaussian")
         process.puJetMvaEnDown.jetids   = cms.InputTag("puJetIdEnDown")
-        process.puJetMvaEnDown.jets     = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEt")
+        process.puJetMvaEnDown.jets     = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEtWithGaussian")
+
+	# For jet without Gaussian smearing collection
+	process.puJetMvaSmearedNoGaussian	= process.puJetMva.clone()
+	process.puJetIdSmearedNoGaussian	= process.puJetId.clone()
+	process.puJetMvaResUpNoGaussian         = process.puJetMva.clone()
+        process.puJetIdResUpNoGaussian          = process.puJetId.clone()
+        process.puJetMvaResDownNoGaussian       = process.puJetMva.clone()
+        process.puJetIdResDownNoGaussian        = process.puJetId.clone()
+        process.puJetMvaEnUpNoGaussian          = process.puJetMva.clone()
+        process.puJetIdEnUpNoGaussian           = process.puJetId.clone()
+        process.puJetMvaEnDownNoGaussian        = process.puJetMva.clone()
+        process.puJetIdEnDownNoGaussian         = process.puJetId.clone()
+
+	process.puJetIdSmearedNoGaussian.jets     = cms.InputTag("smearedGoodPatJetsNoGaussian")
+        process.puJetMvaSmearedNoGaussian.jetids  = cms.InputTag("puJetIdSmearedNoGaussian")
+        process.puJetMvaSmearedNoGaussian.jets    = cms.InputTag("smearedGoodPatJetsNoGaussian")
+
+        process.puJetIdResUpNoGaussian.jets       = cms.InputTag("smearedGoodPatJetsResUpNoGaussian")
+        process.puJetMvaResUpNoGaussian.jetids    = cms.InputTag("puJetIdResUpNoGaussian")
+        process.puJetMvaResUpNoGaussian.jets      = cms.InputTag("smearedGoodPatJetsResUpNoGaussian")
+
+        process.puJetIdResDownNoGaussian.jets     = cms.InputTag("smearedGoodPatJetsResDownNoGaussian")
+        process.puJetMvaResDownNoGaussian.jetids  = cms.InputTag("puJetIdResDownNoGaussian")
+        process.puJetMvaResDownNoGaussian.jets    = cms.InputTag("smearedGoodPatJetsResDownNoGaussian")
+
+        process.puJetIdEnUpNoGaussian.jets        = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEtNoGaussian")
+        process.puJetMvaEnUpNoGaussian.jetids     = cms.InputTag("puJetIdEnUpNoGaussian")
+        process.puJetMvaEnUpNoGaussian.jets       = cms.InputTag("shiftedGoodPatJetsEnUpForCorrMEtNoGaussian")
+
+        process.puJetIdEnDownNoGaussian.jets      = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEtNoGaussian")
+        process.puJetMvaEnDownNoGaussian.jetids   = cms.InputTag("puJetIdEnDownNoGaussian")
+        process.puJetMvaEnDownNoGaussian.jets     = cms.InputTag("shiftedGoodPatJetsEnDownForCorrMEtNoGaussian")
     ###--------------------------------------------------------------
 
 
@@ -323,6 +354,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                             sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data,
                             doApplySysShiftCorr = False,
 			    addToPatDefaultSequence = False,
+			    postfix = ''
                             )
         process.patPFJetMETtype1p2Corr.jetCorrLabel = cms.string('L2L3Residual')
         process.patPFJetMETtype2Corr.jetCorrLabel = cms.string('L2L3Residual')
@@ -343,7 +375,30 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                             sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc,
                             doApplySysShiftCorr = False,
 			    addToPatDefaultSequence = False,
+			    postfix = 'WithGaussian'
                             )
+        runMEtUncertainties(process,
+                            electronCollection = cms.InputTag('selectVetoElectrons'),
+                            photonCollection = '',
+                            muonCollection = 'selectLooseMuons',
+                            tauCollection = '',
+                            jetCollection = cms.InputTag('goodPatJets'),
+                            jetCorrLabel = 'L3Absolute',
+                            doSmearJets = True,
+                            makeType1corrPFMEt = True,
+                            makeType1p2corrPFMEt = False,
+                            makePFMEtByMVA = False,
+                            makeNoPileUpPFMEt = False,
+                            doApplyType0corr = True,
+                            sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc,
+                            doApplySysShiftCorr = False,
+                            addToPatDefaultSequence = False,
+                            postfix = 'NoGaussian'
+                            )
+	# Turn off gaussian smearing
+    	process.smearedGoodPatJetsNoGaussian.doGaussian = cms.int32(0)
+    	process.smearedGoodPatJetsResUpNoGaussian.doGaussian = cms.int32(0)
+    	process.smearedGoodPatJetsResDownNoGaussian.doGaussian = cms.int32(0)
 
     # Fix Type0 correction module
     process.patPFMETtype0Corr.correction.par3 = cms.double(0.909209)
@@ -446,10 +501,13 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
                 # Generate PAT
                 process.pfParticleSelectionSequence *
+		process.genParticlesForJetsNoNu *
+                process.ak5GenJetsNoNu *
                 process.patDefaultSequence *
                 process.goodPatJets *
                 process.PhysicsObjectSequence *
-                process.metUncertaintySequence *
+                process.metUncertaintySequenceWithGaussian *
+		process.metUncertaintySequenceNoGaussian *
                 process.puJetIdSqeuence *
 		process.puJetIdSmeared *
 		process.puJetMvaSmeared *
@@ -460,7 +518,17 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
         	process.puJetIdEnUp *
         	process.puJetMvaEnUp *
         	process.puJetIdEnDown *
-        	process.puJetMvaEnDown
+        	process.puJetMvaEnDown *
+                process.puJetIdSmearedNoGaussian *
+                process.puJetMvaSmearedNoGaussian *
+                process.puJetIdResUpNoGaussian *
+                process.puJetMvaResUpNoGaussian *
+                process.puJetIdResDownNoGaussian *
+                process.puJetMvaResDownNoGaussian *
+                process.puJetIdEnUpNoGaussian *
+                process.puJetMvaEnUpNoGaussian *
+                process.puJetIdEnDownNoGaussian *
+                process.puJetMvaEnDownNoGaussian
         	)
     ###--------------------------------------------------------------
 
@@ -492,6 +560,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                                        ,'keep GenMETs_*_*_*'
                                        ,'keep *_addPileupInfo_*_*'
                                        ,'keep LHEEventProduct_*_*_*'
+				       ,'keep ak5GenJets_*_*_*'
+                                       ,'keep ak5GenJetsNoNu_*_*_*'
                                        ]
         
     process.out.fileName = 'patTuple.root'

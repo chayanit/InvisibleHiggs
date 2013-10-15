@@ -29,6 +29,7 @@ InvHiggsInfo::InvHiggsInfo() :
   metflag6(false), 
   metflag7(false),
   metflag8(false),
+  nJets_pass(0),
   jet1Index(-1),
   jet1Pt(-10.),
   jet1Eta(-10.),

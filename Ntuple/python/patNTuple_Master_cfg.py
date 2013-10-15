@@ -184,7 +184,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                             doBTagging       = False,            
                             jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']),
                             doType1MET       = True,            
-                            genJetCollection = cms.InputTag("ak5GenJets"),
+                            genJetCollection = cms.InputTag("ak5GenJetsNoNu"),
                             doJetID          = False,
                             jetIdLabel       = "ak5"
                             )
@@ -195,7 +195,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                             doBTagging       = False,            
                             jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute']),
                             doType1MET       = True,            
-                            genJetCollection = cms.InputTag("ak5GenJets"),
+                            genJetCollection = cms.InputTag("ak5GenJetsNoNu"),
                             doJetID          = False,
                             jetIdLabel       = "ak5"
                             )
@@ -473,24 +473,26 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                 process.recoTauClassicHPSSequence *
 
                 # Generate PAT
-                #process.pfParticleSelectionSequence *
+                process.genParticlesForJetsNoNu *
+                process.ak5GenJetsNoNu *
+                process.pfParticleSelectionSequence *
                 process.patDefaultSequence *
                 process.goodPatJets *
                 process.PhysicsObjectSequence *
                 process.metUncertaintySequence *
                 process.puJetIdSqeuence *
-		process.puJetIdSmeared *
-		process.puJetMvaSmeared *
-        	process.puJetIdResUp *
-		process.puJetMvaResUp *
-         	process.puJetIdResDown *
-        	process.puJetMvaResDown *
-        	process.puJetIdEnUp *
-        	process.puJetMvaEnUp *
-        	process.puJetIdEnDown *
-        	process.puJetMvaEnDown *
-		process.WSequence *
-		process.ZSequence *
+        process.puJetIdSmeared *
+        process.puJetMvaSmeared *
+            process.puJetIdResUp *
+        process.puJetMvaResUp *
+            process.puJetIdResDown *
+            process.puJetMvaResDown *
+            process.puJetIdEnUp *
+            process.puJetMvaEnUp *
+            process.puJetIdEnDown *
+            process.puJetMvaEnDown *
+        process.WSequence *
+        process.ZSequence *
 		process.invHiggsInfo
         	)
     ###--------------------------------------------------------------
@@ -523,6 +525,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
                                        ,'keep GenMETs_*_*_*'
                                        ,'keep *_addPileupInfo_*_*'
                                        ,'keep LHEEventProduct_*_*_*'
+                                       ,'keep ak5GenJets_*_*_*'
+                                       ,'keep ak5GenJetsNoNu_*_*_*'
                                        ]
         
     process.out.fileName = 'patTuple.root'

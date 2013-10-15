@@ -7,6 +7,8 @@ invHiggsInfo = cms.EDAnalyzer(
     genEvtTag      = cms.untracked.InputTag("generator","","SIM"),
     genParticleTag = cms.untracked.InputTag("genParticles","","SIM"),
     mcPYTHIA       = cms.untracked.bool(True),
+    genJetTag      = cms.untracked.InputTag("ak5GenJets"),
+    genJetNoNuTag  = cms.untracked.InputTag("ak5GenJetsNoNu"),
 
     # trigger
     L1ExtraEtMissMET = cms.untracked.InputTag("l1extraParticles","MET"),
