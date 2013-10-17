@@ -3,7 +3,7 @@
 //
 // Robin Aggleton 2013
 
-void makeHists(std::string filename){
+void makeHists(std::string filename, TFile* outputFile){
     ifstream infile;
     infile.open(filename.c_str());
     if (!infile.fail()) { //check if file opened correctly
@@ -69,30 +69,34 @@ void makeHists(std::string filename){
         // c1.SaveAs((histName+".pdf").c_str());
 
         // Save TH2s to file
-        TFile *file = new TFile((histName+".root").c_str(),"RECREATE");
+        // TFile *file = new TFile((histName+".root").c_str(),"RECREATE");
+        outputFile->cd();
         histSF.Write();
         histSFup.Write();
         histSFdown.Write();
-        file->Close();
+        // file->Close();
     } else 
         std::cout << "ERROR: No such file " << filename << std::endl;
 }
 
 void MakeLeptonWeightHistos(){
     gStyle->SetOptStat("n");
-    makeHists("ele_tight_id.txt");
-    makeHists("ele_veto_id_data_eff.txt");
-    makeHists("ele_veto_id_mc_eff.txt");
-    makeHists("mu_loose_id_SF.txt");
-    makeHists("mu_loose_id_data_eff.txt");
-    makeHists("mu_loose_id_mc_eff.txt");
-    makeHists("mu_loose_iso_SF.txt");
-    makeHists("mu_loose_iso_data_eff.txt");
-    makeHists("mu_loose_iso_mc_eff.txt");
-    makeHists("mu_tight_id_SF.txt");
-    makeHists("mu_tight_id_data_eff.txt");
-    makeHists("mu_tight_id_mc_eff.txt");
-    makeHists("mu_tight_iso_SF.txt");
-    makeHists("mu_tight_iso_data_eff.txt");
-    makeHists("mu_tight_iso_mc_eff.txt");
+    std::vector<std::string> fileList;
+    TFile *outputFile = new TFile("leptonWeights.root","RECREATE");
+    makeHists("ele_tight_id.txt",outputFile);
+    makeHists("ele_veto_id_data_eff.txt",outputFile);
+    makeHists("ele_veto_id_mc_eff.txt",outputFile);
+    makeHists("mu_loose_id_SF.txt",outputFile);
+    makeHists("mu_loose_id_data_eff.txt",outputFile);
+    makeHists("mu_loose_id_mc_eff.txt",outputFile);
+    makeHists("mu_loose_iso_SF.txt",outputFile);
+    makeHists("mu_loose_iso_data_eff.txt",outputFile);
+    makeHists("mu_loose_iso_mc_eff.txt",outputFile);
+    makeHists("mu_tight_id_SF.txt",outputFile);
+    makeHists("mu_tight_id_data_eff.txt",outputFile);
+    makeHists("mu_tight_id_mc_eff.txt",outputFile);
+    makeHists("mu_tight_iso_SF.txt",outputFile);
+    makeHists("mu_tight_iso_data_eff.txt",outputFile);
+    makeHists("mu_tight_iso_mc_eff.txt",outputFile);
+    outputFile->Close();
 }

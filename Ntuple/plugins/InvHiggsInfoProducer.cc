@@ -284,6 +284,16 @@ private:
   TH1D*  hTrigCorrMjj_;
   bool   doTrigCorr_;
 
+  // lepton ID eff
+  TFile* fLeptCorr_;
+  TH2D*  hLeptCorrETight_;
+  TH2D*  hLeptCorrMuTight_;
+  TH2D*  hLeptCorrEVetoData_;
+  TH2D*  hLeptCorrEVetoMC_;
+  TH2D*  hLeptCorrMuVetoData_;
+  TH2D*  hLeptCorrMuVetoMC_;
+  bool   doLeptCorr_;
+  
   // VBF jets
   unsigned tagJet1Index_;
   unsigned tagJet2Index_;
