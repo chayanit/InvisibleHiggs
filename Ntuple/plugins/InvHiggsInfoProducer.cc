@@ -159,7 +159,7 @@ private:
   void doEventInfo(const edm::Event&);
 
   /// write MC info
-  void doMC(const GenEventInfoProduct& genEvt, const GenParticleCollection& genParticles, const GenJetCollection& genJets, const GenJetCollection& genJetsNoNu);
+  void doMC(const GenEventInfoProduct& genEvt, const GenParticleCollection& genParticles);
   int hadronicTau(const reco::Candidate*);
 
   /// write trigger info
@@ -228,8 +228,7 @@ private:
   edm::InputTag genEvtTag_;
   edm::InputTag genParticleTag_;
   bool mcPYTHIA_;
-  edm::InputTag genJetTag_;
-  edm::InputTag genJetNoNuTag_;
+  // edm::InputTag genJetTag_;
   
   edm::InputTag L1ExtraEtMissMET_;
   edm::InputTag L1ExtraHtMissMHT_;
@@ -311,8 +310,7 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   genEvtTag_(iConfig.getUntrackedParameter<edm::InputTag>("genEvtTag",edm::InputTag("generator","","SIM"))),
   genParticleTag_(iConfig.getUntrackedParameter<edm::InputTag>("genParticleTag", edm::InputTag("genParticles","","SIM"))),
   mcPYTHIA_(iConfig.getUntrackedParameter<bool>("mcPYTHIA",true)),
-  genJetTag_(iConfig.getUntrackedParameter<edm::InputTag>("genJetTag",edm::InputTag("ak5GenJets"))),
-  genJetNoNuTag_(iConfig.getUntrackedParameter<edm::InputTag>("genJetNoNuTag",edm::InputTag("ak5GenJetsNoNu"))),
+  // genJetTag_(iConfig.getUntrackedParameter<edm::InputTag>("genJetTag",edm::InputTag("ak5GenJetsNoNu","","PAT"))),
 
   // Trigger 
   L1ExtraEtMissMET_(iConfig.getUntrackedParameter<edm::InputTag>("L1ExtraEtMissMET",edm::InputTag("l1extraParticles","MET"))), 
@@ -522,13 +520,10 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     edm::Handle<GenParticleCollection> genParticles;
     iEvent.getByLabel(genParticleTag_, genParticles);   
     
-    edm::Handle<GenJetCollection> genJets;
-    iEvent.getByLabel(genJetTag_, genJets);
+    // edm::Handle<GenJetCollection> genJets;
+    // iEvent.getByLabel(genJetTag_, genJets);
 
-    edm::Handle<GenJetCollection> genJetsNoNu;
-    iEvent.getByLabel(genJetNoNuTag_, genJetsNoNu);
-
-    if (genEvt.isValid() && genParticles.isValid() && genJets.isValid() && genJetsNoNu.isValid()) doMC(*genEvt, *genParticles, *genJets, *genJetsNoNu);
+    if (genEvt.isValid() && genParticles.isValid()) doMC(*genEvt, *genParticles);
     else {
       edm::LogWarning("InvHiggsInfoProducer") << "GenEventInfoProduct not found, branch will not be filled!" << std::endl;
     }
@@ -645,7 +640,7 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 }
 
 
-void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenParticleCollection& genParticles, const GenJetCollection& genJets, const GenJetCollection& genJetsNoNu) {
+void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenParticleCollection& genParticles) {
 
   //   const HepMC::GenEvent *evt = genEvt.GetEvent();
   
@@ -751,28 +746,19 @@ void InvHiggsInfoProducer::doMC(const GenEventInfoProduct& genEvt, const GenPart
 	    info_->wle     = pl->energy();
 	    info_->wtauhadron = hadronicTau(pl);
       // Get hadronic tau genJet
-      if (info_->wtauhadron == 1){ // Only if hadronic!
-        // Include invisibles 
-        for (unsigned n = 0; n < genJets.size(); n++){ //loop over genJet collection to find match to hadronic tau
-          const GenJet & j = genJets[n];
-          if (deltaR(j.eta(),j.phi(),pl->eta(),pl->phi()) < 0.5){
-            info_->tauGenJetPt = j.pt();
-            info_->tauGenJetEta = j.eta();
-            info_->tauGenJetPhi = j.phi();
-            info_->tauGenJetM   = j.mass();
-          }
-        }
-        // GenJets with no neutrinos
-        for (unsigned n = 0; n < genJetsNoNu.size(); n++){ //loop over genJet collection to find match to hadronic tau
-          const GenJet & j = genJetsNoNu[n];
-          if (deltaR(j.eta(),j.phi(),pl->eta(),pl->phi()) < 0.5){
-            info_->tauGenJetNoNuPt  = j.pt();
-            info_->tauGenJetNoNuEta = j.eta();
-            info_->tauGenJetNoNuPhi = j.phi();
-            info_->tauGenJetNoNuM   = j.mass();
-          }
-        }
-      }
+      // if (info_->wtauhadron == 1){ // Only if hadronic!
+        // No neutrinos
+        // for (unsigned n = 0; n < genJets.size(); n++){ //loop over genJet collection to find match to hadronic tau
+        //   const GenJet & j = genJets[n];
+        //   if (deltaR(j.eta(),j.phi(),pl->eta(),pl->phi()) < 0.5){
+        //     info_->tauGenJetPt = j.pt();
+        //     info_->tauGenJetEta = j.eta();
+        //     info_->tauGenJetPhi = j.phi();
+        //     info_->tauGenJetM   = j.mass();
+        //     std::cout << "Doing tau genjet" << std::endl;
+        //   }
+        // }
+      // }
 	  }
 	  else if(fabs(pl->pdgId())==12 ||fabs(pl->pdgId())==14 ||fabs(pl->pdgId())==16){
 	    info_->wmetpt  = pl->pt();

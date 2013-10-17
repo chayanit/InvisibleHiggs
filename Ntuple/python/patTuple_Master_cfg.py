@@ -501,7 +501,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="PromptC2", iHLTFilter="M
 
                 # Generate PAT
                 process.pfParticleSelectionSequence *
-		process.genParticlesForJetsNoNu *
+        		process.genParticlesForJetsNoNu *
                 process.ak5GenJetsNoNu *
                 process.patDefaultSequence *
                 process.goodPatJets *

@@ -208,6 +208,10 @@ InvHiggsInfo::InvHiggsInfo() :
   wmeteta(-10.),
   wmetphi(-10.),
   wmete(-10.),
+  // tauGenJetPt(-10.),
+  // tauGenJetEta(-10.),
+  // tauGenJetPhi(-10.),
+  // tauGenJetM(-10.),
 
   // MC Info -- Z
   zgenmass(-10.),

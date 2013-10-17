@@ -193,19 +193,11 @@ class InvHiggsInfo { //: public TObject {
   Double_t tau2mT;
   Int_t nTaus_match;
   // Hadronic tau genJet
-  Double_t tauGenJetPt;
-  Double_t tauGenJetEta;
-  Double_t tauGenJetPhi;
-  Double_t tauGenJetM;
+  // Double_t tauGenJetPt;
+  // Double_t tauGenJetEta;
+  // Double_t tauGenJetPhi;
+  // Double_t tauGenJetM;
   
-  Double_t tauGenJetNoNuPt;
-  Double_t tauGenJetNoNuEta;
-  Double_t tauGenJetNoNuPhi;
-  Double_t tauGenJetNoNuM;
-
-
-
-
   // Ws
   Int_t nW;
   Double_t wPt;
