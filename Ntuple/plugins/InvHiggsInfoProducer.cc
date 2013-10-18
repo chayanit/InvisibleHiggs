@@ -123,6 +123,7 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TTree.h"
 #include "TF1.h"
 #include "TMath.h"
@@ -179,6 +180,13 @@ private:
 
   // do trigger data/MC weighting
   void doTrigCorrWeights();
+
+  // do lepton ID eff corrections
+  void doLeptonCorrWeights(const std::vector<pat::Muon>& tightMuons,   //Tight muons
+      const std::vector<pat::Electron>& tightElectrons,        //Tight electrons
+      const std::vector<pat::Muon>& looseMuons,               //Loose muons
+      const std::vector<pat::Electron>& looseElectrons,       //Loose electrons
+      const GenParticleCollection& genParticles);
 
   // write PAT objects
   void doJets(edm::Handle<edm::View<pat::Jet> > jets,
@@ -286,14 +294,14 @@ private:
 
   // lepton ID eff
   TFile* fLeptCorr_;
-  TH2D*  hLeptCorrETight_;
+  TH2D*  hLeptCorrEleTight_;
   TH2D*  hLeptCorrMuTight_;
-  TH2D*  hLeptCorrEVetoData_;
-  TH2D*  hLeptCorrEVetoMC_;
+  TH2D*  hLeptCorrEleVetoData_;
+  TH2D*  hLeptCorrEleVetoMC_;
   TH2D*  hLeptCorrMuVetoData_;
   TH2D*  hLeptCorrMuVetoMC_;
   bool   doLeptCorr_;
-  
+
   // VBF jets
   unsigned tagJet1Index_;
   unsigned tagJet2Index_;
@@ -378,6 +386,14 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   hTrigCorrMET_(0),
   hTrigCorrMjj_(0),
   doTrigCorr_(0),
+  fLeptCorr_(0),
+  hLeptCorrEleTight_(0),
+  hLeptCorrMuTight_(0),
+  hLeptCorrEleVetoData_(0),
+  hLeptCorrEleVetoMC_(0),
+  hLeptCorrMuVetoData_(0),
+  hLeptCorrMuVetoMC_(0),
+  doLeptCorr_(0),
   tagJet1Index_(-1),
   tagJet2Index_(-1),
   tagJetEtaMin_(0.),
@@ -418,7 +434,27 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   else {
     edm::LogWarning("InvHiggsInfoProducer") << "No trigger data/MC corrections - all weights will be 1"<<std::endl;
   }
-  
+ 
+  // check lepton eff weight hists exists, and add weights if they do
+  std::string leptCorrFile = iConfig.getUntrackedParameter<std::string>("leptCorrFile","");
+  if (stat(leptCorrFile.c_str(), &buf) != -1) {
+    std::cout << "Reading lepton efficiency corrections from " << leptCorrFile << std::endl;
+    fLeptCorr_            = TFile::Open(leptCorrFile.c_str());
+    // Central scale factors
+    hLeptCorrEleTight_    = (TH2D*) fLeptCorr_->Get("ele_tight_id");
+    hLeptCorrMuTight_     = (TH2D*) fLeptCorr_->Get("mu_tight_eff");
+    hLeptCorrEleVetoData_ = (TH2D*) fLeptCorr_->Get("ele_veto_id_data_eff");
+    hLeptCorrEleVetoMC_   = (TH2D*) fLeptCorr_->Get("ele_veto_id_mc_eff");
+    hLeptCorrMuVetoData_  = (TH2D*) fLeptCorr_->Get("mu_loose_data_eff");
+    hLeptCorrMuVetoMC_    = (TH2D*) fLeptCorr_->Get("mu_loose_mc_eff");
+    // + error scale factors
+
+    // - error scale factos 
+    doLeptCorr_ = true;
+  } else {
+    edm::LogWarning("InvHiggsInfoProducer") << "No lepton efficiency corrections - all weights will be 1" << std::endl;
+  }
+
 }
 
 
@@ -640,7 +676,14 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   if (wEls.isValid()) doWs(*wEls, 2);
 
-  if (! iEvent.eventAuxiliary().isRealData()) doTrigCorrWeights();
+  if (! iEvent.eventAuxiliary().isRealData()) {
+    doTrigCorrWeights();
+
+    edm::Handle<GenParticleCollection> genParticles;
+    iEvent.getByLabel(genParticleTag_, genParticles);
+    if (doLeptCorr_ && muons.isValid() && electrons.isValid() && looseMuons.isValid() && looseElectrons.isValid() && genParticles.isValid()) 
+      doLeptonCorrWeights(*muons, *electrons, *looseMuons, *looseElectrons, *genParticles);
+  }
 
   // fill TInfo
   tree_->Fill();
@@ -1065,6 +1108,65 @@ void InvHiggsInfoProducer::doTrigCorrWeights() {
   }
 
   info_->trigCorrWeight = weight;
+
+}
+
+void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tightMuons,   //Tight muons
+    const std::vector<pat::Electron>& tightElectrons,        //Tight electrons
+    const std::vector<pat::Muon>& looseMuons,               //Loose muons
+    const std::vector<pat::Electron>& looseElectrons,       //Loose electrons
+    const GenParticleCollection& genParticles) {
+
+  double eleWeight(1.), muWeight(1.);
+  std::cout << "Starting leptonWeights" << std::endl;
+  // Loop through tight mu and e first
+  for (unsigned e = 0; e < tightElectrons.size(); e++){
+    int bin = hLeptCorrEleTight_->FindBin(tightElectrons.at(e).pt(),tightElectrons.at(e).eta());
+    eleWeight *= hLeptCorrEleTight_->GetBinContent(bin);
+  }
+
+  for (unsigned m = 0; m < tightMuons.size(); m++){
+    int bin = hLeptCorrMuTight_->FindBin(tightMuons.at(m).pt(),tightMuons.at(m).eta());
+    muWeight *= hLeptCorrMuTight_->GetBinContent(bin);
+    std::cout << "mu: " << tightMuons.at(m).pt() << " eta: " << tightMuons.at(m).eta() << " SF: " << hLeptCorrMuTight_->GetBinContent(bin) <<std::endl;
+  }
+
+  // Loop through veto e & mu
+  // Since we veto on veto e/mu, we instead use the genParticles
+  // to apply a correction (1-eff_data)/(1-eff_mc)
+  for(size_t i = 0; i < genParticles.size(); i++) {
+      const GenParticle & p = genParticles[i];
+
+      std::cout << "gen ele " << p.status() << "  " << p.pdgId() << "  " << p.eta() << std::endl;
+      if (p.status() != 3) continue;
+
+      // ele
+      if ((fabs(p.pdgId())==11) && (p.pt()>10.) && (fabs(p.eta())<2.4)){
+        int bin = hLeptCorrEleVetoData_->FindBin(p.pt(),fabs(p.eta()));
+        eleWeight *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
+        std::cout << "gen ele " << p.status() << "  " << p.pt() << "  " << p.eta() << " " << hLeptCorrEleVetoData_->GetBinContent(bin)<< "  " << hLeptCorrEleVetoMC_->GetBinContent(bin)<< "  " << std::endl;
+      }
+
+      // mu
+      if ((fabs(p.pdgId())==13) && (p.pt()>10.) && (fabs(p.eta())<2.1)){
+        int bin = hLeptCorrMuVetoData_->FindBin(p.pt(),fabs(p.eta()));
+        muWeight *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
+      }
+
+      // tau
+      if (fabs(p.pdgId()) ==15){
+        std::cout << "TAU MOFO" << std::endl;
+        for(int j=0;p.daughter(j)!=NULL;j++){
+          const reco::Candidate* pl = p.daughter(j);  
+          // if (pl->status() == 3 && )
+          std::cout << pl->status() << "  " <<pl->pdgId() << "  " << pl->pt() << "  " << pl->eta() << std::endl;
+        }
+      }
+  }
+
+  info_->eleEffCorr  = eleWeight;
+  info_->muEffCorr   = muWeight;
+  info_->leptEffCorr = muWeight*eleWeight;
 
 }
 

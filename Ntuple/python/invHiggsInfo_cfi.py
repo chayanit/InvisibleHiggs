@@ -52,6 +52,8 @@ invHiggsInfo = cms.EDAnalyzer(
     puDataHist = cms.untracked.string(""),
 
     # trigger MC re-weighting
-    trigCorrFile = cms.untracked.string("")
+    trigCorrFile = cms.untracked.string(""),
     
+    # lepton efficiency scale factors
+    leptCorrFile = cms.untracked.string("")
 )

@@ -88,34 +88,40 @@ void MakeLeptonWeightHistos(){
     makeHists("ele_tight_id.txt",outputFile);
     makeHists("ele_veto_id_data_eff.txt",outputFile);
     makeHists("ele_veto_id_mc_eff.txt",outputFile);
+    
     // makeHists("mu_loose_id_SF.txt",outputFile);
     makeHists("mu_loose_id_data_eff.txt",outputFile);
     makeHists("mu_loose_id_mc_eff.txt",outputFile);
     // makeHists("mu_loose_iso_SF.txt",outputFile);
     makeHists("mu_loose_iso_data_eff.txt",outputFile);
     makeHists("mu_loose_iso_mc_eff.txt",outputFile);
+
     makeHists("mu_tight_id_SF.txt",outputFile);
-    makeHists("mu_tight_id_data_eff.txt",outputFile);
-    makeHists("mu_tight_id_mc_eff.txt",outputFile);
+    // makeHists("mu_tight_id_data_eff.txt",outputFile);
+    // makeHists("mu_tight_id_mc_eff.txt",outputFile);
     makeHists("mu_tight_iso_SF.txt",outputFile);
-    makeHists("mu_tight_iso_data_eff.txt",outputFile);
-    makeHists("mu_tight_iso_mc_eff.txt",outputFile);
+    // makeHists("mu_tight_iso_data_eff.txt",outputFile);
+    // makeHists("mu_tight_iso_mc_eff.txt",outputFile);
     
-    // Multiply ID * ISO and store
+    // Multiply ID * ISO for mu and store
+    // Loose
     std::string dataMc[] = {"data","mc"};
-    std::string tightLoose[] = {"tight","loose"};
     std::string post[] = {"","_errUp","_errDown"};
-    for (int i =0; i < 2; i++){
-        for (int j =0; j<2; j++){
-            for (int k = 0; k < 3; k++){
-                TH2D* temp = ((TH2D*) outputFile->Get(("mu_"+tightLoose[i]+"_id_"+dataMc[j]+"_eff"+post[k]).c_str())); 
-                temp->Multiply((TH2D*) outputFile->Get(("mu_"+tightLoose[i]+"_iso_"+dataMc[j]+"_eff"+post[k]).c_str()));
-                temp->SetName(("mu_"+tightLoose[i]+"_"+dataMc[j]+"_eff"+post[k]).c_str());
-                temp->Write();
-                delete temp;
-            }
+    for (int j =0; j<2; j++){
+        for (int k = 0; k < 3; k++){
+            TH2D* temp = ((TH2D*) outputFile->Get(("mu_loose_id_"+dataMc[j]+"_eff"+post[k]).c_str())); 
+            temp->Multiply((TH2D*) outputFile->Get(("mu_loose_iso_"+dataMc[j]+"_eff"+post[k]).c_str()));
+            temp->SetName(("mu_loose_"+dataMc[j]+"_eff"+post[k]).c_str());
+            temp->Write();
+            delete temp;
         }
     }
+    // Tight
+    TH2D* muTight = (TH2D*) outputFile->Get("mu_tight_id_SF");
+    muTight->Multiply((TH2D*) outputFile->Get("mu_tight_iso_SF"));
+    muTight->SetName("mu_tight_eff");
+    muTight->Write();
+
     outputFile->ls();
     outputFile->Close();
 }

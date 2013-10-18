@@ -17,6 +17,8 @@ process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
 
 process.invHiggsInfo.trigCorrFile   = cms.untracked.string("DataMCWeight_53X_v1.root")
 
+process.invHiggsInfo.leptCorrFile   = cms.untracked.string("../data/leptonWeights.root")
+
 process.TFileService.fileName = cms.string('invHiggsInfo_MC.root')
 
 

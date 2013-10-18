@@ -236,6 +236,11 @@ class InvHiggsInfo { //: public TObject {
   // MC corrections
   Double_t trigCorrWeight;
 
+  // Lepton ID efficiency corrections
+  Double_t eleEffCorr;
+  Double_t muEffCorr;
+  Double_t leptEffCorr;
+
   // MC jets
   Double_t genJet1Pt;
   Double_t genJet1Eta;
