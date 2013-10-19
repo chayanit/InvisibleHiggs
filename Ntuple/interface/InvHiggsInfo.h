@@ -240,6 +240,12 @@ class InvHiggsInfo { //: public TObject {
   Double_t eleEffCorr;
   Double_t muEffCorr;
   Double_t leptEffCorr;
+  Double_t eleEffCorrErrUp;
+  Double_t muEffCorrErrUp;
+  Double_t leptEffCorrErrUp;
+  Double_t eleEffCorrErrDown;
+  Double_t muEffCorrErrDown;
+  Double_t leptEffCorrErrDown;
 
   // MC jets
   Double_t genJet1Pt;

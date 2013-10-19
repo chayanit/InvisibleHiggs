@@ -89,38 +89,32 @@ void MakeLeptonWeightHistos(){
     makeHists("ele_veto_id_data_eff.txt",outputFile);
     makeHists("ele_veto_id_mc_eff.txt",outputFile);
     
-    // makeHists("mu_loose_id_SF.txt",outputFile);
     makeHists("mu_loose_id_data_eff.txt",outputFile);
     makeHists("mu_loose_id_mc_eff.txt",outputFile);
-    // makeHists("mu_loose_iso_SF.txt",outputFile);
     makeHists("mu_loose_iso_data_eff.txt",outputFile);
     makeHists("mu_loose_iso_mc_eff.txt",outputFile);
 
     makeHists("mu_tight_id_SF.txt",outputFile);
-    // makeHists("mu_tight_id_data_eff.txt",outputFile);
-    // makeHists("mu_tight_id_mc_eff.txt",outputFile);
     makeHists("mu_tight_iso_SF.txt",outputFile);
-    // makeHists("mu_tight_iso_data_eff.txt",outputFile);
-    // makeHists("mu_tight_iso_mc_eff.txt",outputFile);
     
     // Multiply ID * ISO for mu and store
-    // Loose
-    std::string dataMc[] = {"data","mc"};
     std::string post[] = {"","_errUp","_errDown"};
-    for (int j =0; j<2; j++){
-        for (int k = 0; k < 3; k++){
+    std::string dataMc[] = {"data","mc"};
+    for (int k = 0; k < 3; k++){
+        for (int j =0; j<2; j++){
+            // Loose
             TH2D* temp = ((TH2D*) outputFile->Get(("mu_loose_id_"+dataMc[j]+"_eff"+post[k]).c_str())); 
             temp->Multiply((TH2D*) outputFile->Get(("mu_loose_iso_"+dataMc[j]+"_eff"+post[k]).c_str()));
             temp->SetName(("mu_loose_"+dataMc[j]+"_eff"+post[k]).c_str());
             temp->Write();
             delete temp;
         }
+        // Tight
+        TH2D* muTight = (TH2D*) outputFile->Get(("mu_tight_id_SF"+post[k]).c_str());
+        muTight->Multiply((TH2D*) outputFile->Get(("mu_tight_iso_SF"+post[k]).c_str()));
+        muTight->SetName(("mu_tight_eff"+post[k]).c_str());
+        muTight->Write();        
     }
-    // Tight
-    TH2D* muTight = (TH2D*) outputFile->Get("mu_tight_id_SF");
-    muTight->Multiply((TH2D*) outputFile->Get("mu_tight_iso_SF"));
-    muTight->SetName("mu_tight_eff");
-    muTight->Write();
 
     outputFile->ls();
     outputFile->Close();
