@@ -27,7 +27,7 @@ process.TFileService.fileName = cms.string('invHiggsInfo_MC.root')
 # change Global Tag
 process.GlobalTag.globaltag = 'START53_V7G::All'
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
 # input files
 readFiles = cms.untracked.vstring()

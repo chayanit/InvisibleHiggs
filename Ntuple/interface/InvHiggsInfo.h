@@ -237,15 +237,26 @@ class InvHiggsInfo { //: public TObject {
   Double_t trigCorrWeight;
 
   // Lepton ID efficiency corrections
-  Double_t eleEffCorr;
-  Double_t muEffCorr;
-  Double_t leptEffCorr;
-  Double_t eleEffCorrErrUp;
-  Double_t muEffCorrErrUp;
-  Double_t leptEffCorrErrUp;
-  Double_t eleEffCorrErrDown;
-  Double_t muEffCorrErrDown;
-  Double_t leptEffCorrErrDown;
+  // Tight (for control regions)
+  Double_t eleTightCorr;
+  Double_t muTightCorr;
+  Double_t leptTightCorr;
+  Double_t eleTightCorrErrUp;
+  Double_t muTightCorrErrUp;
+  Double_t leptTightCorrErrUp;
+  Double_t eleTightCorrErrDown;
+  Double_t muTightCorrErrDown;
+  Double_t leptTightCorrErrDown;
+  // Veto (for signal region)
+  Double_t eleVetoCorr;
+  Double_t muVetoCorr;
+  Double_t leptVetoCorr;
+  Double_t eleVetoCorrErrUp;
+  Double_t muVetoCorrErrUp;
+  Double_t leptVetoCorrErrUp;
+  Double_t eleVetoCorrErrDown;
+  Double_t muVetoCorrErrDown;
+  Double_t leptVetoCorrErrDown;
 
   // MC jets
   Double_t genJet1Pt;
