@@ -19,13 +19,13 @@ iHLTFilter  = "MET"
 
 #MCSignal or Background if True, PDF will be collected (Not applied yet)
 #No meaning if iRunData = True
-iMCSignal   = False  
+iMCSignal   = True  
 
-iFile	    = '/store/mc/Summer12_DR53X/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/7CDFA60D-29CF-E111-9D37-002481E150EA.root'
-#iFile       = '/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/BE502377-92D1-E111-B1B6-0025B3E0656C.root'
+#iFile	    = '/store/mc/Summer12_DR53X/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/7CDFA60D-29CF-E111-9D37-002481E150EA.root'
+iFile       = '/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/BE502377-92D1-E111-B1B6-0025B3E0656C.root'
 #iFile       = '/store/data/Run2012C/MET/AOD/PromptReco-v2/000/203/002/04BCEC26-AA02-E211-A81D-003048CF99BA.root'
 
-iMaxEvent   = 10000 
+iMaxEvent   = 500 
 
 #Dump configuration (Used to check configuration)
 iDump       = True
@@ -47,11 +47,11 @@ if iDump == True:
         iFileName += "_"
     else:
         if iMCSignal == True:
-            iFileName += "_MCSignal_"
+            iFileName += "_DY_"
         else:
             iFileName += "_MC_"
     iFileName += iHLTFilter
-    iFileName += "_cfg.py"
+    iFileName += "_Central_cfg.py"
     file = open(iFileName,'w')
     file.write(str(process.dumpPython()))
     file.close()
