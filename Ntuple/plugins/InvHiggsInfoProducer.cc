@@ -1163,7 +1163,6 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
   double eleVetoWeightErrUp(1.), muVetoWeightErrUp(1.);
   double eleVetoWeightErrDown(1.), muVetoWeightErrDown(1.);
 
-  std::cout << "Starting leptonWeights" << std::endl;
   // Loop through tight mu and e first
   for (unsigned e = 0; e < tightElectrons.size(); e++){
     int bin = hLeptCorrEleTight_->FindBin(tightElectrons.at(e).pt(),fabs(tightElectrons.at(e).eta()));
@@ -1177,9 +1176,6 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
     muTightWeight        *= hLeptCorrMuTight_->GetBinContent(bin);
     muTightWeightErrUp   *= hLeptCorrMuTightErrUp_->GetBinContent(bin);
     muTightWeightErrDown *= hLeptCorrMuTightErrDown_->GetBinContent(bin);
-    std::cout << "mu: " << tightMuons.at(m).pt() << " eta: " << tightMuons.at(m).eta() << " SF: " << hLeptCorrMuTight_->GetBinContent(bin) <<std::endl;
-    std::cout << "mu +: " << tightMuons.at(m).pt() << " eta: " << tightMuons.at(m).eta() << " SF: " << hLeptCorrMuTightErrUp_->GetBinContent(bin) <<std::endl;
-    std::cout << "mu -: " << tightMuons.at(m).pt() << " eta: " << tightMuons.at(m).eta() << " SF: " << hLeptCorrMuTightErrDown_->GetBinContent(bin) <<std::endl;
   }
 
   // Loop through veto e & mu
@@ -1190,6 +1186,8 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
   // Not leptons in jets
   // So we can't just loop over all status 1 leptons, as that includes leptons in jets
   // Instead we look for status 3 (hard part) for immediate W-e/mu, and then loop through tau daughters for lepton (status 1 or 2?)
+  // Note that if the tau does decay leptonically it'll do so by tau(status 3) - taus (status 2) - e/mu (stauts 1)
+  // You don't need to descend further
 
   for(size_t i = 0; i < genParticles.size(); i++) {
     const GenParticle & p = genParticles[i];
@@ -1203,7 +1201,6 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
       eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
       eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
       eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
-      std::cout << "gen ele " << p.status() << "  " << p.pt() << "  " << p.eta() << " " << hLeptCorrEleVetoData_->GetBinContent(bin)<< "  " << hLeptCorrEleVetoMC_->GetBinContent(bin)<< "  " << (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin)) << std::endl;
     }
 
     // mu
@@ -1212,51 +1209,32 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
       muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
       muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
       muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
-      std::cout << "gen mu " << p.status() << "  " << p.pt() << "  " << p.eta() << " " << hLeptCorrMuVetoData_->GetBinContent(bin)<< "  " << hLeptCorrMuVetoMC_->GetBinContent(bin)<< "  " << (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin)) << std::endl;
     }
 
     // tau
     if (fabs(p.pdgId()) ==15){
-      std::cout << "TAU MOFO" << std::endl;
-      for(int j=0;p.daughter(j)!=NULL;j++){
+      const reco::Candidate* pl = p.daughter(0); // this is the status 2 tau 
+      
+      for(int k=0;pl->daughter(k)!=NULL;k++){ 
+        const reco::Candidate* pla = pl->daughter(k);  
+      
+        if ((fabs(pla->pdgId())==11) && (pla->status()==1) && (pla->pt()>10.) && (fabs(pla->eta())<2.4)) {
+          int bin = hLeptCorrEleVetoData_->FindBin(pla->pt(),fabs(pla->eta()));
+          eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
+          eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
+          eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
+        }
 
-        const reco::Candidate* pl = p.daughter(j);  
-        std::cout << pl->status() << "  " <<pl->pdgId() << "  " << pl->pt() << "  " << pl->eta() << "  " << pl->numberOfDaughters() << std::endl;
-        
-        for(int k=0;pl->daughter(k)!=NULL;k++){
-        
-          const reco::Candidate* pla = pl->daughter(k);  
-          // std::cout << "- " << pla->status() << "  " <<pla->pdgId() << "  " << pla->pt() << "  " << pla->eta() << "  " << pla->numberOfDaughters() << std::endl;
-        
-          if ((fabs(pla->pdgId())==11) && (pla->status()==1) && (pla->pt()>10.) && (fabs(pla->eta())<2.4)) {
-            std::cout << "found e " << std::endl;
-            int bin = hLeptCorrEleVetoData_->FindBin(pla->pt(),fabs(pla->eta()));
-            eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
-            eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
-            eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
-            // std::cout << "gen ele " << pla->status() << "  " << pla->pt() << "  " << pla->eta() << " " << hLeptCorrEleVetoData_->GetBinContent(bin)<< "  " << hLeptCorrEleVetoMC_->GetBinContent(bin)<< "  " << std::endl;
-          }
-
-          if ((fabs(pla->pdgId())==13) && (pla->status()==1) && (pla->pt()>10.) && (fabs(pla->eta())<2.1)){
-            std::cout << "found e " << std::endl;
-            int bin = hLeptCorrMuVetoData_->FindBin(pla->pt(),fabs(pla->eta()));
-            muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
-            muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
-            muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
-            std::cout << "gen mu " << pla->status() << "  " << pla->pt() << "  " << pla->eta() << " " << hLeptCorrMuVetoData_->GetBinContent(bin)<< "  " << hLeptCorrMuVetoMC_->GetBinContent(bin)<< "  " << (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin)) << std::endl; 
-          }
-
-
-          // for(int l=0;pla->daughter(l)!=NULL;l++){
-            // const reco::Candidate* plb = pla->daughter(k);  
-            // std::cout << "-- " << plb->status() << "  " <<plb->pdgId() << "  " << plb->pt() << "  " << plb->eta() << "  " << plb->numberOfDaughters() << std::endl;
-          // }
+        if ((fabs(pla->pdgId())==13) && (pla->status()==1) && (pla->pt()>10.) && (fabs(pla->eta())<2.1)){
+          int bin = hLeptCorrMuVetoData_->FindBin(pla->pt(),fabs(pla->eta()));
+          muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
+          muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
+          muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
         }
       }
     }
   }
-  std::cout << "MU TIGHT WEIGHT: " << muTightWeight <<std::endl;
-  std::cout << "MU VETO WEIGHT: " << muVetoWeight <<std::endl;
+
   // Store tight weights
   info_->eleTightCorr         = eleTightWeight;
   info_->muTightCorr          = muTightWeight;
