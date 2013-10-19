@@ -17,7 +17,7 @@ process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
 
 process.invHiggsInfo.trigCorrFile   = cms.untracked.string("DataMCWeight_53X_v1.root")
 
-process.invHiggsInfo.leptCorrFile   = cms.untracked.string("../data/leptonWeights.root")
+process.invHiggsInfo.leptCorrFile   = cms.untracked.string("leptonWeights.root")
 
 process.TFileService.fileName = cms.string('invHiggsInfo_MC.root')
 
@@ -34,17 +34,6 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 process.source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [
-        # 'file:patTuple.root'
-        'file:./WJets/patTuple_50_1_j4e.root',
-        'file:./WJets/patTuple_51_1_kpE.root',
-        'file:./WJets/patTuple_52_1_svD.root',
-        'file:./WJets/patTuple_53_1_hfc.root',
-        'file:./WJets/patTuple_54_1_mT3.root',
-        'file:./WJets/patTuple_55_1_HTT.root',
-        'file:./WJets/patTuple_56_1_xYR.root',
-        'file:./WJets/patTuple_57_1_h61.root',
-        'file:./WJets/patTuple_58_1_1tn.root',
-        'file:./WJets/patTuple_59_1_iYE.root',
-        'file:./WJets/patTuple_5_1_67b.root'
+        'file:patTuple.root'
     ] );
 
