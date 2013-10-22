@@ -19,7 +19,7 @@ iHLTFilter  = "MET"
 
 #MCSignal or Background if True, PDF will be collected (Not applied yet)
 #No meaning if iRunData = True
-iMCSignal   = True  
+iMCSignal   = False
 
 #iFile	    = '/store/mc/Summer12_DR53X/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/7CDFA60D-29CF-E111-9D37-002481E150EA.root'
 iFile       = '/store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/BE502377-92D1-E111-B1B6-0025B3E0656C.root'

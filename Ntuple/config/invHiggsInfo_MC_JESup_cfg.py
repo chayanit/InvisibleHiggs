@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 from InvisibleHiggs.Ntuple.invHiggsInfo_Master_cfg import *
 
 # Jet/MET uncertainty
-process.invHiggsInfo.jetTag      = cms.untracked.InputTag("shiftedGoodPatJetsEnUpForCorrMEt")
-process.invHiggsInfo.metTag      = cms.untracked.InputTag("patType1CorrectedPFMetJetEnUp")
+process.invHiggsInfo.jetTag      = cms.untracked.InputTag("shiftedGoodPatJetsEnUpForCorrMEtWithGaussian")
+process.invHiggsInfo.metTag      = cms.untracked.InputTag("patType1CorrectedPFMetJetEnUpWithGaussian")
 process.invHiggsInfo.puJetMvaTag = cms.untracked.InputTag("puJetMvaEnUp", "fullDiscriminant")
 process.invHiggsInfo.puJetIdTag  = cms.untracked.InputTag("puJetMvaEnUp", "fullId")
  
@@ -16,6 +16,8 @@ process.invHiggsInfo.puDataHist  = cms.untracked.string("pileup")
 process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
 
 process.invHiggsInfo.trigCorrFile   = cms.untracked.string("DataMCWeight_53X_v1.root")
+
+process.invHiggsInfo.leptCorrFile   = cms.untracked.string("leptonWeights.root")
 
 process.TFileService.fileName = cms.string('invHiggsInfo_MC.root')
 
