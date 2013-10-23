@@ -20724,7 +20724,7 @@ process.selectedPatJetsForMETtype1p2CorrResDownNoGaussian = cms.EDProducer("Smea
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
+    sigmaMaxGenJetMatch = cms.double(3.0)
 )
 
 
@@ -20809,7 +20809,7 @@ process.selectedPatJetsForMETtype1p2CorrResDownWithGaussian = cms.EDProducer("Sm
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
+    sigmaMaxGenJetMatch = cms.double(3.0)
 )
 
 
@@ -20894,7 +20894,7 @@ process.selectedPatJetsForMETtype1p2CorrResUpNoGaussian = cms.EDProducer("Smeare
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
+    sigmaMaxGenJetMatch = cms.double(3.0)
 )
 
 
@@ -20979,7 +20979,7 @@ process.selectedPatJetsForMETtype1p2CorrResUpWithGaussian = cms.EDProducer("Smea
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
+    sigmaMaxGenJetMatch = cms.double(3.0)
 )
 
 
@@ -22192,7 +22192,7 @@ process.smearedGoodPatJetsNoGaussian = cms.EDProducer("SmearedPATJetProducer",
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
+    sigmaMaxGenJetMatch = cms.double(3.0)
 )
 
 
@@ -22276,7 +22276,7 @@ process.smearedGoodPatJetsResDownNoGaussian = cms.EDProducer("SmearedPATJetProdu
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0),
+    sigmaMaxGenJetMatch = cms.double(3.0),
     shiftBy = cms.double(1.0)
 )
 
@@ -22361,7 +22361,7 @@ process.smearedGoodPatJetsResDownWithGaussian = cms.EDProducer("SmearedPATJetPro
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0),
+    sigmaMaxGenJetMatch = cms.double(3.0),
     shiftBy = cms.double(1.0)
 )
 
@@ -22446,7 +22446,7 @@ process.smearedGoodPatJetsResUpNoGaussian = cms.EDProducer("SmearedPATJetProduce
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0),
+    sigmaMaxGenJetMatch = cms.double(3.0),
     shiftBy = cms.double(-1.0)
 )
 
@@ -22531,7 +22531,7 @@ process.smearedGoodPatJetsResUpWithGaussian = cms.EDProducer("SmearedPATJetProdu
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0),
+    sigmaMaxGenJetMatch = cms.double(3.0),
     shiftBy = cms.double(-1.0)
 )
 
@@ -22616,7 +22616,7 @@ process.smearedGoodPatJetsWithGaussian = cms.EDProducer("SmearedPATJetProducer",
     skipJetSelection = cms.string('jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'),
     dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
     lutName = cms.string('pfJetResolutionMCtoDataCorrLUT'),
-    sigmaMaxGenJetMatch = cms.double(5.0)
+    sigmaMaxGenJetMatch = cms.double(3.0)
 )
 
 
