@@ -17,6 +17,7 @@ class ProgramOptions{
   int qcdMethod;
   int wTauMethod;
   bool doMCFMWeights;
+  std::string leptCorr;
   
 };
 

@@ -11,7 +11,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
   datasetFile(""),
   lumi(0.),
   qcdMethod(1),
-  doMCFMWeights(false)
+  doMCFMWeights(false),
+  leptCorr("off")
  {
 
   namespace po = boost::program_options;
@@ -26,7 +27,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
     ("lumi,l", po::value<double>(), "Integrated luminosity")
     ("qcd,q", po::value<int>(), "QCD method")
     ("tau,t", po::value<int>(), "W->tau method")
-    ("mcfmWeights,m", po::value<bool>(), "apply MCFM re-weighting");
+    ("mcfmWeights,m", po::value<bool>(), "apply MCFM re-weighting")
+    ("leptCorr,c", po::value<std::string>(), "apply lepton corrections, options are off (default), central, elUp, elDown, muUp, muDown. You can't do both (yet).");
 
   po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  
@@ -45,6 +47,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
   if (vm.count("qcd"))        qcdMethod=vm["qcd"].as<int>();
   if (vm.count("tau"))        wTauMethod=vm["tau"].as<int>();
   if (vm.count("mcfmWeights")) doMCFMWeights=vm["mcfmWeights"].as<bool>();
+  if (vm.count("leptCorr"))   leptCorr=vm["leptCorr"].as<std::string>();
 
   // create output directory if it doesn't exist already
   if (oDir!="") {

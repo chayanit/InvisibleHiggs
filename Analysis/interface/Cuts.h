@@ -2,7 +2,7 @@
 #define Cuts_h
 
 #include "TCut.h"
-
+#include <iostream>
 
 class Cuts {
  public:
@@ -55,6 +55,12 @@ class Cuts {
 
   // special weight for W MC
   TCut wWeight();
+  
+  // return correct lepton weights dep on user option
+  TCut elTightWeight(std::string option);
+  TCut elVetoWeight(std::string option);
+  TCut muTightWeight(std::string option);
+  TCut muVetoWeight(std::string option);
 
   // combinations
   TCut HLTandMETFilters();
