@@ -59,10 +59,8 @@ int main(int argc, char* argv[]) {
   TCut elVetoWeight = cuts.elVetoWeight(options.leptCorr);
   TCut muVetoWeight = cuts.muVetoWeight(options.leptCorr);
 
-  // TCut puWeight("puWeight");
-  TCut puWeight("1.");
-  // TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
-  TCut trigCorrWeight( "1." );
+  TCut puWeight("puWeight");
+  TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
 
   // Cuts for control plots
   // Get puWeight etc added below if necessary
@@ -147,8 +145,8 @@ int main(int argc, char* argv[]) {
     TH1D* hWTau_MCC_CJV_DPhi_tmp    = new TH1D("hWTau_MCC_CJV_DPhi_tmp",    "", 3, dphiEdges);  // W+jets MC ctrl region
 
     // Weight to lumi
-    // double weight = (dataset.isData) ? 1. : (lumi * dataset.sigma / dataset.nEvents);
-    double weight = 1.;
+    double weight = (dataset.isData) ? 1. : (lumi * dataset.sigma / dataset.nEvents);
+    // double weight = 1.;
 
     ///////////////////////////////
     // Now do some hist filling! //
@@ -182,7 +180,7 @@ int main(int argc, char* argv[]) {
       	  wWeight     = yStarWeight * mjjWeight * cuts.wWeight();
       	}
       	else {
-      	  // wWeight     = cuts.wWeight();
+      	  wWeight     = cuts.wWeight();
       	}
       }
 
@@ -265,12 +263,12 @@ int main(int argc, char* argv[]) {
         	if (options.doMCFMWeights) {
           	yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/(sqrt(zgenmass*zgenmass + zgenpt*zgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
           	mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
-		}
+      		}
         }
 
-	otherCuts *= yStarWeight * mjjWeight;
+      	otherCuts *= yStarWeight * mjjWeight;
 
-	// Setup control plot cuts 
+      	// Setup control plot cuts 
       	cutTightMjj        = otherCuts * (cutD + cutTightMjj_basic);
       	cutDPhiSignalNoCJV = otherCuts * (cutD + cutDPhiSignalNoCJV_basic);
 
