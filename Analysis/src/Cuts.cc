@@ -223,7 +223,7 @@ TCut Cuts::elTightWeight(std::string option){
   } else if (option == "elDown"){
     std::cout << "Using electron tight weights, errDown" << std::endl;
     tmp="(eleTightCorrErrDown > 0.) ? eleTightCorrErrDown : 1.";
-  } else{
+  } else {
     std::cout << "Using central electron tight weights" << std::endl;
     tmp="(eleTightCorr > 0.) ? eleTightCorr : 1.";
   }
@@ -249,7 +249,7 @@ TCut Cuts::elVetoWeight(std::string option){
 
 TCut Cuts::muTightWeight(std::string option){
   TCut tmp("");
-  if (option == "central"){
+  if (option == "off"){
     std::cout << "Not using muon tight weights" << std::endl;
   } else if (option == "muUp"){
     std::cout << "Using muon tight weights, errUp" << std::endl;
