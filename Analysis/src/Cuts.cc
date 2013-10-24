@@ -259,7 +259,7 @@ TCut Cuts::muVetoWeight(std::string option){
   TCut tmp("");
   if (option == "central"){
     std::cout << "Using muon veto weights" << std::endl;
-    tmp="muVetoCorr";
+    tmp="(muVetoCorr > 0.) ? muVetoCorr : 1.";
   } else if (option == "muUp"){
     std::cout << "Using muon veto weights, errUp" << std::endl;
     tmp="muVetoCorrErrUp";
