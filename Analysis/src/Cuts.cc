@@ -205,17 +205,21 @@ TCut Cuts::wWeight() {
 
 // bunch of methods to return the correct lepton weights
 // split up because you want to apply certain weights in certain regions
+// use the conditonal form, in case 
+// a) 1-eff_MC = 0, in which case you get NaN (>0 stops this)
+// b) eff_MC or eff_data > 1, in which case either denominator or numerator is < 0, SF < 0
+
 TCut Cuts::elTightWeight(std::string option){
   TCut tmp("");
   if (option == "central"){
     std::cout << "Using electron tight weights" << std::endl;
-    tmp="eleTightCorr";
+    tmp="(eleTightCorr > 0.) ? eleTightCorr : 1.";
   } else if (option == "elUp"){
     std::cout << "Using electron tight weights, errUp" << std::endl;
-    tmp="eleTightCorrErrUp";
+    tmp="(eleTightCorrErrUp > 0.) ? eleTightCorrErrUp : 1.";
   } else if (option == "elDown"){
     std::cout << "Using electron tight weights, errDown" << std::endl;
-    tmp="eleTightCorrErrDown";
+    tmp="(eleTightCorrErrDown > 0.) ? eleTightCorrErrDown : 1.";
   } else
     std::cout << "Not using electron tight weights" << std::endl;
   return tmp;
@@ -225,13 +229,13 @@ TCut Cuts::elVetoWeight(std::string option){
   TCut tmp("");
   if (option == "central"){
     std::cout << "Using electron veto weights" << std::endl;
-    tmp="eleVetoCorr";
+    tmp="(eleVetoCorr > 0.) ? eleVetoCorr : 1.";
   } else if (option == "elUp"){
     std::cout << "Using electron veto weights, errUp" << std::endl;
-    tmp="eleVetoCorrErrUp";
+    tmp="(eleVetoCorrErrUp > 0.) ? eleVetoCorrErrUp : 1.";
   } else if (option == "elDown"){
     std::cout << "Using electron veto weights, errDown" << std::endl;
-    tmp="eleVetoCorrErrDown";
+    tmp="(eleVetoCorrErrDown > 0.) ? eleVetoCorrErrDown : 1.";
   } else
     std::cout << "Not using electron veto weights" << std::endl;
 
@@ -242,13 +246,13 @@ TCut Cuts::muTightWeight(std::string option){
   TCut tmp("");
   if (option == "central"){
     std::cout << "Using muon tight weights" << std::endl;
-    tmp="muTightCorr";
+    tmp="(muTightCorr > 0.) ? muTightCorr : 1.";
   } else if (option == "muUp"){
     std::cout << "Using muon tight weights, errUp" << std::endl;
-    tmp="muTightCorrErrUp";
+    tmp="(muTightCorrErrUp > 0.) ? muTightCorrErrUp : 1.";
   } else if (option == "muDown"){
     std::cout << "Using muon tight weights, errDown" << std::endl;
-    tmp="muTightCorrErrDown";
+    tmp="(muTightCorrErrDown > 0.) ? muTightCorrErrDown : 1.";
   } else
     std::cout << "Not using muon tight weights" << std::endl;
   
@@ -262,10 +266,10 @@ TCut Cuts::muVetoWeight(std::string option){
     tmp="(muVetoCorr > 0.) ? muVetoCorr : 1.";
   } else if (option == "muUp"){
     std::cout << "Using muon veto weights, errUp" << std::endl;
-    tmp="muVetoCorrErrUp";
+    tmp="(muVetoCorrErrUp > 0.) ? muVetoCorrErrUp : 1.";
   } else if (option == "muDown"){
     std::cout << "Using muon veto weights, errDown" << std::endl;
-    tmp="muVetoCorrErrDown";
+    tmp="(muVetoCorrErrDown > 0.) ? muVetoCorrErrDown : 1.";
   } else
     std::cout << "Not using muon veto weights" << std::endl;
   return tmp;
