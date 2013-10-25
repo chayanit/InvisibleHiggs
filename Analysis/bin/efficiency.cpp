@@ -38,6 +38,10 @@ int main(int argc, char* argv[]) {
   Cuts cuts;
   unsigned nCuts = cuts.nCuts();
 
+  // For lepton weights
+  TCut elVetoWeight = cuts.elVetoWeight(options.leptCorr);
+  TCut muVetoWeight = cuts.muVetoWeight(options.leptCorr);
+
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/Efficiency.root")).c_str(), "RECREATE");
 
@@ -53,7 +57,7 @@ int main(int argc, char* argv[]) {
   TH1D* hWEWKEl  = new TH1D("hCutFlow_WEWKEl", "", nCuts, 0., nCuts);
   TH1D* hWEWKTau  = new TH1D("hCutFlow_WEWKTau", "", nCuts, 0., nCuts);
   TH1D* hSingleT = new TH1D("hCutFlow_SingleTSum", "", nCuts, 0., nCuts);
-  TH1D* hDYLL	 = new TH1D("hCutFlow_DYLL", "", nCuts, 0., nCuts);
+  TH1D* hDYLL  = new TH1D("hCutFlow_DYLL", "", nCuts, 0., nCuts);
   TH1D* hDiboson = new TH1D("hCutFlow_Diboson", "", nCuts, 0., nCuts);
 
   for (unsigned i=0; i<datasets.size(); ++i) {
@@ -73,11 +77,14 @@ int main(int argc, char* argv[]) {
     TCut trigCorrWeight("trigCorrWeight");
     //TCut trigCorrWeight("1.");
     TCut wWeight("");
+    TCut leptonWeight("");
+    if (!(dataset.isData)) leptonWeight = elVetoWeight*muVetoWeight;
+    
     if (dataset.name=="WJets" ||
-	dataset.name=="W1Jets" ||
-	dataset.name=="W2Jets" ||
-	dataset.name=="W3Jets" ||
-	dataset.name=="W4Jets") {
+  dataset.name=="W1Jets" ||
+  dataset.name=="W2Jets" ||
+  dataset.name=="W3Jets" ||
+  dataset.name=="W4Jets") {
       wWeight = cuts.wWeight();
       std::cout << "W MC weight : " << wWeight << std::endl; 
     }
@@ -99,16 +106,16 @@ int main(int argc, char* argv[]) {
       TCut cut, cutMu, cutEl, cutTau;
 
       if(c == nCuts-1) {
-      	cut    = puWeight * trigCorrWeight * wWeight * (cutD + cuts.cutflow(c));
-      	cutMu  = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wMuGen() + cuts.cutflow(c));
-      	cutEl  = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wElGen() + cuts.cutflow(c));
-      	cutTau = puWeight * trigCorrWeight * wWeight * (cutD + cuts.wTauGen() + cuts.cutflow(c));
+      	cut    = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.cutflow(c));
+      	cutMu  = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.wMuGen() + cuts.cutflow(c));
+      	cutEl  = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.wElGen() + cuts.cutflow(c));
+      	cutTau = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.wTauGen() + cuts.cutflow(c));
       }
       else {
-        cut    = puWeight * wWeight * (cutD + cuts.cutflow(c));
-        cutMu  = puWeight * wWeight * (cutD + cuts.wMuGen() + cuts.cutflow(c));
-        cutEl  = puWeight * wWeight * (cutD + cuts.wElGen() + cuts.cutflow(c));
-        cutTau = puWeight * wWeight * (cutD + cuts.wTauGen() + cuts.cutflow(c));
+        cut    = puWeight * wWeight * leptonWeight * (cutD + cuts.cutflow(c));
+        cutMu  = puWeight * wWeight * leptonWeight * (cutD + cuts.wMuGen() + cuts.cutflow(c));
+        cutEl  = puWeight * wWeight * leptonWeight * (cutD + cuts.wElGen() + cuts.cutflow(c));
+        cutTau = puWeight * wWeight * leptonWeight * (cutD + cuts.wTauGen() + cuts.cutflow(c));
       }
       //      std::cout << cut << std::endl;
 
