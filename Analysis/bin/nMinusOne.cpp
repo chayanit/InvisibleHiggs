@@ -43,6 +43,10 @@ int main(int argc, char* argv[]) {
   //TCut trigCorr("trigCorrWeight");
   TCut trigCorr("(trigCorrWeight>0) ? trigCorrWeight : 1.");
 
+  // For lepton weights
+  TCut elVetoWeight = cuts.elVetoWeight(options.leptCorr);
+  TCut muVetoWeight = cuts.muVetoWeight(options.leptCorr);
+
   TCut trig      = cuts.nMinusOneCuts("trigger");
   TCut metFilt   = cuts.nMinusOneCuts("metFilter");
   TCut eVeto     = cuts.nMinusOneCuts("EVeto");
@@ -116,7 +120,11 @@ int main(int argc, char* argv[]) {
       if(isWJets) wWeight =  cuts.wWeight();
     } 
 
-    TCut otherCuts = puWeight * trigCorr * wWeight;
+    // Add in lepton weights
+    TCut leptonWeight("");
+    if (!(dataset.isData)) leptonWeight = elVetoWeight*muVetoWeight;
+
+    TCut otherCuts = puWeight * trigCorr * wWeight * leptonWeight;
 
     // fill histograms
     int n = tree->Draw("hltResult2>>hTrigNM1", (trig + cutD) * otherCuts);
