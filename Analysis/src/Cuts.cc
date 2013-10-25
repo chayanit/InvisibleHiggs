@@ -240,7 +240,7 @@ TCut Cuts::elVetoWeight(std::string option){
   } else if (option == "elDown"){
     std::cout << "Using electron veto weights, errDown" << std::endl;
     tmp="(eleVetoCorrErrDown > 0.) ? eleVetoCorrErrDown : 1.";
-  } else{
+  } else {
     std::cout << "Using central electron veto weights" << std::endl;
     tmp="(eleVetoCorr > 0.) ? eleVetoCorr : 1.";
 }
