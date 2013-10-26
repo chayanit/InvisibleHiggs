@@ -27,7 +27,11 @@ This will check out and compile the complete Analysis and PAT/ntuple code. For n
 
 Running programs is easy:
 
-    <program name> -i <location of ntuples> -o <output folder> -l <luminosity> -f <location of dataset list>
+    <program name> -i <location of ntuples> -o <output folder> -l <luminosity> -f <location of dataset list> -c <lepton weight option>
+
+For the prompt data, luminosity = 19494. The dataset list is in the `data` folder. The lepton ID/iso corrections are ON by default. Other possible options are: `off`, `elUp`, `elDown`, `muUp`, `muDown`. The last 4 options have the other central lepton weight applied as well (e.g. `elUp` = electron error up weight + muon central weight).
+
+For a reminder of the program options, do `<program name> -h`.
 
 The program source files are stored in `Analysis/bin`. If you edit a program file, make sure you run `scram b` (in /Analysis) to re-compile.
 

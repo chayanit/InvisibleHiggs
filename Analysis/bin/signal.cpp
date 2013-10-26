@@ -43,7 +43,10 @@ int main(int argc, char* argv[]) {
   // cuts
   Cuts cuts;
   TCut puWeight("puWeight");
-  TCut weightedAllCuts = puWeight * cuts.allCuts();
+  // For lepton weights
+  TCut elVetoWeight = cuts.elVetoWeight(options.leptCorr);
+  TCut muVetoWeight = cuts.muVetoWeight(options.leptCorr);
+  TCut weightedAllCuts = puWeight * elVetoWeight * muVetoWeight * cuts.allCuts();
 
   // plots
   int nSignalPoints=0;

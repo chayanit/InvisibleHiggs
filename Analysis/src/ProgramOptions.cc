@@ -6,13 +6,14 @@
 
 
 ProgramOptions::ProgramOptions(int argc, char* argv[]) :
+  // Set default for program args
   iDir(""),
   oDir(""),
   datasetFile(""),
   lumi(0.),
   qcdMethod(1),
   doMCFMWeights(false),
-  leptCorr("off")
+  leptCorr("central")
  {
 
   namespace po = boost::program_options;
@@ -28,7 +29,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
     ("qcd,q", po::value<int>(), "QCD method")
     ("tau,t", po::value<int>(), "W->tau method")
     ("mcfmWeights,m", po::value<bool>(), "apply MCFM re-weighting")
-    ("leptCorr,c", po::value<std::string>(), "apply lepton corrections, options are off (default), central, elUp, elDown, muUp, muDown. You can't do both (yet).");
+    ("leptCorr,c", po::value<std::string>(), "apply lepton corrections, options are off, central (default if nothing specified), elUp, elDown, muUp, muDown. You can't do both (yet).");
 
   po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);  

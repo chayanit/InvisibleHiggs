@@ -71,6 +71,10 @@ int main(int argc, char* argv[]) {
   TCut puWeight("puWeight");
   TCut trigWeight( "(trigCorrWeight>0.) ? trigCorrWeight : 1." );
 
+  // For lepton weights
+  TCut elVetoWeight = cuts.elVetoWeight(options.leptCorr);
+  TCut muVetoWeight = cuts.muVetoWeight(options.leptCorr);
+
   TFile* ofile = TFile::Open((oDir+std::string("/QCD3.root")).c_str(), "RECREATE");
 
   double metEdges[3] = { 0., 130., 1000. };
@@ -184,8 +188,8 @@ int main(int argc, char* argv[]) {
     else if (dataset.name=="SignalM125_POWHEG") {
       std::cout << "Analysing Signal MC        : " << dataset.name << std::endl;
       
-      TCut cutLo = puWeight * (cutBase + cutLoDPhi);
-      TCut cutHi = puWeight * (cutBase + cutHiDPhi);
+      TCut cutLo = puWeight * elVetoWeight * muVetoWeight * (cutBase + cutLoDPhi);
+      TCut cutHi = puWeight * elVetoWeight * muVetoWeight * (cutBase + cutHiDPhi);
 
       tree->Draw("cenJetEt:met>>hTmp_METCJV",        cutLo);
       tree->Draw("cenJetEt:met>>hTmp_HiDPhi_METCJV", cutHi);
@@ -200,8 +204,8 @@ int main(int argc, char* argv[]) {
     else {
       std::cout << "Analysing BG MC        : " << dataset.name << std::endl;
       
-      TCut cutLo = puWeight * trigWeight * (cutD + cutBase + cutLoDPhi);
-      TCut cutHi = puWeight * trigWeight * (cutD + cutBase + cutHiDPhi);
+      TCut cutLo = puWeight * trigWeight * elVetoWeight * muVetoWeight * (cutD + cutBase + cutLoDPhi);
+      TCut cutHi = puWeight * trigWeight * elVetoWeight * muVetoWeight * (cutD + cutBase + cutHiDPhi);
       if (dataset.name=="WJets" ||
 	  dataset.name=="W1Jets" ||
 	  dataset.name=="W2Jets" ||

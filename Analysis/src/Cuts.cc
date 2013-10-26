@@ -205,69 +205,79 @@ TCut Cuts::wWeight() {
 
 // bunch of methods to return the correct lepton weights
 // split up because you want to apply certain weights in certain regions
+// use the conditonal form, in case 
+// a) 1-eff_MC = 0, in which case you get NaN (>0 stops this)
+// b) eff_MC or eff_data > 1, in which case either denominator or numerator is < 0, SF < 0
+
+// Note that this could be done more flexibley by getting the user to pass in a string as a command line arg
+// e.g. ElUpMuCentral
+// then parse it to figure out what they want
+// My method is quick n simple, but does **default to central values**, not off
 TCut Cuts::elTightWeight(std::string option){
   TCut tmp("");
-  if (option == "central"){
-    std::cout << "Using electron tight weights" << std::endl;
-    tmp="eleTightCorr";
+  if (option == "off"){
+    std::cout << "Not using electron tight weights" << std::endl;
   } else if (option == "elUp"){
     std::cout << "Using electron tight weights, errUp" << std::endl;
-    tmp="eleTightCorrErrUp";
+    tmp="(eleTightCorrErrUp > 0.) ? eleTightCorrErrUp : 1.";
   } else if (option == "elDown"){
     std::cout << "Using electron tight weights, errDown" << std::endl;
-    tmp="eleTightCorrErrDown";
-  } else
-    std::cout << "Not using electron tight weights" << std::endl;
+    tmp="(eleTightCorrErrDown > 0.) ? eleTightCorrErrDown : 1.";
+  } else {
+    std::cout << "Using central electron tight weights" << std::endl;
+    tmp="(eleTightCorr > 0.) ? eleTightCorr : 1.";
+  }
   return tmp;
 }
 
 TCut Cuts::elVetoWeight(std::string option){
   TCut tmp("");
-  if (option == "central"){
-    std::cout << "Using electron veto weights" << std::endl;
-    tmp="eleVetoCorr";
+  if (option == "off"){
+    std::cout << "Not using electron veto weights" << std::endl;
   } else if (option == "elUp"){
     std::cout << "Using electron veto weights, errUp" << std::endl;
-    tmp="eleVetoCorrErrUp";
+    tmp="(eleVetoCorrErrUp > 0.) ? eleVetoCorrErrUp : 1.";
   } else if (option == "elDown"){
     std::cout << "Using electron veto weights, errDown" << std::endl;
-    tmp="eleVetoCorrErrDown";
-  } else
-    std::cout << "Not using electron veto weights" << std::endl;
-
+    tmp="(eleVetoCorrErrDown > 0.) ? eleVetoCorrErrDown : 1.";
+  } else {
+    std::cout << "Using central electron veto weights" << std::endl;
+    tmp="(eleVetoCorr > 0.) ? eleVetoCorr : 1.";
+}
   return tmp;
 }
 
 TCut Cuts::muTightWeight(std::string option){
   TCut tmp("");
-  if (option == "central"){
-    std::cout << "Using muon tight weights" << std::endl;
-    tmp="muTightCorr";
+  if (option == "off"){
+    std::cout << "Not using muon tight weights" << std::endl;
   } else if (option == "muUp"){
     std::cout << "Using muon tight weights, errUp" << std::endl;
-    tmp="muTightCorrErrUp";
+    tmp="(muTightCorrErrUp > 0.) ? muTightCorrErrUp : 1.";
   } else if (option == "muDown"){
     std::cout << "Using muon tight weights, errDown" << std::endl;
-    tmp="muTightCorrErrDown";
-  } else
-    std::cout << "Not using muon tight weights" << std::endl;
-  
+    tmp="(muTightCorrErrDown > 0.) ? muTightCorrErrDown : 1.";
+  } else {
+    std::cout << "Using central muon tight weights" << std::endl;
+    tmp="(muTightCorr > 0.) ? muTightCorr : 1.";
+  }
   return tmp;
 }
 
 TCut Cuts::muVetoWeight(std::string option){
   TCut tmp("");
-  if (option == "central"){
-    std::cout << "Using muon veto weights" << std::endl;
-    tmp="muVetoCorr";
+  if (option == "off"){
+    std::cout << "Not using muon veto weights" << std::endl;
   } else if (option == "muUp"){
     std::cout << "Using muon veto weights, errUp" << std::endl;
-    tmp="muVetoCorrErrUp";
+    tmp="(muVetoCorrErrUp > 0.) ? muVetoCorrErrUp : 1.";
   } else if (option == "muDown"){
     std::cout << "Using muon veto weights, errDown" << std::endl;
-    tmp="muVetoCorrErrDown";
-  } else
-    std::cout << "Not using muon veto weights" << std::endl;
+    tmp="(muVetoCorrErrDown > 0.) ? muVetoCorrErrDown : 1.";
+  } else {
+    std::cout << "Using central muon veto weights" << std::endl;
+    tmp="(muVetoCorr > 0.) ? muVetoCorr : 1.";
+  }
   return tmp;
 }
 
