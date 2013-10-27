@@ -303,16 +303,16 @@ int main(int argc, char* argv[]) {
     TH1D* ZCtrlYStarMjjWt    = new TH1D("ZCtrlYStarMjjWt",    "", 50, -1., 5.);    
 
     tree->Draw("zMass>>ZCtrlZMass"	    , cutPlots);
-    tree->Draw("zPt>>ZCtrlZpT"		      , cutPlots);
-    tree->Draw("jet1Pt>>ZCtrlJet1pT"	  , cutPlots);
-    tree->Draw("jet1Eta>>ZCtrlJet1Eta"	, cutPlots);
-    tree->Draw("jet2Pt>>ZCtrlJet2pT"	  , cutPlots);
-    tree->Draw("jet2Eta>>ZCtrlJet2Eta"	, cutPlots);
-    tree->Draw("cenJetEt>>ZCtrlCenJetpT", cutPlots);
-    tree->Draw("vbfDEta>>ZCtrlDEtajj"	  , cutPlots);
-    tree->Draw("vbfM>>ZCtrlMjj"		      , cutPlots);
-    tree->Draw("metNo2Muon>>ZCtrlMET"	  , cutPlots);
-    tree->Draw("vbfDPhi>>ZCtrlDPhijj"	  , cutPlots);
+    tree->Draw("zPt>>ZCtrlZpT"		    , cutPlots);
+    tree->Draw("jet1Pt>>ZCtrlJet1pT"	    , cutPlots);
+    tree->Draw("jet1Eta>>ZCtrlJet1Eta"	    , cutPlots);
+    tree->Draw("jet2Pt>>ZCtrlJet2pT"	    , cutPlots);
+    tree->Draw("jet2Eta>>ZCtrlJet2Eta"	    , cutPlots);
+    tree->Draw("cenJetEt>>ZCtrlCenJetpT"    , cutPlots);
+    tree->Draw("vbfDEta>>ZCtrlDEtajj"	    , cutPlots);
+    tree->Draw("vbfM>>ZCtrlMjj"		    , cutPlots);
+    tree->Draw("metNo2Muon>>ZCtrlMET"	    , cutPlots);
+    tree->Draw("vbfDPhi>>ZCtrlDPhijj"	    , cutPlots);
 
     if (options.doMCFMWeights) {
 

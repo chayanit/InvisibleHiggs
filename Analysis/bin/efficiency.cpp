@@ -81,10 +81,10 @@ int main(int argc, char* argv[]) {
     if (!(dataset.isData)) leptonWeight = elVetoWeight*muVetoWeight;
     
     if (dataset.name=="WJets" ||
-  dataset.name=="W1Jets" ||
-  dataset.name=="W2Jets" ||
-  dataset.name=="W3Jets" ||
-  dataset.name=="W4Jets") {
+  	dataset.name=="W1Jets" ||
+  	dataset.name=="W2Jets" ||
+  	dataset.name=="W3Jets" ||
+  	dataset.name=="W4Jets") {
       wWeight = cuts.wWeight();
       std::cout << "W MC weight : " << wWeight << std::endl; 
     }
@@ -182,7 +182,8 @@ int main(int argc, char* argv[]) {
     if (dataset.name.compare(0,7,"SingleT")==0) hSingleT->Add(hCutFlow);
     if (dataset.name.compare(0,2,"WW")==0 ||
 	dataset.name.compare(0,2,"WZ")==0 ||
-	dataset.name.compare(0,2,"ZZ")==0 )
+	dataset.name.compare(0,2,"ZZ")==0 ||
+	dataset.name.compare(0,2,"WG")==0)
       hDiboson->Add(hCutFlow);
     if (dataset.name.compare(0,2,"DY")==0) hDYLL->Add(hCutFlow);
 
@@ -250,7 +251,7 @@ int main(int argc, char* argv[]) {
 
     Dataset dataset = datasets.getDataset(i);
 
-    if (!(dataset.name.compare(0,6,"Signal") ==0 ||
+    if (!(dataset.name.compare(0,6,"Signal") == 0 ||
 	  dataset.name.compare(0,6,"GluGlu") == 0 )) continue;
 
     std::string hname = std::string("hCutFlow_")+dataset.name;

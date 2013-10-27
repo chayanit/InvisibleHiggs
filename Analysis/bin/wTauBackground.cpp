@@ -352,7 +352,8 @@ int main(int argc, char* argv[]) {
     
     if (dataset.name.compare(0,2,"WW")==0 ||
         dataset.name.compare(0,2,"WZ")==0 ||
-        dataset.name.compare(0,2,"ZZ")==0 ) 
+        dataset.name.compare(0,2,"ZZ")==0 ||
+	dataset.name.compare(0,2,"WG")==0) 
       hDibosonWTau->Add(hCutFlowWTau);
 
     hCutFlowWTau->Write("",TObject::kOverwrite);
@@ -582,6 +583,7 @@ int main(int argc, char* argv[]) {
   dibDatasets.push_back(std::string("WW"));
   dibDatasets.push_back(std::string("WZ"));
   dibDatasets.push_back(std::string("ZZ"));
+  dibDatasets.push_back(std::string("WG"));
   SumDatasets(oDirPlots, dibDatasets, hnames, "DiBoson");
 
   // sum QCD histograms

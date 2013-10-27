@@ -61,6 +61,11 @@ int main(int argc, char* argv[]) {
   TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
 
   TCut cutSignalNoMETNoDPhi = cuts.HLTandMETFilters() + cuts.leptonVeto() + cuts.vbf();
+
+  // For lepton weights
+  TCut lVetoWeight   = cuts.elVetoWeight(options.leptCorr) * cuts.muVetoWeight(options.leptCorr);
+  TCut muTightWeight = cuts.muTightWeight(options.leptCorr);
+  TCut elTightWeight = cuts.elTightWeight(options.leptCorr);
   
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
@@ -150,13 +155,13 @@ int main(int argc, char* argv[]) {
 	}
       }
 
-      cutWMu_C = otherCuts * wWeight * (cuts.wMuVBF() + cuts.cutWMu("MET"));
-      cutWMu_S = otherCuts * wWeight * (cuts.wMuGen() + cuts.allCutsNoDPhi());
-      cutWEl_C = otherCuts * wWeight * (cuts.wElVBF() + cuts.cutWEl("MET"));
-      cutWEl_S = otherCuts * wWeight * (cuts.wElGen() + cuts.allCutsNoDPhi());
+      cutWMu_C = otherCuts * lVetoWeight * muTightWeight * wWeight * (cuts.wMuVBF() + cuts.cutWMu("MET"));
+      cutWMu_S = otherCuts * lVetoWeight * muTightWeight * wWeight * (cuts.wMuGen() + cuts.allCutsNoDPhi());
+      cutWEl_C = otherCuts * lVetoWeight * elTightWeight * wWeight * (cuts.wElVBF() + cuts.cutWEl("MET"));
+      cutWEl_S = otherCuts * lVetoWeight * elTightWeight * wWeight * (cuts.wElGen() + cuts.allCutsNoDPhi());
 
-      cutWMuControlPlot = otherCuts * wWeight * (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
-      cutWElControlPlot = otherCuts * wWeight * (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
+      cutWMuControlPlot = otherCuts * muTightWeight * wWeight * (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
+      cutWElControlPlot = otherCuts * elTightWeight * wWeight * (cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
 
       // weight  to lumi
       weight = lumi * dataset.sigma / dataset.nEvents;
@@ -211,13 +216,13 @@ int main(int argc, char* argv[]) {
 
       otherCuts  *= yStarWeight * mjjWeight;
 
-      cutWMu_C = otherCuts * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
-      cutWMu_S = otherCuts * (cutD + cuts.allCutsNoDPhi());
-      cutWEl_C = otherCuts * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
-      cutWEl_S = otherCuts * (cutD + cuts.allCutsNoDPhi());
+      cutWMu_C = otherCuts * lVetoWeight * muTightWeight * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
+      cutWMu_S = otherCuts * lVetoWeight * muTightWeight * (cutD + cuts.allCutsNoDPhi());
+      cutWEl_C = otherCuts * lVetoWeight * elTightWeight * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
+      cutWEl_S = otherCuts * lVetoWeight * elTightWeight * (cutD + cuts.allCutsNoDPhi());
 
-      cutWMuControlPlot = otherCuts * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
-      cutWElControlPlot = otherCuts * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
+      cutWMuControlPlot = otherCuts * muTightWeight * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWMu("MET") + cuts.cutWMu("wMu") );
+      cutWElControlPlot = otherCuts * elTightWeight * (cutD + cuts.HLTandMETFilters() + cuts.vbfloose() + cuts.cutWEl("MET") + cuts.cutWEl("wEl") );
 
       // weight  to lumi
       weight = lumi * dataset.sigma / dataset.nEvents;
@@ -262,11 +267,15 @@ int main(int argc, char* argv[]) {
         {
 	  cut = otherCuts * (cutD + cuts.cutflowWMu(c));
           if(isWJets) cut = otherCuts * wWeight * (cuts.cutflowWMu(c));
+
+	  if(!(dataset.isData)) cut *= lVetoWeight * muTightWeight;
         }
       else
         {
 	  cut = puWeight * yStarWeight * mjjWeight * (cutD + cuts.cutflowWMu(c));
           if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
+
+	  if(!(dataset.isData)) cut *= lVetoWeight * muTightWeight;
         }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
@@ -284,11 +293,15 @@ int main(int argc, char* argv[]) {
         {
 	  cut = otherCuts * (cutD + cuts.cutflowWEl(c));
           if(isWJets) cut = otherCuts * wWeight * (cuts.cutflowWEl(c));
+
+	  if(!(dataset.isData)) cut *= lVetoWeight * elTightWeight;
         }
       else
         {
 	  cut = puWeight * yStarWeight * mjjWeight * (cuts.cutflowWEl(c));
           if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
+
+	  if(!(dataset.isData)) cut *= lVetoWeight * elTightWeight;
         }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
@@ -325,7 +338,8 @@ int main(int argc, char* argv[]) {
     }
     if (dataset.name.compare(0,2,"WW")==0 ||
         dataset.name.compare(0,2,"WZ")==0 ||
-        dataset.name.compare(0,2,"ZZ")==0 ) {
+        dataset.name.compare(0,2,"ZZ")==0 ||
+	dataset.name.compare(0,2,"WG")==0) {
       hDibosonWMu->Add(hCutFlowWMu);
       hDibosonWEl->Add(hCutFlowWEl);
     }
@@ -638,6 +652,7 @@ for (unsigned n = 0; n < hnames.size(); n++)
   dibDatasets.push_back(std::string("WW"));
   dibDatasets.push_back(std::string("WZ"));
   dibDatasets.push_back(std::string("ZZ"));
+  dibDatasets.push_back(std::string("WG"));
   SumDatasets(oDirPlots, dibDatasets, hnames, "DiBoson");
 
   // sum QCD histograms

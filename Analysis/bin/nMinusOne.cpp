@@ -310,6 +310,7 @@ int main(int argc, char* argv[]) {
   other.push_back("WW");
   other.push_back("WZ");
   other.push_back("ZZ");
+  other.push_back("WG");
   other.push_back("DYJetsToLL");
   other.push_back("DYJetsToLL_PtZ-100");
   other.push_back("DYJetsToLL_EWK");
