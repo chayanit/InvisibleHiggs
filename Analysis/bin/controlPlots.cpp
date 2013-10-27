@@ -49,9 +49,15 @@ int main(int argc, char* argv[]) {
   ctrl += cuts.cut("EVeto");       // lepton vetoes
   ctrl += cuts.cut("MuVeto");
 
+  // For lepton weights
+  TCut elVetoWeight = cuts.elVetoWeight(options.leptCorr);
+  TCut muVetoWeight = cuts.muVetoWeight(options.leptCorr);
+  TCut leptonVetoWeight = elVetoWeight * muVetoWeight;
+
   TCut puWeight("puWeight"); // PU weights
   // TCut trigCorr("trigCorrWeight"); // Trigger data/mc corrections
-  TCut trigCorr( "( (trigCorrWeight>0)*trigCorrWeight + (trigCorrWeight<=0)*1 )" );
+  TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
+
   // loop over datasets
   for (unsigned i=0; i<datasets.size(); ++i) {
 
@@ -86,7 +92,7 @@ int main(int argc, char* argv[]) {
     TH1D* hmjj            = new TH1D("hmjj",       "", 50, 0.,  4000.);
     // TH1D* hmet         = new TH1D("hmet",       "", 100, 0.,  200.);
     TH1D* hmet            = new TH1D("hmet",       "", 50, 0.,  800.);
-    TH1D* hmetphi        = new TH1D("hmetphi",   "", 72, -1*TMath::Pi(), TMath::Pi());
+    TH1D* hmetphi         = new TH1D("hmetphi",   "", 72, -1*TMath::Pi(), TMath::Pi());
 
 
     // set up cuts
@@ -105,8 +111,8 @@ int main(int argc, char* argv[]) {
       wWeight =  cuts.wWeight();
     } 
 
-    TCut ctrl1 = puWeight * wWeight * trigCorr * (cutD + ctrl + cuts.cut("Mjj"));  // Mjj
-    TCut ctrl2 = puWeight * wWeight * trigCorr * (cutD + ctrl + cuts.cut("MET"));  // MET
+    TCut ctrl1 = puWeight * wWeight * trigCorr * leptonVetoWeight * (cutD + ctrl + cuts.cut("Mjj"));  // Mjj
+    TCut ctrl2 = puWeight * wWeight * trigCorr * leptonVetoWeight * (cutD + ctrl + cuts.cut("MET"));  // MET
 
     // fill histograms
     tree->Draw("jet1Pt>>hjet1pt", ctrl2);

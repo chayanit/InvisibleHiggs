@@ -49,7 +49,18 @@ int main(int argc, char* argv[]) {
   Cuts cuts;
   TCut puWeight("puWeight");
   TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
-  TCut otherCuts = puWeight * trigCorr;
+
+  // For lepton weights
+  TCut elTightWeight     = cuts.elTightWeight(options.leptCorr);
+  TCut muTightWeight     = cuts.muTightWeight(options.leptCorr);
+  TCut leptonTightWeight = elTightWeight * muTightWeight;
+
+  TCut elVetoWeight      = cuts.elVetoWeight(options.leptCorr);
+  TCut muVetoWeight      = cuts.muVetoWeight(options.leptCorr);
+  TCut leptonVetoWeight  = elVetoWeight * muVetoWeight;
+
+  TCut otherCutsTight = puWeight * trigCorr * leptonTightWeight;
+  TCut otherCutsVeto  = puWeight * trigCorr * leptonVetoWeight;
 
   TCut cutSignalNoMETNoDPhi = cuts.HLTandMETFilters() + cuts.leptonVeto() + cuts.vbf();
   
@@ -222,11 +233,11 @@ int main(int argc, char* argv[]) {
       if(isWJets) wWeight =  cuts.wWeight();
 
       // Mu cuts
-      tree->Draw("vbfDPhi>>hWMu_MCC_DPhi_tmp", otherCuts * wWeight * cutWMu_MCC_DPhi);
-      tree->Draw("0.5>>hWMu_MCGen_DPhi_tmp", otherCuts * wWeight * cutWMu_Gen);
-      tree->Draw("vbfM>>hWMu_MCC_Mjj_tmp", otherCuts * wWeight * cutWMu_MCC_Mjj);
-      tree->Draw("metNoWLepton>>hWMu_MCC_MET_tmp", otherCuts * wWeight * cutWMu_MCC_MET);
-      tree->Draw("cenJetEt>>hWMu_MCC_CenJetEt_tmp", otherCuts * wWeight * cutWMu_MCC_CenJetEt);
+      tree->Draw("vbfDPhi>>hWMu_MCC_DPhi_tmp", otherCutsTight * wWeight * cutWMu_MCC_DPhi);
+      tree->Draw("0.5>>hWMu_MCGen_DPhi_tmp", otherCutsTight * wWeight * cutWMu_Gen);
+      tree->Draw("vbfM>>hWMu_MCC_Mjj_tmp", otherCutsTight * wWeight * cutWMu_MCC_Mjj);
+      tree->Draw("metNoWLepton>>hWMu_MCC_MET_tmp", otherCutsTight * wWeight * cutWMu_MCC_MET);
+      tree->Draw("cenJetEt>>hWMu_MCC_CenJetEt_tmp", otherCutsTight * wWeight * cutWMu_MCC_CenJetEt);
 
       hWMu_MCC_DPhi_tmp->Scale(weight);
       hWMu_MCGen_DPhi_tmp->Scale(weight);
@@ -241,11 +252,11 @@ int main(int argc, char* argv[]) {
       hWMu_MCC_MET->Add(hWMu_MCC_MET_tmp);
       hWMu_MCC_CenJetEt->Add(hWMu_MCC_CenJetEt_tmp);
 
-      tree->Draw("vbfDPhi>>hWTau_MCC_DPhi_tmp", otherCuts * wWeight * cutWTau_MCC_DPhi);
-      tree->Draw("0.5>>hWTau_MCGen_DPhi_tmp", otherCuts * wWeight * cutWTau_Gen);
-      tree->Draw("vbfM>>hWTau_MCC_Mjj_tmp", otherCuts * wWeight * cutWTau_MCC_Mjj);
-      tree->Draw("met>>hWTau_MCC_MET_tmp", otherCuts * wWeight * cutWTau_MCC_MET);
-      tree->Draw("cenJetEt>>hWTau_MCC_CenJetEt_tmp", otherCuts * wWeight * cutWTau_MCC_CenJetEt);
+      tree->Draw("vbfDPhi>>hWTau_MCC_DPhi_tmp", otherCutsVeto * wWeight * cutWTau_MCC_DPhi);
+      tree->Draw("0.5>>hWTau_MCGen_DPhi_tmp", otherCutsVeto * wWeight * cutWTau_Gen);
+      tree->Draw("vbfM>>hWTau_MCC_Mjj_tmp", otherCutsVeto * wWeight * cutWTau_MCC_Mjj);
+      tree->Draw("met>>hWTau_MCC_MET_tmp", otherCutsVeto * wWeight * cutWTau_MCC_MET);
+      tree->Draw("cenJetEt>>hWTau_MCC_CenJetEt_tmp", otherCutsVeto * wWeight * cutWTau_MCC_CenJetEt);
 
       hWTau_MCC_DPhi_tmp->Scale(weight);
       hWTau_MCGen_DPhi_tmp->Scale(weight);
@@ -299,42 +310,42 @@ int main(int argc, char* argv[]) {
 
       if (dataset.name.compare(0,17,"SignalM125_POWHEG")== 0 || dataset.name.compare(0,3,"QCD") == 0) continue;
 
-      if(dataset.name.compare(0,3,"Zvv") != 0){ // Dont need Zvv in WMu estimates
-          tree->Draw("vbfDPhi>>hWMu_BGC_DPhi_tmp", otherCuts * cutWMu_C_DPhi);
-          tree->Draw("vbfM>>hWMu_BGC_Mjj_tmp", otherCuts * cutWMu_C_Mjj);
-          tree->Draw("metNoWLepton>>hWMu_BGC_MET_tmp", otherCuts * cutWMu_C_MET);
-          tree->Draw("cenJetEt>>hWMu_BGC_CenJetEt_tmp", otherCuts * cutWMu_C_CenJetEt);
-          
-          hWMu_BGC_DPhi_tmp->Scale(weight);
-	  hWMu_BGC_Mjj_tmp->Scale(weight);
-          hWMu_BGC_MET_tmp->Scale(weight);
-          hWMu_BGC_CenJetEt_tmp->Scale(weight);
-          
-          hWMu_BGC_DPhi->Add(hWMu_BGC_DPhi_tmp);
-          hWMu_BGC_Mjj->Add(hWMu_BGC_Mjj_tmp);
-          hWMu_BGC_MET->Add(hWMu_BGC_MET_tmp);
-          hWMu_BGC_CenJetEt->Add(hWMu_BGC_CenJetEt_tmp);
-        } 
+      if(dataset.name.compare(0,3,"Zvv") != 0){ // Don't need Zvv in WMu estimates
+        tree->Draw("vbfDPhi>>hWMu_BGC_DPhi_tmp", otherCutsTight * cutWMu_C_DPhi);
+        tree->Draw("vbfM>>hWMu_BGC_Mjj_tmp", otherCutsTight * cutWMu_C_Mjj);
+        tree->Draw("metNoWLepton>>hWMu_BGC_MET_tmp", otherCutsTight * cutWMu_C_MET);
+        tree->Draw("cenJetEt>>hWMu_BGC_CenJetEt_tmp", otherCutsTight * cutWMu_C_CenJetEt);
+        
+        hWMu_BGC_DPhi_tmp->Scale(weight);
+    	  hWMu_BGC_Mjj_tmp->Scale(weight);
+        hWMu_BGC_MET_tmp->Scale(weight);
+        hWMu_BGC_CenJetEt_tmp->Scale(weight);
+        
+        hWMu_BGC_DPhi->Add(hWMu_BGC_DPhi_tmp);
+        hWMu_BGC_Mjj->Add(hWMu_BGC_Mjj_tmp);
+        hWMu_BGC_MET->Add(hWMu_BGC_MET_tmp);
+        hWMu_BGC_CenJetEt->Add(hWMu_BGC_CenJetEt_tmp);
+      } 
 
-        // Count number of tau in control region in bg mc
-        tree->Draw("vbfDPhi>>hWTau_BGC_DPhi_tmp", otherCuts * cutWTau_C_DPhi);
-        tree->Draw("vbfM>>hWTau_BGC_Mjj_tmp", otherCuts * cutWTau_C_Mjj);
-        tree->Draw("met>>hWTau_BGC_MET_tmp", otherCuts * cutWTau_C_MET);
-        tree->Draw("cenJetEt>>hWTau_BGC_CenJetEt_tmp", otherCuts * cutWTau_C_CenJetEt);
+      // Count number of tau in control region in bg mc
+      tree->Draw("vbfDPhi>>hWTau_BGC_DPhi_tmp", otherCutsVeto * cutWTau_C_DPhi);
+      tree->Draw("vbfM>>hWTau_BGC_Mjj_tmp", otherCutsVeto * cutWTau_C_Mjj);
+      tree->Draw("met>>hWTau_BGC_MET_tmp", otherCutsVeto * cutWTau_C_MET);
+      tree->Draw("cenJetEt>>hWTau_BGC_CenJetEt_tmp", otherCutsVeto * cutWTau_C_CenJetEt);
 
-        hWTau_BGC_DPhi_tmp->Scale(weight);
-        hWTau_BGC_Mjj_tmp->Scale(weight);
-        hWTau_BGC_MET_tmp->Scale(weight);
-        hWTau_BGC_CenJetEt_tmp->Scale(weight);
+      hWTau_BGC_DPhi_tmp->Scale(weight);
+      hWTau_BGC_Mjj_tmp->Scale(weight);
+      hWTau_BGC_MET_tmp->Scale(weight);
+      hWTau_BGC_CenJetEt_tmp->Scale(weight);
 
-        hWTau_BGC_DPhi->Add(hWTau_BGC_DPhi_tmp);
-        hWTau_BGC_Mjj->Add(hWTau_BGC_Mjj_tmp);
-        hWTau_BGC_MET->Add(hWTau_BGC_MET_tmp);
-        hWTau_BGC_CenJetEt->Add(hWTau_BGC_CenJetEt_tmp);
+      hWTau_BGC_DPhi->Add(hWTau_BGC_DPhi_tmp);
+      hWTau_BGC_Mjj->Add(hWTau_BGC_Mjj_tmp);
+      hWTau_BGC_MET->Add(hWTau_BGC_MET_tmp);
+      hWTau_BGC_CenJetEt->Add(hWTau_BGC_CenJetEt_tmp);
 
-        // debug output
-        std::cout << "  N ctrl region (dphi<1) : " << hWTau_BGC_DPhi_tmp->GetBinContent(1) << " +/- " << hWTau_BGC_DPhi_tmp->GetBinError(1) << std::endl;
-        std::cout << "  N ctrl region (MET)    : " << hWTau_BGC_MET_tmp->GetBinContent(1) << " +/- " << hWTau_BGC_MET_tmp->GetBinError(1) << std::endl;
+      // debug output
+      std::cout << "  N ctrl region (dphi<1) : " << hWTau_BGC_DPhi_tmp->GetBinContent(1) << " +/- " << hWTau_BGC_DPhi_tmp->GetBinError(1) << std::endl;
+      std::cout << "  N ctrl region (MET)    : " << hWTau_BGC_MET_tmp->GetBinContent(1) << " +/- " << hWTau_BGC_MET_tmp->GetBinError(1) << std::endl;
 
     }
 

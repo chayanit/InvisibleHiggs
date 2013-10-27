@@ -311,8 +311,8 @@ int main(int argc, char* argv[]) {
           cut = otherCuts * (cutD + cuts.cutflowWTau(c));
           if(isWJets) cut = otherCuts * wWeight * ( cuts.cutflowWTau(c));
       } else {
-          cut = puWeight * yStarWeight * mjjWeight * (cutD + cuts.cutflowWTau(c));
-          if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWTau(c));
+          cut = puWeight * yStarWeight * mjjWeight * elVetoWeight * muVetoWeight * (cutD + cuts.cutflowWTau(c));
+          if(isWJets) cut = puWeight * wWeight * elVetoWeight * muVetoWeight * (cuts.cutflowWTau(c));
       }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
