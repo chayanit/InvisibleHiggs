@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
 	cutEfficiencyVBFC_N *= muTightWeight;
 	cutDYNoVBFNoWeight  *= muTightWeight;
 	cutDYNoVBFWeight    *= muTightWeight;
-    {
+    }
 
     // fill tmp histograms for BG estimation
     TH1D* hZ_C_DPhi  = new TH1D("hZ_C_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
