@@ -56,6 +56,10 @@ int main(int argc, char* argv[]) {
   TCut METNo2Muon130("metNo2Muon>130.");
   TCut cutLoDPhi = cuts.cut("dPhiJJ");
 
+  // For lepton weights
+  TCut lVetoWeight   = cuts.elVetoWeight(options.leptCorr) * cuts.muVetoWeight(options.leptCorr);
+  TCut muTightWeight = cuts.muTightWeight(options.leptCorr);
+
   // histograms
   double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
   //double metEdges[13] = { 0., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 120. };
@@ -133,6 +137,18 @@ int main(int argc, char* argv[]) {
     TCut cutEfficiencyVBFC_D  = otherWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
     TCut cutEfficiencyVBFC_N  = otherWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon130 + cutLoDPhi);
 
+    // re-weighting
+    TCut cutDYNoVBFNoWeight = puWeight * trigCorr * (cutD  + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.cutZMuMu("dijet"));
+    TCut cutDYNoVBFWeight   = otherWeight * trigCorr * (cutD  + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.cutZMuMu("dijet"));
+
+    if(!(dataset.isData)) {
+	cutZMuMu_C *= lVetoWeight * muTightWeight;
+	cutEfficiencyMuMu_N *= muTightWeight;
+	cutEfficiencyVBFC_N *= muTightWeight;
+	cutDYNoVBFNoWeight  *= muTightWeight;
+	cutDYNoVBFWeight    *= muTightWeight;
+    {
+
     // fill tmp histograms for BG estimation
     TH1D* hZ_C_DPhi  = new TH1D("hZ_C_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
     // fill tmp histograms for efficiency calculation
@@ -142,10 +158,6 @@ int main(int argc, char* argv[]) {
     TH1D* hZ_EffVBFS_N  = new TH1D("hZ_EffVBFS_N", "", 1, 0., 1.);
     TH1D* hZ_EffVBFC_D  = new TH1D("hZ_EffVBFC_D", "", 1, 0., 1.);
     TH1D* hZ_EffVBFC_N  = new TH1D("hZ_EffVBFC_N", "", 1, 0., 1.);
-
-    // re-weighting
-    TCut cutDYNoVBFNoWeight = puWeight * trigCorr * (cutD  + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.cutZMuMu("dijet"));
-    TCut cutDYNoVBFWeight   = otherWeight * trigCorr * (cutD  + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.cutZMuMu("dijet"));
 
     TH1D* hZ_DY_NoWeight = new TH1D("hZ_DY_NoWeight", "", 1, 0, 1);
     TH1D* hZ_DY_Weight   = new TH1D("hZ_DY_Weight",   "", 1, 0, 1);
@@ -232,6 +244,8 @@ int main(int argc, char* argv[]) {
       if(c == nCutsZMuMu-1) cut = otherWeight * trigCorr * (cutD + cuts.cutflowZMuMu(c));
       else cut = otherWeight * (cutD + cuts.cutflowZMuMu(c));
 
+      if(!(dataset.isData)) cut *= lVetoWeight * muTightWeight;
+
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
 
@@ -254,7 +268,8 @@ int main(int argc, char* argv[]) {
     }
     if (dataset.name.compare(0,2,"WW")==0 ||
   	dataset.name.compare(0,2,"WZ")==0 ||
-  	dataset.name.compare(0,2,"ZZ")==0 ) {
+  	dataset.name.compare(0,2,"ZZ")==0 || 
+	dataset.name.compare(0,2,"WG")==0) {
       hZ_CutFlow_Diboson->Add(hZ_CutFlow);
     }
 
@@ -265,6 +280,8 @@ int main(int argc, char* argv[]) {
 
     // Z control plots
     TCut cutPlots = otherWeight * trigCorr * (cutD + cuts.zMuMuVBFLoose());
+
+    if(!(dataset.isData)) cutPlots *= muTightWeight;
  
     TFile* ofile_Plot = TFile::Open( (oDir_Plot+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
@@ -541,11 +558,12 @@ int main(int argc, char* argv[]) {
   topDatasets.push_back(std::string("TTBar"));
   SumDatasets(oDir_Plot, topDatasets, hists, "SingleT+TTbar"); 
 
-  // sum single top datasets
+  // sum diboson datasets
   std::vector<std::string> dibDatasets;
   dibDatasets.push_back(std::string("WW"));
   dibDatasets.push_back(std::string("WZ"));
   dibDatasets.push_back(std::string("ZZ"));
+  dibDatasets.push_back(std::string("WG"));
   SumDatasets(oDir_Plot, dibDatasets, hists, "DiBoson");
 
   // sum SM backgrounds
@@ -553,6 +571,7 @@ int main(int argc, char* argv[]) {
   bgDatasets.push_back(std::string("WW"));
   bgDatasets.push_back(std::string("WZ"));
   bgDatasets.push_back(std::string("ZZ"));
+  bgDatasets.push_back(std::string("WG"));
   bgDatasets.push_back(std::string("SingleT_t"));
   bgDatasets.push_back(std::string("SingleTbar_t"));
   bgDatasets.push_back(std::string("SingleT_s"));

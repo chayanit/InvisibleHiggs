@@ -34,8 +34,6 @@ int main(int argc, char* argv[]) {
   Datasets datasets(options.iDir);
   datasets.readFile(options.datasetFile);
 
-  LeptonWeights lw;
-
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/WBackground.root")).c_str(), "RECREATE");
 

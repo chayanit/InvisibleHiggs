@@ -570,7 +570,7 @@ int main(int argc, char* argv[]) {
     txtFile << "process           0  \t 1   \t 2   \t 3  \t 4    \t 5   \t 6     " << std::endl;
     txtFile << "rate            " << nSig.at(i) << "\t" << nBG_Z << "\t" << nBG_WMu << "\t" << nBG_WEl << "\t" << nBG_WTau << "\t" << nBG_QCD << "\t" << nBG_Other << std::endl;
     txtFile << "------------" << std::endl;
-    txtFile << "CMS_lumi      lnN   " << fLum << "\t - \t - \t - \t - \t - \t" << fLum << std::endl;
+    txtFile << "lumi_8TeV     lnN   " << fLum << "\t - \t - \t - \t - \t - \t" << fLum << std::endl;
     txtFile << "CMS_scale_j   lnN   " << fSigJESm << "/" << fSigJESp << "\t" << fZJESm << "/" << fZJESp << "\t" << fWMuJESm << "/" << fWMuJESp << "\t" << fWElJESm << "/" << fWElJESp << "\t" << fWTauJESm << "/" << fWTauJESp << "\t" << fQCDJESm << "/" << fQCDJESp << "\t" << fOtherJESm << "/" << fOtherJESp << std::endl;
     txtFile << "CMS_res_j     lnN   " << fSigJERm << "/" << fSigJERp << "\t" << fZJERm << "/" << fZJERp << "\t" << fWMuJERm << "/" << fWMuJERp << "\t" << fWElJERm << "/" << fWElJERp << "\t" << fWTauJERm << "/" << fWTauJERp << "\t" << fQCDJERm << "/" << fQCDJERp << "\t" << fOtherJERm << "/" << fOtherJERp << std::endl;
     txtFile << "CMS_scale_met lnN   " << fSigUESm << "/" << fSigUESp << "\t" << fZUESm << "/" << fZUESp << "\t" << fWMuUESm << "/" << fWMuUESp << "\t" << fWElUESm << "/" << fWElUESp << "\t" << fWTauUESm << "/" << fWTauUESp << "\t" << fQCDUESm << "/" << fQCDUESp << "\t" << fOtherUESm << "/" << fOtherUESp << std::endl;
