@@ -56,8 +56,7 @@ int main(int argc, char* argv[]) {
   unsigned nCutsWTau = cuts.nCutsWTau();
 
   // For lepton weights
-  TCut elVetoWeight = cuts.elVetoWeight(options.leptCorr);
-  TCut muVetoWeight = cuts.muVetoWeight(options.leptCorr);
+  TCut lVetoWeight  = cuts.elVetoWeight(options.leptCorr) * cuts.muVetoWeight(options.leptCorr);
 
   TCut puWeight("puWeight");
   TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
@@ -160,7 +159,7 @@ int main(int argc, char* argv[]) {
     TCut yStarWeight("");
     TCut mjjWeight("");
     TCut otherCuts = puWeight * trigCorrWeight; 
-    if(!(dataset.isData)) otherCuts *= elVetoWeight * muVetoWeight;
+    if(!(dataset.isData)) otherCuts *= lVetoWeight;
 
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" || 
@@ -311,9 +310,11 @@ int main(int argc, char* argv[]) {
           cut = otherCuts * (cutD + cuts.cutflowWTau(c));
           if(isWJets) cut = otherCuts * wWeight * ( cuts.cutflowWTau(c));
       } else {
-          cut = puWeight * yStarWeight * mjjWeight * elVetoWeight * muVetoWeight * (cutD + cuts.cutflowWTau(c));
-          if(isWJets) cut = puWeight * wWeight * elVetoWeight * muVetoWeight * (cuts.cutflowWTau(c));
+          cut = puWeight * yStarWeight * mjjWeight * (cutD + cuts.cutflowWTau(c));
+          if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWTau(c));
+	  if(!(dataset.isData)) cut *= lVetoWeight;
       }
+
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
       // cut.Print();

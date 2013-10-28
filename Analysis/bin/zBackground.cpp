@@ -398,8 +398,8 @@ int main(int argc, char* argv[]) {
   // calculate efficiencies
   hZ_DY_EffMuMu->Add(hZ_DY_EffMuMu_N);
   hZ_DY_EffMuMu->Divide(hZ_DY_EffMuMu_D);
-  double syst_EffMuMu = constants::syst_effMu*hZ_DY_EffMuMu->GetBinContent(1);      //2.5% Muon ID/Iso efficiency uncertainty from EWK-10-002
-  hZ_DY_EffMuMu->SetBinError(1,TMath::Sqrt(hZ_DY_EffMuMu->GetBinError(1)*hZ_DY_EffMuMu->GetBinError(1) + syst_EffMuMu*syst_EffMuMu));
+  //double syst_EffMuMu = constants::syst_effMu*hZ_DY_EffMuMu->GetBinContent(1);      //2.5% Muon ID/Iso efficiency uncertainty from EWK-10-002
+  //hZ_DY_EffMuMu->SetBinError(1,TMath::Sqrt(hZ_DY_EffMuMu->GetBinError(1)*hZ_DY_EffMuMu->GetBinError(1) + syst_EffMuMu*syst_EffMuMu));
  
   hZ_DY_EffVBFS->Add(hZ_DY_EffVBFS_N);
   hZ_DY_EffVBFS->Divide(hZ_DY_EffVBFS_D);
