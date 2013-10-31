@@ -1198,17 +1198,38 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
     // ele
     if ((fabs(p.pdgId())==11) && (p.pt()>10.) && (fabs(p.eta())<2.4)){
       int bin = hLeptCorrEleVetoData_->FindBin(p.pt(),fabs(p.eta()));
-      eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
-      eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
-      eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
+      
+      if(hLeptCorrEleVetoData_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMC_->GetBinContent(bin) >= 1. ||
+	 hLeptCorrEleVetoData_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMC_->GetBinContent(bin) <  0.)
+	   eleVetoWeight        *= 1.;
+      else eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
+      if(hLeptCorrEleVetoDataErrUp_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMCErrUp_->GetBinContent(bin) >= 1. ||
+	 hLeptCorrEleVetoDataErrUp_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMCErrUp_->GetBinContent(bin) <  0.) 
+	   eleVetoWeightErrUp   *= 1.;
+      else eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
+      if(hLeptCorrEleVetoDataErrDown_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMCErrDown_->GetBinContent(bin) >= 1. ||
+	 hLeptCorrEleVetoDataErrDown_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMCErrDown_->GetBinContent(bin) <  0.) 
+	   eleVetoWeightErrDown *= 1.;
+      else eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
     }
 
     // mu
     if ((fabs(p.pdgId())==13) && (p.pt()>10.) && (fabs(p.eta())<2.1)){
       int bin = hLeptCorrMuVetoData_->FindBin(p.pt(),fabs(p.eta()));
-      muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
-      muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
-      muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
+
+      if(hLeptCorrMuVetoData_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMC_->GetBinContent(bin) >= 1. ||
+	 hLeptCorrMuVetoData_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMC_->GetBinContent(bin) <  0.)
+	   muVetoWeight        *= 1.;
+      else muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
+      if(hLeptCorrMuVetoDataErrUp_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMCErrUp_->GetBinContent(bin) >= 1. ||
+	 hLeptCorrMuVetoDataErrUp_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMCErrUp_->GetBinContent(bin) <  0.)
+	   muVetoWeightErrUp   *= 1.;
+      else muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
+      if(hLeptCorrMuVetoDataErrDown_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMCErrDown_->GetBinContent(bin) >= 1. ||
+	 hLeptCorrMuVetoDataErrDown_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMCErrDown_->GetBinContent(bin) <  0.)
+	   muVetoWeightErrDown *= 1.;
+      else muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
+ 
     }
 
     // tau
@@ -1220,16 +1241,36 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
       
         if ((fabs(pla->pdgId())==11) && (pla->status()==1) && (pla->pt()>10.) && (fabs(pla->eta())<2.4)) {
           int bin = hLeptCorrEleVetoData_->FindBin(pla->pt(),fabs(pla->eta()));
-          eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
-          eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
-          eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
+
+      	  if(hLeptCorrEleVetoData_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMC_->GetBinContent(bin) >= 1. ||
+             hLeptCorrEleVetoData_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMC_->GetBinContent(bin) <  0.)
+               eleVetoWeight        *= 1.;
+      	  else eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
+      	  if(hLeptCorrEleVetoDataErrUp_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMCErrUp_->GetBinContent(bin) >= 1. ||
+             hLeptCorrEleVetoDataErrUp_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMCErrUp_->GetBinContent(bin) <  0.)
+               eleVetoWeightErrUp   *= 1.;
+      	  else eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
+      	  if(hLeptCorrEleVetoDataErrDown_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMCErrDown_->GetBinContent(bin) >= 1. ||
+             hLeptCorrEleVetoDataErrDown_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMCErrDown_->GetBinContent(bin) <  0.)
+               eleVetoWeightErrDown *= 1.;
+      	  else eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
         }
 
         if ((fabs(pla->pdgId())==13) && (pla->status()==1) && (pla->pt()>10.) && (fabs(pla->eta())<2.1)){
           int bin = hLeptCorrMuVetoData_->FindBin(pla->pt(),fabs(pla->eta()));
-          muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
-          muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
-          muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
+
+          if(hLeptCorrMuVetoData_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMC_->GetBinContent(bin) >= 1. ||
+             hLeptCorrMuVetoData_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMC_->GetBinContent(bin) <  0.)
+               muVetoWeight        *= 1.;
+          else muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
+          if(hLeptCorrMuVetoDataErrUp_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMCErrUp_->GetBinContent(bin) >= 1. ||
+             hLeptCorrMuVetoDataErrUp_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMCErrUp_->GetBinContent(bin) <  0.)
+               muVetoWeightErrUp   *= 1.;
+          else muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
+          if(hLeptCorrMuVetoDataErrDown_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMCErrDown_->GetBinContent(bin) >= 1. ||
+             hLeptCorrMuVetoDataErrDown_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMCErrDown_->GetBinContent(bin) <  0.)
+               muVetoWeightErrDown *= 1.;
+      	  else muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
         }
       }
     }

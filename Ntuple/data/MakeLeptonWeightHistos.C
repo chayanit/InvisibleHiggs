@@ -1,4 +1,4 @@
-// #include <TH2>
+#include <TH2.h>
 
 // Macro to create TH2s from lepton weight text files, like for trigger weights
 // They can then be used in Ntuple code
@@ -24,7 +24,7 @@ void makeHists(std::string filename, TFile* outputFile){
         {
             std::stringstream ss(line);
             double ptMin, ptMax, etaMin, etaMax, sf, sfErrP, sfErrM;
-            if (ss >> ptMin >> ptMax >> etaMin >> etaMax >> sf >> sfErrP >> sfErrM) {
+            if (ss >> ptMin >> ptMax >> etaMin >> etaMax >> sf >> sfErrM >> sfErrP) {
                 SF.push_back(sf);
                 SFerrUp.push_back(sfErrP);
                 SFerrDown.push_back(sfErrM);

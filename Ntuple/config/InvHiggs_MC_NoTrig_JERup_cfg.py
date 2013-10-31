@@ -16433,7 +16433,7 @@ process.pfMET = cms.EDProducer("METProducer",
     PF_PhiResType2 = cms.vdouble(0.002),
     PF_PhiResType3 = cms.vdouble(0.002),
     HF_EtResPar = cms.vdouble(0.0, 1.82, 0.09),
-    resolutionsEra = cms.string('Spring10'),
+    resolutionsEra = cms.string('Autumn13'),
     PF_PhiResType6 = cms.vdouble(0.02511),
     InputType = cms.string('PFCandidateCollection'),
     PF_PhiResType4 = cms.vdouble(0.0028, 0.0, 0.0022),
@@ -16532,7 +16532,7 @@ process.pfMEtSysShiftCorr = cms.EDProducer("SysShiftMETcorrInputProducer",
 
 
 process.pfMet = cms.EDProducer("METProducer",
-    resolutionsEra = cms.string('Spring10'),
+    resolutionsEra = cms.string('Autumn13'),
     PF_EtResType6 = cms.vdouble(0.0, 1.22, 0.05),
     HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
     jdphi6 = cms.vdouble(0.084, 0.08, 0.072, 0.065, 0.066, 
@@ -20645,7 +20645,7 @@ process.selectedPatJetsForMETtype1p2CorrEnUpWithGaussian = cms.EDProducer("Shift
 
 process.selectedPatJetsForMETtype1p2CorrResDownNoGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -20730,7 +20730,7 @@ process.selectedPatJetsForMETtype1p2CorrResDownNoGaussian = cms.EDProducer("Smea
 
 process.selectedPatJetsForMETtype1p2CorrResDownWithGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -20815,7 +20815,7 @@ process.selectedPatJetsForMETtype1p2CorrResDownWithGaussian = cms.EDProducer("Sm
 
 process.selectedPatJetsForMETtype1p2CorrResUpNoGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -20900,7 +20900,7 @@ process.selectedPatJetsForMETtype1p2CorrResUpNoGaussian = cms.EDProducer("Smeare
 
 process.selectedPatJetsForMETtype1p2CorrResUpWithGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -22114,7 +22114,7 @@ process.sisCone7GenJetsNoNu = cms.EDProducer("FastjetJetProducer",
 
 process.smearedGoodPatJetsNoGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -22198,7 +22198,7 @@ process.smearedGoodPatJetsNoGaussian = cms.EDProducer("SmearedPATJetProducer",
 
 process.smearedGoodPatJetsResDownNoGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -22283,7 +22283,7 @@ process.smearedGoodPatJetsResDownNoGaussian = cms.EDProducer("SmearedPATJetProdu
 
 process.smearedGoodPatJetsResDownWithGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -22368,7 +22368,7 @@ process.smearedGoodPatJetsResDownWithGaussian = cms.EDProducer("SmearedPATJetPro
 
 process.smearedGoodPatJetsResUpNoGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -22453,7 +22453,7 @@ process.smearedGoodPatJetsResUpNoGaussian = cms.EDProducer("SmearedPATJetProduce
 
 process.smearedGoodPatJetsResUpWithGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -22538,7 +22538,7 @@ process.smearedGoodPatJetsResUpWithGaussian = cms.EDProducer("SmearedPATJetProdu
 
 process.smearedGoodPatJetsWithGaussian = cms.EDProducer("SmearedPATJetProducer",
     jetResolutions = cms.PSet(
-        resolutionsEra = cms.string('Spring10'),
+        resolutionsEra = cms.string('Autumn13'),
         HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
         EE_PhiResPar = cms.vdouble(0.02511),
         jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
@@ -27145,7 +27145,7 @@ process.GenJetParameters = cms.PSet(
 )
 
 process.METSignificance_params = cms.PSet(
-    resolutionsEra = cms.string('Spring10'),
+    resolutionsEra = cms.string('Autumn13'),
     HB_EtResPar = cms.vdouble(0.0, 1.22, 0.05),
     EE_PhiResPar = cms.vdouble(0.02511),
     jdpt9 = cms.vdouble(0.843, 0.885, 1.245, 1.665, 1.944, 
