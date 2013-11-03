@@ -56,6 +56,11 @@ int main(int argc, char* argv[]) {
   // cuts
   Cuts cuts;
 
+  // For lepton weights
+  TCut muTightWeight    = cuts.muTightWeight(options.leptCorr);
+  TCut elTightWeight    = cuts.elTightWeight(options.leptCorr);
+  TCut lVetoWeight      = cuts.elVetoWeight(options.leptCorr) * cuts.muVetoWeight(options.leptCorr);
+
   TCut puWeight("puWeight"); 
   TCut trigCorr( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
   TCut cutnoMjjnoMET = cuts.cutWMu("trigger")+cuts.cutWMu("dijet")+cuts.cutWMu("dEtaJJ")+cuts.cutWMu("CJV")+cuts.cutWMu("dPhiJJ");
@@ -122,6 +127,8 @@ int main(int argc, char* argv[]) {
     // setup cuts
     TCut cutD = cuts.cutDataset(dataset.name);
     TCut wWeight("");
+
+    if (dataset.name.compare(0,3,"QCD") == 0) continue;
 
     // check it's  W+Jets
     bool isWJets = false;

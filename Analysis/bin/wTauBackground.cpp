@@ -145,6 +145,7 @@ int main(int argc, char* argv[]) {
 
     // Weight to lumi
     double weight = (dataset.isData) ? 1. : (lumi * dataset.sigma / dataset.nEvents);
+    if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
     // double weight = 1.;
 
     ///////////////////////////////
@@ -342,9 +343,11 @@ int main(int argc, char* argv[]) {
     if (dataset.name.compare(0,2,"DY")==0) 
       hDYWTau->Add(hCutFlowWTau);
 
-    if (dataset.name.compare(0,3,"Zvv")==0) 
+    if (dataset.name.compare(0,3,"Zvv")==0 || 
+	dataset.name == "EWK_ZvvFake" ) {
       hZvvWTau->Add(hCutFlowWTau);
-    
+    }    
+
     if (dataset.name.compare(0,7,"SingleT")==0) 
       hSingleTWTau->Add(hCutFlowWTau);
     
@@ -577,6 +580,7 @@ int main(int argc, char* argv[]) {
   zJets.push_back("Zvv_100to200");
   zJets.push_back("Zvv_200to400");
   zJets.push_back("Zvv_400toinf");
+  zJets.push_back("EWK_ZvvFake");
   SumDatasets(oDirPlots, zJets, hnames, "ZJets");
 
   // sum single top datasets

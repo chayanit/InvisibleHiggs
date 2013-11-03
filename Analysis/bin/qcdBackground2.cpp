@@ -5,6 +5,7 @@
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
+#include "InvisibleHiggs/Analysis/interface/Constants.h"
 
 #include "TROOT.h"
 #include "TStyle.h"
@@ -51,6 +52,9 @@ int main(int argc, char* argv[]) {
   TCut puWeight("puWeight");
   TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
   TCut wWeight = cuts.wWeight();
+
+  // For lepton weights
+  TCut lVetoWeight = cuts.elVetoWeight(options.leptCorr) * cuts.muVetoWeight(options.leptCorr);
 
   TCut cutLoDPhi = cuts.cut("dPhiJJ");
   TCut cutHiDPhi("vbfDPhi>2.6");
@@ -134,7 +138,6 @@ int main(int argc, char* argv[]) {
 
     TCut cutQCDHiDPhiCtrl("");
     TCut cutQCDLoDPhiCtrl("");
-    TCut cutQCDLoDPhiMETCtrl("");
 
     if (dataset.name == "WJets" ||
         dataset.name == "W1Jets" ||
@@ -142,12 +145,11 @@ int main(int argc, char* argv[]) {
         dataset.name == "W3Jets" ||
         dataset.name == "W4Jets") {
       
-      cutQCDHiDPhi     = puWeight * trigCorrWeight * wWeight * (cutD + cuts.qcdNoMET() + cutHiDPhi);
-      cutQCDLoDPhi     = puWeight * trigCorrWeight * wWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi);
-      cutQCDLoDPhiMET  = puWeight * trigCorrWeight * wWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi + METLow);      
-      cutQCDHiDPhiCtrl = puWeight * trigCorrWeight * wWeight * (cutD + cutsCtrl + cutHiDPhi);
-      cutQCDLoDPhiCtrl = puWeight * trigCorrWeight * wWeight * (cutD + cutsCtrl + cutLoDPhi);
-      cutQCDLoDPhiMETCtrl  = puWeight * trigCorrWeight * wWeight * (cutD + cutsCtrl + cutLoDPhi + METLow);      
+      cutQCDHiDPhi     = puWeight * trigCorrWeight * lVetoWeight * wWeight * (cutD + cuts.qcdNoMET() + cutHiDPhi);
+      cutQCDLoDPhi     = puWeight * trigCorrWeight * lVetoWeight * wWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi);
+      cutQCDLoDPhiMET  = puWeight * trigCorrWeight * lVetoWeight * wWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi + METLow);      
+      cutQCDHiDPhiCtrl = puWeight * trigCorrWeight * lVetoWeight * wWeight * (cutD + cutsCtrl + cutHiDPhi);
+      cutQCDLoDPhiCtrl = puWeight * trigCorrWeight * lVetoWeight * wWeight * (cutD + cutsCtrl + cutLoDPhi);
     }
     else {
       cutQCDHiDPhi     = puWeight * trigCorrWeight * (cutD + cuts.qcdNoMET() + cutHiDPhi);
@@ -155,6 +157,14 @@ int main(int argc, char* argv[]) {
       cutQCDLoDPhiMET  = puWeight * trigCorrWeight * (cutD + cuts.qcdNoMET() + cutLoDPhi + METLow); 
       cutQCDHiDPhiCtrl     = puWeight * trigCorrWeight * (cutD + cutsCtrl + cutHiDPhi);
       cutQCDLoDPhiCtrl     = puWeight * trigCorrWeight * (cutD + cutsCtrl + cutLoDPhi);
+
+      if (!dataset.isData) {
+	cutQCDHiDPhi *= lVetoWeight;
+	cutQCDLoDPhi *= lVetoWeight;
+	cutQCDLoDPhiMET  *= lVetoWeight;
+	cutQCDHiDPhiCtrl *= lVetoWeight;
+	cutQCDLoDPhiCtrl *= lVetoWeight;
+      }	
     }
 
 
@@ -190,6 +200,7 @@ int main(int argc, char* argv[]) {
 
     // weight  to lumi
     double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
+    if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
  
     hQCD_HiDPhi_MET->Scale(weight);
     hQCD_LoDPhi_MET->Scale(weight);
@@ -218,7 +229,8 @@ int main(int argc, char* argv[]) {
 	hQCD_BG_LoDPhiCtrl_MET->Add(hQCD_LoDPhiCtrl_MET);
     }
 
-    if (dataset.name.compare(0,3,"Zvv")==0) {
+    if (dataset.name.compare(0,3,"Zvv")==0 ||
+	dataset.name == "EWK_ZvvFake") {
 	hQCD_ZNuNu_HiDPhi_MET->Add(hQCD_HiDPhi_MET);
         hQCD_ZNuNu_LoDPhi_MET->Add(hQCD_LoDPhi_MET);
     }
@@ -227,7 +239,9 @@ int main(int argc, char* argv[]) {
         dataset.name == "W1Jets" ||
         dataset.name == "W2Jets" ||
         dataset.name == "W3Jets" ||
-        dataset.name == "W4Jets") {
+        dataset.name == "W4Jets" ||
+	dataset.name == "EWK_Wp2Jets" ||
+	dataset.name == "EWK_Wm2Jets") {
 	hQCD_Wlv_HiDPhi_MET->Add(hQCD_HiDPhi_MET);
         hQCD_Wlv_LoDPhi_MET->Add(hQCD_LoDPhi_MET);
     }
@@ -248,7 +262,8 @@ int main(int argc, char* argv[]) {
 
     if (dataset.name == "WW" ||
 	dataset.name == "WZ" ||
-	dataset.name == "ZZ") {
+	dataset.name == "ZZ" ||
+	dataset.name == "WG") {
         hQCD_Diboson_HiDPhi_MET->Add(hQCD_HiDPhi_MET);
         hQCD_Diboson_LoDPhi_MET->Add(hQCD_LoDPhi_MET);
     }     

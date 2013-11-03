@@ -215,7 +215,7 @@ int main(int argc, char* argv[]) {
   ofstream texFile;
   texFile.open(options.oDir+std::string("/cutflow.tex"));
  
-  texFile << "Cut & N(Data) & N($Z\\rightarrow\\nu\\nu$) & N($W\\rightarrow \\mu\\nu$) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV \\\\" << std::endl;
+  texFile << "Cut & N(Data) & N($Z\\rightarrow\\nu\\nu$) & N($W\\rightarrow \\mu\\nu$) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV \\\\" << std::endl;
 
   TH1D* hData   = (TH1D*) ofile->Get("hCutFlow_METABCD");
   TH1D* hZEWK   = (TH1D*) ofile->Get("hCutFlow_EWK_ZvvFake");

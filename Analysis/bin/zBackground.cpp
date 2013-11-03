@@ -142,8 +142,9 @@ int main(int argc, char* argv[]) {
     TCut cutDYNoVBFWeight   = otherWeight * trigCorr * (cutD  + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.cutZMuMu("dijet"));
 
     if(!(dataset.isData)) {
-	cutZMuMu_C *= lVetoWeight * muTightWeight;
+	cutZMuMu_C *= muTightWeight;
 	cutEfficiencyMuMu_N *= muTightWeight;
+	cutEfficiencyVBFC_D *= muTightWeight;
 	cutEfficiencyVBFC_N *= muTightWeight;
 	cutDYNoVBFNoWeight  *= muTightWeight;
 	cutDYNoVBFWeight    *= muTightWeight;
@@ -244,7 +245,7 @@ int main(int argc, char* argv[]) {
       if(c == nCutsZMuMu-1) cut = otherWeight * trigCorr * (cutD + cuts.cutflowZMuMu(c));
       else cut = otherWeight * (cutD + cuts.cutflowZMuMu(c));
 
-      if(!(dataset.isData)) cut *= lVetoWeight * muTightWeight;
+      if(!(dataset.isData)) cut *= muTightWeight;
 
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);

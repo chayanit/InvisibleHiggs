@@ -212,6 +212,7 @@ int main(int argc, char* argv[]) {
 
     // Weight to lumi
     double weight = (dataset.isData) ? 1. : (lumi * dataset.sigma / dataset.nEvents);
+    if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
 
     // check it's  W+Jets
     bool isWJets = false;
@@ -310,14 +311,14 @@ int main(int argc, char* argv[]) {
 
       if (dataset.name.compare(0,17,"SignalM125_POWHEG")== 0 || dataset.name.compare(0,3,"QCD") == 0) continue;
 
-      if(dataset.name.compare(0,3,"Zvv") != 0){ // Don't need Zvv in WMu estimates
+      if(dataset.name.compare(0,3,"Zvv") != 0 && dataset.name != "EWK_ZvvFake"){ // Don't need Zvv in WMu estimates
         tree->Draw("vbfDPhi>>hWMu_BGC_DPhi_tmp", otherCutsTight * cutWMu_C_DPhi);
         tree->Draw("vbfM>>hWMu_BGC_Mjj_tmp", otherCutsTight * cutWMu_C_Mjj);
         tree->Draw("metNoWLepton>>hWMu_BGC_MET_tmp", otherCutsTight * cutWMu_C_MET);
         tree->Draw("cenJetEt>>hWMu_BGC_CenJetEt_tmp", otherCutsTight * cutWMu_C_CenJetEt);
         
         hWMu_BGC_DPhi_tmp->Scale(weight);
-    	  hWMu_BGC_Mjj_tmp->Scale(weight);
+    	hWMu_BGC_Mjj_tmp->Scale(weight);
         hWMu_BGC_MET_tmp->Scale(weight);
         hWMu_BGC_CenJetEt_tmp->Scale(weight);
         

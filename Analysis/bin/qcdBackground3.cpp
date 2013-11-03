@@ -5,6 +5,7 @@
 #include "InvisibleHiggs/Analysis/interface/StackPlot.h"
 #include "InvisibleHiggs/Analysis/interface/SumDatasets.h"
 #include "InvisibleHiggs/Analysis/interface/Datasets.h"
+#include "InvisibleHiggs/Analysis/interface/Constants.h"
 
 #include "TROOT.h"
 #include "TStyle.h"
@@ -138,6 +139,7 @@ int main(int argc, char* argv[]) {
     TH1D* hTmpLo_METF_CJEt = new TH1D("hTmpLo_METF_CJEt", "", 17, 30., 200.);
    
     double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
+    if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
 
     if (dataset.isData) {
       std::cout << "Analysing Data         : " << dataset.name << std::endl;
