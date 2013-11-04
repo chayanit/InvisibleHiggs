@@ -346,7 +346,7 @@ int main(int argc, char* argv[]) {
   plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "N_{events}",1,1);
   plots.setYMax(-1); // resets plot to automate maximum
   plots.draw("hMjjNM1", "M_{jj} [GeV]", "Events / 100 GeV",1,1);
-  plots.draw("hMETNM1", "#slash{E}_{T} [GeV]", "Events / 20 GeV",1,1);
+  plots.draw("hMETNM1", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,1);
   plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,1);
   plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,1);
   plots.setYMax(5E5);

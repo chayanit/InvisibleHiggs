@@ -58,14 +58,13 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   TH1::SetDefaultSumw2();
 
   TCanvas canvas;
-  // canvas.SetLogy();
-  unsigned int ww = canvas.GetWindowWidth();
-  unsigned int wh = canvas.GetWindowHeight();
+  // unsigned int ww = canvas.GetWindowWidth();
+  // unsigned int wh = canvas.GetWindowHeight();
 
   //std::cout << "canvas weight = " << ww << std::endl;
   //std::cout << "canvas height = " << wh << std::endl;
 
-  TPad *pad1; // Use TPad to allow us to draw ratio plot below main plot
+  TPad *pad1; // This TPad is for the main plot. There's another one for the ratio plot
   if (drawRatioPlot) {
     canvas.SetCanvasSize(500, 600);
     canvas.Divide(1, 2);
@@ -137,28 +136,28 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
     if (styles_.at(i) == 0 || styles_.at(i) == 3) {
       if (h->GetEntries()==0) {
-      	std::cout << "No entries in histogram " << labels_.at(i) << std::endl;
-      	continue;
+        std::cout << "No entries in histogram " << labels_.at(i) << std::endl;
+        continue;
       }
       
       drawStack=true;
       // h->SetLineColor(cols_.at(i));
       // h->SetLineWidth(0);
       h->SetLineColor(kBlack);
-      h->SetLineWidth(2);
+      h->SetLineWidth(1);
       h->SetFillColor(cols_.at(i));
       if(styles_.at(i) == 3) {
-	nMinusOne=true;
+        nMinusOne=true;
         h->SetLineStyle(1);
         h->SetLineWidth(3);
         h->SetLineColor(cols_.at(i));
-	h->SetFillColor(0);
+        h->SetFillColor(0);
       } 
 
       stack.Add(h);
       TLegendEntry *legE;
-      if(styles_.at(i) == 3) 	legE = new TLegendEntry(h, labels_.at(i).c_str(), "L");
-      else 			legE = new TLegendEntry(h, labels_.at(i).c_str(), "F");
+      if(styles_.at(i) == 3)  legE = new TLegendEntry(h, labels_.at(i).c_str(), "L");
+      else      legE = new TLegendEntry(h, labels_.at(i).c_str(), "F");
       entries.push_back(legE);
       
     }
@@ -167,9 +166,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   
 
   // Little hack here to get sum of hists in the THStack
-  // ROOT doesn't have a method to convert a THStack to a TH1 for some stupid reason
-  // Good ol' Rene...
-
+  // Since apparently there isn't a method for that... (If there is please fix me!)
   TList *histList = stack.GetHists();
   TIter next(histList); // Get list of hists in Stack
   TH1 *hMC  = (TH1*) histList->First()->Clone();
@@ -182,12 +179,14 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     hMC -> Add((TH1*)obj);
   }
 
+  //////////////////////////////
+  // Draw the histogram Stack //
+  //////////////////////////////
 
   if (drawStack) {
     stack.Draw("HIST");
 
-    // Some auto-axis ranging, doesn't work brilliantly, try tweaking the 5 and 0.1
-    // assumes log axes!!!
+    // Some auto-axis ranging, doesn't work brilliantly, try tweaking the factors
     if (logy){
       stack.SetMaximum(stack.GetMaximum()*100);
       // stack.SetMinimum(ymin*0.1);
@@ -222,6 +221,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     stack.GetYaxis()->SetTitle(yTitle.c_str());
 
     if (!drawRatioPlot){
+      // TODO
+      // set title and label size & offsets
     }
 
 
@@ -243,6 +244,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   /////////////////////////////////
   // draw non-stacked histograms //
   /////////////////////////////////
+
   TH1D* hData;
   file = files_.begin();
   i=0;
@@ -286,9 +288,9 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
   }
 
-  // draw the other stuff
+  // draw the axes again over the top of block colours
   canvas.RedrawAxis();  
-
+  
   // Draw line on plot if N-1
   // Note, depends on hists defined in nMinusOne.cpp
   double cutVal = 0.;
@@ -314,36 +316,35 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   // Note, it's just repeated with different constructor values
   // That's because using SetX1NDC doesn't work, even if you call Draw() again
   // So I'm stuck doing this 
-  // Also I found that if you create the object NOT via pointer (i.e. TPaveText cms(...))
+  // Also I found that if you create the object NOT via pointer but via a normal object (i.e. TPaveText cms(...))
   // it doesn't like doing it INSIDE the if(drawRatioPlot){...} bit
-  // Hence the null pointer first, then the constructors...
   
-  TPaveText *cms = 0;
+  TPaveText *cms;
   if(drawRatioPlot){
     // Optimised for ratio plots
-    cms = new TPaveText(0.18, 0.65, 0.70, 0.89, "NDC");
+    cms = new TPaveText(0.18, 0.65, 0.6, 0.89, "NDC");
   } else {
-    // Optimised for N-1
+    // Optimised for non-ratio plots
     cms = new TPaveText(0.12, 0.68, 0.45, 0.9, "NDC");
   }
-    cms->SetFillColor(0);
-    cms->SetFillStyle(4000);
-    cms->SetBorderSize(0);
-    cms->SetLineColor(0);
-    cms->SetTextAlign(12);
-    cms->AddText("CMS Preliminary");
-    cms->AddText("");
-    cms->AddText("#sqrt{s} = 8 TeV L = 19.6 fb^{-1}");
-    cms->AddText("");
-    // any other text user has specified
-    cms->AddText(label_.c_str());
-    cms->Draw();
-  // gPad->Modified();
-  // gPad->Update();
+  cms->SetFillColor(0);
+  cms->SetFillStyle(4000);
+  cms->SetBorderSize(0);
+  cms->SetLineColor(0);
+  cms->SetTextAlign(12);
+  cms->AddText("CMS");
+  // cms->AddText("");
+  cms->AddText("#sqrt{s} = 8 TeV, L = 19.5 fb^{-1}");
+  // cms->AddText("");
+  cms->AddText("VBF H(inv)");
+  // any other text user has specified
+  cms->AddText(label_.c_str());
+  cms->Draw();
 
   //////////////////////////////////////////////
   // draw legend, with entries in right order //
   //////////////////////////////////////////////
+
   std::reverse(entries.begin(),entries.end());
   for (unsigned int n = 0;n < entries.size(); n++)
   {
@@ -357,9 +358,9 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   //////////////////////
   // Draw ratio plot  //
   //////////////////////
+
   if (drawRatioPlot){
     TPad *pad2 = new TPad("pad2","",0,0.0,1,0.30);
-    // TPad *pad2 = (TPad *) canvas.cd(2);
     pad2->SetTopMargin(1);
     pad2->SetBottomMargin(0.33);
     pad2->SetLeftMargin(pad1->GetLeftMargin());
@@ -367,35 +368,40 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     // pad2->SetTopMargin(0);
     pad2->Draw();
     pad2->cd();
-
      
-    hData->Add(hMC,-1);
     hData->Divide(hMC);
     hData->SetMarkerStyle(8);
-    // hData->Draw("ep");
+
+    // BE CAREFUL WHEN EDITING THESE VALUES
+    // They *should* work to give nice sizes & offsets 
+    // - ignore the fact that some of the Offsets are odd numbers like 0.011
+    // It involved a lot of trial and error, so edit at your own risk...
+    // ROOT does some magic to convert these to actual distances...
+
     hData->SetXTitle(xTitle.c_str());
-    hData->SetYTitle("#frac{Data - MC}{MC}");
+    hData->SetYTitle("#frac{Data}{MC}");
     hData->GetXaxis()->SetTitleSize(0.15);
     hData->GetXaxis()->SetTitleOffset(0.85);
     hData->GetXaxis()->SetLabelSize(0.12);
     hData->GetXaxis()->SetLabelOffset(0.008);
 
+    hData->GetYaxis()->CenterTitle(kTRUE);
     hData->GetYaxis()->SetTitleSize(0.12);
     hData->GetYaxis()->SetTitleOffset(0.5);
     hData->GetYaxis()->SetNdivisions(3,5,0);
     hData->GetYaxis()->SetLabelSize(0.12);
-    hData->GetYaxis()->SetLabelOffset(0.008);
+    hData->GetYaxis()->SetLabelOffset(0.011);
 
-    // remove any points if no data ie (data-mc)/mc= -1
+    // remove any points if no data ie data/mc = 0
     for(int nbin = 1; nbin<= hData->GetNbinsX(); nbin++)
     {
-      if(hData->GetBinContent(nbin) == -1)
+      if(hData->GetBinContent(nbin) == 0)
         hData->SetBinContent(nbin,1000);
     }
 
     hData->Draw("ep");
-    hData->SetMaximum(1.);
-    hData->SetMinimum(-1.);
+    hData->SetMaximum(2);
+    hData->SetMinimum(0);
 
     int NBins = hMC->GetNbinsX();
     TGraphErrors * Erreff = new TGraphErrors(NBins);
@@ -404,7 +410,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       double y_smSum = hMC->GetBinContent(iBin); 
       if(!(y_smSum > 0.)) continue;
       double relerr = hMC->GetBinError(iBin)/hMC->GetBinContent(iBin);
-      Erreff->SetPoint(iBin-1, x, 0);
+      Erreff->SetPoint(iBin-1, x, 1);
       Erreff->SetPointError(iBin-1, 0.5*hMC->GetBinWidth(iBin),relerr);
     }
     Erreff->SetMarkerStyle(0);
@@ -419,7 +425,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
     double lineMin = hData->GetXaxis()->GetXmin();
     double lineMax = hData->GetXaxis()->GetXmax();
-    TLine *line = new TLine(lineMin,0,lineMax,0);
+    TLine *line = new TLine(lineMin,1,lineMax,1);
     line->SetLineColor(kBlack);
     line->SetLineWidth(2);
     line->SetLineStyle(2);
@@ -427,7 +433,9 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     canvas.cd();
   }
 
-
+  /////////////////
+  // Save as PDF //
+  /////////////////
   std::string filename = dir_+std::string("/")+hname+".pdf";
   std::cout << "Writing pdf file " << filename << std::endl;
 
