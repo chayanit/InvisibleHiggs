@@ -1,5 +1,5 @@
 #include <TH2.h>
-
+#include <iomanip>
 // Macro to create TH2s from lepton weight text files, like for trigger weights
 // They can then be used in Ntuple code
 //
@@ -81,6 +81,43 @@ void makeHists(std::string filename, TFile* outputFile){
         std::cout << "ERROR: No such file " << filename << std::endl;
 }
 
+double calculateVetoEff(double eff_data, double eff_mc) {
+    // Slightly complicated procedure here. Following IC, rules are:
+        // if eff_data > 1, set = 1. Same with eff_mc
+        // if eff_data < 0, set = 0. Same with eff_mc
+        // When calculating the total eff, 1-eff_data / 1-eff_mc,
+        // if you get 1/1 or 0/0, this = NaN, which we set = 1
+        // All written & calcualted explicitly, so no ambiguity with NaN! 
+    if(eff_data >= 1) {
+        if(eff_mc >= 1)
+            //set = 1/1 = NaN = 1
+            return 1.;
+        else
+            //set = 0
+            return 0.;
+    } else if (eff_data < 0) {
+        if(eff_mc >= 1)
+            //set = 1 (1/0 =NaN) (this never occurs in practice)
+            return 1.;
+        else if (eff_mc < 0)
+            //set = 1
+            return 1.;
+        else
+            //set = 1/1-mc
+            return 1./(1.-eff_mc);
+    } else { // normal eff_data
+        if(eff_mc >= 1)
+            //set=1 (/0 =NaN)
+            return 1.;
+        else if (eff_mc < 0)
+            //set = 1-hData/1
+            return 1.-eff_data;
+        else
+            //set = 1-hData/1-mc
+            return (1.-eff_data)/(1.-eff_mc);
+    }
+}
+
 void MakeLeptonWeightHistos(){
     gStyle->SetOptStat("n");
     std::vector<std::string> fileList;
@@ -98,24 +135,58 @@ void MakeLeptonWeightHistos(){
     makeHists("mu_tight_iso_SF.txt",outputFile);
     
     // Multiply ID * ISO for mu and store
+    // Also do 1-eff_data/1-eff_mc for loose mu and veto electrons and store
     std::string post[] = {"","_errUp","_errDown"};
     std::string dataMc[] = {"data","mc"};
     for (int k = 0; k < 3; k++){
+        std::cout << " >>> " << post[k] << std::endl;
+
         for (int j =0; j<2; j++){
-            // Loose
+            // Loose mu: ID * ISO
             TH2D* temp = ((TH2D*) outputFile->Get(("mu_loose_id_"+dataMc[j]+"_eff"+post[k]).c_str())); 
             temp->Multiply((TH2D*) outputFile->Get(("mu_loose_iso_"+dataMc[j]+"_eff"+post[k]).c_str()));
             temp->SetName(("mu_loose_"+dataMc[j]+"_eff"+post[k]).c_str());
             temp->Write();
             delete temp;
         }
-        // Tight
+
+        // Loose mu eff
+        std::cout << "Loose mu" << std::endl;
+        TH2D* hDataMu  = (TH2D*) outputFile->Get(("mu_loose_data_eff"+post[k]).c_str());
+        TH2D* hMcMu    = (TH2D*) outputFile->Get(("mu_loose_mc_eff"+post[k]).c_str());
+        TH2D* hFinalMu = (TH2D*) hDataMu->Clone(("mu_loose_eff"+post[k]).c_str());
+        for(int x = 1; x <= hDataMu->GetNbinsX();x++){
+            for(int y = 1; y <= hDataMu->GetNbinsY(); y++){
+                hFinalMu->SetBinContent(x,y,calculateVetoEff(hDataMu->GetBinContent(x,y),hMcMu->GetBinContent(x,y)));
+                std::cout << std::fixed;
+                std::cout << std::setprecision(15) << hDataMu->GetBinContent(x,y) << "   " << hMcMu->GetBinContent(x,y) << "   " << (1.-(hDataMu->GetBinContent(x,y)))/(1.-(hMcMu->GetBinContent(x,y))) << "   " << hFinalMu->GetBinContent(x,y) <<std::endl;
+            }
+        }
+        hFinalMu->Write();
+        delete hFinalMu;       
+
+        // Tight mu ID * ISO
+        // std::cout << "Tight Mu" << std::endl;
         TH2D* muTight = (TH2D*) outputFile->Get(("mu_tight_id_SF"+post[k]).c_str());
         muTight->Multiply((TH2D*) outputFile->Get(("mu_tight_iso_SF"+post[k]).c_str()));
         muTight->SetName(("mu_tight_eff"+post[k]).c_str());
-        muTight->Write();        
+        muTight->Write(); 
+
+        // Veto electrons
+        std::cout << "Veto ele" << std::endl;
+        TH2D* hDataEl  = (TH2D*) outputFile->Get(("ele_veto_id_data_eff"+post[k]).c_str());
+        TH2D* hMcEl    = (TH2D*) outputFile->Get(("ele_veto_id_mc_eff"+post[k]).c_str());
+        TH2D* hFinalEl = (TH2D*) hDataEl->Clone(("ele_veto_eff"+post[k]).c_str());
+        for(int x = 1; x <= hDataEl->GetNbinsX();x++){
+            for(int y = 1; y <= hDataEl->GetNbinsY(); y++){
+                hFinalEl->SetBinContent(x,y,calculateVetoEff(hDataEl->GetBinContent(x,y),hMcEl->GetBinContent(x,y)));
+                std::cout << std::setprecision(15) << hDataEl->GetBinContent(x,y) << "   " << hMcEl->GetBinContent(x,y) << "   " << (1.-(hDataEl->GetBinContent(x,y)))/(1.-(hMcEl->GetBinContent(x,y))) << "   " << hFinalEl->GetBinContent(x,y)  << std::endl;
+            }
+        }
+        hFinalEl->Write();
+        delete hFinalEl;       
     }
 
-    outputFile->ls();
+    // outputFile->ls();
     outputFile->Close();
 }
