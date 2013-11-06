@@ -296,24 +296,18 @@ private:
   TFile* fLeptCorr_;
   TH2D*  hLeptCorrEleTight_;
   TH2D*  hLeptCorrMuTight_;
-  TH2D*  hLeptCorrEleVetoData_;
-  TH2D*  hLeptCorrEleVetoMC_;
-  TH2D*  hLeptCorrMuVetoData_;
-  TH2D*  hLeptCorrMuVetoMC_;
+  TH2D*  hLeptCorrEleVeto_;
+  TH2D*  hLeptCorrMuVeto_;
 
   TH2D*  hLeptCorrEleTightErrUp_;
   TH2D*  hLeptCorrMuTightErrUp_;
-  TH2D*  hLeptCorrEleVetoDataErrUp_;
-  TH2D*  hLeptCorrEleVetoMCErrUp_;
-  TH2D*  hLeptCorrMuVetoDataErrUp_;
-  TH2D*  hLeptCorrMuVetoMCErrUp_;
+  TH2D*  hLeptCorrEleVetoErrUp_;
+  TH2D*  hLeptCorrMuVetoErrUp_;
 
   TH2D*  hLeptCorrEleTightErrDown_;
   TH2D*  hLeptCorrMuTightErrDown_;
-  TH2D*  hLeptCorrEleVetoDataErrDown_;
-  TH2D*  hLeptCorrEleVetoMCErrDown_;
-  TH2D*  hLeptCorrMuVetoDataErrDown_;
-  TH2D*  hLeptCorrMuVetoMCErrDown_;
+  TH2D*  hLeptCorrEleVetoErrDown_;
+  TH2D*  hLeptCorrMuVetoErrDown_;
   bool   doLeptCorr_;
 
   // VBF jets
@@ -403,22 +397,16 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   fLeptCorr_(0),
   hLeptCorrEleTight_(0),
   hLeptCorrMuTight_(0),
-  hLeptCorrEleVetoData_(0),
-  hLeptCorrEleVetoMC_(0),
-  hLeptCorrMuVetoData_(0),
-  hLeptCorrMuVetoMC_(0),
+  hLeptCorrEleVeto_(0),
+  hLeptCorrMuVeto_(0),
   hLeptCorrEleTightErrUp_(0),
   hLeptCorrMuTightErrUp_(0),
-  hLeptCorrEleVetoDataErrUp_(0),
-  hLeptCorrEleVetoMCErrUp_(0),
-  hLeptCorrMuVetoDataErrUp_(0),
-  hLeptCorrMuVetoMCErrUp_(0),
+  hLeptCorrEleVetoErrUp_(0),
+  hLeptCorrMuVetoErrUp_(0),
   hLeptCorrEleTightErrDown_(0),
   hLeptCorrMuTightErrDown_(0),
-  hLeptCorrEleVetoDataErrDown_(0),
-  hLeptCorrEleVetoMCErrDown_(0),
-  hLeptCorrMuVetoDataErrDown_(0),
-  hLeptCorrMuVetoMCErrDown_(0),
+  hLeptCorrEleVetoErrDown_(0),
+  hLeptCorrMuVetoErrDown_(0),
   doLeptCorr_(0),
   tagJet1Index_(-1),
   tagJet2Index_(-1),
@@ -467,26 +455,22 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
     std::cout << "Reading lepton efficiency corrections from " << leptCorrFile << std::endl;
     fLeptCorr_            = TFile::Open(leptCorrFile.c_str());
     // Central scale factors
-    hLeptCorrEleTight_           = (TH2D*) fLeptCorr_->Get("ele_tight_id");
-    hLeptCorrMuTight_            = (TH2D*) fLeptCorr_->Get("mu_tight_eff");
-    hLeptCorrEleVetoData_        = (TH2D*) fLeptCorr_->Get("ele_veto_id_data_eff");
-    hLeptCorrEleVetoMC_          = (TH2D*) fLeptCorr_->Get("ele_veto_id_mc_eff");
-    hLeptCorrMuVetoData_         = (TH2D*) fLeptCorr_->Get("mu_loose_data_eff");
-    hLeptCorrMuVetoMC_           = (TH2D*) fLeptCorr_->Get("mu_loose_mc_eff");
+    hLeptCorrEleTight_              = (TH2D*) fLeptCorr_->Get("ele_tight_id");
+    hLeptCorrMuTight_               = (TH2D*) fLeptCorr_->Get("mu_tight_eff");
+    hLeptCorrEleVeto_               = (TH2D*) fLeptCorr_->Get("ele_veto_eff");
+    hLeptCorrMuVeto_                = (TH2D*) fLeptCorr_->Get("mu_loose_eff");
+    
     // + error scale factors
-    hLeptCorrEleTightErrUp_      = (TH2D*) fLeptCorr_->Get("ele_tight_id_errUp");
-    hLeptCorrMuTightErrUp_       = (TH2D*) fLeptCorr_->Get("mu_tight_eff_errUp");
-    hLeptCorrEleVetoDataErrUp_   = (TH2D*) fLeptCorr_->Get("ele_veto_id_data_eff_errUp");
-    hLeptCorrEleVetoMCErrUp_     = (TH2D*) fLeptCorr_->Get("ele_veto_id_mc_eff_errUp");
-    hLeptCorrMuVetoDataErrUp_    = (TH2D*) fLeptCorr_->Get("mu_loose_data_eff_errUp");
-    hLeptCorrMuVetoMCErrUp_      = (TH2D*) fLeptCorr_->Get("mu_loose_mc_eff_errUp");
+    hLeptCorrEleTightErrUp_         = (TH2D*) fLeptCorr_->Get("ele_tight_id_errUp");
+    hLeptCorrMuTightErrUp_          = (TH2D*) fLeptCorr_->Get("mu_tight_eff_errUp");
+    hLeptCorrEleVetoErrUp_          = (TH2D*) fLeptCorr_->Get("ele_veto_eff_errUp");
+    hLeptCorrMuVetoErrUp_           = (TH2D*) fLeptCorr_->Get("mu_loose_eff_errUp");
+    
     // - error scale factos 
-    hLeptCorrEleTightErrDown_    = (TH2D*) fLeptCorr_->Get("ele_tight_id_errDown");
-    hLeptCorrMuTightErrDown_     = (TH2D*) fLeptCorr_->Get("mu_tight_eff_errDown");
-    hLeptCorrEleVetoDataErrDown_ = (TH2D*) fLeptCorr_->Get("ele_veto_id_data_eff_errDown");
-    hLeptCorrEleVetoMCErrDown_   = (TH2D*) fLeptCorr_->Get("ele_veto_id_mc_eff_errDown");
-    hLeptCorrMuVetoDataErrDown_  = (TH2D*) fLeptCorr_->Get("mu_loose_data_eff_errDown");
-    hLeptCorrMuVetoMCErrDown_    = (TH2D*) fLeptCorr_->Get("mu_loose_mc_eff_errDown");
+    hLeptCorrEleTightErrDown_       = (TH2D*) fLeptCorr_->Get("ele_tight_id_errDown");
+    hLeptCorrMuTightErrDown_        = (TH2D*) fLeptCorr_->Get("mu_tight_eff_errDown");
+    hLeptCorrEleVetoErrDown_        = (TH2D*) fLeptCorr_->Get("ele_veto_eff_errDown");
+    hLeptCorrMuVetoErrDown_         = (TH2D*) fLeptCorr_->Get("mu_loose_eff_errDown");
 
     doLeptCorr_ = true;
   } else {
@@ -1188,7 +1172,6 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
   // Instead we look for status 3 (hard part) for immediate W-e/mu, and then loop through tau daughters for lepton (status 1 or 2?)
   // Note that if the tau does decay leptonically it'll do so by tau(status 3) - taus (status 2) - e/mu (stauts 1)
   // You don't need to descend further
-
   for(size_t i = 0; i < genParticles.size(); i++) {
     const GenParticle & p = genParticles[i];
 
@@ -1197,39 +1180,18 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
 
     // ele
     if ((fabs(p.pdgId())==11) && (p.pt()>10.) && (fabs(p.eta())<2.4)){
-      int bin = hLeptCorrEleVetoData_->FindBin(p.pt(),fabs(p.eta()));
-      
-      if(hLeptCorrEleVetoData_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMC_->GetBinContent(bin) >= 1. ||
-	 hLeptCorrEleVetoData_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMC_->GetBinContent(bin) <  0.)
-	   eleVetoWeight        *= 1.;
-      else eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
-      if(hLeptCorrEleVetoDataErrUp_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMCErrUp_->GetBinContent(bin) >= 1. ||
-	 hLeptCorrEleVetoDataErrUp_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMCErrUp_->GetBinContent(bin) <  0.) 
-	   eleVetoWeightErrUp   *= 1.;
-      else eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
-      if(hLeptCorrEleVetoDataErrDown_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMCErrDown_->GetBinContent(bin) >= 1. ||
-	 hLeptCorrEleVetoDataErrDown_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMCErrDown_->GetBinContent(bin) <  0.) 
-	   eleVetoWeightErrDown *= 1.;
-      else eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
+      int bin = hLeptCorrEleVeto_->FindBin(p.pt(),fabs(p.eta()));
+      eleVetoWeight        *= hLeptCorrEleVeto_->GetBinContent(bin);
+      eleVetoWeightErrUp   *= hLeptCorrEleVetoErrUp_->GetBinContent(bin);
+      eleVetoWeightErrDown *= hLeptCorrEleVetoErrDown_->GetBinContent(bin);
     }
 
     // mu
     if ((fabs(p.pdgId())==13) && (p.pt()>10.) && (fabs(p.eta())<2.1)){
-      int bin = hLeptCorrMuVetoData_->FindBin(p.pt(),fabs(p.eta()));
-
-      if(hLeptCorrMuVetoData_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMC_->GetBinContent(bin) >= 1. ||
-	 hLeptCorrMuVetoData_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMC_->GetBinContent(bin) <  0.)
-	   muVetoWeight        *= 1.;
-      else muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
-      if(hLeptCorrMuVetoDataErrUp_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMCErrUp_->GetBinContent(bin) >= 1. ||
-	 hLeptCorrMuVetoDataErrUp_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMCErrUp_->GetBinContent(bin) <  0.)
-	   muVetoWeightErrUp   *= 1.;
-      else muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
-      if(hLeptCorrMuVetoDataErrDown_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMCErrDown_->GetBinContent(bin) >= 1. ||
-	 hLeptCorrMuVetoDataErrDown_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMCErrDown_->GetBinContent(bin) <  0.)
-	   muVetoWeightErrDown *= 1.;
-      else muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
- 
+      int bin = hLeptCorrMuVeto_->FindBin(p.pt(),fabs(p.eta()));
+      muVetoWeight        *= hLeptCorrMuVeto_->GetBinContent(bin);
+      muVetoWeightErrUp   *= hLeptCorrMuVetoErrUp_->GetBinContent(bin);
+      muVetoWeightErrDown *= hLeptCorrMuVetoErrDown_->GetBinContent(bin);
     }
 
     // tau
@@ -1240,37 +1202,17 @@ void InvHiggsInfoProducer::doLeptonCorrWeights(const std::vector<pat::Muon>& tig
         const reco::Candidate* pla = pl->daughter(k);  
       
         if ((fabs(pla->pdgId())==11) && (pla->status()==1) && (pla->pt()>10.) && (fabs(pla->eta())<2.4)) {
-          int bin = hLeptCorrEleVetoData_->FindBin(pla->pt(),fabs(pla->eta()));
-
-      	  if(hLeptCorrEleVetoData_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMC_->GetBinContent(bin) >= 1. ||
-             hLeptCorrEleVetoData_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMC_->GetBinContent(bin) <  0.)
-               eleVetoWeight        *= 1.;
-      	  else eleVetoWeight        *= (1-hLeptCorrEleVetoData_->GetBinContent(bin))/(1-hLeptCorrEleVetoMC_->GetBinContent(bin));
-      	  if(hLeptCorrEleVetoDataErrUp_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMCErrUp_->GetBinContent(bin) >= 1. ||
-             hLeptCorrEleVetoDataErrUp_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMCErrUp_->GetBinContent(bin) <  0.)
-               eleVetoWeightErrUp   *= 1.;
-      	  else eleVetoWeightErrUp   *= (1-hLeptCorrEleVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrUp_->GetBinContent(bin));
-      	  if(hLeptCorrEleVetoDataErrDown_->GetBinContent(bin) >= 1. || hLeptCorrEleVetoMCErrDown_->GetBinContent(bin) >= 1. ||
-             hLeptCorrEleVetoDataErrDown_->GetBinContent(bin) <  0. || hLeptCorrEleVetoMCErrDown_->GetBinContent(bin) <  0.)
-               eleVetoWeightErrDown *= 1.;
-      	  else eleVetoWeightErrDown *= (1-hLeptCorrEleVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrEleVetoMCErrDown_->GetBinContent(bin));
+          int bin = hLeptCorrEleVeto_->FindBin(pla->pt(),fabs(pla->eta()));
+          eleVetoWeight        *= hLeptCorrEleVeto_->GetBinContent(bin);
+          eleVetoWeightErrUp   *= hLeptCorrEleVetoErrUp_->GetBinContent(bin);
+          eleVetoWeightErrDown *= hLeptCorrEleVetoErrDown_->GetBinContent(bin);
         }
 
         if ((fabs(pla->pdgId())==13) && (pla->status()==1) && (pla->pt()>10.) && (fabs(pla->eta())<2.1)){
-          int bin = hLeptCorrMuVetoData_->FindBin(pla->pt(),fabs(pla->eta()));
-
-          if(hLeptCorrMuVetoData_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMC_->GetBinContent(bin) >= 1. ||
-             hLeptCorrMuVetoData_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMC_->GetBinContent(bin) <  0.)
-               muVetoWeight        *= 1.;
-          else muVetoWeight        *= (1-hLeptCorrMuVetoData_->GetBinContent(bin))/(1-hLeptCorrMuVetoMC_->GetBinContent(bin));
-          if(hLeptCorrMuVetoDataErrUp_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMCErrUp_->GetBinContent(bin) >= 1. ||
-             hLeptCorrMuVetoDataErrUp_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMCErrUp_->GetBinContent(bin) <  0.)
-               muVetoWeightErrUp   *= 1.;
-          else muVetoWeightErrUp   *= (1-hLeptCorrMuVetoDataErrUp_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrUp_->GetBinContent(bin));
-          if(hLeptCorrMuVetoDataErrDown_->GetBinContent(bin) >= 1. || hLeptCorrMuVetoMCErrDown_->GetBinContent(bin) >= 1. ||
-             hLeptCorrMuVetoDataErrDown_->GetBinContent(bin) <  0. || hLeptCorrMuVetoMCErrDown_->GetBinContent(bin) <  0.)
-               muVetoWeightErrDown *= 1.;
-      	  else muVetoWeightErrDown *= (1-hLeptCorrMuVetoDataErrDown_->GetBinContent(bin))/(1-hLeptCorrMuVetoMCErrDown_->GetBinContent(bin));
+          int bin = hLeptCorrMuVeto_->FindBin(pla->pt(),fabs(pla->eta()));
+          muVetoWeight        *= hLeptCorrMuVeto_->GetBinContent(bin);
+          muVetoWeightErrUp   *= hLeptCorrMuVetoErrUp_->GetBinContent(bin);
+          muVetoWeightErrDown *= hLeptCorrMuVetoErrDown_->GetBinContent(bin);
         }
       }
     }
