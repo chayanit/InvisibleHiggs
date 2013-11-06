@@ -5,6 +5,8 @@
 //
 // Robin Aggleton 2013
 
+// (Apologies for the use of "ele" here, and "el" in ntuple code - inherited ele from IC code...)
+
 void makeHists(std::string filename, TFile* outputFile){
     ifstream infile;
     infile.open(filename.c_str());
@@ -82,6 +84,7 @@ void makeHists(std::string filename, TFile* outputFile){
 }
 
 double calculateVetoEff(double eff_data, double eff_mc) {
+    // Veto eff = 1-eff_data/1-eff_mc
     // Slightly complicated procedure here. Following IC, rules are:
         // if eff_data > 1, set = 1. Same with eff_mc
         // if eff_data < 0, set = 0. Same with eff_mc
@@ -187,6 +190,6 @@ void MakeLeptonWeightHistos(){
         delete hFinalEl;       
     }
 
-    // outputFile->ls();
+    outputFile->ls();
     outputFile->Close();
 }
