@@ -82,10 +82,12 @@ int main(int argc, char* argv[]) {
 			    +pow(nBG_Z*constants::syst_Z,2)); // for combine tool
   double syst_BG_Z_p = sqrt(pow(hZ_Syst->GetBinError(1),2)    // for summary table
 			    +pow(nBG_Z*constants::syst_Z,2)
+			    +pow(nBG_Z*constants::syst_Z_Mu_m,2)
 			    +pow(nBG_Z*constants::syst_Z_JES_p,2)
 			    +pow(nBG_Z*constants::syst_Z_JER_p,2));
   double syst_BG_Z_m = sqrt(pow(hZ_Syst->GetBinError(1),2)
 			    +pow(nBG_Z*constants::syst_Z,2)
+			    +pow(nBG_Z*constants::syst_Z_Mu_p,2)
 			    +pow(nBG_Z*constants::syst_Z_JES_m,2)
 			    +pow(nBG_Z*constants::syst_Z_JER_m,2)
 			    +pow(nBG_Z*constants::syst_Z_UES_m,2));
@@ -114,12 +116,15 @@ int main(int argc, char* argv[]) {
 			      +pow(nBG_WMu*constants::syst_WMu,2)); // for combine tool
   double syst_BG_WMu_p = sqrt(pow(hWMu_Syst->GetBinError(1),2)
 			      +pow(nBG_WMu*constants::syst_WMu,2)
-			      +pow(nBG_WMu*constants::syst_WMu_JER_p,2)
-			      +pow(nBG_WMu*constants::syst_WMu_UES_m,2));
+			      +pow(nBG_WMu*constants::syst_WMu_Mu_m,2)
+                              +pow(nBG_WMu*constants::syst_WMu_JES_m,2)
+			      +pow(nBG_WMu*constants::syst_WMu_JER_p,2));
   double syst_BG_WMu_m = sqrt(pow(hWMu_Syst->GetBinError(1),2)
 			      +pow(nBG_WMu*constants::syst_WMu,2)
+                              +pow(nBG_WMu*constants::syst_WMu_Mu_p,2)
 			      +pow(nBG_WMu*constants::syst_WMu_JES_p,2)
-			      +pow(nBG_WMu*constants::syst_WMu_JER_m,2));
+			      +pow(nBG_WMu*constants::syst_WMu_JER_m,2)
+                              +pow(nBG_WMu*constants::syst_WMu_UES_p,2));
 
   double nBG_WEl   = hWEl->GetBinContent(1);
   double stat_BG_WEl = hWEl->GetBinError(1);
@@ -127,12 +132,15 @@ int main(int argc, char* argv[]) {
 			      +pow(nBG_WEl*constants::syst_WEl,2)); // for combine tool
   double syst_BG_WEl_p = sqrt(pow(hWEl_Syst->GetBinError(1),2)
 			      +pow(nBG_WEl*constants::syst_WEl,2)
+			      +pow(nBG_WEl*constants::syst_WEl_El_m,2)
 			      +pow(nBG_WEl*constants::syst_WEl_JES_m,2)
-			      +pow(nBG_WEl*constants::syst_WEl_JER_p,2)
+			      +pow(nBG_WEl*constants::syst_WEl_JER_m,2)
 			      +pow(nBG_WEl*constants::syst_WEl_UES_m,2));
   double syst_BG_WEl_m = sqrt(pow(hWEl_Syst->GetBinError(1),2)
 			      +pow(nBG_WEl*constants::syst_WEl,2)
+                              +pow(nBG_WEl*constants::syst_WEl_El_p,2)
 			      +pow(nBG_WEl*constants::syst_WEl_JES_p,2)
+                              +pow(nBG_WEl*constants::syst_WEl_JER_p,2)
 			      +pow(nBG_WEl*constants::syst_WEl_UES_p,2));
   
   wFile->Close();
@@ -164,12 +172,15 @@ int main(int argc, char* argv[]) {
 			+pow(nBG_WTau*constants::syst_WTau,2)); // for combine tool
     syst_BG_WTau_p = sqrt(pow(hWTau_Syst->GetBinError(1),2)
 			+pow(nBG_WTau*constants::syst_WTau,2)
+                        +pow(nBG_WTau*constants::syst_WTau_El_p,2)
+                        +pow(nBG_WTau*constants::syst_WTau_Mu_m,2)
 			+pow(nBG_WTau*constants::syst_WTau_JES_m,2)
-			+pow(nBG_WTau*constants::syst_WTau_JER_m,2)
-			+pow(nBG_WTau*constants::syst_WTau_UES_p,2));
+			+pow(nBG_WTau*constants::syst_WTau_UES_m,2));
     syst_BG_WTau_m = sqrt(pow(hWTau_Syst->GetBinError(1),2)
 			+pow(nBG_WTau*constants::syst_WTau,2)
-			+pow(nBG_WTau*constants::syst_WTau_UES_m,2));
+                        +pow(nBG_WTau*constants::syst_WTau_El_m,2)
+                        +pow(nBG_WTau*constants::syst_WTau_Mu_p,2)
+			+pow(nBG_WTau*constants::syst_WTau_JER_p,2));
     wTauFile->Close();
   }
 
@@ -212,12 +223,16 @@ int main(int argc, char* argv[]) {
     nBG_QCD     = hQCD->GetBinContent(2,1);
     stat_BG_QCD = hQCD->GetBinError(2,1);
     syst_BG_QCD_p = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
+                         +pow(nBG_QCD*constants::syst_QCD3_El_p,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JES_m,2)
-			 +pow(nBG_QCD*constants::syst_QCD3_JER_m,2));
+			 +pow(nBG_QCD*constants::syst_QCD3_JER_m,2)
+                         +pow(nBG_QCD*constants::syst_QCD3_UES_m,2));
     syst_BG_QCD_m = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
+                         +pow(nBG_QCD*constants::syst_QCD3_El_m,2)
+                         +pow(nBG_QCD*constants::syst_QCD3_Mu_m,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JES_p,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JER_p,2)
-			 +pow(nBG_QCD*constants::syst_QCD3_UES_m,2));
+			 +pow(nBG_QCD*constants::syst_QCD3_UES_p,2));
     qFile->Close();
   }
 
@@ -256,7 +271,9 @@ int main(int argc, char* argv[]) {
 				  +pow(nBG_TTbar*constants::syst_TTbar,2)); // for combine tool
   double syst_BG_TTbar_p   = sqrt(pow(hTTbar->GetBinError(nCuts),2)
 				  +pow(nBG_TTbar*constants::syst_lumi,2)
-				  +pow(nBG_TTbar*constants::syst_TTbar,2));
+				  +pow(nBG_TTbar*constants::syst_TTbar,2)
+                                  +pow(nBG_TTbar*constants::syst_TTbar_JES_p,2)
+                                  +pow(nBG_TTbar*constants::syst_TTbar_JER_p,2));
   double syst_BG_TTbar_m   = sqrt(pow(hTTbar->GetBinError(nCuts),2)
 				  +pow(nBG_TTbar*constants::syst_lumi,2)
 				  +pow(nBG_TTbar*constants::syst_TTbar,2)
@@ -271,11 +288,13 @@ int main(int argc, char* argv[]) {
   double syst_BG_SingleT_p = sqrt(pow(hSingleT->GetBinError(nCuts),2)
 				  +pow(nBG_SingleT*constants::syst_lumi,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT,2)
+                                  +pow(nBG_SingleT*constants::syst_SingleT_El_m,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT_JES_p,2)
-				  +pow(nBG_SingleT*constants::syst_SingleT_JER_p,2));
+				  +pow(nBG_SingleT*constants::syst_SingleT_JER_m,2));
   double syst_BG_SingleT_m = sqrt(pow(hSingleT->GetBinError(nCuts),2)
 				  +pow(nBG_SingleT*constants::syst_lumi,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT,2)
+                                  +pow(nBG_SingleT*constants::syst_SingleT_El_p,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT_JES_m,2)
 				  +pow(nBG_SingleT*constants::syst_SingleT_UES_m,2));
 
@@ -288,14 +307,16 @@ int main(int argc, char* argv[]) {
   double syst_BG_Diboson_p = sqrt(pow(hDiboson->GetBinError(nCuts),2)
 				  +pow(nBG_Diboson*constants::syst_lumi,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson,2)
-				  +pow(nBG_Diboson*constants::syst_Diboson_JES_p,2)
-				  +pow(nBG_Diboson*constants::syst_Diboson_JER_p,2)
+                                  +pow(nBG_Diboson*constants::syst_Diboson_El_m,2)
+                                  +pow(nBG_Diboson*constants::syst_Diboson_Mu_m,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson_UES_p,2));
   double syst_BG_Diboson_m = sqrt(pow(hDiboson->GetBinError(nCuts),2)
 				  +pow(nBG_Diboson*constants::syst_lumi,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson,2)
+                                  +pow(nBG_Diboson*constants::syst_Diboson_El_p,2)
+                                  +pow(nBG_Diboson*constants::syst_Diboson_Mu_p,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson_JES_m,2)
-				  +pow(nBG_Diboson*constants::syst_Diboson_JER_m,2)
+				  +pow(nBG_Diboson*constants::syst_Diboson_JER_p,2)
 				  +pow(nBG_Diboson*constants::syst_Diboson_UES_m,2));
   
   TH1D* hDYLL    = (TH1D*) mcFile->Get("hCutFlow_DYLL");
@@ -306,11 +327,15 @@ int main(int argc, char* argv[]) {
   double syst_BG_DYLL_p  = sqrt(pow(hDYLL->GetBinError(nCuts),2)
 				+pow(nBG_DYLL*constants::syst_lumi,2)
 				+pow(nBG_DYLL*constants::syst_DYLL,2)
+                                +pow(nBG_DYLL*constants::syst_DYLL_El_m,2)
+				+pow(nBG_DYLL*constants::syst_DYLL_Mu_m,2)
 				+pow(nBG_DYLL*constants::syst_DYLL_JES_p,2)
-				+pow(nBG_DYLL*constants::syst_DYLL_JER_p,2));
+				+pow(nBG_DYLL*constants::syst_DYLL_JER_p,2)
+				+pow(nBG_DYLL*constants::syst_DYLL_UES_p,2));
   double syst_BG_DYLL_m  = sqrt(pow(hDYLL->GetBinError(nCuts),2)
 				+pow(nBG_DYLL*constants::syst_lumi,2)
 				+pow(nBG_DYLL*constants::syst_DYLL,2)
+				+pow(nBG_DYLL*constants::syst_DYLL_El_p,2)
 				+pow(nBG_DYLL*constants::syst_DYLL_JES_m,2)
 				+pow(nBG_DYLL*constants::syst_DYLL_JER_m,2)
 				+pow(nBG_DYLL*constants::syst_DYLL_UES_m,2));
@@ -488,6 +513,10 @@ int main(int argc, char* argv[]) {
   double fLum  = 1 + constants::syst_lumi;
 
   double fZ     = 1 + syst_BG_Z/nBG_Z;
+  double fZElp  = 1 + constants::syst_Z_El_p;
+  double fZElm  = 1 + constants::syst_Z_El_m;
+  double fZMup  = 1 + constants::syst_Z_Mu_p;
+  double fZMum  = 1 + constants::syst_Z_Mu_m;
   double fZJESp = 1 + constants::syst_Z_JES_p;
   double fZJESm = 1 + constants::syst_Z_JES_m;
   double fZJERp = 1 + constants::syst_Z_JER_p;
@@ -496,6 +525,10 @@ int main(int argc, char* argv[]) {
   double fZUESm = 1 + constants::syst_Z_UES_m;
 
   double fWMu     = 1 + sqrt(pow(syst_BG_WMu/nBG_WMu,2) + pow(stat_BG_WMu/nBG_WMu,2));
+  double fWMuElp  = 1 + constants::syst_WMu_El_p;
+  double fWMuElm  = 1 + constants::syst_WMu_El_m;
+  double fWMuMup  = 1 + constants::syst_WMu_Mu_p;
+  double fWMuMum  = 1 + constants::syst_WMu_Mu_m;
   double fWMuJESp = 1 + constants::syst_WMu_JES_p;
   double fWMuJESm = 1 + constants::syst_WMu_JES_m;
   double fWMuJERp = 1 + constants::syst_WMu_JER_p;
@@ -504,6 +537,10 @@ int main(int argc, char* argv[]) {
   double fWMuUESm = 1 + constants::syst_WMu_UES_m;
 
   double fWEl     = 1 + sqrt(pow(syst_BG_WEl/nBG_WEl,2) + pow(stat_BG_WEl/nBG_WEl,2));
+  double fWElElp  = 1 + constants::syst_WEl_El_p;
+  double fWElElm  = 1 + constants::syst_WEl_El_m;
+  double fWElMup  = 1 + constants::syst_WEl_Mu_p;
+  double fWElMum  = 1 + constants::syst_WEl_Mu_m;
   double fWElJESp = 1 + constants::syst_WEl_JES_p;
   double fWElJESm = 1 + constants::syst_WEl_JES_m;
   double fWElJERp = 1 + constants::syst_WEl_JER_p;
@@ -512,6 +549,10 @@ int main(int argc, char* argv[]) {
   double fWElUESm = 1 + constants::syst_WEl_UES_m;
 
   double fWTau     = 1 + sqrt(pow(syst_BG_WTau/nBG_WTau,2) + pow(stat_BG_WTau/nBG_WTau,2));
+  double fWTauElp  = 1 + constants::syst_WTau_El_p;
+  double fWTauElm  = 1 + constants::syst_WTau_El_m;
+  double fWTauMup  = 1 + constants::syst_WTau_Mu_p;
+  double fWTauMum  = 1 + constants::syst_WTau_Mu_m;
   double fWTauJESp = 1 + constants::syst_WTau_JES_p;
   double fWTauJESm = 1 + constants::syst_WTau_JES_m;
   double fWTauJERp = 1 + constants::syst_WTau_JER_p;
@@ -520,6 +561,10 @@ int main(int argc, char* argv[]) {
   double fWTauUESm = 1 + constants::syst_WTau_UES_m;
 
   double fQCD     = 1 + sqrt(pow(constants::syst_QCD3,2) + pow(stat_BG_QCD/nBG_QCD,2));
+  double fQCDElp  = 1 + constants::syst_QCD3_El_p;
+  double fQCDElm  = 1 + constants::syst_QCD3_El_m;
+  double fQCDMup  = 1 + constants::syst_QCD3_Mu_p;
+  double fQCDMum  = 1 + constants::syst_QCD3_Mu_m;
   double fQCDJESp = 1 + constants::syst_QCD3_JES_p;
   double fQCDJESm = 1 + constants::syst_QCD3_JES_m;
   double fQCDJERp = 1 + constants::syst_QCD3_JER_p;
@@ -528,13 +573,17 @@ int main(int argc, char* argv[]) {
   double fQCDUESm = 1 + constants::syst_QCD3_UES_m;
  
   double fOther     = 1 + (sqrt(pow(syst_BG_TTbar,2) + pow(syst_BG_SingleT,2) + pow(syst_BG_Diboson,2) + pow(syst_BG_DYLL,2))/nBG_Other);
+  double fOtherElp  = 1 + constants::syst_Other_El_p;
+  double fOtherElm  = 1 + constants::syst_Other_El_m;
+  double fOtherMup  = 1 + constants::syst_Other_Mu_p;
+  double fOtherMum  = 1 + constants::syst_Other_Mu_m;
   double fOtherJESp = 1 + constants::syst_Other_JES_p;
   double fOtherJESm = 1 + constants::syst_Other_JES_m;
   double fOtherJERp = 1 + constants::syst_Other_JER_p;
   double fOtherJERm = 1 + constants::syst_Other_JER_m;
   double fOtherUESp = 1 + constants::syst_Other_UES_p;
   double fOtherUESm = 1 + constants::syst_Other_UES_m;
-
+ 
   double aZ    = nBG_Z / nCtrlZ;
 
   // write combine tool card file
@@ -544,6 +593,10 @@ int main(int argc, char* argv[]) {
 
     double fSigPDF   = 1 + constants::syst_Sig_PDF[i];
     double fSigQCD   = 1 + constants::syst_Sig_QCD[i];
+    double fSigElp   = 1 + constants::syst_Sig_El_p[i];
+    double fSigElm   = 1 + constants::syst_Sig_El_m[i];
+    double fSigMup   = 1 + constants::syst_Sig_Mu_p[i];
+    double fSigMum   = 1 + constants::syst_Sig_Mu_m[i];
     double fSigJESp  = 1 + constants::syst_Sig_JES_p[i];
     double fSigJESm  = 1 + constants::syst_Sig_JES_m[i];
     double fSigJERp  = 1 + constants::syst_Sig_JER_p[i];
@@ -571,6 +624,8 @@ int main(int argc, char* argv[]) {
     txtFile << "rate            " << nSig.at(i) << "\t" << nBG_Z << "\t" << nBG_WMu << "\t" << nBG_WEl << "\t" << nBG_WTau << "\t" << nBG_QCD << "\t" << nBG_Other << std::endl;
     txtFile << "------------" << std::endl;
     txtFile << "lumi_8TeV     lnN   " << fLum << "\t - \t - \t - \t - \t - \t" << fLum << std::endl;
+    //txtFile << "CMS_eff_e     lnN   " << fSigElm << "/" << fSigElp << "\t" << fZElm << "/" << fZElp << "\t" << fWMuElm << "/" << fWMuElp << "\t" << fWElElm << "/" << fWElElp << "\t" << fWTauElm << "/" << fWTauElp << "\t" << fQCDElm << "/" << fQCDElp << "\t" << fOtherElm << "/" << fOtherElp << std::endl;
+    //txtFile << "CMS_eff_mu    lnN   " << fSigMum << "/" << fSigMup << "\t" << fZMum << "/" << fZMup << "\t" << fWMuMum << "/" << fWMuMup << "\t" << fWElMum << "/" << fWElMup << "\t" << fWTauMum << "/" << fWTauMup << "\t" << fQCDMum << "/" << fQCDMup << "\t" << fOtherMum << "/" << fOtherMup << std::endl;
     txtFile << "CMS_scale_j   lnN   " << fSigJESm << "/" << fSigJESp << "\t" << fZJESm << "/" << fZJESp << "\t" << fWMuJESm << "/" << fWMuJESp << "\t" << fWElJESm << "/" << fWElJESp << "\t" << fWTauJESm << "/" << fWTauJESp << "\t" << fQCDJESm << "/" << fQCDJESp << "\t" << fOtherJESm << "/" << fOtherJESp << std::endl;
     txtFile << "CMS_res_j     lnN   " << fSigJERm << "/" << fSigJERp << "\t" << fZJERm << "/" << fZJERp << "\t" << fWMuJERm << "/" << fWMuJERp << "\t" << fWElJERm << "/" << fWElJERp << "\t" << fWTauJERm << "/" << fWTauJERp << "\t" << fQCDJERm << "/" << fQCDJERp << "\t" << fOtherJERm << "/" << fOtherJERp << std::endl;
     txtFile << "CMS_scale_met lnN   " << fSigUESm << "/" << fSigUESp << "\t" << fZUESm << "/" << fZUESp << "\t" << fWMuUESm << "/" << fWMuUESp << "\t" << fWElUESm << "/" << fWElUESp << "\t" << fWTauUESm << "/" << fWTauUESp << "\t" << fQCDUESm << "/" << fQCDUESp << "\t" << fOtherUESm << "/" << fOtherUESp << std::endl;
