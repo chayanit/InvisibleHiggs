@@ -30,6 +30,8 @@
 
 <bin name="wTauClosure" file="wTauClosure.cpp"/>
 
+<bin name="wTauClosureEl" file="wTauClosureEl.cpp"/>
+
 <bin name="qcdBackground" file="qcdBackground.cpp"/>
 
 <bin name="qcdBackground2" file="qcdBackground2.cpp"/>
