@@ -5,16 +5,16 @@
 ODIR=$1
 RUN=$2
 
-echo "combine -M Asymptotic --run=$RUN $ODIR/card*.txt"
+echo "combine -M Asymptotic --run=$RUN $ODIR/vbfhinv_*_8TeV.txt"
 
 cd $ODIR
 
-combine -M Asymptotic --run=$RUN -m 110 card110.txt
-combine -M Asymptotic --run=$RUN -m 125 card125.txt
-combine -M Asymptotic --run=$RUN -m 150 card150.txt
-combine -M Asymptotic --run=$RUN -m 200 card200.txt
-combine -M Asymptotic --run=$RUN -m 300 card300.txt
-combine -M Asymptotic --run=$RUN -m 400 card400.txt
+combine -M Asymptotic --run=$RUN -m 110 vbfhinv_110_8TeV.txt
+combine -M Asymptotic --run=$RUN -m 125 vbfhinv_125_8TeV.txt
+combine -M Asymptotic --run=$RUN -m 150 vbfhinv_150_8TeV.txt
+combine -M Asymptotic --run=$RUN -m 200 vbfhinv_200_8TeV.txt
+combine -M Asymptotic --run=$RUN -m 300 vbfhinv_300_8TeV.txt
+combine -M Asymptotic --run=$RUN -m 400 vbfhinv_400_8TeV.txt
 echo
 
 hadd -f combineMerge.root higgsCombineTest.Asymptotic.mH*.root

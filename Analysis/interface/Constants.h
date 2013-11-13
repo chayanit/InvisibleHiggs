@@ -45,8 +45,8 @@ namespace constants {
 
   // W->enu
   static const double syst_WEl         = 0.20;    // 20% extrapolation systematics
-  static const double syst_WEl_El_m    = 0.005;
-  static const double syst_WEl_El_p    = -0.006;
+  static const double syst_WEl_El_m    = 0.028;   //from Analysis B
+  static const double syst_WEl_El_p    = -0.029;  //form Analysis B
   static const double syst_WEl_Mu_m    = 0.0;
   static const double syst_WEl_Mu_p    = 0.0;
   static const double syst_WEl_JES_m   = 0.033;
@@ -58,8 +58,8 @@ namespace constants {
 
   // W->taunu
   static const double syst_WTau       = 0.22;    // 20% extrapolation + 8% tau ID + 5& lepton contamination
-  static const double syst_WTau_El_m  = -0.0002;
-  static const double syst_WTau_El_p  = 0.0002;
+  static const double syst_WTau_El_m  = -0.01;   //from Analysis B
+  static const double syst_WTau_El_p  = 0.011;   //form Analysis B
   static const double syst_WTau_Mu_m  = 0.0001;
   static const double syst_WTau_Mu_p  = -0.0002;
   static const double syst_WTau_JES_m = 0.074;
@@ -80,8 +80,8 @@ namespace constants {
 
   // QCD 3
   static const double syst_QCD3        = 0.40;     // 40% shape systematic
-  static const double syst_QCD3_El_m   = -0.0003;
-  static const double syst_QCD3_El_p   = 0.0007;
+  static const double syst_QCD3_El_m   = -0.015;   //0.03/0.02 * 0.01
+  static const double syst_QCD3_El_p   = 0.039;    //0.07/0.02 * 0.011
   static const double syst_QCD3_Mu_m   = -0.002;
   static const double syst_QCD3_Mu_p   = -0.0009;
   static const double syst_QCD3_JES_m  = 0.499;
@@ -106,8 +106,8 @@ namespace constants {
 
   // diboson
   static const double syst_Diboson       = 0.18;   // 18% x-section
-  static const double syst_Diboson_El_m  = 0.0001;
-  static const double syst_Diboson_El_p  = -0.0001;
+  static const double syst_Diboson_El_m  = 0.005;  //0.01/0.02 * 0.01
+  static const double syst_Diboson_El_p  = -0.006; //0.01/0.02 * 0.011
   static const double syst_Diboson_Mu_m  = 0.002;
   static const double syst_Diboson_Mu_p  = -0.002;
   static const double syst_Diboson_JES_m = -0.327;
@@ -119,8 +119,8 @@ namespace constants {
 
   // single T
   static const double syst_SingleT       = 0.16;   // 16% x-section
-  static const double syst_SingleT_El_m  = 0.0009;
-  static const double syst_SingleT_El_p  = -0.0009;
+  static const double syst_SingleT_El_m  = 0.045;  //0.09/0.02 * 0.01
+  static const double syst_SingleT_El_p  = -0.05;  //0.09/0.02 * 0.011
   static const double syst_SingleT_Mu_m  = 0.0;
   static const double syst_SingleT_Mu_p  = 0.0;
   static const double syst_SingleT_JES_m = -0.226;
@@ -132,8 +132,8 @@ namespace constants {
 
   // DY
   static const double syst_DYLL          = 0.20;   // 20% x-section
-  static const double syst_DYLL_El_m	 = 0.0003;
-  static const double syst_DYLL_El_p	 = -0.0003;
+  static const double syst_DYLL_El_m	 = 0.015;  //0.03/0.02 * 0.01
+  static const double syst_DYLL_El_p	 = -0.017; //0.03/0.02 * 0.011
   static const double syst_DYLL_Mu_m	 = 0.005;
   static const double syst_DYLL_Mu_p	 = 0.002;
   static const double syst_DYLL_JES_m    = -0.223;
@@ -144,8 +144,8 @@ namespace constants {
   static const double syst_DYLL_UES_p    = 0.004;
 
   // Summed all minor BGs
-  static const double syst_Other_El_m	 = 0.0002;
-  static const double syst_Other_El_p	 = -0.0002;
+  static const double syst_Other_El_m	 = 0.01;    //0.02/0.02 * 0.01
+  static const double syst_Other_El_p	 = -0.011;  //0.02/0.02 * 0.011
   static const double syst_Other_Mu_m	 = 0.0019;
   static const double syst_Other_Mu_p	 = -0.0014;
   static const double syst_Other_JES_m   = -0.317;

@@ -607,12 +607,12 @@ int main(int argc, char* argv[]) {
     std::stringstream ss;
     ss << (int) constants::mH[i];
 
-    std::string filename = options.oDir+std::string("/card")+ss.str()+std::string(".txt");
+    std::string filename = options.oDir+std::string("/vbfhinv_")+ss.str()+std::string("_8TeV.txt");
     txtFile.open(filename);
     txtFile << "# Invisible Higgs analysis for mH=" << constants::mH[i] << " GeV" << std::endl;
     txtFile << "imax 1" << std::endl;
     txtFile << "jmax 6  number of backgrounds" << std::endl;
-    txtFile << "kmax 13  number of nuisance parameters (sources of systematical uncertainties)" << std::endl;
+    txtFile << "kmax 15  number of nuisance parameters (sources of systematical uncertainties)" << std::endl;
     txtFile << "------------" << std::endl;
     txtFile << "# we have just one channel, in which we observe 0 events" << std::endl;
     txtFile << "bin 1" << std::endl;
@@ -624,8 +624,8 @@ int main(int argc, char* argv[]) {
     txtFile << "rate            " << nSig.at(i) << "\t" << nBG_Z << "\t" << nBG_WMu << "\t" << nBG_WEl << "\t" << nBG_WTau << "\t" << nBG_QCD << "\t" << nBG_Other << std::endl;
     txtFile << "------------" << std::endl;
     txtFile << "lumi_8TeV     lnN   " << fLum << "\t - \t - \t - \t - \t - \t" << fLum << std::endl;
-    //txtFile << "CMS_eff_e     lnN   " << fSigElm << "/" << fSigElp << "\t" << fZElm << "/" << fZElp << "\t" << fWMuElm << "/" << fWMuElp << "\t" << fWElElm << "/" << fWElElp << "\t" << fWTauElm << "/" << fWTauElp << "\t" << fQCDElm << "/" << fQCDElp << "\t" << fOtherElm << "/" << fOtherElp << std::endl;
-    //txtFile << "CMS_eff_mu    lnN   " << fSigMum << "/" << fSigMup << "\t" << fZMum << "/" << fZMup << "\t" << fWMuMum << "/" << fWMuMup << "\t" << fWElMum << "/" << fWElMup << "\t" << fWTauMum << "/" << fWTauMup << "\t" << fQCDMum << "/" << fQCDMup << "\t" << fOtherMum << "/" << fOtherMup << std::endl;
+    txtFile << "CMS_eff_e     lnN   " << fSigElm << "/" << fSigElp << "\t" << fZElm << "/" << fZElp << "\t" << fWMuElm << "/" << fWMuElp << "\t" << fWElElm << "/" << fWElElp << "\t" << fWTauElm << "/" << fWTauElp << "\t" << fQCDElm << "/" << fQCDElp << "\t" << fOtherElm << "/" << fOtherElp << std::endl;
+    txtFile << "CMS_eff_mu    lnN   " << fSigMum << "/" << fSigMup << "\t" << fZMum << "/" << fZMup << "\t" << fWMuMum << "/" << fWMuMup << "\t" << fWElMum << "/" << fWElMup << "\t" << fWTauMum << "/" << fWTauMup << "\t" << fQCDMum << "/" << fQCDMup << "\t" << fOtherMum << "/" << fOtherMup << std::endl;
     txtFile << "CMS_scale_j   lnN   " << fSigJESm << "/" << fSigJESp << "\t" << fZJESm << "/" << fZJESp << "\t" << fWMuJESm << "/" << fWMuJESp << "\t" << fWElJESm << "/" << fWElJESp << "\t" << fWTauJESm << "/" << fWTauJESp << "\t" << fQCDJESm << "/" << fQCDJESp << "\t" << fOtherJESm << "/" << fOtherJESp << std::endl;
     txtFile << "CMS_res_j     lnN   " << fSigJERm << "/" << fSigJERp << "\t" << fZJERm << "/" << fZJERp << "\t" << fWMuJERm << "/" << fWMuJERp << "\t" << fWElJERm << "/" << fWElJERp << "\t" << fWTauJERm << "/" << fWTauJERp << "\t" << fQCDJERm << "/" << fQCDJERp << "\t" << fOtherJERm << "/" << fOtherJERp << std::endl;
     txtFile << "CMS_scale_met lnN   " << fSigUESm << "/" << fSigUESp << "\t" << fZUESm << "/" << fZUESp << "\t" << fWMuUESm << "/" << fWMuUESp << "\t" << fWElUESm << "/" << fWElUESp << "\t" << fWTauUESm << "/" << fWTauUESp << "\t" << fQCDUESm << "/" << fQCDUESp << "\t" << fOtherUESm << "/" << fOtherUESp << std::endl;
