@@ -21,3 +21,5 @@ sed -i 's@#include "InvisibleHiggs/Analysis/interface/StackPlot.h"@#include "Sta
 sed -i 's@// ClassImp(StackPlot)@ClassImp(StackPlot)@g' StackPlot.cc
 
 root -l -q -L StackPlot.cc++
+
+# Now you can do root -q -b plotScript.C (edit it first though!)
