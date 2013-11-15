@@ -696,12 +696,12 @@ for (unsigned n = 0; n < hnames.size(); n++)
     hname = "hW"+chan[c]+"_jet1Eta";
     if (c == 0) plots.setYMax(1E5);
     plots.draw(hname.c_str(), "Leading jet #eta", "N_{events}",true, true);
-    if (c == 0) plots.setYMax(-1);
+    // if (c == 0) plots.setYMax(-1);
 
     if (c == 0) plots.setYMax(1E5); else plots.setYMax(3E4);
     hname = "hW"+chan[c]+"_jet2Eta";
     plots.draw(hname.c_str(), "Sub-leading jet #eta", "N_{events}",true, true);
-    plots.setYMax(-1);
+    // plots.setYMax(-1);
 
     hname = "hW"+chan[c]+"_Mjj";
     plots.draw(hname.c_str(), "M_{jj} [GeV]", "N_{events}",true, true);
@@ -712,7 +712,7 @@ for (unsigned n = 0; n < hnames.size(); n++)
     hname = "hW"+chan[c]+"_dPhiJJ";
     if (c == 1) plots.setYMax(2E4);
     plots.draw(hname.c_str(), "#Delta #phi_{jj}", "N_{events}",true, true);
-    plots.setYMax(-1);
+    // plots.setYMax(-1);
 
     hname = "hW"+chan[c]+"_MET";
     plots.draw(hname.c_str(), "E_{T}^{miss} [GeV]", "N_{events}",true, true);

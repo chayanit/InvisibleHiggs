@@ -639,7 +639,7 @@ int main(int argc, char* argv[]) {
   plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",false, true);
 
   hname = "hNumberTaus";
-  plots.setYMax(-1);
+  ;
   plots.draw(hname.c_str(), "Number of #tau", "N_{events}",true, true);
 
   hname = "hMinDR";
@@ -647,7 +647,7 @@ int main(int argc, char* argv[]) {
   plots.draw(hname.c_str(), "#Delta R_{min}(#tau, leading jet)", "N_{events}",true, true);
 
   hname = "hTauMatchJet";
-  plots.setYMax(-1);
+  ;
   plots.draw(hname.c_str(), "#tau matching with tagging jets", "N_{events}",true, true);
   
   hname = "hWTau_mT_TightMjj";

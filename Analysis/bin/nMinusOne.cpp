@@ -338,13 +338,13 @@ int main(int argc, char* argv[]) {
   plots.addDataset("Signal 100%BR", kRed, 3);
   plots.addDataset("METABCD",    kBlack, 1);
 
+  plots.setLumi(19.5); // doens't rescale anything, just adds a bit of text on the plot
   plots.draw("hTrigNM1", "", "");
   plots.draw("hMETFiltNM1", "", "");
   plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "N_{events}",1,1);
   // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "N_{events}",1,1);
   plots.setYMax(5E4);
   plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "N_{events}",1,1);
-  plots.setYMax(-1); // resets plot to automate maximum
   plots.draw("hMjjNM1", "M_{jj} [GeV]", "Events / 100 GeV",1,1);
   plots.draw("hMETNM1", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,1);
   plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,1);
@@ -353,7 +353,6 @@ int main(int argc, char* argv[]) {
   plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "Events",1,1);
   plots.setYMax(1E5);
   plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "N_{events}",1,1);
-  plots.setYMax(-1); // resets plot to automate maximum
   plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}",1,1);
 
   plots.setYMin(1e-1);
