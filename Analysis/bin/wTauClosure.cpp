@@ -23,6 +23,7 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include "THStack.h"
 
 #include <iostream>
 #include <fstream>
@@ -68,12 +69,15 @@ int main(int argc, char* argv[]) {
   // Get puWeight etc added below if necessary
   // standard TightMjj selection - essentially signal selection but no DPhiJJ and no cjv
   TCut cutTightMjj_basic = cuts.HLTandMETFilters() + cuts.cutWTau("lVeto") + cuts.cutWTau("dijet") + cuts.cutWTau("dEtaJJ") + cuts.cutWTau("MET") + cuts.cutWTau("Mjj"); 
-  TCut cutwMunoMjj       = cuts.cutWMu("trigger")+ cuts.cutWMu("wMu")+cuts.cutWMu("lVeto")+cuts.cutWMu("dijet")+cuts.cutWMu("dEtaJJ")+cuts.cutWMu("MET")+cuts.cutWMu("CJV")+cuts.cutWMu("dPhiJJ"); //for W->mu regions
+  TCut cutwMunoMjj       = cuts.cutWMu("trigger")+ cuts.cutWMu("wMu")+cuts.cutWMu("lVeto")+cuts.cutWMu("dijet")+cuts.cutWMu("dEtaJJ")+cuts.cutWMu("MET") + cuts.cutWMu("dPhiJJ") + cuts.cutWMu("CJV"); //for W->mu regions
+  cutwMunoMjj.Print();
   TCut cutTightMjj(""); // used to add in PU, trig corr, wWeight etc
+  TCut cutWMuVBFNoCJV = cuts.cutWMu("trigger")  + cuts.cutWMu("wMu")  + cuts.cutWMu("lVeto")  + cuts.cutWMu("dijet")  + cuts.cutWMu("dEtaJJ")  + cuts.cutWMu("Mjj");
 
   // double dphiEdges[4] = { 0., 1.0, 2.6, TMath::Pi() };
   double dphiEdges[5]     = { 0., 1.0, 1.8, 2.6, TMath::Pi() };
   double MjjEdges[5]      = { 800., 1000., 1200., 1800., 3000. };
+  // double MjjEdges[5]      = { 800., 1100., 1400., 1800., 3000. };
   double METEdges[5]      = { 100., 150., 200., 250., 300. };
   //double CenJetEtEdges[5] = { 10., 40., 70., 120. ,200};
   double CenJetEtEdges[5] = { 10., 30., 60., 100., 150.};
@@ -135,6 +139,7 @@ int main(int argc, char* argv[]) {
 
     TFile* file = datasets.getTFile(dataset.name);
     TTree* tree = (TTree*) file->Get("invHiggsInfo/InvHiggsInfo");
+    // TFile* ofile = TFile::Open( (oDir+std::string("/")+dataset.name+std::string(".root")).c_str(), "RECREATE");
 
     // setup cuts
     TCut wWeight("");
@@ -154,7 +159,7 @@ int main(int argc, char* argv[]) {
     TCut cutWTau_C_Mjj        = cutD + cuts.cutWTau("wTau") + cuts.cutWTau("trigger") + cuts.cutWTau("lVeto") + cuts.cutWTau("dijet") + cuts.cutWTau("dEtaJJ") + cuts.cutWTau("MET") + cuts.cutWTau("dPhiJJ");
     
     TCut cutWMu_MCC_MET       = cuts.wMuGen() + cuts.wMuVBF() + cuts.cutWMu("dPhiJJ");
-    TCut cutWMu_C_MET         = cutD + cuts.wMuVBF() + cuts.cutWMu("dPhiJJ");
+    TCut cutWMu_C_MET         = cutD + cuts.wMuVBF()+ cuts.cutWMu("dPhiJJ");
     TCut cutWTau_MCC_MET      = cuts.wTauGen() + cuts.cutWTau("wTau") + cuts.cutWTau("trigger") + cuts.cutWTau("lVeto") + cuts.cutWTau("dijet") + cuts.cutWTau("dEtaJJ") + cuts.cutWTau("Mjj") + cuts.cutWTau("dPhiJJ");
     TCut cutWTau_C_MET        = cutD + cuts.cutWTau("wTau") + cuts.cutWTau("trigger") + cuts.cutWTau("lVeto") + cuts.cutWTau("dijet") + cuts.cutWTau("dEtaJJ") + cuts.cutWTau("Mjj") + cuts.cutWTau("dPhiJJ");
     
@@ -318,7 +323,7 @@ int main(int argc, char* argv[]) {
         tree->Draw("cenJetEt>>hWMu_BGC_CenJetEt_tmp", otherCutsTight * cutWMu_C_CenJetEt);
         
         hWMu_BGC_DPhi_tmp->Scale(weight);
-    	hWMu_BGC_Mjj_tmp->Scale(weight);
+      	hWMu_BGC_Mjj_tmp->Scale(weight);
         hWMu_BGC_MET_tmp->Scale(weight);
         hWMu_BGC_CenJetEt_tmp->Scale(weight);
         
@@ -389,6 +394,7 @@ int main(int argc, char* argv[]) {
     delete hWTau_BGC_CenJetEt_tmp;
 
     file->Close();
+    // ofile->Close();
    
   } // end of datasets loop
 
@@ -591,8 +597,12 @@ int main(int argc, char* argv[]) {
   double y_dPhi1[4],ey_dPhi1[4],y_dPhi2[4],ey_dPhi2[4],y_dPhi3[4],ey_dPhi3[4]; // For raw numbers - prediceted (data), observed, predicted (MC)
   double frac_dPhi[4],efrac_dPhi[4]; // For Frac diff
 
+  // double MjjEdges[5]      = { 800., 1100., 1400., 1800., 3000. };
+
   double x_Mjj[4]   = {900., 1100., 1500., 2400.};
   double ex_Mjj[4]  = {100, 100, 300, 600};
+  // double x_Mjj[4]   = {950., 1250., 1600., 2400.};
+  // double ex_Mjj[4]  = {150, 150, 200, 600};
   double y_Mjj1[4],ey_Mjj1[4],y_Mjj2[4],ey_Mjj2[4],y_Mjj3[4],ey_Mjj3[4]; // For raw numbers - prediceted (data), observed, predicted (MC)
   double frac_Mjj[4],efrac_Mjj[4]; // For Frac diff
 

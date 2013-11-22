@@ -203,12 +203,26 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       continue;
     }
 
+    if (styles_.at(i) == 0 || styles_.at(i) == 3) {
+      if (h->GetEntries()==0) {
+        std::cout << "No entries in histogram " << labels_.at(i) << std::endl;
+        continue;
+      }
+    }
+
     // Get min of BG hist to determine y axis min
     // This could probably be done better...
     if (styles_.at(i) == 0) {
-      double min = h->GetMinimum(0);
-      if (min != 0) ymin = min;
+      if (h->GetEntries() == 0) continue;
+      double min = h->GetMinimum(0.); 
       
+      if(fabs(h->GetMaximum(0)) == min ) continue; // Occasionally it does something odd and min = 3.4e38, max = -3.4e38. I guess it's and overflow thing. This stops it
+      
+      if (logy){
+        if( min > 0 ) ymin = min;
+      } else 
+        if (min != 0.) ymin = min;
+
       if (xMin_ != 0.)
         xMin = xMin_;
       else
@@ -219,7 +233,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       else
         xMax = h->GetXaxis()->GetXmax();
     }
-    if (ymin != 0) break;
+    if (logy && (ymin > 0)) break;
+    else if (!logy && (ymin != 0)) break;
   }
 
   /////////////////////////////////
@@ -228,7 +243,6 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   i=0;
   file = files_.begin();
   for (; file!=files_.end(); ++file, ++i) {
-
     if (*file==0) {
       std::cerr << "No file for " << labels_.at(i) << std::endl;
       continue;
@@ -292,7 +306,6 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   //////////////////////////////
   // Draw the histogram stack //
   //////////////////////////////
-
   if (drawStack) {
     stack.Draw("HIST"); // Draw first so can change axes
 
@@ -405,8 +418,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   double cutVal = 0.;
   if (!hname.compare("hDijetNM1")) cutVal = 50.;
   else if (!hname.compare("hDEtaJJNM1")) cutVal = 4.2;
-  //else if (!hname.compare("hMjjNM1")) cutVal = 1100.;
-  //else if (!hname.compare("hMETNM1")) cutVal = 130.;
+  else if (!hname.compare("hMjjNM1")) cutVal = 1100.;
+  else if (!hname.compare("hMETNM1")) cutVal = 130.;
   else if (!hname.compare("hDPhiJJNM1")) cutVal = 1.0;
   else if (!hname.compare("hCenEtNM1")) cutVal = 30.0;
 

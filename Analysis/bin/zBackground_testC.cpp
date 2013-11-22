@@ -105,6 +105,10 @@ int main(int argc, char* argv[]) {
     TCut cutD = cuts.cutDataset(dataset.name);
     TCut wWeight("");
 
+    // bit of a fudge for mutight weight - data doesn't have the var in it, so need to add an exception (see below)
+    // and then restore it for all other MC
+    muTightWeight=cuts.muTightWeight(options.leptCorr);
+
     // check if it's DYJets
     bool isDY = false;
     bool isWJets = false;
@@ -133,6 +137,7 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing QCD : " << dataset.name << std::endl;
     }
     else if (dataset.isData) {
+      muTightWeight="";
       std::cout << "Analysing Data      : " << dataset.name << std::endl;
     }
     else {
@@ -598,6 +603,7 @@ int main(int argc, char* argv[]) {
 
   h->GetXaxis()->SetTitle("#Delta #phi_{jj}");
   h->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
+  h->GetYaxis()->SetTitleOffset(1.2);
   h->GetYaxis()->SetRangeUser(-2,2);
   h->SetLineColor(kBlue);
   h->SetLineWidth(2);

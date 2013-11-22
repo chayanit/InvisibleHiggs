@@ -54,10 +54,8 @@ int main(int argc, char* argv[]) {
   TCut dijet     = cuts.nMinusOneCuts("dijet");
   TCut sgnEtaJJ  = cuts.nMinusOneCuts("sgnEtaJJ");
   TCut dEtaJJ    = cuts.nMinusOneCuts("dEtaJJ");
-  //TCut met       = cuts.nMinusOneCuts("MET");
-  //TCut mJJ       = cuts.nMinusOneCuts("Mjj");
-  TCut met       = cuts.allCutsLoDPhi();
-  TCut mJJ       = cuts.allCutsLoDPhi();
+  TCut met       = cuts.nMinusOneCuts("MET");
+  TCut mJJ       = cuts.nMinusOneCuts("Mjj");
   TCut dPhiJJ    = cuts.nMinusOneCuts("dPhiJJ");
   TCut cjv       = cuts.nMinusOneCuts("CJV");
 
@@ -66,8 +64,8 @@ int main(int argc, char* argv[]) {
 
     Dataset dataset = datasets.getDataset(i);
 
-    //if (dataset.isData) continue;
-    if (dataset.name.compare(0,3,"QCD") == 0) continue;
+    // if (dataset.isData) continue;
+    // if (dataset.name.compare(0,3,"QCD") == 0) continue;
 
     TFile* ifile = datasets.getTFile(dataset.name);
 
@@ -87,8 +85,8 @@ int main(int argc, char* argv[]) {
     TH1D* hDijet                = new TH1D("hDijetNM1",                  "", 50,  0.,  250.);
     TH1D* hSgnEtaJJ             = new TH1D("hSgnEtaJJNM1",               "", 2,   -1., 1.);
     TH1D* hDEtaJJ               = new TH1D("hDEtaJJNM1",                 "", 50,  0.,  8.);
-    TH1D* hMjj                  = new TH1D("hMjjNM1",                    "", 35,  0.,  3500.);
-    TH1D* hMET                  = new TH1D("hMETNM1",                    "", 25,  10.,  510.);
+    TH1D* hMjj                  = new TH1D("hMjjNM1",                    "", 25,  0.,  4000.);
+    TH1D* hMET                  = new TH1D("hMETNM1",                    "", 25,  0.,  500.);
     TH1D* hDPhiJMet             = new TH1D("hDPhiJMetNM1",               "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNoDPhiJJ     = new TH1D("hDPhiJMetNM1NoDPhiJJ",       "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNorm         = new TH1D("hDPhiJMetNormNM1",           "", 50,  0.,  200);
@@ -96,7 +94,7 @@ int main(int argc, char* argv[]) {
     TH1D* hDPhiJJ               = new TH1D("hDPhiJJNM1",                 "", 25,  0.,  TMath::Pi());
     TH1D* hEVeto                = new TH1D("hEVetoNM1",                  "", 50,  0.,  50.);
     TH1D* hMuVeto               = new TH1D("hMuVetoNM1",                 "", 50,  0.,  50.);
-    TH1D* hCenEt                = new TH1D("hCenEtNM1",                  "", 50,  0.,  150.); 
+    TH1D* hCenEt                = new TH1D("hCenEtNM1",                  "", 30,  0.,  150.); 
     TH1D* hCenEta               = new TH1D("hCenEtaNM1",                 "", 50, -5.,  5.);
 
     // Additional cuts specific to DYJetsToLL (cut on Zpt <100 to avoid double counting with the PtZ-100 sample)
@@ -214,154 +212,118 @@ int main(int argc, char* argv[]) {
   hists.push_back("hCenEtaNM1");
 
   // sum Z+jets
-  //std::cout << "Summing histograms for Z+Jets" << std::endl;
-  //std::vector<std::string> zJets;
-  //zJets.push_back("Zvv_50to100");
-  //zJets.push_back("Zvv_100to200");
-  //zJets.push_back("Zvv_200to400");
-  //zJets.push_back("Zvv_400toinf");
-  //zJets.push_back("EWK_ZvvFake");  
-  //SumDatasets(oDir, zJets, hists, "ZJets+EWK");
+  std::cout << "Summing histograms for Z+Jets" << std::endl;
+  std::vector<std::string> zJets;
+  zJets.push_back("Zvv_50to100");
+  zJets.push_back("Zvv_100to200");
+  zJets.push_back("Zvv_200to400");
+  zJets.push_back("Zvv_400toinf");
+  zJets.push_back("EWK_ZvvFake");  
+  SumDatasets(oDir, zJets, hists, "ZJets+EWK");
 
   // sum W+jets datasets
-  //std::cout << "Summing histograms for W+Jets" << std::endl;
-  //std::vector<std::string> wJets;
-  //wJets.push_back(std::string("WJets"));
-  //wJets.push_back(std::string("W1Jets"));
-  //wJets.push_back(std::string("W2Jets"));
-  //wJets.push_back(std::string("W3Jets"));
-  //wJets.push_back(std::string("W4Jets"));
-  //wJets.push_back(std::string("EWK_Wp2Jets"));
-  //wJets.push_back(std::string("EWK_Wm2Jets"));
-  //SumDatasets(oDir, wJets, hists, "WNJets+EWK");
-
-  // sum V+jets
-  std::cout << "Summing histograms for V+Jets" << std::endl;
-  std::vector<std::string> vJets;
-  vJets.push_back("Zvv_50to100");
-  vJets.push_back("Zvv_100to200");
-  vJets.push_back("Zvv_200to400");
-  vJets.push_back("Zvv_400toinf");
-  vJets.push_back("EWK_ZvvFake");
-  vJets.push_back("WJets");
-  vJets.push_back("W1Jets");
-  vJets.push_back("W2Jets");
-  vJets.push_back("W3Jets");
-  vJets.push_back("W4Jets");
-  vJets.push_back("EWK_Wp2Jets");
-  vJets.push_back("EWK_Wm2Jets");
-  SumDatasets(oDir, vJets, hists, "V+jets");
+  std::cout << "Summing histograms for W+Jets" << std::endl;
+  std::vector<std::string> wJets;
+  wJets.push_back(std::string("WJets"));
+  wJets.push_back(std::string("W1Jets"));
+  wJets.push_back(std::string("W2Jets"));
+  wJets.push_back(std::string("W3Jets"));
+  wJets.push_back(std::string("W4Jets"));
+  wJets.push_back(std::string("EWK_Wp2Jets"));
+  wJets.push_back(std::string("EWK_Wm2Jets"));
+  SumDatasets(oDir, wJets, hists, "WNJets+EWK");
 
   // sum QCD
-  //std::cout << "Summing histograms for QCD" << std::endl;
-  //std::vector<std::string> qcd;
-  //qcd.push_back("QCD_Pt30to50");
-  //qcd.push_back("QCD_Pt50to80");
-  //qcd.push_back("QCD_Pt80to120");
-  //qcd.push_back("QCD_Pt120to170");
-  //qcd.push_back("QCD_Pt170to300");
-  //qcd.push_back("QCD_Pt300to470");
-  //qcd.push_back("QCD_Pt470to600");
-  //qcd.push_back("QCD_Pt600to800");
-  //qcd.push_back("QCD_Pt800to1000");
-  //qcd.push_back("QCD_Pt1000to1400");
-  //qcd.push_back("QCD_Pt1400to1800");
-  //qcd.push_back("QCD_Pt1800");
-  //SumDatasets(oDir, qcd, hists, "QCD");
+  std::cout << "Summing histograms for QCD" << std::endl;
+  std::vector<std::string> qcd;
+  qcd.push_back("QCD_Pt30to50");
+  qcd.push_back("QCD_Pt50to80");
+  qcd.push_back("QCD_Pt80to120");
+  qcd.push_back("QCD_Pt120to170");
+  qcd.push_back("QCD_Pt170to300");
+  qcd.push_back("QCD_Pt300to470");
+  qcd.push_back("QCD_Pt470to600");
+  qcd.push_back("QCD_Pt600to800");
+  qcd.push_back("QCD_Pt800to1000");
+  qcd.push_back("QCD_Pt1000to1400");
+  qcd.push_back("QCD_Pt1400to1800");
+  qcd.push_back("QCD_Pt1800");
+  SumDatasets(oDir, qcd, hists, "QCD");
 
   // Sum Single t and tbar
-  //std::cout << "Summing histograms for Single T and TTbar" << std::endl;
-  //std::vector<std::string> singleT;
-  //singleT.push_back("TTBar");
-  //singleT.push_back("SingleT_t");
-  //singleT.push_back("SingleT_s");
-  //singleT.push_back("SingleT_tW");
-  //singleT.push_back("SingleTbar_t");
-  //singleT.push_back("SingleTbar_s");
-  //singleT.push_back("SingleTbar_tW");
-  //SumDatasets(oDir, singleT, hists, "SingleT+TTbar");
+  std::cout << "Summing histograms for Single T and TTbar" << std::endl;
+  std::vector<std::string> singleT;
+  singleT.push_back("TTBar");
+  singleT.push_back("SingleT_t");
+  singleT.push_back("SingleT_s");
+  singleT.push_back("SingleT_tW");
+  singleT.push_back("SingleTbar_t");
+  singleT.push_back("SingleTbar_s");
+  singleT.push_back("SingleTbar_tW");
+  SumDatasets(oDir, singleT, hists, "SingleT+TTbar");
 
   // Sum diboson
-  //std::cout << "Summing histograms for Diboson" << std::endl;
-  //std::vector<std::string> diboson;
-  //diboson.push_back("WW");
-  //diboson.push_back("WZ");
-  //diboson.push_back("ZZ");
-  //SumDatasets(oDir, diboson, hists, "Diboson");
+  std::cout << "Summing histograms for Diboson" << std::endl;
+  std::vector<std::string> diboson;
+  diboson.push_back("WW");
+  diboson.push_back("WZ");
+  diboson.push_back("ZZ");
+  diboson.push_back("WG");
+  SumDatasets(oDir, diboson, hists, "Diboson");
 
   //Sum DYJetsToLL
-  //std::cout << "Summing histograms for DYJetsToLL" << std::endl;
-  //std::vector<std::string> dyjets;
-  //dyjets.push_back("DYJetsToLL");
-  //dyjets.push_back("DYJetsToLL_PtZ-100");
-  //dyjets.push_back("DYJetsToLL_EWK");
-  //SumDatasets(oDir, dyjets, hists, "DYJets+EWK");
-
-  // Sum other SM
-  std::cout << "Summing histograms for Other SM" << std::endl;
-  std::vector<std::string> other;
-  other.push_back("TTBar");
-  other.push_back("SingleT_t");
-  other.push_back("SingleT_s");
-  other.push_back("SingleT_tW");
-  other.push_back("SingleTbar_t");
-  other.push_back("SingleTbar_s");
-  other.push_back("SingleTbar_tW");
-  other.push_back("WW");
-  other.push_back("WZ");
-  other.push_back("ZZ");
-  other.push_back("WG");
-  other.push_back("DYJetsToLL");
-  other.push_back("DYJetsToLL_PtZ-100");
-  other.push_back("DYJetsToLL_EWK");
-  SumDatasets(oDir, other, hists, "tt+DY+VV");
+  std::cout << "Summing histograms for DYJetsToLL" << std::endl;
+  std::vector<std::string> dyjets;
+  dyjets.push_back("DYJetsToLL");
+  dyjets.push_back("DYJetsToLL_PtZ-100");
+  dyjets.push_back("DYJetsToLL_EWK");
+  SumDatasets(oDir, dyjets, hists, "DYJets+EWK");
 
   // Signal
   std::vector<std::string> signal;
   signal.push_back("SignalM125_POWHEG");
-  SumDatasets(oDir, signal, hists, "Signal 100%BR");
+  SumDatasets(oDir, signal, hists, "Signal");
 
   // make plots
   std::cout << "Making plots" << std::endl;
   StackPlot plots(oDir);
   // plots.setLegPos(0.69,0.70,0.98,0.97);
-  plots.setLegPos(0.63,0.63,0.93,0.89);
+  plots.setLegPos(0.63,0.58,0.93,0.89);
 
-  //plots.addDataset("Diboson", kViolet-6, 0);
-  //plots.addDataset("DYJets+EWK", kPink-4,0);
-  //plots.addDataset("SingleT+TTbar", kAzure-2, 0);
-  //plots.addDataset("QCD", kGreen+3, 0);
-  //plots.addDataset("ZJets+EWK", kOrange-2, 0);
-  //plots.addDataset("WNJets+EWK", kGreen-3, 0);
-  plots.addDataset("tt+DY+VV", kAzure-2, 0);
-  plots.addDataset("V+jets", kPink-4,0);
-  plots.addDataset("Signal 100%BR", kRed, 3);
+  plots.addDataset("Diboson", kViolet-6, 0);
+  plots.addDataset("DYJets+EWK", kPink-4,0);
+  plots.addDataset("SingleT+TTbar", kAzure-2, 0);
+  plots.addDataset("QCD", kGreen+3, 0);
+  plots.addDataset("ZJets+EWK", kOrange-2, 0);
+  plots.addDataset("WNJets+EWK", kGreen-3, 0);
+  plots.addDataset("Signal","Signal 100% BR", kRed, 2);
   plots.addDataset("METABCD",    kBlack, 1);
 
   plots.setLumi(19.5); // doens't rescale anything, just adds a bit of text on the plot
-  plots.draw("hTrigNM1", "", "");
-  plots.draw("hMETFiltNM1", "", "");
-  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "N_{events}",1,1);
+  std::cout << "plotting hTrigNM1" << std::endl;
+  plots.draw("hTrigNM1", "", "",1,1);
+  plots.draw("hMETFiltNM1", "", "",1,1);
+  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "Events / 5 GeV",1,1);
   // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "N_{events}",1,1);
   plots.setYMax(5E4);
-  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "N_{events}",1,1);
+  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "Events / 0.16",1,1);
   plots.draw("hMjjNM1", "M_{jj} [GeV]", "Events / 100 GeV",1,1);
   plots.draw("hMETNM1", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,1);
   plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,1);
   plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,1);
   plots.setYMax(5E5);
-  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "Events",1,1);
+  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "Events / (#pi/25)",1,1);
   plots.setYMax(1E5);
-  plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "N_{events}",1,1);
+  plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "Events / 5 GeV",1,1);
   plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}",1,1);
 
   plots.setYMin(1e-1);
   // plots.setYMax(1e2);
-  plots.draw("hEVetoNM1", "E_{T} [GeV]", "N_{events}");
-  plots.draw("hMuVetoNM1", "p_{T} [GeV]", "N_{events}");
+  plots.draw("hEVetoNM1", "E_{T} [GeV]", "N_{events}",1,1);
+  plots.draw("hMuVetoNM1", "p_{T} [GeV]", "N_{events}",1,1);
 
   // plots.setYMin(1e-2);
-  plots.draw("hDPhiJMetNormNM1", "#Delta #phi_{N}^{min}", "N_{events}");
-  plots.draw("hDPhiJMetNormNM1NoDPhiJJ", "#Delta #phi_{N}^{min}, no #Delta #phi_{jj} cut", "N_{events}");
+  plots.draw("hDPhiJMetNormNM1", "#Delta #phi_{N}^{min}", "N_{events}",1,1);
+  plots.draw("hDPhiJMetNormNM1NoDPhiJJ", "#Delta #phi_{N}^{min}, no #Delta #phi_{jj} cut", "N_{events}",1,1);
 
 }
