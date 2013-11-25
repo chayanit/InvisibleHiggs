@@ -147,6 +147,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
   gStyle->SetOptTitle(0);
   gStyle->SetOptStat("");
+  gStyle->SetLegendBorderSize(0);
 
   TH1::SetDefaultSumw2();
 
@@ -274,7 +275,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       } 
       h->SetAxisRange(xMin,xMax,"X");
       stack.Add(h);
-
+      
       // Add entry to legend vector
       TLegendEntry *legE;
       if(styles_.at(i) == 3)
@@ -448,7 +449,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   } else {
     // Optimised for non-ratio plots
     // Probably needs re-optimising, hasn'tbeen tested in a while...
-    cms = new TPaveText(0.12, 0.68, 0.45, 0.9, "NDC");
+    cms = new TPaveText(0.12, 0.60, 0.45, 0.9, "NDC");
   }
   
 
