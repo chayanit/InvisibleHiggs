@@ -192,8 +192,8 @@ int main(int argc, char* argv[]) {
     TH1D* hWEl_WC_CJV = new TH1D("hWEl_WC_CJV", "", 4, cjvEdges);
 
     // Cut 
-    TCut cutWMu_GEN  = otherCutsMu * cuts.wMuGen();
-    TCut cutWEl_GEN  = otherCutsEl * cuts.wElGen();
+    TCut cutWMu_GEN  = puWeight * trigCorr * wWeight * cuts.wMuGen();
+    TCut cutWEl_GEN  = puWeight * trigCorr * wWeight * cuts.wElGen();
 
     TCut cutWMu_C_noDPhi  = otherCutsMu * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
     TCut cutWMu_WC_noDPhi = otherCutsMu * (cuts.wMuGen() + cuts.wMuVBF() + cuts.cutWMu("MET"));
@@ -692,8 +692,10 @@ int main(int argc, char* argv[]) {
   // draw control plots
   std::string pdfName;
 
-  //gStyle->SetOptStat(0);
-  //gStyle->SetOptFit(111111111);
+  bool inPAS = 0;
+
+  if(!inPAS) gStyle->SetOptStat(0);
+  if(!inPAS) gStyle->SetOptFit(111111111);
 
   double x_dPhi[4]  = {0.5, 1.4, 2.2, 2.6 + (TMath::Pi()-2.6)/2};
   double ex_dPhi[4] = {0.5, 0.4, 0.4, (TMath::Pi()-2.6)/2};
@@ -719,7 +721,7 @@ int main(int argc, char* argv[]) {
 
   for(int i=0; i<4; ++i) {
     y_syst1[i] = 0.;
-    e_syst1[i] = 0.23;
+    e_syst1[i] = 0.25;
 
     y_dPhi1[i]  = hWEl_EstS_DPhi->GetBinContent(i+1);	//Predicted WEl
     ey_dPhi1[i] = hWEl_EstS_DPhi->GetBinError(i+1);	
@@ -766,7 +768,7 @@ int main(int argc, char* argv[]) {
 
   for(int i=0; i<5; ++i) {
     y_syst2[i] = 0.;
-    e_syst2[i] = 0.23;
+    e_syst2[i] = 0.25;
 
     y_mjj1[i]  = hWEl_EstS_Mjj->GetBinContent(i+1);	//Predicted WEl
     ey_mjj1[i] = hWEl_EstS_Mjj->GetBinError(i+1);	
@@ -790,9 +792,9 @@ int main(int argc, char* argv[]) {
   //TF1 *f1 = new TF1("f1","pol0",0, 2.6); 		// fit 3 bins
   TF1 *f2 = new TF1("f2","pol0",0., +2.1);
   //TF1 *f2 = new TF1("f2","pol0",-2.1, +2.1); 
-  TF1 *f3 = new TF1("f3","pol0",800., 3000.); 
-  TF1 *f4 = new TF1("f4","pol0",100., 500.); 
-  TF1 *f5 = new TF1("f5","pol0",10., 150.); 
+  TF1 *f3 = new TF1("f3","pol0",800., 3000.); 		// Mjj
+  TF1 *f4 = new TF1("f4","pol0",100., 500.); 		// MET
+  TF1 *f5 = new TF1("f5","pol0",10., 150.); 		// CJV
 
   TGraphErrors *gp_dPhi1  = new TGraphErrors(4,x_dPhi,y_dPhi1,ex_dPhi,ey_dPhi1);
   TGraphErrors *gp_dPhi2  = new TGraphErrors(4,x_dPhi,y_dPhi2,ex_dPhi,ey_dPhi2);
@@ -838,7 +840,7 @@ int main(int argc, char* argv[]) {
   TCanvas canvas; 
   canvas.SetCanvasSize(canvas.GetWindowWidth(), 1.2*canvas.GetWindowHeight());
   TPad *pad = (TPad *)canvas.cd(1);
-  pad->SetPad("pad","pad",0.05,0.05,.97,.97,kWhite,0,0);
+  if(inPAS) pad->SetPad("pad","pad",0.05,0.05,.97,.97,kWhite,0,0);
   
   gp_dPhi1->SetTitle("");
   gp_dPhi1->SetMarkerStyle(20);
@@ -884,21 +886,21 @@ int main(int argc, char* argv[]) {
   gp_dPhiS->SetFillColor(kGray);
   gp_dPhiS->SetFillStyle(3001);
   gp_dPhiF->SetMarkerStyle(20);
-  gp_dPhiF->SetMarkerSize(1.5);
+  gp_dPhiF->SetMarkerSize(1.4);
   gp_dPhiF->SetMarkerColor(kBlue);
   gp_dPhiF->Fit("f1","R");
   h1->Draw();
   gp_dPhiS->Draw("2 same");
   gp_dPhiF->Draw("P same");
 
-  TLegend leg2(0.62,0.67,0.88,0.87);
+  TLegend leg2(0.12,0.67,0.38,0.87);
   leg2.SetBorderSize(0);
   leg2.SetFillColor(0);
-  leg2.AddEntry(f1,"Fit","l");
   //leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < 2.6)","l");
+  leg2.AddEntry(f1,"pol0 fit (0 < #Delta #phi_{jj} < #pi)","l");
   leg2.AddEntry(gp_dPhiS,"Systematic error","f");
   leg2.Draw();
-  cms->Draw();
+  //cms->Draw();
 
   pdfName= oDir + std::string("/DPhi_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
@@ -940,20 +942,20 @@ int main(int argc, char* argv[]) {
   gp_etaS->SetFillColor(kGray);
   gp_etaS->SetFillStyle(3001);
   gp_etaF->SetMarkerStyle(20);
-  gp_etaF->SetMarkerSize(1.5);
+  gp_etaF->SetMarkerSize(1.4);
   gp_etaF->SetMarkerColor(kBlue);
   gp_etaF->Fit("f2","R");
   h2->Draw();
   gp_etaS->Draw("2 same");
   gp_etaF->Draw("P same");
 
-  TLegend leg3(0.62,0.67,0.88,0.87);
+  TLegend leg3(0.12,0.67,0.38,0.87);
   leg3.SetBorderSize(0);
   leg3.SetFillColor(0);
   leg3.AddEntry(f2,"Fit","l");
   leg3.AddEntry(gp_etaS,"Systematic error","f");
   leg3.Draw();
-  cms->Draw();
+  //cms->Draw();
 
   pdfName= oDir + std::string("/Eta_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
@@ -985,11 +987,12 @@ int main(int argc, char* argv[]) {
   
 
   h3->GetXaxis()->SetTitle("M_{jj} [GeV]");
-  h3->GetXaxis()->SetTitleSize(0.053);
-  h3->GetXaxis()->SetTitleOffset(0.85);
-  h3->GetYaxis()->SetTitle("(Predicted - Observed)/Observed");
-  h3->GetYaxis()->SetTitleSize(0.050);
-  h3->GetYaxis()->SetTitleOffset(0.85);
+  if(inPAS) h3->GetXaxis()->SetTitleSize(0.053);
+  if(inPAS) h3->GetXaxis()->SetTitleOffset(0.85);
+  if(inPAS) h3->GetYaxis()->SetTitle("(Predicted - Observed)/Observed");
+  else      h3->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
+  if(inPAS) h3->GetYaxis()->SetTitleSize(0.050);
+  if(inPAS) h3->GetYaxis()->SetTitleOffset(0.85);
   h3->GetYaxis()->SetRangeUser(-1.0,2.0);
   h3->SetStats(kFALSE);
   h3->SetLineColor(kBlack);
@@ -1013,9 +1016,14 @@ int main(int argc, char* argv[]) {
   leg4.SetBorderSize(0);
   leg4.SetFillColor(0);
   leg4.AddEntry(f3,"Fit","l");
-  leg4.AddEntry(gp_mjjS,"Syst. error","f");
+  if(inPAS) leg4.AddEntry(gp_mjjS,"Syst. error","f");
+  else {
+  leg4.SetX1(0.12);
+  leg4.SetX2(0.38);
+  leg4.AddEntry(gp_mjjS,"Systematic error","f");
+  }
   leg4.Draw();
-  cms->Draw();
+  if(inPAS) cms->Draw();
   pdfName= oDir + std::string("/MJJ_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
 
@@ -1045,11 +1053,12 @@ int main(int argc, char* argv[]) {
   canvas.Print(pdfName.c_str());
 
   h4->GetXaxis()->SetTitle("E_{T}^{miss} [GeV]");
-  h4->GetXaxis()->SetTitleSize(0.053);
-  h4->GetXaxis()->SetTitleOffset(0.85);
-  h4->GetYaxis()->SetTitle("(Predicted - Observed)/Observed");
-  h4->GetYaxis()->SetTitleSize(0.050);
-  h4->GetYaxis()->SetTitleOffset(0.85);
+  if(inPAS) h4->GetXaxis()->SetTitleSize(0.053);
+  if(inPAS) h4->GetXaxis()->SetTitleOffset(0.85);
+  if(inPAS) h4->GetYaxis()->SetTitle("(Predicted - Observed)/Observed");
+  else 	    h4->GetYaxis()->SetTitle("#frac{Predicted - Observed}{Observed}");
+  if(inPAS) h4->GetYaxis()->SetTitleSize(0.050);
+  if(inPAS) h4->GetYaxis()->SetTitleOffset(0.85);
   h4->GetYaxis()->SetRangeUser(-1.0,2.0);
   h4->SetStats(kFALSE);
   h4->SetLineColor(kBlack);
@@ -1073,9 +1082,14 @@ int main(int argc, char* argv[]) {
   leg5.SetBorderSize(0);
   leg5.SetFillColor(0);
   leg5.AddEntry(f4,"Fit","l");
-  leg5.AddEntry(gp_metS,"Syst. error","f");
+  if(inPAS) leg5.AddEntry(gp_metS,"Syst. error","f");
+  else {
+  leg5.SetX1(0.12);
+  leg5.SetX2(0.38);
+  leg5.AddEntry(gp_metS,"Systematic error","f");
+  }
   leg5.Draw();
-  cms->Draw();
+  if(inPAS) cms->Draw();
   pdfName= oDir + std::string("/MET_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
 
@@ -1125,20 +1139,20 @@ int main(int argc, char* argv[]) {
   gp_cjvS->SetFillColor(kGray);
   gp_cjvS->SetFillStyle(3001);
   gp_cjvF->SetMarkerStyle(20);
-  gp_cjvF->SetMarkerSize(1.5);
+  gp_cjvF->SetMarkerSize(1.4);
   gp_cjvF->SetMarkerColor(kBlue);
   gp_cjvF->Fit("f5","R");
   h5->Draw();
   gp_cjvS->Draw("2 same");
   gp_cjvF->Draw("P same");
 
-  TLegend leg6(0.62,0.67,0.88,0.87);
+  TLegend leg6(0.12,0.67,0.38,0.87);
   leg6.SetBorderSize(0);
   leg6.SetFillColor(0);
   leg6.AddEntry(f5,"Fit","l");
   leg6.AddEntry(gp_cjvS,"Systematic error","f");
   leg6.Draw();
-  cms->Draw();
+  //cms->Draw();
   pdfName= oDir + std::string("/CJV_Welnu_frac.pdf");
   canvas.Print(pdfName.c_str());
   
