@@ -9,6 +9,7 @@
 
 
 #include "TTree.h"
+#include "THStack.h"
 #include "TMath.h"
 #include "TF1.h"
 #include "TH1D.h"
@@ -155,8 +156,12 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing BG MC     : " << dataset.name << std::endl;
     }
 
-    TCut otherCuts = puWeight * trigCorr * wWeight;
-
+    TCut otherCutsMu = puWeight * trigCorr * wWeight;
+    TCut otherCutsEl = puWeight * trigCorr * wWeight;
+    if (!dataset.isData){
+      otherCutsMu *= muTightWeight;
+      otherCutsEl *= elTightWeight;
+    }
     // tmp histograms
     TH1D* hWMu_GEN  = new TH1D("hWMu_GEN", "",  1, 0., 1.);     // for genlevel ratio 
     TH1D* hWEl_GEN  = new TH1D("hWEl_GEN", "",  1, 0., 1.);     // for genlevel ratio
@@ -187,33 +192,33 @@ int main(int argc, char* argv[]) {
     TH1D* hWEl_WC_CJV = new TH1D("hWEl_WC_CJV", "", 4, cjvEdges);
 
     // Cut 
-    TCut cutWMu_GEN  = otherCuts * cuts.wMuGen();
-    TCut cutWEl_GEN  = otherCuts * cuts.wElGen();
+    TCut cutWMu_GEN  = otherCutsMu * cuts.wMuGen();
+    TCut cutWEl_GEN  = otherCutsEl * cuts.wElGen();
 
-    TCut cutWMu_C_noDPhi  = otherCuts * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
-    TCut cutWMu_WC_noDPhi = otherCuts * (cuts.wMuGen() + cuts.wMuVBF() + cuts.cutWMu("MET"));
-    TCut cutWEl_C_noDPhi  = otherCuts * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
-    TCut cutWEl_WC_noDPhi = otherCuts * (cuts.wElGen() + cuts.wElVBF() + cuts.cutWEl("MET"));
+    TCut cutWMu_C_noDPhi  = otherCutsMu * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET"));
+    TCut cutWMu_WC_noDPhi = otherCutsMu * (cuts.wMuGen() + cuts.wMuVBF() + cuts.cutWMu("MET"));
+    TCut cutWEl_C_noDPhi  = otherCutsEl * (cutD + cuts.wElVBF() + cuts.cutWEl("MET"));
+    TCut cutWEl_WC_noDPhi = otherCutsEl * (cuts.wElGen() + cuts.wElVBF() + cuts.cutWEl("MET"));
 
-    TCut cutWMu_C_noEta  = otherCuts * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET") + cuts.cutWMu("dPhiJJ"));
-    TCut cutWMu_WC_noEta = otherCuts * (cuts.wMuGen() + cuts.wMuVBF() + cuts.cutWMu("MET") + cuts.cutWMu("dPhiJJ"));
-    TCut cutWEl_C_noEta  = otherCuts * (cutD + cuts.wElVBF() + cuts.cutWEl("MET") + cuts.cutWMu("dPhiJJ"));
-    TCut cutWEl_WC_noEta = otherCuts * (cuts.wElGen() + cuts.wElVBF() + cuts.cutWEl("MET") + cuts.cutWMu("dPhiJJ"));
+    TCut cutWMu_C_noEta  = otherCutsMu * (cutD + cuts.wMuVBF() + cuts.cutWMu("MET") + cuts.cutWMu("dPhiJJ"));
+    TCut cutWMu_WC_noEta = otherCutsMu * (cuts.wMuGen() + cuts.wMuVBF() + cuts.cutWMu("MET") + cuts.cutWMu("dPhiJJ"));
+    TCut cutWEl_C_noEta  = otherCutsEl * (cutD + cuts.wElVBF() + cuts.cutWEl("MET") + cuts.cutWMu("dPhiJJ"));
+    TCut cutWEl_WC_noEta = otherCutsEl * (cuts.wElGen() + cuts.wElVBF() + cuts.cutWEl("MET") + cuts.cutWMu("dPhiJJ"));
 
-    TCut cutWMu_C_noMjj  = otherCuts * (cutD + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMjjnoMET + cuts.cutWMu("MET"));
-    TCut cutWMu_WC_noMjj = otherCuts * (cuts.wMuGen() + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMjjnoMET + cuts.cutWMu("MET"));
-    TCut cutWEl_C_noMjj  = otherCuts * (cutD + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("MET"));
-    TCut cutWEl_WC_noMjj = otherCuts * (cuts.wElGen() + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("MET"));
+    TCut cutWMu_C_noMjj  = otherCutsMu * (cutD + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMjjnoMET + cuts.cutWMu("MET"));
+    TCut cutWMu_WC_noMjj = otherCutsMu * (cuts.wMuGen() + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMjjnoMET + cuts.cutWMu("MET"));
+    TCut cutWEl_C_noMjj  = otherCutsEl * (cutD + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("MET"));
+    TCut cutWEl_WC_noMjj = otherCutsEl * (cuts.wElGen() + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("MET"));
 
-    TCut cutWMu_C_noMET  = otherCuts * (cutD + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMjjnoMET + cuts.cutWMu("Mjj"));
-    TCut cutWMu_WC_noMET = otherCuts * (cuts.wMuGen() + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMjjnoMET + cuts.cutWMu("Mjj"));
-    TCut cutWEl_C_noMET  = otherCuts * (cutD + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("Mjj"));
-    TCut cutWEl_WC_noMET = otherCuts * (cuts.wElGen() + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("Mjj"));
+    TCut cutWMu_C_noMET  = otherCutsMu * (cutD + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMjjnoMET + cuts.cutWMu("Mjj"));
+    TCut cutWMu_WC_noMET = otherCutsMu * (cuts.wMuGen() + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMjjnoMET + cuts.cutWMu("Mjj"));
+    TCut cutWEl_C_noMET  = otherCutsEl * (cutD + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("Mjj"));
+    TCut cutWEl_WC_noMET = otherCutsEl * (cuts.wElGen() + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMjjnoMET + cuts.cutWEl("Mjj"));
 
-    TCut cutWMu_C_noCJV  = otherCuts * (cutD + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMETnoCJV + cuts.cutWMu("MET"));
-    TCut cutWMu_WC_noCJV = otherCuts * (cuts.wMuGen() + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMETnoCJV + cuts.cutWMu("MET"));
-    TCut cutWEl_C_noCJV  = otherCuts * (cutD + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMETnoCJV + cuts.cutWEl("MET"));
-    TCut cutWEl_WC_noCJV = otherCuts * (cuts.wElGen() + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMETnoCJV + cuts.cutWEl("MET"));
+    TCut cutWMu_C_noCJV  = otherCutsMu * (cutD + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMETnoCJV + cuts.cutWMu("MET"));
+    TCut cutWMu_WC_noCJV = otherCutsMu * (cuts.wMuGen() + cuts.cutWMu("wMu") + cuts.cutWMu("lVeto") + cutnoMETnoCJV + cuts.cutWMu("MET"));
+    TCut cutWEl_C_noCJV  = otherCutsEl * (cutD + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMETnoCJV + cuts.cutWEl("MET"));
+    TCut cutWEl_WC_noCJV = otherCutsEl * (cuts.wElGen() + cuts.cutWEl("wEl") + cuts.cutWEl("lVeto") + cutnoMETnoCJV + cuts.cutWEl("MET"));
 
     tree->Draw("0.5>>hWMu_GEN", cutWMu_GEN);
     tree->Draw("0.5>>hWEl_GEN", cutWEl_GEN);

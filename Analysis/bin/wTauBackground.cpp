@@ -174,14 +174,14 @@ int main(int argc, char* argv[]) {
       else isWJets = true;
     
       if(isWJets) {
-      	if (options.doMCFMWeights) {
-      	  yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(wgenmass*wgenmass + wgenpt*wgenpt*cosh(wgeneta)*cosh(wgeneta)) + wgenpt*sinh(wgeneta))/(sqrt(wgenmass*wgenmass + wgenpt*wgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
-      	  mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
-      	  wWeight     = yStarWeight * mjjWeight * cuts.wWeight();
-      	}
-      	else {
-      	  wWeight     = cuts.wWeight();
-      	}
+        if (options.doMCFMWeights) {
+          yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(wgenmass*wgenmass + wgenpt*wgenpt*cosh(wgeneta)*cosh(wgeneta)) + wgenpt*sinh(wgeneta))/(sqrt(wgenmass*wgenmass + wgenpt*wgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+          mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
+          wWeight     = yStarWeight * mjjWeight * cuts.wWeight();
+        }
+        else {
+          wWeight     = cuts.wWeight();
+        }
       }
 
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
@@ -260,17 +260,17 @@ int main(int argc, char* argv[]) {
         std::cout << "  weight : " << weight << std::endl;
 
         if (dataset.name == "DYJetsToLL_PtZ-100" || dataset.name == "DYJetsToLL") {
-        	if (options.doMCFMWeights) {
-          	yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/(sqrt(zgenmass*zgenmass + zgenpt*zgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
-          	mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
-      		}
+          if (options.doMCFMWeights) {
+            yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/(sqrt(zgenmass*zgenmass + zgenpt*zgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+            mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
+          }
         }
 
-      	otherCuts *= yStarWeight * mjjWeight;
+        otherCuts *= yStarWeight * mjjWeight;
 
-      	// Setup control plot cuts 
-      	cutTightMjj        = otherCuts * (cutD + cutTightMjj_basic);
-      	cutDPhiSignalNoCJV = otherCuts * (cutD + cutDPhiSignalNoCJV_basic);
+        // Setup control plot cuts 
+        cutTightMjj        = otherCuts * (cutD + cutTightMjj_basic);
+        cutDPhiSignalNoCJV = otherCuts * (cutD + cutDPhiSignalNoCJV_basic);
 
         // Count number of tau in control region in bg
         cutWTau_C = otherCuts * (cutD  && cuts.cutWTau("wTau") && cutDPhiSignalNoCJV_basic);
@@ -313,7 +313,7 @@ int main(int argc, char* argv[]) {
       } else {
           cut = puWeight * yStarWeight * mjjWeight * (cutD + cuts.cutflowWTau(c));
           if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWTau(c));
-	  if(!(dataset.isData)) cut *= lVetoWeight;
+          if(!(dataset.isData)) cut *= lVetoWeight;
       }
 
       TH1D* h = new TH1D("h","", 1, 0., 1.);
@@ -344,7 +344,7 @@ int main(int argc, char* argv[]) {
       hDYWTau->Add(hCutFlowWTau);
 
     if (dataset.name.compare(0,3,"Zvv")==0 || 
-	dataset.name == "EWK_ZvvFake" ) {
+        dataset.name == "EWK_ZvvFake" ) {
       hZvvWTau->Add(hCutFlowWTau);
     }    
 
@@ -357,7 +357,7 @@ int main(int argc, char* argv[]) {
     if (dataset.name.compare(0,2,"WW")==0 ||
         dataset.name.compare(0,2,"WZ")==0 ||
         dataset.name.compare(0,2,"ZZ")==0 ||
-	dataset.name.compare(0,2,"WG")==0) 
+        dataset.name.compare(0,2,"WG")==0) 
       hDibosonWTau->Add(hCutFlowWTau);
 
     hCutFlowWTau->Write("",TObject::kOverwrite);
@@ -462,10 +462,10 @@ int main(int argc, char* argv[]) {
   TH1D* hWTau_EstS_DPhi_Syst       = new TH1D("hWTau_EstS_DPhi_Syst",  "", 3, dphiEdges); // Final number of tau estimate (syst)
   
   // Syst hists - data/mc ID
-  TH1D* hWTau_TauIDEff_Dphi_SystID = new TH1D("hWTau_TauIDEff_Dphi_SystID",   "", 3, dphiEdges); // tau ID eff
-  TH1D* hWTau_EstC_DPhi_SystID     = new TH1D("hWTau_EstC_DPhi_SystID",  "", 3, dphiEdges); // n^data - n^BG in Anne Marie's AN (syst)
-  TH1D* hWTau_EstS_DPhi_SystID     = new TH1D("hWTau_EstS_DPhi_SystID",  "", 3, dphiEdges); // Final number of tau estimate (syst)
-  TH1D* hWTau_R_DPhi_SystID        = new TH1D("hWTau_R_DPhi_SystID",     "", 3, dphiEdges); // ratio of sngl/ctrl
+  // TH1D* hWTau_TauIDEff_Dphi_SystID = new TH1D("hWTau_TauIDEff_Dphi_SystID",   "", 3, dphiEdges); // tau ID eff
+  // TH1D* hWTau_EstC_DPhi_SystID     = new TH1D("hWTau_EstC_DPhi_SystID",  "", 3, dphiEdges); // n^data - n^BG in Anne Marie's AN (syst)
+  // TH1D* hWTau_EstS_DPhi_SystID     = new TH1D("hWTau_EstS_DPhi_SystID",  "", 3, dphiEdges); // Final number of tau estimate (syst)
+  // TH1D* hWTau_R_DPhi_SystID        = new TH1D("hWTau_R_DPhi_SystID",     "", 3, dphiEdges); // ratio of sngl/ctrl
 
   hWTau_TauIDEff_DPhi->Divide(hWTau_MCC_NoCJV_DPhi, hWTau_MCS_NoCJV_DPhi, 1., 1.); // calculate tau ID eff
   hWTau_CJVEff_DPhi->Divide(hWTau_MC_CJV_DPhi, hWTau_MC_NoCJV_DPhi, 1., 1.); // calculate CJV eff
@@ -486,19 +486,19 @@ int main(int argc, char* argv[]) {
   hWTau_EstS_DPhi_Syst->Multiply(hWTau_EstC_DPhi_Syst, hWTau_R_DPhi_Syst, 1., 1.); 
 
   // Systematics on data/mc tau ID 
-  // This could probably be streamlined...
-  double scaleFactor = 0.08;
-  hWTau_TauIDEff_Dphi_SystID->Add(hWTau_TauIDEff_DPhi,1.);
-  for (int i=1; i<=hWTau_TauIDEff_Dphi_SystID->GetNbinsX(); ++i) hWTau_TauIDEff_Dphi_SystID->SetBinError(i,scaleFactor*hWTau_TauIDEff_Dphi_SystID->GetBinContent(i));
-  hWTau_R_DPhi_SystID->Add(hWTau_R_DPhi);
-  for (int i=1; i<=hWTau_R_DPhi_SystID->GetNbinsX(); ++i) hWTau_R_DPhi_SystID->SetBinError(i,scaleFactor*hWTau_R_DPhi_SystID->GetBinContent(i)); //ignore MC stats in R
-  hWTau_EstC_DPhi_SystID->Add(hWTau_DataC_DPhi_Syst, hWTau_BGC_DPhi, 1., -1.); // no stat errors form data or mc
-  hWTau_EstS_DPhi_SystID->Multiply(hWTau_EstC_DPhi_SystID, hWTau_R_DPhi_SystID, 1., 1.); // use hWTau_EstC_DPhi_SystID if you only want data/mc scale systs errors, or hWTau_EstC_DPhi_Syst if you want total syst error
+  // data:mc = 1.0 +/- 0.08 from tau pog
+  double errID = 0.08;
+  // hWTau_TauIDEff_Dphi_SystID->Add(hWTau_TauIDEff_DPhi,1.);
+  // for (int i=1; i<=hWTau_TauIDEff_Dphi_SystID->GetNbinsX(); ++i) hWTau_TauIDEff_Dphi_SystID->SetBinError(i,scaleFactor*hWTau_TauIDEff_Dphi_SystID->GetBinContent(i));
+  // hWTau_R_DPhi_SystID->Add(hWTau_R_DPhi);
+  // for (int i=1; i<=hWTau_R_DPhi_SystID->GetNbinsX(); ++i) hWTau_R_DPhi_SystID->SetBinError(i,scaleFactor*hWTau_R_DPhi_SystID->GetBinContent(i)); //ignore MC stats in R
+  // hWTau_EstC_DPhi_SystID->Add(hWTau_DataC_DPhi_Syst, hWTau_BGC_DPhi, 1., -1.); // no stat errors form data or mc
+  // hWTau_EstS_DPhi_SystID->Multiply(hWTau_EstC_DPhi_SystID, hWTau_R_DPhi_SystID, 1., 1.); // use hWTau_EstC_DPhi_SystID if you only want data/mc scale systs errors, or hWTau_EstC_DPhi_Syst if you want total syst error
 
   std::cout << std::endl << std::endl;
   std::cout << "W->tau channel (dphi<1.0)" << std::endl;
   std::cout << "  Data ctrl region                                       : " << hWTau_DataC_DPhi->GetBinContent(1) << " +/- " << hWTau_DataC_DPhi->GetBinError(1) << std::endl;
-  std::cout << "  Background ctrl region                                 : " << hWTau_BGC_DPhi->GetBinContent(1) << " +/- " << hWTau_BGC_DPhi->GetBinError(1) << std::endl;
+  std::cout << "  Background ctrl region                                 : " << hWTau_BGC_DPhi_Syst->GetBinContent(1) << " +/- " << hWTau_BGC_DPhi_Syst->GetBinError(1) << std::endl;
   std::cout << "  W+jets MC - gen level tau, standard selection, no CJV, tau reco            : " << hWTau_MCC_NoCJV_DPhi->GetBinContent(1) << " +/- " << hWTau_MCC_NoCJV_DPhi->GetBinError(1) << std::endl;
   std::cout << "  W+jets MC - gen level tau, standard selection, no CJV                      : " << hWTau_MCS_NoCJV_DPhi->GetBinContent(1) << " +/- " << hWTau_MCS_NoCJV_DPhi->GetBinError(1) << std::endl;
   std::cout << "  W+jets MC - gen level tau, standard selection w/CJV (MC estimate in signal region) : " << hWTau_MC_CJV_DPhi->GetBinContent(1) << " +/- " << hWTau_MC_CJV_DPhi->GetBinError(1) << std::endl;
@@ -507,10 +507,10 @@ int main(int argc, char* argv[]) {
   std::cout << "  Number of W->enu that pass VBF + tau selection (no CJV): " << hWTau_MCEl_DPhi->GetBinContent(1) << " +/- " << hWTau_MCEl_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  W in ctrl region                                       : " << hWTau_EstC_DPhi ->GetBinContent(1) << " +/- " << hWTau_EstC_DPhi ->GetBinError(1) << std::endl;
-  std::cout << "  eff_tauID                                              : " << hWTau_TauIDEff_DPhi->GetBinContent(1) << " +/- " << hWTau_TauIDEff_DPhi->GetBinError(1) << " +/- " << hWTau_TauIDEff_Dphi_SystID->GetBinError(1) << std::endl;
+  std::cout << "  eff_tauID                                              : " << hWTau_TauIDEff_DPhi->GetBinContent(1) << " +/- " << hWTau_TauIDEff_DPhi->GetBinError(1) << " +/- " << errID*hWTau_TauIDEff_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  eff_CJV                                                : " << hWTau_CJVEff_DPhi->GetBinContent(1) << " +/- " << hWTau_CJVEff_DPhi->GetBinError(1) << std::endl;
   std::cout << std::endl << std::endl;
-  std::cout << "  W in sgnl region                                       : " << hWTau_EstS_DPhi->GetBinContent(1) << " +/- " << hWTau_EstS_DPhi->GetBinError(1) << " (stat from data) +/- " << 0.08*hWTau_EstS_DPhi->GetBinContent(1) << " (syst, data/mc ID scale) +/- " << hWTau_EstS_DPhi_Syst->GetBinError(1) << " (syst from MC stats) +/- " << 0.05*hWTau_EstS_DPhi->GetBinContent(1) << " (w->e contamination" << std::endl;
+  std::cout << "  W in sgnl region                                       : " << hWTau_EstS_DPhi->GetBinContent(1) << " +/- " << hWTau_EstS_DPhi->GetBinError(1) << " (stat from data) +/- " << errID*hWTau_EstS_DPhi->GetBinContent(1) << " (syst, data/mc ID scale) +/- " << hWTau_EstS_DPhi_Syst->GetBinError(1) << " (syst from MC stats) +/- " << 0.05*hWTau_EstS_DPhi->GetBinContent(1) << " (w->e contamination" << std::endl;
 
 
   // write the cutflow table

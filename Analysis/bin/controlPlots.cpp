@@ -87,8 +87,8 @@ int main(int argc, char* argv[]) {
     TH1D* hDijet                = new TH1D("hDijetSig",                  "", 50,  0.,  250.);
     TH1D* hSgnEtaJJ             = new TH1D("hSgnEtaJJSig",               "", 2,   -1., 1.);
     TH1D* hDEtaJJ               = new TH1D("hDEtaJJSig",                 "", 50,  0.,  8.);
-    TH1D* hMjj                  = new TH1D("hMjjSig",                    "", 35,  0.,  3500.);
-    TH1D* hMET                  = new TH1D("hMETSig",                    "", 25,  10.,  510.);
+    TH1D* hMjj                  = new TH1D("hMjjSig",                    "", 35,  1100.,  4600.);
+    TH1D* hMET                  = new TH1D("hMETSig",                    "", 25,  130.,  680.);
     TH1D* hDPhiJMet             = new TH1D("hDPhiJMetSig",               "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNoDPhiJJ     = new TH1D("hDPhiJMetSigNoDPhiJJ",       "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNorm         = new TH1D("hDPhiJMetNormSig",           "", 50,  0.,  200);

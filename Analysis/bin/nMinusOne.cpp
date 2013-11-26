@@ -85,8 +85,8 @@ int main(int argc, char* argv[]) {
     TH1D* hDijet                = new TH1D("hDijetNM1",                  "", 50,  0.,  250.);
     TH1D* hSgnEtaJJ             = new TH1D("hSgnEtaJJNM1",               "", 2,   -1., 1.);
     TH1D* hDEtaJJ               = new TH1D("hDEtaJJNM1",                 "", 50,  0.,  8.);
-    TH1D* hMjj                  = new TH1D("hMjjNM1",                    "", 25,  0.,  4000.);
-    TH1D* hMET                  = new TH1D("hMETNM1",                    "", 25,  0.,  500.);
+    TH1D* hMjj                  = new TH1D("hMjjNM1",                    "", 40,  0.,  4000.);
+    TH1D* hMET                  = new TH1D("hMETNM1",                    "", 50,  0.,  500.);
     TH1D* hDPhiJMet             = new TH1D("hDPhiJMetNM1",               "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNoDPhiJJ     = new TH1D("hDPhiJMetNM1NoDPhiJJ",       "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNorm         = new TH1D("hDPhiJMetNormNM1",           "", 50,  0.,  200);
@@ -307,7 +307,7 @@ int main(int argc, char* argv[]) {
   plots.setYMax(5E4);
   plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "Events / 0.16",1,0);
   plots.draw("hMjjNM1", "M_{jj} [GeV]", "Events / 100 GeV",1,0);
-  plots.draw("hMETNM1", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,0);
+  plots.draw("hMETNM1", "E_{T}^{miss} [GeV]", "Events / 10 GeV",1,0);
   plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,0);
   plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,0);
   plots.setYMax(5E5);

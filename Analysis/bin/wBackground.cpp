@@ -136,8 +136,8 @@ int main(int argc, char* argv[]) {
         dataset.name == "W2Jets" || 
         dataset.name == "W3Jets" || 
         dataset.name == "W4Jets" ||
-	dataset.name == "EWK_Wp2Jets" ||
-	dataset.name == "EWK_Wm2Jets") {
+  dataset.name == "EWK_Wp2Jets" ||
+  dataset.name == "EWK_Wm2Jets") {
 
       std::cout << "Analysing W MC     : " << dataset.name << std::endl;
 
@@ -145,14 +145,14 @@ int main(int argc, char* argv[]) {
       else isWJets = true;
  
       if(isWJets) {
-	if (options.doMCFMWeights) {
-	  yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(wgenmass*wgenmass + wgenpt*wgenpt*cosh(wgeneta)*cosh(wgeneta)) + wgenpt*sinh(wgeneta))/(sqrt(wgenmass*wgenmass + wgenpt*wgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
-	  mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
-	  wWeight     = yStarWeight * mjjWeight * cuts.wWeight();
-	}
-	else {
-	  wWeight     = cuts.wWeight();
-	}
+  if (options.doMCFMWeights) {
+    yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(wgenmass*wgenmass + wgenpt*wgenpt*cosh(wgeneta)*cosh(wgeneta)) + wgenpt*sinh(wgeneta))/(sqrt(wgenmass*wgenmass + wgenpt*wgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+    mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
+    wWeight     = yStarWeight * mjjWeight * cuts.wWeight();
+  }
+  else {
+    wWeight     = cuts.wWeight();
+  }
       }
 
       cutWMu_C = otherCuts * muTightWeight * wWeight * (cuts.wMuVBF() + cuts.cutWMu("MET"));
@@ -208,10 +208,10 @@ int main(int argc, char* argv[]) {
       if (dataset.name.compare(0,3,"QCD") == 0) isQCD = true;
 
       if (dataset.name == "DYJetsToLL_PtZ-100" || dataset.name == "DYJetsToLL") {
-	if (options.doMCFMWeights) {
-	  yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/(sqrt(zgenmass*zgenmass + zgenpt*zgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
-	  mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
-	}
+  if (options.doMCFMWeights) {
+    yStarWeight = TCut("8.49667e-01 + (1.49687e-01*abs((log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/(sqrt(zgenmass*zgenmass + zgenpt*zgenpt)))) - 0.5*(genJet1Eta + genJet2Eta)))");
+    mjjWeight   = TCut("3.92568e-01 + (1.20734e-01*log(genVBFM)) - (2.55622e-04*genVBFM)");
+  }
       }
 
       otherCuts  *= yStarWeight * mjjWeight;
@@ -265,17 +265,17 @@ int main(int argc, char* argv[]) {
       TCut cut;
       if(c == nCutsWMu-1) //apply trigger correction
         {
-	  cut = otherCuts * (cutD + cuts.cutflowWMu(c));
+    cut = otherCuts * (cutD + cuts.cutflowWMu(c));
           if(isWJets) cut = otherCuts * wWeight * (cuts.cutflowWMu(c));
 
-	  if(!(dataset.isData)) cut *= muTightWeight;
+    if(!(dataset.isData)) cut *= muTightWeight;
         }
       else
         {
-	  cut = puWeight * yStarWeight * mjjWeight * (cutD + cuts.cutflowWMu(c));
+    cut = puWeight * yStarWeight * mjjWeight * (cutD + cuts.cutflowWMu(c));
           if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWMu(c));
 
-	  if(!(dataset.isData)) cut *= muTightWeight;
+    if(!(dataset.isData)) cut *= muTightWeight;
         }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
@@ -291,17 +291,17 @@ int main(int argc, char* argv[]) {
       TCut cut;
       if(c == nCutsWEl-1) //apply trigger correction
         {
-	  cut = otherCuts * (cutD + cuts.cutflowWEl(c));
+    cut = otherCuts * (cutD + cuts.cutflowWEl(c));
           if(isWJets) cut = otherCuts * wWeight * (cuts.cutflowWEl(c));
 
-	  if(!(dataset.isData)) cut *= elTightWeight;
+    if(!(dataset.isData)) cut *= elTightWeight;
         }
       else
         {
-	  cut = puWeight * yStarWeight * mjjWeight * (cuts.cutflowWEl(c));
+    cut = puWeight * yStarWeight * mjjWeight * (cuts.cutflowWEl(c));
           if(isWJets) cut = puWeight * wWeight * (cuts.cutflowWEl(c));
 
-	  if(!(dataset.isData)) cut *= elTightWeight;
+    if(!(dataset.isData)) cut *= elTightWeight;
         }
       TH1D* h = new TH1D("h","", 1, 0., 1.);
       tree->Draw("0.5>>h", cut);
@@ -339,7 +339,7 @@ int main(int argc, char* argv[]) {
     if (dataset.name.compare(0,2,"WW")==0 ||
         dataset.name.compare(0,2,"WZ")==0 ||
         dataset.name.compare(0,2,"ZZ")==0 ||
-	dataset.name.compare(0,2,"WG")==0) {
+  dataset.name.compare(0,2,"WG")==0) {
       hDibosonWMu->Add(hCutFlowWMu);
       hDibosonWEl->Add(hCutFlowWEl);
     }
@@ -540,7 +540,7 @@ int main(int argc, char* argv[]) {
   std::cout << "W->mu channel (dphi<1.0)" << std::endl;
   std::cout << "  W+jets MC  ctrl region : " << hWMu_MCC_DPhi->GetBinContent(1) << " +/- 0 (stat) +/- " << hWMu_MCC_DPhi->GetBinError(1) << " (syst)" << std::endl;
   std::cout << "  W+jets MC  sgnl region : " << hWMu_MCS_DPhi->GetBinContent(1) << " +/- 0 (stat) +/- " << hWMu_MCS_DPhi->GetBinError(1) << " (syst)" << std::endl;
-  std::cout << "  Background ctrl region : " << hWMu_BGC_DPhi->GetBinContent(1) << " +/- " << hWMu_BGC_DPhi->GetBinError(1) << " (stat) +/- " << hWMu_BGC_DPhi->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  Background ctrl region : " << hWMu_BGC_DPhi->GetBinContent(1) << " +/- " << hWMu_BGC_DPhi->GetBinError(1) << " (stat) +/- " << hWMu_BGC_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   //  std::cout << "  Background sgnl region : " << hWMu_BGS_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  Data ctrl region       : " << hWMu_DataC_DPhi->GetBinContent(1) << " +/- " << hWMu_DataC_DPhi->GetBinError(1) << " (stat) +/- " << hWMu_DataC_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   std::cout << std::endl;
@@ -552,7 +552,7 @@ int main(int argc, char* argv[]) {
   std::cout << "W->el channel (dphi<1.0)" << std::endl;
   std::cout << "  W+jets MC  ctrl region : " << hWEl_MCC_DPhi->GetBinContent(1) << " +/- 0 (stat) +/- " << hWEl_MCC_DPhi->GetBinError(1) << " (syst)" << std::endl;
   std::cout << "  W+jets MC  sgnl region : " << hWEl_MCS_DPhi->GetBinContent(1) << " +/- 0 (stat) +/- " << hWEl_MCS_DPhi->GetBinError(1) << " (syst)" << std::endl;
-  std::cout << "  Background ctrl region : " << hWEl_BGC_DPhi->GetBinContent(1) << " +/- " << hWEl_BGC_DPhi->GetBinError(1) << " (stat) +/- " << hWEl_BGC_DPhi->GetBinError(1) << " (syst)" << std::endl;
+  std::cout << "  Background ctrl region : " << hWEl_BGC_DPhi->GetBinContent(1) << " +/- " << hWEl_BGC_DPhi->GetBinError(1) << " (stat) +/- " << hWEl_BGC_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   //  std::cout << "  Background sgnl region : " << hWEl_BGS_DPhi->GetBinContent(1) << std::endl;
   std::cout << "  Data ctrl region       : " << hWEl_DataC_DPhi->GetBinContent(1) << " +/- " << hWEl_DataC_DPhi->GetBinError(1) << " (stat) +/- " << hWEl_DataC_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   std::cout << std::endl;
