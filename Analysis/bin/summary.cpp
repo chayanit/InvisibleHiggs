@@ -413,18 +413,18 @@ int main(int argc, char* argv[]) {
 
   texFile << "Background \t & $N_{est} \\pm (stat) \\pm (syst)$ - data  \t & $N_{est} \\pm (syst)$ - MC \\\\" << std::endl;
   texFile << "\\hline";
-  texFile << "$Z \\rightarrow \\nu\\nu$ \t & $" << nBG_Z << " \\pm " << stat_BG_Z << " \\pm " << syst_BG_Z_m << "/" << syst_BG_Z_p  << "$ \t &  $" << nBG_ZMC << " \\pm " << syst_BG_ZMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << " \\pm " << syst_BG_WEl_m << "/" << syst_BG_WEl_p  << "$ \t &  $" << nBG_WElMC << " \\pm " << syst_BG_WElMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << " \\pm " << syst_BG_WMu_m << "/" << syst_BG_WMu_p  << "$ \t & $" << nBG_WMuMC << " \\pm " << syst_BG_WMuMC << "$ \\\\" << std::endl;
-  texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << " \\pm " << syst_BG_WTau_m << "/" << syst_BG_WTau_p  << "$ \t & $" << nBG_WTauMC << " \\pm " << syst_BG_WTauMC << "$ \\\\" << std::endl;
-  texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_BG_QCD << " \\pm " << syst_BG_QCD_m << "/" << syst_BG_QCD_p  << "$ \t & - \\\\" << std::endl;
-  texFile << "$t\\bar{t}$ \t & -	\t & $" << nBG_TTbar << " \\pm " << syst_BG_TTbar_m << "/" << syst_BG_TTbar_p << "$ \\\\" << std::endl;
-  texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << syst_BG_SingleT_m << "/" << syst_BG_SingleT_p << "$ \\\\" << std::endl;
-  texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << syst_BG_Diboson_m << "/" << syst_BG_Diboson_p << "$ \\\\" << std::endl;
-  texFile << "DY \t & -  \t & $" << nBG_DYLL << " \\pm " << syst_BG_DYLL_m << "/" << syst_BG_DYLL_p << "$ \\\\" << std::endl;
-  texFile << "Sum other BGs \t & -  \t & $" << nBG_Other << " \\pm " << syst_BG_Other_m << "/" << syst_BG_Other_p << "$ \\\\" << std::endl;
+  texFile << "$Z \\rightarrow \\nu\\nu$ \t & $" << nBG_Z << " \\pm " << stat_BG_Z << " \\pm " << syst_BG_Z_p << "/" << syst_BG_Z_m  << "$ \t &  $" << nBG_ZMC << " \\pm " << syst_BG_ZMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << " \\pm " << syst_BG_WEl_p << "/" << syst_BG_WEl_m  << "$ \t &  $" << nBG_WElMC << " \\pm " << syst_BG_WElMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << " \\pm " << syst_BG_WMu_p << "/" << syst_BG_WMu_m  << "$ \t & $" << nBG_WMuMC << " \\pm " << syst_BG_WMuMC << "$ \\\\" << std::endl;
+  texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << " \\pm " << syst_BG_WTau_p << "/" << syst_BG_WTau_m  << "$ \t & $" << nBG_WTauMC << " \\pm " << syst_BG_WTauMC << "$ \\\\" << std::endl;
+  texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_BG_QCD << " \\pm " << syst_BG_QCD_p << "/" << syst_BG_QCD_m  << "$ \t & - \\\\" << std::endl;
+  texFile << "$t\\bar{t}$ \t & -	\t & $" << nBG_TTbar << " \\pm " << syst_BG_TTbar_p << "/" << syst_BG_TTbar_m << "$ \\\\" << std::endl;
+  texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << syst_BG_SingleT_p << "/" << syst_BG_SingleT_m << "$ \\\\" << std::endl;
+  texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << syst_BG_Diboson_p << "/" << syst_BG_Diboson_m << "$ \\\\" << std::endl;
+  texFile << "DY \t & -  \t & $" << nBG_DYLL << " \\pm " << syst_BG_DYLL_p << "/" << syst_BG_DYLL_m << "$ \\\\" << std::endl;
+  texFile << "Sum other BGs \t & -  \t & $" << nBG_Other << " \\pm " << syst_BG_Other_p << "/" << syst_BG_Other_m << "$ \\\\" << std::endl;
   texFile << "\\hline" << std::endl;
-  texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << "\\pm" << stat_BG_Total << "\\pm" << syst_BG_Total_m << "/" << syst_BG_Total_p << "$}  \\\\" << std::endl;
+  texFile << "Total  & \\multicolumn{2}{c|}{$" << nBG_Total << "\\pm" << stat_BG_Total << "\\pm" << syst_BG_Total_p << "/" << syst_BG_Total_m << "$}  \\\\" << std::endl;
   texFile << "Observed & \\multicolumn{2}{c|}{$" << nObs << "$}  \\\\" << std::endl;
 
   texFile.close();
