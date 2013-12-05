@@ -580,7 +580,7 @@ int main(int argc, char* argv[]) {
   bgDatasets.push_back(std::string("SingleT_tW"));
   bgDatasets.push_back(std::string("SingleTbar_tW"));
   bgDatasets.push_back(std::string("TTBar"));
-  SumDatasets(oDir_Plot, topDatasets, hists, "tt+VV"); 
+  SumDatasets(oDir_Plot, bgDatasets, hists, "tt+VV"); 
 
   // make plots
   std::cout << "Making plots" << std::endl;
@@ -600,9 +600,12 @@ int main(int argc, char* argv[]) {
   plots.draw("ZCtrlJet2Eta",    "Sub-leading jet #eta",         "N_{events}"	,1,1);
   plots.draw("ZCtrlCenJetpT",	"Central jet p_{T} [GeV]",	"N_{events}"    ,1,1);
   plots.draw("ZCtrlDEtajj",	"#Delta #eta_{jj}",		"N_{events}"	,1,1);
-  plots.setYMax(3.e2);
+  plots.setYMax(5.e2);
+  plots.setXMin(1100.);
+  plots.setXMax(2600.);
   plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"Events / 100 GeV"	,1,1);
-  plots.setYMax(3.e2);
+  plots.setYMax(5.e2);
+  plots.setXMin(130.);
   plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"Events / 20 GeV"	,1,1);
   plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj}",		"Events"	,1,1);
   plots.setYMax(80.);
