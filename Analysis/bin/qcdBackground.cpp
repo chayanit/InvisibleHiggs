@@ -359,8 +359,8 @@ int main(int argc, char* argv[]) {
   plots.addDataset("METABCD",    kBlack, 1);
 
   plots.setYMax(1e+8); 
-  plots.draw("QCD_DPhijj",	"#Delta #phi_{jj}",	"N_{events}"    ,1,1);
-  plots.draw("QCD_MET",		"E_{T}^{miss} [GeV]",	"N_{events}"    ,1,1);
+  plots.draw("QCD_DPhijj",	"#Delta #phi_{jj}",	"N_{events}"    ,1,"RATIO");
+  plots.draw("QCD_MET",		"E_{T}^{miss} [GeV]",	"N_{events}"    ,1,"RATIO");
 
   // write out histograms
   ofile->cd();

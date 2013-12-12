@@ -138,10 +138,14 @@ void StackPlot::setTextPos(float x1, float y1, float x2, float y2){
 //  xTitle        = title on x-axis                                //
 //  yTitle        = title on y-axis                                //
 //  logy          = draw with log Y axis                           //
-//  drawRatioPlot = draw with ratio plot below main plot           //
+//  drawRatioPlot = draw with ratio plot below main plot, or not   //
+//                  "RATIO" draw ratio plot below,      
+//                  "NM1" doesn't draw ratio plot, is short and wide,
+//                  "SIG" doesn't draw ratio plot, 
+//                  but main plot is same size as in RATIO
 // You can only draw once you have used addDataset to add datasets //
 /////////////////////////////////////////////////////////////////////
-void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, bool logy, bool drawRatioPlot) {
+void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, bool logy, std::string ratioPlotOption) {
 
   std::cout << "Drawing " << hname << " " << std::endl;
 
@@ -153,21 +157,51 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
   TCanvas canvas;
 
+  // For signal plots ("SIG") we want no ratio plot, and want the signal MC stacked on top of BGs,
+  // but the same size main plot as in the ratio plots ("RATIO") (for the paper)
+  // For N-1 plots ("NM1") we want the short fat canvas, for signal it's more square
+  bool drawRatioPlot; 
+  bool drawSignal; // if both are false, it's a N-1 plot
+
+  if (ratioPlotOption == "RATIO") {
+    drawRatioPlot = true; // draw a ratio plot below
+    drawSignal = false;
+  } else {
+    drawRatioPlot = false;
+    if (ratioPlotOption == "SIG")
+      drawSignal = true; // signal plot
+    else if (ratioPlotOption == "NM1")
+      drawSignal = false; // in which case we must be dealing with N-1 plots
+    else {
+      std::cerr << "Please choose a valid ratio plot option in your plots.draw() call!" << std::endl;
+      std::cerr << "Options are \"RATIO\", \"NM1\" or \"SIG\"" << std::endl;
+      std::cerr << "Exiting without drawing" << std::endl;
+      return;
+    }
+  }
+
   TPad *pad1; // This TPad is for the main plot. There's another one for the ratio plot
   if (drawRatioPlot) {
     canvas.SetCanvasSize(500, 600);
     canvas.Divide(1, 2);
-    // pad1 = (TPad *) canvas.cd(1);
     pad1 = new TPad("pad1","",0,0.30,1,1);
     pad1->SetBottomMargin(0.02);
     pad1->SetRightMargin(0.05); // The ratio plot below inherits the right and left margins settings here!
     pad1->SetLeftMargin(0.16);
   } else {
-    pad1 = new TPad("pad1","",0,0,1,1);
+    if (drawSignal){
+      // How I calculated these size so identitcal to ratio plots, but without ratio bit:
+      // Canvas size: 420+51-> 420 = 0.7*600, 51 = (0.33*0.3*600) [space required for x title and labels on ratio plot pad2]-(0.02*420)[space taken up by bottom of hist on pad1]
+      // Pad bottom margin [space from bottom of hist to bottom of pad = bottom of pdf if pad goes down to y=0] = (0.33*0.3*600)/(420+51)
+      // Right & left margins are the same as before
+      canvas.SetCanvasSize(500, 420+51); 
+      pad1 = new TPad("pad1","",0,0,1,1);
+      pad1->SetBottomMargin(0.126); // = correct space for axis labels and title. 
+      pad1->SetRightMargin(0.05); 
+      pad1->SetLeftMargin(0.16);
+    } else
+      pad1 = new TPad("pad1","",0,0,1,1);
   }
-  // pad1->SetFillStyle(4000); // For transparent pad?
-  // pad1->SetFillColor(0);
-  // pad1->SetFrameFillStyle(4000);
   pad1->Draw();
   pad1->cd();
   if (logy) pad1->SetLogy();
@@ -177,17 +211,19 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   leg.SetFillColor(0);
 
   bool drawStack=false;
-  bool nMinusOne=false;
+  // bool nMinusOne=false;
 
   std::vector<TLegendEntry*> entries; // To hold legend entries, so can put in proper order later (otherwise it comes out upside down!)
 
   std::vector<TFile*>::iterator file = files_.begin();
   
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
   // Some method of scanning all input files and determining the min y value needed for y axis
   // Uses the first BG file to determine minimum
   // Maximum is normally determined by the stack hist
   // BIT BROKEN - if you get a seg fault when drawing, you prob have no events in the first file and it gets angry
   // also potential problem with lin axis?
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
   int i = 0;
   double ymin=0;
   double xMin(0.),xMax(0.);
@@ -267,7 +303,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       h->SetLineWidth(1);
       h->SetFillColor(cols_.at(i));
       if(styles_.at(i) == 3) {
-        nMinusOne=true;
+        // nMinusOne=true;
         h->SetLineStyle(1);
         h->SetLineWidth(3);
         h->SetLineColor(cols_.at(i));
@@ -300,7 +336,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   {
     // skip first object since it's used by creating the histogram                               
     if(obj == histList->First()) continue;
-    if(nMinusOne && obj == histList->Last())  continue; //don't account signal histogram
+    if(drawSignal && obj == histList->Last())  continue; //don't account signal histogram
     hMC -> Add((TH1*)obj);
   }
 
@@ -339,12 +375,24 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       stack.GetYaxis()->SetTitleOffset(1.);
       stack.GetYaxis()->SetLabelSize(0.05);
     } else{
-      stack.GetXaxis()->SetTitleSize(0.045);
-      stack.GetXaxis()->SetTitleOffset(0.9);
-      stack.GetXaxis()->SetTitle(xTitle.c_str());
+      if (drawSignal){
+        // These are magic values. ie. found after some calculations/trial and error
+        stack.GetXaxis()->SetTitleSize(0.057);
+        stack.GetXaxis()->SetTitleOffset(0.9);
+        stack.GetXaxis()->SetTitle(xTitle.c_str());
+        stack.GetXaxis()->SetLabelSize(0.046);
 
-      stack.GetYaxis()->SetTitleSize(0.045);
-      // stack.GetYaxis()->SetTitleOffset(1.2);    
+        stack.GetYaxis()->SetTitleSize(0.061); 
+        stack.GetYaxis()->SetTitleOffset(1.08);
+        stack.GetYaxis()->SetLabelSize(0.05);
+      } else {
+        stack.GetXaxis()->SetTitleSize(0.045);
+        stack.GetXaxis()->SetTitleOffset(0.9);
+        stack.GetXaxis()->SetTitle(xTitle.c_str());
+
+        stack.GetYaxis()->SetTitleSize(0.045);
+        // stack.GetYaxis()->SetTitleOffset(1.2);    
+      }
     }
     stack.GetYaxis()->SetTitle(yTitle.c_str());
 
@@ -448,8 +496,10 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     cms = new TPaveText(0.18, 0.60, 0.6, 0.89, "NDC");
   } else {
     // Optimised for non-ratio plots
-    // Probably needs re-optimising, hasn'tbeen tested in a while...
-    cms = new TPaveText(0.12, 0.60, 0.45, 0.9, "NDC");
+    if (drawSignal)
+      cms = new TPaveText(0.18, 0.60, 0.6, 0.89, "NDC");
+    else
+      cms = new TPaveText(0.12, 0.60, 0.45, 0.9, "NDC");
   }
   
 
@@ -459,7 +509,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   cms->SetLineColor(0);
   cms->SetTextAlign(12);
   cms->AddText("CMS");
-  std::stringstream s;
+  std::stringstream s; // convert float to string to make concatenation easier
   s << lumi_;
   cms->AddText(("#sqrt{s} = 8 TeV, L = "+s.str()+" fb^{-1}").c_str());
   cms->AddText("VBF H(inv)");
@@ -468,11 +518,11 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   // cms->Draw();
 
   // This works. DON'T use SetX1NDC EVEN THOUGH it says NDC above.
-  // This is because ROOT is bloody shit.
-  if (textX1_ != 0) cms->SetX1(textX1_);
-  if (textX2_ != 0) cms->SetX2(textX2_);
-  if (textY1_ != 0) cms->SetY1(textY1_);
-  if (textY2_ != 0) cms->SetY2(textY2_);
+  // This is because ROOT is silly.
+  if (textX1_ != 0.) cms->SetX1(textX1_);
+  if (textX2_ != 0.) cms->SetX2(textX2_);
+  if (textY1_ != 0.) cms->SetY1(textY1_);
+  if (textY2_ != 0.) cms->SetY2(textY2_);
   cms->Draw();
 
   //////////////////////////////////////////////
@@ -484,7 +534,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   {
     leg.AddEntry(entries.at(n)->GetObject(), entries.at(n)->GetLabel(), entries.at(n)->GetOption());
   }
-  if (drawRatioPlot) leg.SetBorderSize(0);
+  if (drawRatioPlot || drawSignal) leg.SetBorderSize(0);
   leg.Draw();
 
   canvas.cd();
@@ -566,7 +616,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
     hData->Draw("ep same");
 
-    // Because ROOT is so bloody stupid, if you use SetRangeUser or SetAxisRange, it doesn't affect the GetXmin or GetXmax
+    // Because ROOT is so stupid, if you use SetRangeUser or SetAxisRange, it doesn't affect the GetXmin or GetXmax
     // You could use SetLimits instead of SetRangeUser, which DOES update GetXmin, but DOESN'T set the x axis to plot between the limits 
     // - instead it literally plots the full range, and just renames the max and min to whatever you passed in SetLimits
     // And there's no documentation either!!!
@@ -574,7 +624,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     // EXCEPT
     // You use GetBinUpEdge if user sets it, or GetBinLowEdge if not.
     // AND
-    // this all goes to hell if the user sets xMin_ or xMax_ to = bin edge value. FML.
+    // this all goes to hell if the user sets xMin_ or xMax_ to = bin edge value. Ack.
     
     double lineMin = hData->GetXaxis()->GetBinLowEdge(hData->GetXaxis()->FindBin(xMin));
     double lineMax = hData->GetXaxis()->GetBinLowEdge(hData->GetXaxis()->FindBin(xMax));

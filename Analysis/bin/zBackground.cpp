@@ -593,24 +593,24 @@ int main(int argc, char* argv[]) {
   plots.addDataset("DY+jets", kPink-4,0);
   plots.addDataset("METABCD", kBlack, 1);
 
-  plots.draw("ZCtrlZpT",	"Z_p_{T} [GeV]",		"N_{events}"	,1,1);
-  plots.draw("ZCtrlJet1pT", 	"Leading jet p_{T} [GeV]", 	"N_{events}"	,1,1);
-  plots.draw("ZCtrlJet1Eta", 	"Leading jet #eta", 		"N_{events}"	,1,1);
-  plots.draw("ZCtrlJet2pT",     "Sub-leading jet p_{T} [GeV]",  "N_{events}"	,1,1);
-  plots.draw("ZCtrlJet2Eta",    "Sub-leading jet #eta",         "N_{events}"	,1,1);
-  plots.draw("ZCtrlCenJetpT",	"Central jet p_{T} [GeV]",	"N_{events}"    ,1,1);
-  plots.draw("ZCtrlDEtajj",	"#Delta #eta_{jj}",		"N_{events}"	,1,1);
+  plots.draw("ZCtrlZpT",	"Z_p_{T} [GeV]",		"N_{events}"	,1,"RATIO");
+  plots.draw("ZCtrlJet1pT", 	"Leading jet p_{T} [GeV]", 	"N_{events}"	,1,"RATIO");
+  plots.draw("ZCtrlJet1Eta", 	"Leading jet #eta", 		"N_{events}"	,1,"RATIO");
+  plots.draw("ZCtrlJet2pT",     "Sub-leading jet p_{T} [GeV]",  "N_{events}"	,1,"RATIO");
+  plots.draw("ZCtrlJet2Eta",    "Sub-leading jet #eta",         "N_{events}"	,1,"RATIO");
+  plots.draw("ZCtrlCenJetpT",	"Central jet p_{T} [GeV]",	"N_{events}"    ,1,"RATIO");
+  plots.draw("ZCtrlDEtajj",	"#Delta #eta_{jj}",		"N_{events}"	,1,"RATIO");
   plots.setYMax(5.e2);
   plots.setXMin(1100.);
   plots.setXMax(2600.);
-  plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"Events / 100 GeV"	,1,1);
+  plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"Events / 100 GeV"	,1,"RATIO");
   plots.setYMax(5.e2);
   plots.setXMin(130.);
-  plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"Events / 20 GeV"	,1,1);
-  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj}",		"Events"	,1,1);
+  plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"Events / 20 GeV"	,1,"RATIO");
+  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj}",		"Events"	,1,"RATIO");
   plots.setYMax(80.);
   plots.setYMin(0.);
-  plots.draw("ZCtrlZMass",      "M_{#mu#mu}  [GeV]",      "Events / 5 GeV"    ,0,1);
+  plots.draw("ZCtrlZMass",      "M_{#mu#mu}  [GeV]",      "Events / 5 GeV"    ,0,"RATIO");
 
   //store histograms
   ofile->cd();

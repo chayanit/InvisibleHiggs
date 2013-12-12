@@ -624,33 +624,33 @@ int main(int argc, char* argv[]) {
   plots.setLabel("#tau channel");
   std::string hname = "hWTau_tau1Pt";
   plots.setYMax(45);
-  plots.draw(hname.c_str(), "Leading #tau p_{T} [GeV]", "N_{events}", false, true);
+  plots.draw(hname.c_str(), "Leading #tau p_{T} [GeV]", "N_{events}", false,"RATIO");
 
   hname = "hWTau_tau1Eta";
   plots.setYMax(12);
-  plots.draw(hname.c_str(), "Leading #tau #eta", "N_{events}",false, true);
+  plots.draw(hname.c_str(), "Leading #tau #eta", "N_{events}",false,"RATIO");
 
   hname = "hWTau_dPhiJJ";
   plots.setYMax(5E5);
-  plots.draw(hname.c_str(), "#Delta #phi_{jj}", "N_{events}",true, true);
+  plots.draw(hname.c_str(), "#Delta #phi_{jj}", "N_{events}",true,"RATIO");
 
   hname = "hWTau_mT_DPhiSignalNoCJV";
   plots.setYMax(15);
-  plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",false, true);
+  plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",false,"RATIO");
 
   hname = "hNumberTaus";
-  plots.draw(hname.c_str(), "Number of #tau", "N_{events}",true, true);
+  plots.draw(hname.c_str(), "Number of #tau", "N_{events}",true,"RATIO");
 
   hname = "hMinDR";
   plots.setYMax(5E4);
-  plots.draw(hname.c_str(), "#Delta R_{min}(#tau, leading jet)", "N_{events}",true, true);
+  plots.draw(hname.c_str(), "#Delta R_{min}(#tau, leading jet)", "N_{events}",true,"RATIO");
 
   hname = "hTauMatchJet";
-  plots.draw(hname.c_str(), "#tau matching with tagging jets", "N_{events}",true, true);
+  plots.draw(hname.c_str(), "#tau matching with tagging jets", "N_{events}",true,"RATIO");
   
   hname = "hWTau_mT_TightMjj";
   plots.setYMax(45);
-  plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",false, true);
+  plots.draw(hname.c_str(), "m_{T}(#tau#nu) [GeV]", "N_{events}",false,"RATIO");
 
   //////////////////////////////////////
   // store cutflow & other histograms //

@@ -50,7 +50,7 @@ public:
   // Optional setters                                                                                          //
   // Note that by default, the StackPlot object does some sort of guess at the correct Y min & max             //
   // but you can override that here                                                                            //
-  // Setting min or max to -1 will restore the option to plot with the guess (for min or max)                  //
+  // Note that each time you call draw() it will reset the y max and min, so you don't have to                 //
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   void setXMin(float min) { xMin_ = min; }
   void setXMax(float max) { xMax_ = max; }
@@ -63,15 +63,16 @@ public:
   void setTextPos(float x1, float y1, float x2, float y2);
   void setLumi(float lumi) { lumi_ = lumi; }
   
-  /////////////////////////////////////////////////////////////////////
-  // Draw a histogram. Args:                                         //
-  //  hname         = name of hist in ROOT files                     //
-  //  logy          = draw with log Y axis                           //
-  //  drawRatioPlot = draw with ratio plot below main plot           //
-  // You can only draw once you have used addDataset to add datasets //
-  /////////////////////////////////////////////////////////////////////
-  void draw(std::string hname, std::string xTitle, std::string yTitle, bool logy = true, bool drawRatioPlot = true);
+  /*Draw a histogram. Args:                                         
+   hname         = name of hist in ROOT files                     
+   logy          = draw with log Y axis                          
+   drawRatioPlot = draw with ratio plot below main plot "RATIO"   
+                   or "SIG" (same size as RATIO but no ratio plots, for signal plots)
+                   or "NM1" (no raito plot, short and fat for N-1 plots)
+  You can only draw once you have used addDataset to add datasets */
 
+  void draw(std::string hname, std::string xTitle, std::string yTitle, bool logy = true, std::string ratioPlotOption="RATIO");
+  
   void dumpInfo(std::ostream &o);
 
 private:

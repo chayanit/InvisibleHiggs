@@ -300,29 +300,29 @@ int main(int argc, char* argv[]) {
 
   plots.setLumi(19.5); // doens't rescale anything, just adds a bit of text on the plot
   std::cout << "plotting hTrigNM1" << std::endl;
-  plots.draw("hTrigNM1", "", "",1,0);
-  plots.draw("hMETFiltNM1", "", "",1,0);
-  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "Events / 5 GeV",1,0);
-  // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "N_{events}",1,0);
+  plots.draw("hTrigNM1", "", "",1,"NM1");
+  plots.draw("hMETFiltNM1", "", "",1,"NM1");
+  plots.draw("hDijetNM1", "Sub-leading jet p_{T} [GeV]", "Events / 5 GeV",1,"NM1");
+  // plots.draw("hSgnEtaNM1", "#eta_{1}#times#eta_{2}", "N_{events}",1,"NM1");
   plots.setYMax(5E4);
-  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "Events / 0.16",1,0);
-  plots.draw("hMjjNM1", "M_{jj} [GeV]", "Events / 100 GeV",1,0);
-  plots.draw("hMETNM1", "E_{T}^{miss} [GeV]", "Events / 10 GeV",1,0);
-  plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,0);
-  plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,0);
+  plots.draw("hDEtaJJNM1", "#Delta #eta_{jj}", "Events / 0.16",1,"NM1");
+  plots.draw("hMjjNM1", "M_{jj} [GeV]", "Events / 100 GeV",1,"NM1");
+  plots.draw("hMETNM1", "E_{T}^{miss} [GeV]", "Events / 10 GeV",1,"NM1");
+  plots.draw("hDPhiJMetNM1", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,"NM1");
+  plots.draw("hDPhiJMetNM1NoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,"NM1");
   plots.setYMax(5E5);
-  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "Events / (#pi/50)",1,0);
+  plots.draw("hDPhiJJNM1", "#Delta #phi_{jj}", "Events / (#pi/50)",1,"NM1");
   plots.setYMax(1E5);
-  plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "Events / 5 GeV",1,0);
-  plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}",1,0);
+  plots.draw("hCenEtNM1", "Central Jet E_{T} [GeV]", "Events / 5 GeV",1,"NM1");
+  plots.draw("hCenEtaNM1", "Central Jet #eta", "N_{events}",1,"NM1");
 
   plots.setYMin(1e-1);
   // plots.setYMax(1e2);
-  plots.draw("hEVetoNM1", "E_{T} [GeV]", "N_{events}",1,0);
-  plots.draw("hMuVetoNM1", "p_{T} [GeV]", "N_{events}",1,0);
+  plots.draw("hEVetoNM1", "E_{T} [GeV]", "N_{events}",1,"NM1");
+  plots.draw("hMuVetoNM1", "p_{T} [GeV]", "N_{events}",1,"NM1");
 
   // plots.setYMin(1e-2);
-  plots.draw("hDPhiJMetNormNM1", "#Delta #phi_{N}^{min}", "N_{events}",1,0);
-  plots.draw("hDPhiJMetNormNM1NoDPhiJJ", "#Delta #phi_{N}^{min}, no #Delta #phi_{jj} cut", "N_{events}",1,0);
+  plots.draw("hDPhiJMetNormNM1", "#Delta #phi_{N}^{min}", "N_{events}",1,"NM1");
+  plots.draw("hDPhiJMetNormNM1NoDPhiJJ", "#Delta #phi_{N}^{min}, no #Delta #phi_{jj} cut", "N_{events}",1,"NM1");
 
 }

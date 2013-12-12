@@ -87,8 +87,8 @@ int main(int argc, char* argv[]) {
     TH1D* hDijet                = new TH1D("hDijetSig",                  "", 50,  0.,  250.);
     TH1D* hSgnEtaJJ             = new TH1D("hSgnEtaJJSig",               "", 2,   -1., 1.);
     TH1D* hDEtaJJ               = new TH1D("hDEtaJJSig",                 "", 50,  0.,  8.);
-    TH1D* hMjj                  = new TH1D("hMjjSig",                    "", 35,  1100.,  3500.);
-    TH1D* hMET                  = new TH1D("hMETSig",                    "", 20,  130.,  530.);
+    TH1D* hMjjNoRatio           = new TH1D("hMjjSigNoRatio",             "", 24,  1100.,  3500.); // signal plots wihtout ratio plot for paper (plots with ratio are done below)
+    TH1D* hMETNoRatio           = new TH1D("hMETSigNoRatio",             "", 20,  130.,  530.); // signal plot without ratio plot for paper
     TH1D* hDPhiJMet             = new TH1D("hDPhiJMetSig",               "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNoDPhiJJ     = new TH1D("hDPhiJMetSigNoDPhiJJ",       "", 50,  0.,  TMath::Pi());
     TH1D* hDPhiJMetNorm         = new TH1D("hDPhiJMetNormSig",           "", 50,  0.,  200);
@@ -134,8 +134,8 @@ int main(int argc, char* argv[]) {
     tree->Draw("jet2Pt>>hDijetSig", (dijet + cutD) * otherCuts);
     tree->Draw("TMath::Sign(1., jet1Eta*jet2Eta)>>hSgnEtaJJSig", (sgnEtaJJ + cutD) * otherCuts);
     tree->Draw("abs(jet1Eta-jet2Eta)>>hDEtaJJSig", (dEtaJJ + cutD) * otherCuts);
-    tree->Draw("vbfM>>hMjjSig", (mJJ  + cutD) * otherCuts);
-    tree->Draw("met>>hMETSig", (met + cutD) * otherCuts);
+    tree->Draw("vbfM>>hMjjSigNoRatio", (mJJ  + cutD) * otherCuts);
+    tree->Draw("met>>hMETSigNoRatio", (met + cutD) * otherCuts);
     // tree->Draw("min(abs(abs(abs(metPhi-jet1Phi)-TMath::Pi())-TMath::Pi()), abs(abs(abs(metPhi-jet2Phi)-TMath::Pi())-TMath::Pi()))>>hDPhiJMetSig", (cuts.allCuts() + cutD) * otherCuts);
     tree->Draw("jmDPhi>>hDPhiJMetSig", (cuts.allCuts() + cutD) * otherCuts);
     tree->Draw("jmDPhi>>hDPhiJMetSigNoDPhiJJ", (dPhiJJ + cutD) * otherCuts);
@@ -156,8 +156,8 @@ int main(int argc, char* argv[]) {
       hDijet->Scale(weight);
       hSgnEtaJJ->Scale(weight);
       hDEtaJJ->Scale(weight);
-      hMjj->Scale(weight);
-      hMET->Scale(weight);
+      hMjjNoRatio->Scale(weight);
+      hMETNoRatio->Scale(weight);
       hDPhiJMet->Scale(weight);
       hDPhiJMetNoDPhiJJ->Scale(weight);
       hDPhiJMetNorm->Scale(weight);
@@ -169,15 +169,20 @@ int main(int argc, char* argv[]) {
       hCenEta->Scale(weight);
     }    
 
-    // write histograms
+    // Clone Mjj and MET hists for ratio plots for internal use
+    TH1D* hMjjRatio = (TH1D*) hMjjNoRatio->Clone("hMjjSigRatio");
+    TH1D* hMETRatio = (TH1D*) hMETNoRatio->Clone("hMETSigRatio");
 
+    // write histograms
     hTrig->Write("",TObject::kOverwrite);
     hMETfilt->Write("",TObject::kOverwrite);
     hDijet->Write("",TObject::kOverwrite);
     hSgnEtaJJ->Write("",TObject::kOverwrite);
     hDEtaJJ->Write("",TObject::kOverwrite);
-    hMjj->Write("",TObject::kOverwrite);
-    hMET->Write("",TObject::kOverwrite);
+    hMjjNoRatio->Write("",TObject::kOverwrite);
+    hMjjRatio->Write("",TObject::kOverwrite);
+    hMETNoRatio->Write("",TObject::kOverwrite);
+    hMETRatio->Write("",TObject::kOverwrite);
     hDPhiJMet->Write("",TObject::kOverwrite);
     hDPhiJMetNoDPhiJJ->Write("",TObject::kOverwrite);
     hDPhiJMetNorm->Write("",TObject::kOverwrite);
@@ -201,8 +206,10 @@ int main(int argc, char* argv[]) {
   hists.push_back("hDijetSig");
   hists.push_back("hSgnEtaJJSig");
   hists.push_back("hDEtaJJSig");
-  hists.push_back("hMjjSig");
-  hists.push_back("hMETSig");
+  hists.push_back("hMjjSigNoRatio");
+  hists.push_back("hMjjSigRatio");
+  hists.push_back("hMETSigNoRatio");
+  hists.push_back("hMETSigRatio");
   hists.push_back("hDPhiJMetSig");
   hists.push_back("hDPhiJMetSigNoDPhiJJ");
   hists.push_back("hDPhiJMetNormSig");
@@ -341,26 +348,32 @@ int main(int argc, char* argv[]) {
   plots.setLumi(19.5); // doens't rescale anything, just adds a bit of text on the plot
   plots.draw("hTrigSig", "", "");
   plots.draw("hMETFiltSig", "", "");
-  plots.draw("hDijetSig", "Sub-leading jet p_{T} [GeV]", "N_{events}",1,1);
-  // plots.draw("hSgnEtaSig", "#eta_{1}#times#eta_{2}", "N_{events}",1,1);
+  plots.draw("hDijetSig", "Sub-leading jet p_{T} [GeV]", "N_{events}",1,"RATIO");
+  // plots.draw("hSgnEtaSig", "#eta_{1}#times#eta_{2}", "N_{events}",1,"RATIO");
   plots.setYMax(5E4);
-  plots.draw("hDEtaJJSig", "#Delta #eta_{jj}", "N_{events}",1,1);
+  plots.draw("hDEtaJJSig", "#Delta #eta_{jj}", "N_{events}",1,"RATIO");
   plots.setXMin(1100.);
   plots.setXMax(3500.);
-  plots.draw("hMjjSig", "M_{jj} [GeV]", "Events / 100 GeV",1,1);
+  plots.draw("hMjjSigNoRatio", "M_{jj} [GeV]", "Events / 100 GeV",1,"SIG");
+  plots.setXMin(1100.);
+  plots.setXMax(3500.);
+  plots.draw("hMjjSigNoRatio", "M_{jj} [GeV]", "Events / 100 GeV",1,"RATIO");
   plots.setXMin(150.);
   plots.setXMax(500.);
-  plots.draw("hMETSig", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,1);
-  plots.draw("hDPhiJMetSig", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,1);
-  plots.draw("hDPhiJMetSigNoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,1);
+  plots.draw("hMETSigNoRatio", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,"SIG");
+  plots.setXMin(150.);
+  plots.setXMax(500.);
+  plots.draw("hMETSigNoRatio", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,"RATIO");
+  plots.draw("hDPhiJMetSig", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,"RATIO");
+  plots.draw("hDPhiJMetSigNoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,"RATIO");
   plots.setYMax(5E5);
-  plots.draw("hDPhiJJSig", "#Delta #phi_{jj}", "Events",1,1);
+  plots.draw("hDPhiJJSig", "#Delta #phi_{jj}", "Events",1,"RATIO");
   plots.setYMax(1E5);
-  plots.draw("hCenEtSig", "Central Jet E_{T} [GeV]", "N_{events}",1,1);
-  plots.draw("hCenEtaSig", "Central Jet #eta", "N_{events}",1,1);
+  plots.draw("hCenEtSig", "Central Jet E_{T} [GeV]", "N_{events}",1,"RATIO");
+  plots.draw("hCenEtaSig", "Central Jet #eta", "N_{events}",1,"RATIO");
 
   plots.setYMin(1e-1);
-  // plots.setYMax(1e2);
+  plots.setYMax(1e2);
   plots.draw("hEVetoSig", "E_{T} [GeV]", "N_{events}");
   plots.draw("hMuVetoSig", "p_{T} [GeV]", "N_{events}");
 

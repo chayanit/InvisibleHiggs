@@ -688,40 +688,40 @@ for (unsigned n = 0; n < hnames.size(); n++)
     std::string label = (c) ? "e channel" : "#mu channel";
     plots.setLabel(label.c_str());
     std::string hname = "hW"+chan[c]+"_jet1Pt";
-    plots.draw(hname.c_str(), "Leading jet p_{T} [GeV]", "N_{events}", true, true);
+    plots.draw(hname.c_str(), "Leading jet p_{T} [GeV]", "N_{events}", true,"RATIO");
 
     hname = "hW"+chan[c]+"_jet2Pt";
-    plots.draw(hname.c_str(), "Sub-leading jet p_{T} [GeV]", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "Sub-leading jet p_{T} [GeV]", "N_{events}",true,"RATIO");
 
     hname = "hW"+chan[c]+"_jet1Eta";
     if (c == 0) plots.setYMax(1E5);
-    plots.draw(hname.c_str(), "Leading jet #eta", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "Leading jet #eta", "N_{events}",true,"RATIO");
     // if (c == 0) plots.setYMax(-1);
 
     if (c == 0) plots.setYMax(1E5); else plots.setYMax(3E4);
     hname = "hW"+chan[c]+"_jet2Eta";
-    plots.draw(hname.c_str(), "Sub-leading jet #eta", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "Sub-leading jet #eta", "N_{events}",true,"RATIO");
     // plots.setYMax(-1);
 
     hname = "hW"+chan[c]+"_Mjj";
-    plots.draw(hname.c_str(), "M_{jj} [GeV]", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "M_{jj} [GeV]", "N_{events}",true,"RATIO");
 
     hname = "hW"+chan[c]+"_dEtaJJ";
-    plots.draw(hname.c_str(), "#Delta #eta_{jj}", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "#Delta #eta_{jj}", "N_{events}",true,"RATIO");
 
     hname = "hW"+chan[c]+"_dPhiJJ";
     if (c == 1) plots.setYMax(2E4);
-    plots.draw(hname.c_str(), "#Delta #phi_{jj}", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "#Delta #phi_{jj}", "N_{events}",true,"RATIO");
     // plots.setYMax(-1);
 
     hname = "hW"+chan[c]+"_MET";
-    plots.draw(hname.c_str(), "E_{T}^{miss} [GeV]", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "E_{T}^{miss} [GeV]", "N_{events}",true,"RATIO");
 
     hname = "hW"+chan[c]+"_WmT";
-    plots.draw(hname.c_str(), "M^{W}_{T} [GeV]", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "M^{W}_{T} [GeV]", "N_{events}",true,"RATIO");
 
     hname = "hW"+chan[c]+"_WpT";
-    plots.draw(hname.c_str(), "p^{W}_{T} [GeV]", "N_{events}",true, true);
+    plots.draw(hname.c_str(), "p^{W}_{T} [GeV]", "N_{events}",true,"RATIO");
 
   }
 
