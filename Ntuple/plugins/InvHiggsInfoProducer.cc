@@ -124,6 +124,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TH3.h"
 #include "TTree.h"
 #include "TF1.h"
 #include "TMath.h"
@@ -200,6 +201,12 @@ private:
 		  edm::Handle<edm::ValueMap<int> > puJetIdFlags,
 		  const std::vector<pat::Muon>& muons,           //Loose muons
 		  const std::vector<pat::Electron>& electrons);  //Loose electrons
+  void doJetsCollection(edm::Handle<edm::View<pat::Jet> > jets,
+                        edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
+                        edm::Handle<edm::ValueMap<int> > puJetIdFlags,
+                        const std::vector<pat::Muon>& muons,               //Loose muons
+                        const std::vector<pat::Electron>& electrons,       //Loose electrons
+                        JetCorrectionUncertainty *JecUnc);
   void doMuons(const std::vector<pat::Muon>& muons);             //Loose muons
   void doElectrons(const std::vector<pat::Electron>& electrons); //Loose electrons
   void doMET(const std::vector<pat::MET>& met,
@@ -224,7 +231,9 @@ public:
   };
 
 private:
-  
+
+  static const int NUM_JET_MAX = 20;  
+
   // output file
   edm::Service<TFileService> fs_;
   
@@ -250,6 +259,10 @@ private:
   edm::InputTag jetTag_;
   edm::InputTag puJetMvaTag_;
   edm::InputTag puJetIdTag_;
+  //
+  edm::InputTag jetCollection_;
+  edm::InputTag puJetCollectionMva_;
+  edm::InputTag puJetCollectionId_;
   //
   edm::InputTag muonTag_;
   edm::InputTag looseMuonTag_;
@@ -286,10 +299,8 @@ private:
 
   // trigger data/MC weights
   TFile* fTrigCorr_;
-  TH1D*  hTrigCorrL1MET_;
-  TH1D*  hTrigCorrJet_;
-  TH1D*  hTrigCorrMET_;
-  TH1D*  hTrigCorrMjj_;
+  TH3D*  hTrigCorrDijet35_;
+  TH3D*  hTrigCorrDijet30_;
   bool   doTrigCorr_;
 
   // lepton ID eff
@@ -360,7 +371,11 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   jetTag_(iConfig.getUntrackedParameter<edm::InputTag>("jetTag",edm::InputTag("patJets"))),
   puJetMvaTag_(iConfig.getUntrackedParameter<edm::InputTag>("puJetMvaTag",edm::InputTag("puJetMva:fullDiscriminant"))),
   puJetIdTag_(iConfig.getUntrackedParameter<edm::InputTag>("puJetIdTag",edm::InputTag("puJetMva:fullId"))),
-  
+
+  jetCollection_(iConfig.getUntrackedParameter<edm::InputTag>("jetCollection",edm::InputTag("patJets"))),
+  puJetCollectionMva_(iConfig.getUntrackedParameter<edm::InputTag>("puJetCollectionMva",edm::InputTag("puJetMva:fullDiscriminant"))),
+  puJetCollectionId_(iConfig.getUntrackedParameter<edm::InputTag>("puJetCollectionId",edm::InputTag("puJetMva:fullId"))),  
+
   muonTag_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag",edm::InputTag("patMuons"))),
   looseMuonTag_(iConfig.getUntrackedParameter<edm::InputTag>("looseMuonTag",edm::InputTag("patMuons"))),
   
@@ -389,10 +404,8 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   doHltBit_(true),
   lumiWeights_(),
   fTrigCorr_(0),
-  hTrigCorrL1MET_(0),
-  hTrigCorrJet_(0),
-  hTrigCorrMET_(0),
-  hTrigCorrMjj_(0),
+  hTrigCorrDijet35_(0),
+  hTrigCorrDijet30_(0),
   doTrigCorr_(0),
   fLeptCorr_(0),
   hLeptCorrEleTight_(0),
@@ -439,10 +452,8 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   if (stat(trigCorrFile.c_str(), &buf) != -1) {
     std::cout << "Reading trigger corrections from " << trigCorrFile << std::endl;
     fTrigCorr_      = TFile::Open(trigCorrFile.c_str());
-    hTrigCorrL1MET_ = (TH1D*) fTrigCorr_->Get("METL1");
-    hTrigCorrJet_   = (TH1D*) fTrigCorr_->Get("JetHLT");
-    hTrigCorrMET_   = (TH1D*) fTrigCorr_->Get("METHLT");
-    hTrigCorrMjj_   = (TH1D*) fTrigCorr_->Get("MjjHLT");
+    hTrigCorrDijet35_ = (TH3D*) fTrigCorr_->Get("h3DHLT_Dijet35_BCD");
+    hTrigCorrDijet30_ = (TH3D*) fTrigCorr_->Get("h3DHLT_Dijet30_D");
     doTrigCorr_     = true;
   }
   else {
@@ -629,6 +640,9 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::Handle<edm::View<pat::Jet> > jets;
   iEvent.getByLabel(jetTag_, jets);
  
+  edm::Handle<edm::View<pat::Jet> > goodjets;
+  iEvent.getByLabel(jetCollection_, goodjets);
+
   edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
   iSetup.get<JetCorrectionsRecord>().get("AK5PF",JetCorParColl); 
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
@@ -639,6 +653,12 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   
   edm::Handle<edm::ValueMap<int> > puJetIdFlag;
   iEvent.getByLabel(puJetIdTag_,puJetIdFlag);
+
+  edm::Handle<edm::ValueMap<float> > puJetCollectionIdMVA;
+  iEvent.getByLabel(puJetCollectionMva_,puJetCollectionIdMVA);
+
+  edm::Handle<edm::ValueMap<int> > puJetCollectionIdFlag;
+  iEvent.getByLabel(puJetCollectionId_,puJetCollectionIdFlag);
 
   edm::Handle<pat::METCollection> met;
   iEvent.getByLabel(metTag_, met);
@@ -679,6 +699,8 @@ InvHiggsInfoProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   if (jets.isValid()) doJets(jets, puJetIdMVA, puJetIdFlag, *looseMuons, *looseElectrons, jecUnc);
 
   if (jets.isValid()) doThirdJet(jets, puJetIdMVA, puJetIdFlag, *looseMuons, *looseElectrons);
+
+  if (goodjets.isValid()) doJetsCollection(goodjets, puJetCollectionIdMVA, puJetCollectionIdFlag, *looseMuons, *looseElectrons, jecUnc);
 
   if (met.isValid()) doMET(*met, *muons, *electrons, *zMus, *wMus, *wEls);
 
@@ -1107,29 +1129,25 @@ void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
 
 void InvHiggsInfoProducer::doTrigCorrWeights() {
 
-  double weight=1.;
+  //double weight=1.;
+  double weightBCD = 1.;
+  double weightD   = 1.;
+
   if (doTrigCorr_) {
     
-    int bin  = hTrigCorrJet_->FindBin(info_->jet1Pt);
-    weight  *= hTrigCorrJet_->GetBinContent(bin);
-    
-    bin      = hTrigCorrJet_->FindBin(info_->jet2Pt);
-    weight  *= hTrigCorrJet_->GetBinContent(bin);
-    
-    bin      = hTrigCorrMjj_->FindBin(info_->vbfM);
-    weight  *= hTrigCorrMjj_->GetBinContent(bin);
-    
-    bin      = hTrigCorrL1MET_->FindBin(info_->metNoMuon);
-    weight  *= hTrigCorrL1MET_->GetBinContent(bin);
-    
-    bin      = hTrigCorrMET_->FindBin(info_->metNoMuon);
-    weight  *= hTrigCorrMET_->GetBinContent(bin);
+    int bin     = hTrigCorrDijet35_->FindBin(info_->jet2Pt,info_->metNoMuon,info_->vbfM);
+    weightBCD  *= hTrigCorrDijet35_->GetBinContent(bin);
+
+    bin 	= hTrigCorrDijet30_->FindBin(info_->jet2Pt,info_->metNoMuon,info_->vbfM);
+    weightD    *= hTrigCorrDijet30_->GetBinContent(bin);
 
     //    std::cout << "weight : " << weight << std::endl;
 
   }
 
-  info_->trigCorrWeight = weight;
+  //info_->trigCorrWeight = weight;
+  info_->trigCorrWeight_BCD = weightBCD;
+  info_->trigCorrWeight_D   = weightD;
 
 }
 
@@ -1519,6 +1537,67 @@ void InvHiggsInfoProducer::doThirdJet(edm::Handle<edm::View<pat::Jet> > jets,
 }
 
 
+void InvHiggsInfoProducer::doJetsCollection(edm::Handle<edm::View<pat::Jet> > jets,
+					    edm::Handle<edm::ValueMap<float> > puJetIdMVAs,
+					    edm::Handle<edm::ValueMap<int> > puJetIdFlags,
+					    const std::vector<pat::Muon>& muons,
+					    const std::vector<pat::Electron>& electrons,
+					    JetCorrectionUncertainty *JecUnc) {
+
+  int iJet = 0.;
+
+  for (unsigned i=0; i<jets->size(); ++i) {
+
+    if( !(iJet < NUM_JET_MAX) ) break;
+
+    // Check overlap between jet and (muon, electron)
+    bool checkOverlap = false;
+
+    for(unsigned iLep=0; iLep<muons.size(); iLep++){
+      if(reco::deltaR(muons.at(iLep).eta(),muons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.5) continue;
+      checkOverlap = true;
+      //std::cout<<"Overlap with muons"<<std::endl;
+      break;
+    }
+    for(unsigned iLep=0; iLep<electrons.size(); iLep++){
+      if(reco::deltaR(electrons.at(iLep).eta(),electrons.at(iLep).phi(),jets->at(i).eta(),jets->at(i).phi())>0.5) continue;
+      checkOverlap = true;
+      //std::cout<<"Overlap with electrons"<<std::endl;
+      break;
+    }
+    if(checkOverlap) continue;
+
+    // check jet is associated with PV
+    int puflag = (*puJetIdFlags)[jets->refAt(i)];
+    if ( PileupJetIdentifier::passJetId( puflag, PileupJetIdentifier::kLoose ) ) {
+
+	info_->jetsPt[iJet]     = jets->at(i).pt();
+	info_->jetsEta[iJet]    = jets->at(i).eta();
+	info_->jetsPhi[iJet]    = jets->at(i).phi();
+	info_->jetsM[iJet]      = jets->at(i).mass();
+	info_->jetsPUMVA[iJet]  = (*puJetIdMVAs)[jets->refAt(i)];
+	info_->jetsPUFlag[iJet] = (*puJetIdFlags)[jets->refAt(i)];
+
+	if (jets->at(i).genJet() != 0) {
+            info_->genJetsPt[iJet]     = jets->at(i).genJet()->pt();
+            info_->genJetsEta[iJet]    = jets->at(i).genJet()->eta();
+            info_->genJetsPhi[iJet]    = jets->at(i).genJet()->phi();
+	    info_->genJetsM[iJet]      = jets->at(i).genJet()->mass();
+	}
+
+	JecUnc->setJetEta(jets->at(i).eta());
+	JecUnc->setJetPt(jets->at(i).pt());
+	info_->jetsunc[iJet]    = JecUnc->getUncertainty(true);
+
+	iJet++;
+     }
+  }
+
+  info_->nJets = iJet;
+}
+
+
+
 void InvHiggsInfoProducer::doMuons(const std::vector<pat::Muon>& muons) {
 
   if (muons.size()>0) {
@@ -1602,11 +1681,12 @@ void InvHiggsInfoProducer::doTaus(const std::vector<pat::Tau>& taus,
     const pat::Tau& tau = taus.at(i);
 
     if (vertices.size() > 0) {
-      //if(tau.leadPFChargedHadrCand()->trackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->trackRef()->dz(vertices.at(0).position()));
-      //else if(tau.leadPFChargedHadrCand()->gsfTrackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->gsfTrackRef()->dz(vertices.at(0).position()));
+      if(tau.leadPFChargedHadrCand()->trackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->trackRef()->dz(vertices.at(0).position()));
+      else if(tau.leadPFChargedHadrCand()->gsfTrackRef().isNonnull()) dz  = fabs(tau.leadPFChargedHadrCand()->gsfTrackRef()->dz(vertices.at(0).position()));
       //std::cout << "dz from track = " << dz << std::endl;
 
-      info_->tau_dz = fabs(tau.vz() - vertices.at(0).z());
+      //info_->tau_dz = fabs(tau.vz() - vertices.at(0).z());
+      info_->tau_dz = dz;
       //std::cout << "dz from hand = " << info_->tau_dz << std::endl;      	
     }
 

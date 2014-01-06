@@ -89,6 +89,21 @@ class InvHiggsInfo { //: public TObject {
   Double_t jet2unc;
   Double_t jet2DeltaT;
 
+  // Jets (unsmeared) collection
+  static const int NUM_JET_MAX = 20;
+  Int_t    nJets;
+  Double_t jetsPt[NUM_JET_MAX];
+  Double_t jetsEta[NUM_JET_MAX];
+  Double_t jetsPhi[NUM_JET_MAX];
+  Double_t jetsM[NUM_JET_MAX];
+  Double_t jetsPUMVA[NUM_JET_MAX];
+  Int_t    jetsPUFlag[NUM_JET_MAX];
+  Double_t jetsunc[NUM_JET_MAX];
+  Double_t genJetsPt[NUM_JET_MAX];
+  Double_t genJetsEta[NUM_JET_MAX];
+  Double_t genJetsPhi[NUM_JET_MAX];
+  Double_t genJetsM[NUM_JET_MAX];
+
   // MET (need XY correction?)
   Double_t met;
   Double_t metPhi;
@@ -234,7 +249,9 @@ class InvHiggsInfo { //: public TObject {
   Double_t puWeight;
 
   // MC corrections
-  Double_t trigCorrWeight;
+  //Double_t trigCorrWeight;
+  Double_t trigCorrWeight_BCD;
+  Double_t trigCorrWeight_D;
 
   // Lepton ID efficiency corrections
   // Tight (for control regions)

@@ -29,6 +29,7 @@ InvHiggsInfo::InvHiggsInfo() :
   metflag6(false), 
   metflag7(false),
   metflag8(false),
+  nJets(0),
   nJets_pass(0),
   jet1Index(-1),
   jet1Pt(-10.),
@@ -158,7 +159,9 @@ InvHiggsInfo::InvHiggsInfo() :
   zDau2Charge(0.),
   nVtx(0),
   puWeight(1.),
-  trigCorrWeight(1.),
+  //trigCorrWeight(1.),
+  trigCorrWeight_BCD(1.),
+  trigCorrWeight_D(1.),
   eleTightCorr(1.),
   muTightCorr(1.),
   leptTightCorr(1.),
@@ -248,6 +251,20 @@ InvHiggsInfo::InvHiggsInfo() :
   zlpphi(-10.),
   zlpe(-10.)
 {
+
+  for(int i=0; i<NUM_JET_MAX; ++i) {
+	jetsPt[i] 	= -1.;
+	jetsEta[i] 	= -1.;
+	jetsPhi[i]	= -1.;
+	jetsM[i]	= -1.;
+	jetsPUMVA[i]	= -1.;
+	jetsPUFlag[i]	= -1.;
+	jetsunc[i]	= -10.;
+	genJetsPt[i]	= -10.;	
+	genJetsEta[i]	= -10.;
+	genJetsPhi[i]	= -10.;
+	genJetsM[i]	= -10.;
+  }	
 
 }
 

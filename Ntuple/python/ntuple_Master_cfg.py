@@ -97,7 +97,7 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
 
     ###--------------------------------------------------------------
     print "-----------------------------------------------"
-    print "INVISIBLE HIGGS: Ntuple V12 for Parked Data"
+    print "INVISIBLE HIGGS: Ntuple V13 for Parked Data"
     print "-----------------------------------------------"
     print "RunOnData = ", iRunOnData
     if iRunOnData == True:
@@ -389,7 +389,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
         process.invHiggsInfo.puDataHist  = cms.untracked.string("pileup")
         process.invHiggsInfo.mcPYTHIA    = cms.untracked.bool(True)
 
-        process.invHiggsInfo.trigCorrFile   = cms.untracked.string("DataMCWeight_53X_v1.root")
+        process.invHiggsInfo.trigCorrFile   = cms.untracked.string("HLTParkedEff_v1.root")
+
+	process.invHiggsInfo.leptCorrFile   = cms.untracked.string("leptonWeights.root")
     # TTree output file
     process.load("CommonTools.UtilAlgos.TFileService_cfi")
     process.TFileService.fileName = cms.string('invHiggsInfo.root')

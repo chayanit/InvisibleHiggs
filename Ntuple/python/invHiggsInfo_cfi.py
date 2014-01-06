@@ -18,11 +18,15 @@ invHiggsInfo = cms.EDAnalyzer(
     hltPath3Name  = cms.untracked.string("HLT_DiJet35_MJJ700_AllJets_DEta3p5_VBF_v"),
     hltPath4Name  = cms.untracked.string("HLT_DiJet30_MJJ700_AllJets_DEta3p5_VBF_v"),
     
-    # jets 
+    # leading jets 
     jetTag      = cms.untracked.InputTag("goodPatJets"),
-    puJetMvaTag = cms.untracked.InputTag("puJetMva", "fullDiscriminant"),
-    puJetIdTag  = cms.untracked.InputTag("puJetMva", "fullId"),
+    puJetMvaTag = cms.untracked.InputTag("puJetMva", "full53xDiscriminant"),
+    puJetIdTag  = cms.untracked.InputTag("puJetMva", "full53xId"),
     useLeadingJets = cms.untracked.bool(True),
+
+    jetCollection  = cms.untracked.InputTag("goodPatJets"),
+    puJetCollectionMva = cms.untracked.InputTag("puJetMva", "full53xDiscriminant"),
+    puJetCollectionId  = cms.untracked.InputTag("puJetMva", "full53xId"),
 
     # leptons
     muonTag     = cms.untracked.InputTag("selectMuons"), #cleanPatMuons
