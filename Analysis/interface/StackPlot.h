@@ -61,21 +61,25 @@ public:
   void setLabel(std::string label) { label_ = label; }
   void setLegPos(float x1, float y1, float x2, float y2);
   void setTextPos(float x1, float y1, float x2, float y2);
-  void setLumi(float lumi) { lumi_ = lumi; }
-  
-  /*Draw a histogram. Args:                                         
-   hname         = name of hist in ROOT files                     
-   logy          = draw with log Y axis                          
-   drawRatioPlot = draw with ratio plot below main plot "RATIO"   
-                   or "SIG" (same size as RATIO but no ratio plots, for signal plots)
-                   or "NM1" (no raito plot, short and fat for N-1 plots)
-  You can only draw once you have used addDataset to add datasets */
+  void setLumi(float lumi) { lumi_ = lumi; } // set lumi value to be displyed on plots, default is 19.5
+  void setScaleMCtoData(bool rescaleMC) { rescaleMC_ = rescaleMC; } // for rescaling integral of MC to data. 
 
+  /////////////////////////////////////////////////////////////////////////////////////////
+  // Draw a histogram. Args:                                                             //
+  //  hname         = name of hist in ROOT files                                         //
+  //  logy          = draw with log Y axis                                               //
+  //  drawRatioPlot = draw with ratio plot below main plot "RATIO"                       //
+  //                  or "SIG" (same size as RATIO but no ratio plots, for signal plots) //
+  //                  or "NM1" (no raito plot, short and fat for N-1 plots)              //
+  // You can only draw once you have used addDataset to add datasets                     //
+  /////////////////////////////////////////////////////////////////////////////////////////
   void draw(std::string hname, std::string xTitle, std::string yTitle, bool logy = true, std::string ratioPlotOption="RATIO");
   
   void dumpInfo(std::ostream &o);
 
 private:
+  // For initialising constructors - common block
+  void init(std::string dir, std::string pdfDir);
 
   // input file directory
   std::string dir_;
@@ -120,8 +124,11 @@ private:
   // DOENS'T do any rescaling!!!
   float lumi_;
 
-  // Required by ROOT when compiling an object to be used in a macro
+  // for rescaling MC to data
+  bool rescaleMC_;
+  double rescaleMCfactor_;
+
+  // Required by ROOT when compiling an object to be used in a macro - please do not delete! See scripts/plotting/
   // ClassDef(StackPlot,1) 
 
 };
-

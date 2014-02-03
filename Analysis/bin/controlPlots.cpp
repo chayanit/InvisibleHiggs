@@ -340,9 +340,13 @@ int main(int argc, char* argv[]) {
   //plots.addDataset("QCD", kGreen+3, 0);
   //plots.addDataset("ZJets+EWK", kOrange-2, 0);
   //plots.addDataset("WNJets+EWK", kGreen-3, 0);
-  plots.addDataset("tt+DY+VV", kAzure-2, 0);
+  //
+  // Note that here I've used the overloaded method addDataset, which allows you to specify a filename for the input ROOT file
+  // *and* also allows you to specify what to put in the TLegend. (By default, it uses the filename as the TLegend entry)
+  // This is because the Tlegend entry involves some odd characters, which are best not used in filenames for safety
+  plots.addDataset("tt+DY+VV","t#bar{t}, tW, DY, VV", kAzure-2, 0);
   plots.addDataset("V+jets", kPink-4,0);
-  plots.addDataset("Signal 100%BR", kRed, 3);
+  plots.addDataset("Signal 100%BR","#splitline{VBF m_{H} = 125 GeV,}{BR(H#rightarrowinv) = 100%}",kRed, 3);
   plots.addDataset("METABCD",    kBlack, 1);
 
   plots.setLumi(19.5); // doens't rescale anything, just adds a bit of text on the plot
@@ -357,13 +361,13 @@ int main(int argc, char* argv[]) {
   plots.draw("hMjjSigNoRatio", "M_{jj} [GeV]", "Events / 100 GeV",1,"SIG");
   plots.setXMin(1100.);
   plots.setXMax(3500.);
-  plots.draw("hMjjSigNoRatio", "M_{jj} [GeV]", "Events / 100 GeV",1,"RATIO");
+  plots.draw("hMjjSigRatio", "M_{jj} [GeV]", "Events / 100 GeV",1,"RATIO");
   plots.setXMin(150.);
   plots.setXMax(500.);
   plots.draw("hMETSigNoRatio", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,"SIG");
   plots.setXMin(150.);
   plots.setXMax(500.);
-  plots.draw("hMETSigNoRatio", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,"RATIO");
+  plots.draw("hMETSigRatio", "E_{T}^{miss} [GeV]", "Events / 20 GeV",1,"RATIO");
   plots.draw("hDPhiJMetSig", "#Delta #phi_{j-#slash{E}_{T}}", "N_{events}",1,"RATIO");
   plots.draw("hDPhiJMetSigNoDPhiJJ", "#Delta #phi_{j-#slash{E}_{T}}, no #Delta #phi_{jj} cut", "N_{events}",1,"RATIO");
   plots.setYMax(5E5);

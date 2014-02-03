@@ -105,11 +105,11 @@ int main(int argc, char* argv[]) {
       std::cout << "Analysing DY->ll MC : " << dataset.name << std::endl; 
       // check if it's QCD
       if ( !(dataset.name.length()>11 && dataset.name.compare(11,14,"EWK")==0) ) {
-	if (options.doMCFMWeights) {
-	  yStarWeight = TCut("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))");
-	  mjjWeight   = TCut("0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM)");
-	}
-	std::cout << "Analysing QCD DY MC " << std::endl;
+    	if (options.doMCFMWeights) {
+    	  yStarWeight = TCut("(0.849667 + (0.149687*abs(log((sqrt(zgenmass*zgenmass + zgenpt*zgenpt*cosh(zgeneta)*cosh(zgeneta)) + zgenpt*sinh(zgeneta))/sqrt(zgenmass*zgenmass + zgenpt*zgenpt)) - 0.5*(genJet1Eta + genJet2Eta))))");
+    	  mjjWeight   = TCut("0.392568 + (0.120734*log(genVBFM)) - (0.000255622*genVBFM)");
+    	}
+    	std::cout << "Analysing QCD DY MC " << std::endl;
       }
     }
     else if (dataset.isData) {
@@ -221,6 +221,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "  N ctrl (dphi<1.0) : " << hZ_C_DPhi->GetBinContent(1) << " +/- " << hZ_C_DPhi->GetBinError(1) << std::endl;  
     
+
     delete hZ_C_DPhi;
     delete hZ_EffMuMu_D;
     delete hZ_EffMuMu_N;
@@ -588,8 +589,12 @@ int main(int argc, char* argv[]) {
   plots.setLegPos(0.70,0.60,0.93,0.89);
   //plots.setLegPos(0.62,0.62,0.89,0.89);
 
+  // Note that here I've used the overloaded method addDataset, which allows you to specify a filename for the input ROOT file
+  // *and* also allows you to specify what to put in the TLegend. (By default, it uses the filename as the TLegend entry)
+  // This is because the Tlegend entry involves some odd characters, which are best not used in filenames for safety
+
   //  plots.addDataset("DiBoson", kViolet-6, 0);
-  plots.addDataset("tt+VV", kAzure-2, 0);
+  plots.addDataset("tt+VV", "t#bar{t}, tW, VV", kAzure-2, 0);
   plots.addDataset("DY+jets", kPink-4,0);
   plots.addDataset("METABCD", kBlack, 1);
 

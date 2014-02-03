@@ -17,95 +17,57 @@
 #include <sstream>
 #include <algorithm>    // std::reverse
 
-// Required by ROOT when when compiling an object to be used in a macro
+// Required by ROOT when when compiling an object to be used in a macro - please don't remove - used in scripts/plotting
 // ClassImp(StackPlot)
 
 
 //////////////////
 // CONSTRUCTORS //
 //////////////////
-StackPlot::StackPlot() :
-  dir_(""),
-  pdfDir_(""),
-  files_(0),
-  labels_(0),
-  cols_(0),
-  styles_(0),
-  title_(""),
-  xTitle_(""),
-  yTitle_(""),
-  label_(""),
-  xMin_(0.),
-  xMax_(0.),
-  yMin_(0.),
-  yMax_(0.),
-  legX1_(0.63),
-  legX2_(0.93),
-  legY1_(0.63),
-  legY2_(0.89),
-  textX1_(0.),
-  textX2_(0.),
-  textY1_(0.),
-  textY2_(0.),
-  lumi_(19.5)
-{
+StackPlot::StackPlot() {
   std::cout << " No input or output file directory specified!" << std::endl;
+  std::cout << " Please specify at least and input directory!" << std::endl;
+  std::cout << " Exiting program." << std::endl;
+  exit(EXIT_FAILURE);
 }
 
 
-StackPlot::StackPlot(std::string dir) :
-  dir_(dir),
-  pdfDir_(dir),
-  files_(0),
-  labels_(0),
-  cols_(0),
-  styles_(0),
-  title_(""),
-  xTitle_(""),
-  yTitle_(""),
-  label_(""),
-  xMin_(0.),
-  xMax_(0.),
-  yMin_(0.),
-  yMax_(0.),
-  legX1_(0.63),
-  legX2_(0.93),
-  legY1_(0.63),
-  legY2_(0.89),
-  textX1_(0.),
-  textX2_(0.),
-  textY1_(0.),
-  textY2_(0.),
-  lumi_(19.5)
-{
+StackPlot::StackPlot(std::string dir) {
   std::cout << " No output directory specified - will use input file directory as default" << std::endl;
+  init(dir,dir);
 }
 
-StackPlot::StackPlot(std::string dir, std::string pdfDir) :
-  dir_(dir),
-  pdfDir_(pdfDir),
-  files_(0),
-  labels_(0),
-  cols_(0),
-  styles_(0),
-  title_(""),
-  xTitle_(""),
-  yTitle_(""),
-  label_(""),
-  xMin_(0.),
-  xMax_(0.),
-  yMin_(0.),
-  yMax_(0.),
-  legX1_(0.63),
-  legX2_(0.93),
-  legY1_(0.63),
-  legY2_(0.89),
-  textX1_(0.),
-  textX2_(0.),
-  textY1_(0.),
-  textY2_(0.),
-  lumi_(19.5)
-{
+StackPlot::StackPlot(std::string dir, std::string pdfDir) {
+  init(dir,pdfDir);
+}
+
+// Common constructor block
+void StackPlot::init(std::string dir, std::string pdfDir) {
+  dir_ = dir;
+  pdfDir_ = pdfDir;
+  // files_ = 0;
+  // labels_ = 0;
+  // cols_ = 0;
+  // styles_ = 0;
+  title_ = "";
+  xTitle_ = "";
+  yTitle_ = "";
+  label_ = "";
+  xMin_ = 0.;
+  xMax_ = 0.;
+  yMin_ = 0.;
+  yMax_ = 0.;
+  legX1_ = 0.63;
+  legX2_ = 0.93;
+  legY1_ = 0.63;
+  legY2_ = 0.89;
+  textX1_ = 0.;
+  textX2_ = 0.;
+  textY1_ = 0.;
+  textY2_ = 0.;
+  lumi_ = 19.5;
+  rescaleMC_ = false;
+  rescaleMCfactor_ = 1.0;
 }
 
 StackPlot::~StackPlot() {
@@ -123,7 +85,7 @@ void StackPlot::setLegPos(float x1, float y1, float x2, float y2) {
 }
 
 ///////////////////////////////////////
-// Set posiiotn of CMS text manually //
+// Set position of CMS text manually //
 ///////////////////////////////////////
 void StackPlot::setTextPos(float x1, float y1, float x2, float y2){
   textX1_ = x1;
@@ -133,17 +95,28 @@ void StackPlot::setTextPos(float x1, float y1, float x2, float y2){
 }
 
 /////////////////////////////////////////////////////////////////////
-// Draw a histogram. Args:                                         //
-//  hname         = name of hist in ROOT files                     //
-//  xTitle        = title on x-axis                                //
-//  yTitle        = title on y-axis                                //
-//  logy          = draw with log Y axis                           //
-//  drawRatioPlot = draw with ratio plot below main plot, or not   //
+// Draw a histogram. Args:                                         
+//  hname         = name of hist in ROOT files, used for output filename
+//  xTitle        = title on x-axis                                
+//  yTitle        = title on y-axis                                
+//  logy          = draw with log Y axis                           
+//  drawRatioPlot = draw with ratio plot below main plot, or not   
 //                  "RATIO" draw ratio plot below,      
 //                  "NM1" doesn't draw ratio plot, is short and wide,
 //                  "SIG" doesn't draw ratio plot, 
 //                  but main plot is same size as in RATIO
-// You can only draw once you have used addDataset to add datasets //
+//                  
+// You can only draw once you have used addDataset to add datasets 
+// 
+// Rough layout of flow:
+//  - Setup canvas, pads, etc
+//  - Scan through all files for a given hist to determine 
+//    min & max for y axis, and count for data/mc normalisation
+//  - Scan through again, set colours, add to stack
+//  - Draw the hist stack, and draw errors
+//  - Draw signal & data on top
+//  - Draw CMS text, legend
+//  - Draw ratio plot if requested
 /////////////////////////////////////////////////////////////////////
 void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, bool logy, std::string ratioPlotOption) {
 
@@ -159,7 +132,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
   // For signal plots ("SIG") we want no ratio plot, and want the signal MC stacked on top of BGs,
   // but the same size main plot as in the ratio plots ("RATIO") (for the paper)
-  // For N-1 plots ("NM1") we want the short fat canvas, for signal it's more square
+  // For N-1 plots ("NM1") we want the short wide canvas, for signal it's more square
   bool drawRatioPlot; 
   bool drawSignal; // if both are false, it's a N-1 plot
 
@@ -183,7 +156,6 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   TPad *pad1; // This TPad is for the main plot. There's another one for the ratio plot
   if (drawRatioPlot) {
     canvas.SetCanvasSize(500, 600);
-    canvas.Divide(1, 2);
     pad1 = new TPad("pad1","",0,0.30,1,1);
     pad1->SetBottomMargin(0.02);
     pad1->SetRightMargin(0.05); // The ratio plot below inherits the right and left margins settings here!
@@ -205,13 +177,6 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   pad1->Draw();
   pad1->cd();
   if (logy) pad1->SetLogy();
-  THStack stack("hs", (hname+std::string(" stack")).c_str());
-
-  TLegend leg(legX1_, legY1_, legX2_, legY2_);
-  leg.SetFillColor(0);
-
-  bool drawStack=false;
-  // bool nMinusOne=false;
 
   std::vector<TLegendEntry*> entries; // To hold legend entries, so can put in proper order later (otherwise it comes out upside down!)
 
@@ -222,11 +187,19 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   // Uses the first BG file to determine minimum
   // Maximum is normally determined by the stack hist
   // BIT BROKEN - if you get a seg fault when drawing, you prob have no events in the first file and it gets angry
-  // also potential problem with lin axis?
+  // 
+  // Also use this loop to get the sum of all BG MC contributions to allow rescaling to data
+  // Note that this INCLUDES under & overflow bins. If you don't want those ones (ie, just what's shown on the plots)
+  // then change  
+  //     h->Integral(0,(h->GetNbinsX())+1)
+  // to
+  //      h->Integral(1,h->GetNbinsX()) 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-  int i = 0;
+  int i = 0; // file counter
   double ymin=0;
   double xMin(0.),xMax(0.);
+  double mcIntegral(0.),dataIntegral(0.); //for rescaling MC
+
   for (; file!=files_.end(); ++file, ++i) {
 
     // Do some checks to see if files & hists exist
@@ -255,7 +228,14 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       
       if(fabs(h->GetMaximum(0)) == min ) continue; // Occasionally it does something odd and min = 3.4e38, max = -3.4e38. I guess it's and overflow thing. This stops it
       
-      if (logy){
+      // Get integral including under & overflow, for renorm MC to data
+      mcIntegral += h->Integral(0,(h->GetNbinsX())+1);
+
+      // Skip the min/max finding if we've already found a decent one
+      if (logy && (ymin > 0)) continue;
+      else if (!logy && (ymin != 0)) continue;
+
+      if (logy) {
         if( min > 0 ) ymin = min;
       } else 
         if (min != 0.) ymin = min;
@@ -269,14 +249,25 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
         xMax = xMax_;
       else
         xMax = h->GetXaxis()->GetXmax();
+    } else if (styles_.at(i) == 1){ // For data
+      dataIntegral =   h->Integral(0,(h->GetNbinsX())+1);
     }
-    if (logy && (ymin > 0)) break;
-    else if (!logy && (ymin != 0)) break;
+  } // end loop over files_
+
+  if (rescaleMC_){
+    rescaleMCfactor_ = dataIntegral/mcIntegral;
+    std::cout << "data integral: " << dataIntegral << std::endl;
+    std::cout << "mc integral: " << mcIntegral << std::endl;
+    std::cout << "rescaleMCfactor_: " << rescaleMCfactor_ << std::endl;
   }
 
   /////////////////////////////////
   // Make the stacked histogram  //
   /////////////////////////////////
+  THStack stack("hs", (hname+std::string(" stack")).c_str());
+
+  bool drawStack=false;
+
   i=0;
   file = files_.begin();
   for (; file!=files_.end(); ++file, ++i) {
@@ -302,8 +293,11 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       h->SetLineColor(kBlack);
       h->SetLineWidth(1);
       h->SetFillColor(cols_.at(i));
+      
+      if(styles_.at(i) == 0)
+        h->Scale(rescaleMCfactor_);
+
       if(styles_.at(i) == 3) {
-        // nMinusOne=true;
         h->SetLineStyle(1);
         h->SetLineWidth(3);
         h->SetLineColor(cols_.at(i));
@@ -337,7 +331,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     // skip first object since it's used by creating the histogram                               
     if(obj == histList->First()) continue;
     if(drawSignal && obj == histList->Last())  continue; //don't account signal histogram
-    hMC -> Add((TH1*)obj);
+    hMC->Add((TH1*)obj);
   }
 
   //////////////////////////////
@@ -361,14 +355,12 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
 
     stack.GetXaxis()->SetRangeUser(xMin, xMax);
 
-    stack.Draw("HIST"); //redraw to update axes (fail)
+    stack.Draw("HIST"); //redraw to update axes 
 
     // Make axis labels nice
     // Change size depending on if ratio plot or not (ratio plot shrinks actual sizes, so need to account for this)
     if (drawRatioPlot){
-      // stack.GetXaxis()->SetTitleSize(0.07);
       stack.GetXaxis()->SetTitleOffset(999); //Effectively turn off x axis title on main plot
-      // stack.GetXaxis()->SetLabelSize(0.07);
       stack.GetXaxis()->SetLabelOffset(999); //Effectively turn off x axis label on main plot
 
       stack.GetYaxis()->SetTitleSize(0.07);
@@ -405,10 +397,10 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   TH1D* ErrComp = (TH1D *) hMC->Clone();
   ErrComp->SetMarkerStyle(0);
   ErrComp->SetMarkerSize(0);
-  ErrComp->SetLineColor(kGray+1);
+  ErrComp->SetLineColor(kGray+3);
   ErrComp->SetLineWidth(0);
-  ErrComp->SetFillColor(kGray+1);
-  ErrComp->SetFillStyle(3001);
+  ErrComp->SetFillColor(kGray+3);
+  ErrComp->SetFillStyle(3013);
   ErrComp->Draw("E2same");
 
   ///////////////////////////////////////////////////
@@ -455,13 +447,12 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
       entries.push_back(legE);
       h->Draw("HISTE SAME");
     }
-    
 
   }
 
   // draw the axes again over the top of block colours
   canvas.RedrawAxis();  
-  
+
   // Draw line on plot if N-1
   // Note, depends on hists defined in nMinusOne.cpp
   double cutVal = 0.;
@@ -484,12 +475,6 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   // Draw text on plot   //
   /////////////////////////
   // First, CMS text in top left of plot
-  // Note, it's just repeated with different constructor values
-  // That's because using SetX1NDC doesn't work, even if you call Draw() again
-  // So I'm stuck doing this 
-  // Also I found that if you create the object NOT via pointer but via a normal object (i.e. TPaveText cms(...))
-  // it doesn't like doing it INSIDE the if(drawRatioPlot){...} bit
-  
   TPaveText *cms;
   if(drawRatioPlot){
     // Optimised for ratio plots
@@ -513,9 +498,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   s << lumi_;
   cms->AddText(("#sqrt{s} = 8 TeV, L = "+s.str()+" fb^{-1}").c_str());
   cms->AddText("VBF H(inv)");
-  // any other text user has specified
-  cms->AddText(label_.c_str());
-  // cms->Draw();
+  cms->AddText(label_.c_str());   // any other text user has specified
 
   // This works. DON'T use SetX1NDC EVEN THOUGH it says NDC above.
   // This is because ROOT is silly.
@@ -528,10 +511,11 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   //////////////////////////////////////////////
   // Draw legend, with entries in right order //
   //////////////////////////////////////////////
+  TLegend leg(legX1_, legY1_, legX2_, legY2_);
+  leg.SetFillColor(0);
 
   std::reverse(entries.begin(),entries.end());
-  for (unsigned int n = 0;n < entries.size(); n++)
-  {
+  for (unsigned int n = 0;n < entries.size(); n++) {
     leg.AddEntry(entries.at(n)->GetObject(), entries.at(n)->GetLabel(), entries.at(n)->GetOption());
   }
   if (drawRatioPlot || drawSignal) leg.SetBorderSize(0);
@@ -581,8 +565,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     hData->GetYaxis()->SetLabelOffset(0.011);
 
     // remove any points if no data ie data/mc = 0
-    for(int nbin = 1; nbin<= hData->GetNbinsX(); nbin++)
-    {
+    for(int nbin = 1; nbin<= hData->GetNbinsX(); nbin++) {
       if(hData->GetBinContent(nbin) == 0)
         hData->SetBinContent(nbin,1000);
     }
@@ -596,6 +579,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     hData->Draw("ep");
 
     // Do MC errors on ratio plot
+    // the bars it puts are of size = err_MC/MC,
+    // ie the relative error on MC. 
     int NBins = hMC->GetNbinsX();
     TGraphErrors * Erreff = new TGraphErrors(NBins);
     for(int iBin = 1; iBin <= NBins; ++iBin) {   
@@ -608,10 +593,10 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     }
     Erreff->SetMarkerStyle(0);
     Erreff->SetMarkerSize(0);
-    Erreff->SetLineColor(kGray+1);
+    Erreff->SetLineColor(kGray+3);
     Erreff->SetLineWidth(0);
-    Erreff->SetFillColor(kGray+1);
-    Erreff->SetFillStyle(3001);
+    Erreff->SetFillColor(kGray+3);
+    Erreff->SetFillStyle(3013);
     Erreff->Draw("2");
 
     hData->Draw("ep same");
@@ -625,6 +610,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
     // You use GetBinUpEdge if user sets it, or GetBinLowEdge if not.
     // AND
     // this all goes to hell if the user sets xMin_ or xMax_ to = bin edge value. Ack.
+    // Occasionally you get a lien which goess off the edge of the ratio box, sorry.
     
     double lineMin = hData->GetXaxis()->GetBinLowEdge(hData->GetXaxis()->FindBin(xMin));
     double lineMax = hData->GetXaxis()->GetBinLowEdge(hData->GetXaxis()->FindBin(xMax));
@@ -643,13 +629,13 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   xMax_ = 0.;
   yMin_ = 0.;
   yMax_ = 0.;
+  canvas.RedrawAxis();  
 
   /////////////////
   // Save as PDF //
   /////////////////
   std::string filename = pdfDir_+std::string("/")+hname+".pdf";
   std::cout << "Writing pdf file " << filename << std::endl;
-
   canvas.Print( filename.c_str() ,"pdf");
   // canvas.Print( (dir_+std::string("/")+hname+".png").c_str(),"png");
 

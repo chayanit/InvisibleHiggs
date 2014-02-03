@@ -58,7 +58,7 @@ To understand git's workflow (which is somewhat different to CVS!), read the fir
 
 * `interface` - header files for helper objects
 
-* `scripts` - contains scripts to run complete analysis and limits
+* `scripts` - contains scripts to run complete analysis, limits, and to remake plots
 
 * `src` - source code for helper objects
 
@@ -89,3 +89,14 @@ Although this varies from program to program, typically we do something like (se
 * `ProgramOptions` - takes care of command-line options like `-i`
 * `StackPlot` - used for making N-1 and control plots. Please see `nMinusOne.cpp` for a clear example of plotting. When creating a `StackPlot` object, you can set its name, axes labels, whether it should be lin or log, and if a ratio plot should be drawn beneath it. By default, the plots are log with no ratio plot. If using a log axis, the y axis will be scaled automatically, however it may require some fine tuning to avoid overlap with legend. Legend is generated automatically, and there is a method to set its position on the canvas
 * `SumDatasets` - used to sum together individual dataset files into one, eg all the `QCD_PtXtoY` into just `QCD` 
+
+## Quickly edit paper plots
+
+To aid in quickly making cosmetic changes to plots for the paper, the folder `scripts/plotting` has some scripts that quickly allow you to make changes to the plot cosmetics, without having to re-run the full Z and controlPlot programs. Instructions for use:
+
+- run the `zBackground` and `controlPlot` programs once to write the necessary histrograms to ROOT files. These will be needed. 
+- make any necessary changes to the cosmetics in `src/StackPlot.cc` and `include/Stackplot.h`.
+- run the script `makePlotsScripts.sh` in `scripts/plotting`. This converts the class defined in `StackPlot.cc` into a standalone class to be used in ROOT.
+- run `root -q -b plotScript.C` to remake the plots with your new cosmetic changes. Please check `plotScript.C` first though for input/output folders!
+
+Note that if you need to make more subtantial changes to the analysis selection, or to the histogram binning/range, etc, you *will* need to run the full Z and controlPlot programs I'm afraid. But if you just want to chagne the axes limits, move the legend around, etc, this will save masses of time!
