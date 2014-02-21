@@ -5,7 +5,11 @@ namespace constants {
   //// Backgrounds ////
 
   //  Z extrapolation
-  static const double ratioZToNuNuZToLL = 5.626;
+  static const double ratioZToNuNuZToLL = 5.616; 	//from MCFM 6425342.388/1144135.943 = 5.616
+  static const double sigma_Zvv_QCD = 5.616*(3503710/3);
+  static const double sigma_Zvv_EWK = 450.;
+  static const double sigma_Zuu_QCD = 3503710.0/3;
+  static const double sigma_Zuu_EWK = 304.;
 
   // background values and total uncertainty (temporary!)
   static const double nBG_WTau   = 0.;
@@ -23,12 +27,12 @@ namespace constants {
   static const double syst_Z_El_p     = 0.0;
   static const double syst_Z_Mu_m     = 0.049;
   static const double syst_Z_Mu_p     = -0.039;
-  static const double syst_Z_JES_m    = -0.044;
-  static const double syst_Z_JES_p    = 0.0014;
-  static const double syst_Z_JER_m    = -0.021;
-  static const double syst_Z_JER_p    = 0.015;
-  static const double syst_Z_UES_m    = -0.014;
-  static const double syst_Z_UES_p    = -0.003;
+  static const double syst_Z_JES_m    = -0.050;
+  static const double syst_Z_JES_p    = 0.0026;
+  static const double syst_Z_JER_m    = -0.027;
+  static const double syst_Z_JER_p    = 0.023;
+  static const double syst_Z_UES_m    = -0.015;
+  static const double syst_Z_UES_p    = -0.0023;
 
   // W->munu
   static const double syst_WMu        = 0.20;    // 20% extrapolation systematics

@@ -69,15 +69,16 @@ int main(int argc, char* argv[]) {
   TH1D* hZ_BG_C_DPhi   = new TH1D("hZ_BG_C_DPhi",   "", 3, dphiEdges);  // background MC ctrl region
   TH1D* hZ_Data_C_DPhi = new TH1D("hZ_Data_C_DPhi", "", 3, dphiEdges);  // Data ctrl region
 
-  TH1D* hZ_DY_EffMuMu_D = new TH1D("hZ_DY_EffMuMu_D", "", 1, 0., 1.);	// denominator of MuMu efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples
-  TH1D* hZ_DY_EffMuMu_N = new TH1D("hZ_DY_EffMuMu_N", "", 1, 0., 1.);	// numerator of MuMu efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples
+  TH1D* hZ_QCD_EffVBFS_D = new TH1D("hZ_QCD_EffVBFS_D", "", 1, 0., 1.);
+  TH1D* hZ_QCD_EffVBFS_N = new TH1D("hZ_QCD_EffVBFS_N", "", 1, 0., 1.);
+  TH1D* hZ_EWK_EffVBFS_D = new TH1D("hZ_EWK_EffVBFS_D", "", 1, 0., 1.);
+  TH1D* hZ_EWK_EffVBFS_N = new TH1D("hZ_EWK_EffVBFS_N", "", 1, 0., 1.);
  
-  TH1D* hZ_DY_EffVBFS_D = new TH1D("hZ_DY_EffVBFS_D", "", 1, 0., 1.);   // denominator of VBF(S) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples
-  TH1D* hZ_DY_EffVBFS_N = new TH1D("hZ_DY_EffVBFS_N", "", 1, 0., 1.);   // numerator of VBF(S) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
- 
-  TH1D* hZ_DY_EffVBFC_D = new TH1D("hZ_DY_EffVBFC_D", "", 1, 0., 1.);   // denominator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples
-  TH1D* hZ_DY_EffVBFC_N = new TH1D("hZ_DY_EffVBFC_N", "", 1, 0., 1.);   // numerator of VBF(C) efficiency from DY(pT<100) + DY(pT>100) + DY_EWK samples 
-
+  // combine eps_VBF_C * eps_mumu which remove canceling term (denominator is Z->uu gen level cut)
+  TH1D* hZ_QCD_EffVBFC_D = new TH1D("hZ_QCD_EffVBFC_D", "", 1, 0., 1.);
+  TH1D* hZ_QCD_EffVBFC_N = new TH1D("hZ_QCD_EffVBFC_N", "", 1, 0., 1.);
+  TH1D* hZ_EWK_EffVBFC_D = new TH1D("hZ_EWK_EffVBFC_D", "", 1, 0., 1.);
+  TH1D* hZ_EWK_EffVBFC_N = new TH1D("hZ_EWK_EffVBFC_N", "", 1, 0., 1.);
 
   // cutflow histograms
   TH1D* hZ_CutFlow_Data       = new TH1D("hZ_CutFlow_Data",       "", nCutsZMuMu, 0., nCutsZMuMu);
@@ -129,12 +130,12 @@ int main(int argc, char* argv[]) {
     TCut cutZMuMu_C           = otherWeight * trigCorr * (cutD + cuts.zMuMuVBF() + METNo2Muon130);
     
     TCut cutEfficiencyMuMu_D  = otherWeight * (cutD + cuts.zMuMuGen());
-    TCut cutEfficiencyMuMu_N  = otherWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
+    //TCut cutEfficiencyMuMu_N  = otherWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
  
     TCut cutEfficiencyVBFS_D  = otherWeight * (cutD + cuts.zMuMuGenMass());
     TCut cutEfficiencyVBFS_N  = otherWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGenMass() + cuts.vbf() + METNoMuon130 + cutLoDPhi);
     
-    TCut cutEfficiencyVBFC_D  = otherWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
+    //TCut cutEfficiencyVBFC_D  = otherWeight * (cutD + cuts.zMuMuGen() + cuts.zMuMuReco());
     TCut cutEfficiencyVBFC_N  = otherWeight * trigCorr * (cutD + cuts.HLTandMETFilters() + cuts.zMuMuGen() + cuts.zMuMuReco() + cuts.vbf() + METNo2Muon130 + cutLoDPhi);
 
     // re-weighting
@@ -143,8 +144,6 @@ int main(int argc, char* argv[]) {
 
     if(!(dataset.isData)) {
 	cutZMuMu_C *= muTightWeight;
-	cutEfficiencyMuMu_N *= muTightWeight;
-	cutEfficiencyVBFC_D *= muTightWeight;
 	cutEfficiencyVBFC_N *= muTightWeight;
 	cutDYNoVBFNoWeight  *= muTightWeight;
 	cutDYNoVBFWeight    *= muTightWeight;
@@ -153,8 +152,6 @@ int main(int argc, char* argv[]) {
     // fill tmp histograms for BG estimation
     TH1D* hZ_C_DPhi  = new TH1D("hZ_C_DPhi", "", 3, dphiEdges);  // this is for the actual BG estimation
     // fill tmp histograms for efficiency calculation
-    TH1D* hZ_EffMuMu_D  = new TH1D("hZ_EffMuMu_D", "", 1, 0., 1.);
-    TH1D* hZ_EffMuMu_N  = new TH1D("hZ_EffMuMu_N", "", 1, 0., 1.);
     TH1D* hZ_EffVBFS_D  = new TH1D("hZ_EffVBFS_D", "", 1, 0., 1.);
     TH1D* hZ_EffVBFS_N  = new TH1D("hZ_EffVBFS_N", "", 1, 0., 1.);
     TH1D* hZ_EffVBFC_D  = new TH1D("hZ_EffVBFC_D", "", 1, 0., 1.);
@@ -166,11 +163,9 @@ int main(int argc, char* argv[]) {
 
     if (isDY) {
       tree->Draw("vbfDPhi>>hZ_C_DPhi", cutZMuMu_C);
-      tree->Draw("0.5>>hZ_EffMuMu_D",  cutEfficiencyMuMu_D);		
-      tree->Draw("0.5>>hZ_EffMuMu_N",  cutEfficiencyMuMu_N);	
       tree->Draw("0.5>>hZ_EffVBFS_D",  cutEfficiencyVBFS_D);
       tree->Draw("0.5>>hZ_EffVBFS_N",  cutEfficiencyVBFS_N);
-      tree->Draw("0.5>>hZ_EffVBFC_D",  cutEfficiencyVBFC_D);
+      tree->Draw("0.5>>hZ_EffVBFC_D",  cutEfficiencyMuMu_D);
       tree->Draw("0.5>>hZ_EffVBFC_N",  cutEfficiencyVBFC_N);
 
       tree->Draw("0.5>>hZ_DY_NoWeight", cutDYNoVBFNoWeight);
@@ -191,8 +186,6 @@ int main(int argc, char* argv[]) {
     hZ_EffVBFS_N->Scale(weight);
     hZ_EffVBFC_D->Scale(weight);
     hZ_EffVBFC_N->Scale(weight);
-    hZ_EffMuMu_D->Scale(weight);
-    hZ_EffMuMu_N->Scale(weight);
 
     hZ_DY_NoWeight->Scale(weight);
     hZ_DY_Weight->Scale(weight);
@@ -200,31 +193,34 @@ int main(int argc, char* argv[]) {
     // add to output histograms
     if (dataset.isData) {
       hZ_Data_C_DPhi->Add(hZ_C_DPhi);
-      //hZ_Data_C_METDPhi->Add(hZ_C_METDPhi);
     }
     else if (isDY) {
       hZ_DY_C_DPhi->Add(hZ_C_DPhi);
-      hZ_DY_EffVBFS_D->Add(hZ_EffVBFS_D);
-      hZ_DY_EffVBFS_N->Add(hZ_EffVBFS_N);
-      hZ_DY_EffVBFC_D->Add(hZ_EffVBFC_D);
-      hZ_DY_EffVBFC_N->Add(hZ_EffVBFC_N);
-      hZ_DY_EffMuMu_D->Add(hZ_EffMuMu_D);
-      hZ_DY_EffMuMu_N->Add(hZ_EffMuMu_N);
 
       hZ_DY_NoVBFNoWeight->Add(hZ_DY_NoWeight);
       hZ_DY_NoVBFWeight->Add(hZ_DY_Weight);
+
+      if(dataset.name == "DYJetsToLL_NoTrig" || dataset.name == "DYJetsToLL_PtZ-100_NoTrig") {
+        hZ_QCD_EffVBFS_D->Add(hZ_EffVBFS_D);
+        hZ_QCD_EffVBFS_N->Add(hZ_EffVBFS_N);
+        hZ_QCD_EffVBFC_D->Add(hZ_EffVBFC_D);
+        hZ_QCD_EffVBFC_N->Add(hZ_EffVBFC_N);
+      }
+      if(dataset.name == "DYJetsToLL_EWK_NoTrig") {
+        hZ_EWK_EffVBFS_D->Add(hZ_EffVBFS_D);
+        hZ_EWK_EffVBFS_N->Add(hZ_EffVBFS_N);
+        hZ_EWK_EffVBFC_D->Add(hZ_EffVBFC_D);
+        hZ_EWK_EffVBFC_N->Add(hZ_EffVBFC_N);
+      }
     }
     else {
       hZ_BG_C_DPhi->Add(hZ_C_DPhi);
-      //hZ_BG_C_METDPhi->Add(hZ_C_METDPhi);
     }
 
     std::cout << "  N ctrl (dphi<1.0) : " << hZ_C_DPhi->GetBinContent(1) << " +/- " << hZ_C_DPhi->GetBinError(1) << std::endl;  
     
 
     delete hZ_C_DPhi;
-    delete hZ_EffMuMu_D;
-    delete hZ_EffMuMu_N;
     delete hZ_EffVBFS_D;
     delete hZ_EffVBFS_N;
     delete hZ_EffVBFC_D;
@@ -379,10 +375,13 @@ int main(int argc, char* argv[]) {
   double ratioBF = constants::ratioZToNuNuZToLL;
 
   // efficiencies (these will all have syst uncertainty only)
-  TH1D* hZ_DY_EffMuMu       = new TH1D("hZ_DY_EffMuMu",  "", 1, 0., 1.);     	// epsilon mumu
+  TH1D* hZ_QCD_EffVBFS      = new TH1D("hZ_QCD_EffVBFS",  "", 1, 0., 1.);
+  TH1D* hZ_QCD_EffVBFC      = new TH1D("hZ_QCD_EffVBFC",  "", 1, 0., 1.);
+  TH1D* hZ_EWK_EffVBFS      = new TH1D("hZ_EWK_EffVBFS",  "", 1, 0., 1.);
+  TH1D* hZ_EWK_EffVBFC      = new TH1D("hZ_EWK_EffVBFC",  "", 1, 0., 1.);
+ 
   TH1D* hZ_DY_EffVBFS       = new TH1D("hZ_DY_EffVBFS",  "", 1, 0., 1.);  	// epsilon_s_vbf
-  TH1D* hZ_DY_EffVBFC       = new TH1D("hZ_DY_EffVBFC",  "", 1, 0., 1.);       // epsilon_c_vbf
-  TH1D* hZ_DY_RatioVBF      = new TH1D("hZ_DY_RatioVBF", "", 1, 0., 1.);	// epsilon_s_vbf/epsilon_c_vbf
+  TH1D* hZ_DY_EffVBFC       = new TH1D("hZ_DY_EffVBFC",  "", 1, 0., 1.);        // epsilon_c_vbf
   TH1D* hZ_DY_TotalEff      = new TH1D("hZ_DY_TotalEff", "", 1, 0., 1.); 
 
   // for stat only calculation
@@ -397,23 +396,25 @@ int main(int argc, char* argv[]) {
   TH1D* hZ_Est_C_DPhi_Syst  = new TH1D("hZ_Est_C_DPhi_Syst",  "", 3, dphiEdges);
   TH1D* hZ_Est_S_DPhi_Syst  = new TH1D("hZ_Est_S_DPhi_Syst",  "", 3, dphiEdges);
 
-  // calculate efficiencies
-  hZ_DY_EffMuMu->Add(hZ_DY_EffMuMu_N);
-  hZ_DY_EffMuMu->Divide(hZ_DY_EffMuMu_D);
-  //double syst_EffMuMu = constants::syst_effMu*hZ_DY_EffMuMu->GetBinContent(1);      //2.5% Muon ID/Iso efficiency uncertainty from EWK-10-002
-  //hZ_DY_EffMuMu->SetBinError(1,TMath::Sqrt(hZ_DY_EffMuMu->GetBinError(1)*hZ_DY_EffMuMu->GetBinError(1) + syst_EffMuMu*syst_EffMuMu));
- 
-  hZ_DY_EffVBFS->Add(hZ_DY_EffVBFS_N);
-  hZ_DY_EffVBFS->Divide(hZ_DY_EffVBFS_D);
+  // calculate efficiencies for QCD and EWK processes
+  hZ_QCD_EffVBFS->Add(hZ_QCD_EffVBFS_N);
+  hZ_QCD_EffVBFS->Divide(hZ_QCD_EffVBFS_D);
+  hZ_EWK_EffVBFS->Add(hZ_EWK_EffVBFS_N);
+  hZ_EWK_EffVBFS->Divide(hZ_EWK_EffVBFS_D);
 
-  hZ_DY_EffVBFC->Add(hZ_DY_EffVBFC_N);
-  hZ_DY_EffVBFC->Divide(hZ_DY_EffVBFC_D);
+  hZ_QCD_EffVBFC->Add(hZ_QCD_EffVBFC_N);
+  hZ_QCD_EffVBFC->Divide(hZ_QCD_EffVBFC_D);
+  hZ_EWK_EffVBFC->Add(hZ_EWK_EffVBFC_N);
+  hZ_EWK_EffVBFC->Divide(hZ_EWK_EffVBFC_D); 
 
-  hZ_DY_RatioVBF->Add(hZ_DY_EffVBFS);
-  hZ_DY_RatioVBF->Divide(hZ_DY_EffVBFC);
+  // combine QCD Zll and EWK Zll with correct weights
+  hZ_DY_EffVBFS->Add(hZ_QCD_EffVBFS,constants::sigma_Zvv_QCD);
+  hZ_DY_EffVBFS->Add(hZ_EWK_EffVBFS,constants::sigma_Zvv_EWK);
+  hZ_DY_EffVBFC->Add(hZ_QCD_EffVBFC,constants::sigma_Zuu_QCD);
+  hZ_DY_EffVBFC->Add(hZ_EWK_EffVBFC,constants::sigma_Zuu_EWK);
 
-  hZ_DY_TotalEff->Add(hZ_DY_RatioVBF);
-  hZ_DY_TotalEff->Divide(hZ_DY_EffMuMu);
+  hZ_DY_TotalEff->Add(hZ_DY_EffVBFS);
+  hZ_DY_TotalEff->Divide(hZ_DY_EffVBFC);
 
   for(int ibin = 1; ibin <= hZ_Eff_S_DPhi->GetNbinsX(); ++ibin) {
     hZ_Eff_S_DPhi->SetBinContent(ibin,hZ_DY_TotalEff->GetBinContent(1));
@@ -426,7 +427,7 @@ int main(int argc, char* argv[]) {
   hZ_BG_C_DPhi_Syst->Add(hZ_BG_C_DPhi, 1.);  // copy MC BG histogram for syst calculation
   for (int i=1; i<=hZ_BG_C_DPhi->GetNbinsX(); ++i) hZ_BG_C_DPhi->SetBinError(i,0.);  // set MC BG errors to zero for stat only
   hZ_Est_C_DPhi->Add(hZ_Data_C_DPhi, hZ_BG_C_DPhi, 1., -1.);
-  hZ_Est_S_DPhi->Add(hZ_Est_C_DPhi,ratioBF);
+  hZ_Est_S_DPhi->Add(hZ_Est_C_DPhi);
   hZ_Est_S_DPhi->Multiply(hZ_Eff_S_DPhi);
 
   // do syst only version
@@ -434,7 +435,7 @@ int main(int argc, char* argv[]) {
   for (int i=1; i<=hZ_Data_C_DPhi_Syst->GetNbinsX(); ++i) hZ_Data_C_DPhi_Syst->SetBinError(i,0.);
 
   hZ_Est_C_DPhi_Syst->Add(hZ_Data_C_DPhi_Syst, hZ_BG_C_DPhi, 1., -1.);
-  hZ_Est_S_DPhi_Syst->Add(hZ_Est_C_DPhi_Syst,ratioBF);
+  hZ_Est_S_DPhi_Syst->Add(hZ_Est_C_DPhi_Syst);
   hZ_Est_S_DPhi_Syst->Multiply(hZ_Eff_S_DPhi_Syst);
 
 
@@ -442,10 +443,24 @@ int main(int argc, char* argv[]) {
   std::cout << "##################################### MET > 130 #####################################" << std::endl;
   std::cout << "dphi<1.0" << std::endl;
   std::cout << std::endl;
-  std::cout << "  eps_mumu  : " << hZ_DY_EffMuMu->GetBinContent(1) << " +/- " << hZ_DY_EffMuMu->GetBinError(1) << std::endl;
+  std::cout << "  Numerator_s_vbf : " << hZ_QCD_EffVBFS_N->GetBinContent(1) << " +/- " << hZ_QCD_EffVBFS_N->GetBinError(1) << std::endl;
+  std::cout << "  Deno_s_vbf      : " << hZ_QCD_EffVBFS_D->GetBinContent(1) << " +/- " << hZ_QCD_EffVBFS_D->GetBinError(1) << std::endl;
+  std::cout << "  eps_s_vbf (QCD) : " << hZ_QCD_EffVBFS->GetBinContent(1) << " +/- " << hZ_QCD_EffVBFS->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Numerator_s_vbf : " << hZ_EWK_EffVBFS_N->GetBinContent(1) << " +/- " << hZ_EWK_EffVBFS_N->GetBinError(1) << std::endl;
+  std::cout << "  Deno_s_vbf      : " << hZ_EWK_EffVBFS_D->GetBinContent(1) << " +/- " << hZ_EWK_EffVBFS_D->GetBinError(1) << std::endl;
+  std::cout << "  eps_s_vbf (EWK) : " << hZ_EWK_EffVBFS->GetBinContent(1) << " +/- " << hZ_EWK_EffVBFS->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Numerator_c_vbf : " << hZ_QCD_EffVBFC_N->GetBinContent(1) << " +/- " << hZ_QCD_EffVBFC_N->GetBinError(1) << std::endl;
+  std::cout << "  Deno_c_vbf      : " << hZ_QCD_EffVBFC_D->GetBinContent(1) << " +/- " << hZ_QCD_EffVBFC_D->GetBinError(1) << std::endl;
+  std::cout << "  eps_c_vbf (QCD) : " << hZ_QCD_EffVBFC->GetBinContent(1) << " +/- " << hZ_QCD_EffVBFC->GetBinError(1) << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Numerator_c_vbf : " << hZ_EWK_EffVBFC_N->GetBinContent(1) << " +/- " << hZ_EWK_EffVBFC_N->GetBinError(1) << std::endl;
+  std::cout << "  Deno_c_vbf      : " << hZ_EWK_EffVBFC_D->GetBinContent(1) << " +/- " << hZ_EWK_EffVBFC_D->GetBinError(1) << std::endl;
+  std::cout << "  eps_c_vbf (EWK) : " << hZ_EWK_EffVBFC->GetBinContent(1) << " +/- " << hZ_EWK_EffVBFC->GetBinError(1) << std::endl;
+  std::cout << std::endl;
   std::cout << "  eps_s_vbf : " << hZ_DY_EffVBFS->GetBinContent(1) << " +/- " << hZ_DY_EffVBFS->GetBinError(1) << std::endl;
   std::cout << "  eps_c_vbf : " << hZ_DY_EffVBFC->GetBinContent(1) << " +/- " << hZ_DY_EffVBFC->GetBinError(1) << std::endl;
-  std::cout << "  ratio_vbf : " << hZ_DY_RatioVBF->GetBinContent(1) << " +/- " << hZ_DY_RatioVBF->GetBinError(1) << std::endl;
   std::cout << "  total eff : " << hZ_DY_TotalEff->GetBinContent(1) << " +/- " << hZ_DY_TotalEff->GetBinError(1) << std::endl;
   std::cout << std::endl;
   std::cout << "  DY+jets MC ctrl region : " << hZ_DY_C_DPhi->GetBinContent(1) << " +/- " << hZ_DY_C_DPhi->GetBinError(1) << std::endl;
@@ -455,9 +470,9 @@ int main(int argc, char* argv[]) {
   std::cout << "  Z in ctrl region       : " << hZ_Est_C_DPhi->GetBinContent(1) << " +/- " << hZ_Est_C_DPhi->GetBinError(1) << " (stat.) + " << hZ_Est_C_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   std::cout << "  Z in sgnl region       : " << hZ_Est_S_DPhi->GetBinContent(1) << " +/- " << hZ_Est_S_DPhi->GetBinError(1) << " (stat.) + " << hZ_Est_S_DPhi_Syst->GetBinError(1) << " (syst)" << std::endl;
   std::cout << std::endl;
-  std::cout << "  N_DY^No VBF (no y* or mjj weight)  : " << hZ_DY_NoVBFNoWeight->GetBinContent(1) << " +/- " << hZ_DY_NoVBFNoWeight->GetBinError(1) << std::endl; 
-  std::cout << "  N_DY^No VBF(with y* and mjj weight): " << hZ_DY_NoVBFWeight->GetBinContent(1) << " +/- " << hZ_DY_NoVBFWeight->GetBinError(1) << std::endl;
-  std::cout << "  norm eff (unweighted DY, no VBF / weighted DY, no VBF): " << dyNorm << std::endl;
+  //std::cout << "  N_DY^No VBF (no y* or mjj weight)  : " << hZ_DY_NoVBFNoWeight->GetBinContent(1) << " +/- " << hZ_DY_NoVBFNoWeight->GetBinError(1) << std::endl; 
+  //std::cout << "  N_DY^No VBF(with y* and mjj weight): " << hZ_DY_NoVBFWeight->GetBinContent(1) << " +/- " << hZ_DY_NoVBFWeight->GetBinError(1) << std::endl;
+  //std::cout << "  norm eff (unweighted DY, no VBF / weighted DY, no VBF): " << dyNorm << std::endl;
   std::cout << std::endl;
   std::cout << "#####################################################################################" << std::endl;
   std::cout << std::endl << std::endl;
@@ -519,9 +534,9 @@ int main(int argc, char* argv[]) {
   TFile* qcdDYFile = TFile::Open(dyJetsName.c_str(), "UPDATE");
   for (std::vector<std::string>::const_iterator hname=hists.begin(); hname!=hists.end(); ++hname) {
     TH1D* h = (TH1D*) qcdDYFile->Get(hname->c_str());
-    std::cout << "Integral before : " << h->Integral() << std::endl;
+    //std::cout << "Integral before : " << h->Integral() << std::endl;
     h->Scale(dyNorm);
-    std::cout << "Integral after : " << h->Integral() << std::endl;
+    //std::cout << "Integral after : " << h->Integral() << std::endl;
     h->Write("",TObject::kOverwrite);
   }
   qcdDYFile->Close();
@@ -629,16 +644,16 @@ int main(int argc, char* argv[]) {
 
   hZ_Eff_S_DPhi->Write("",TObject::kOverwrite);
   hZ_Eff_S_DPhi_Syst->Write("",TObject::kOverwrite);
-  hZ_DY_EffMuMu_D->Write("",TObject::kOverwrite);
-  hZ_DY_EffMuMu_N->Write("",TObject::kOverwrite);
-  hZ_DY_EffVBFS_D->Write("",TObject::kOverwrite);
-  hZ_DY_EffVBFS_N->Write("",TObject::kOverwrite);
-  hZ_DY_EffVBFC_D->Write("",TObject::kOverwrite);
-  hZ_DY_EffVBFC_N->Write("",TObject::kOverwrite);
-  hZ_DY_EffMuMu->Write("",TObject::kOverwrite);
+  hZ_QCD_EffVBFS_D->Write("",TObject::kOverwrite);
+  hZ_QCD_EffVBFS_N->Write("",TObject::kOverwrite);
+  hZ_QCD_EffVBFC_D->Write("",TObject::kOverwrite);
+  hZ_QCD_EffVBFC_N->Write("",TObject::kOverwrite);
+  hZ_EWK_EffVBFS_D->Write("",TObject::kOverwrite);
+  hZ_EWK_EffVBFS_N->Write("",TObject::kOverwrite);
+  hZ_EWK_EffVBFC_D->Write("",TObject::kOverwrite);
+  hZ_EWK_EffVBFC_N->Write("",TObject::kOverwrite);
   hZ_DY_EffVBFS->Write("",TObject::kOverwrite);
   hZ_DY_EffVBFC->Write("",TObject::kOverwrite);
-  hZ_DY_RatioVBF->Write("",TObject::kOverwrite);
   hZ_DY_TotalEff->Write("",TObject::kOverwrite);
 
   hZ_CutFlow_Data->Write("",TObject::kOverwrite);
