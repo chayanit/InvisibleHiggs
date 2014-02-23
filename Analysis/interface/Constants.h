@@ -189,8 +189,8 @@ namespace constants {
   static const double xsggH[6] = { 24.70, 19.27, 13.55, 7.081, 3.594, 2.921 };  // pb
 
   // systematics
-  static const double syst_Sig_ggH_QCD[6]    = { 0., 0.782, 0., 0., 0., 0. };
-  static const double syst_Sig_ggH_PDF[6]    = { 0., 0.113, 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_QCD[6]    = { 0.807, 0.807, 0.807, 0.807, 0.807, 0.807 };
+  static const double syst_Sig_ggH_PDF[6]    = { 0.113, 0.113, 0.113, 0.113, 0.113, 0.113 };
   static const double syst_Sig_ggH_El_m[6]   = { 0., 0., 0., 0., 0., 0. };  //no effect on signal
   static const double syst_Sig_ggH_El_p[6]   = { 0., 0., 0., 0., 0., 0. };
   static const double syst_Sig_ggH_Mu_m[6]   = { 0., 0., 0., 0., 0., 0. };
