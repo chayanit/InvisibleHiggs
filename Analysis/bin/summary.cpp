@@ -446,11 +446,14 @@ int main(int argc, char* argv[]) {
 //   txtFile.close();
 
 
-  // linearise signal efficiency and recompute yields...
+  // get signal efficiency
+   std::cout << "Getting signal efficiency" << std::endl;
   std::vector<double> effSig(constants::nM);
   std::vector<double> errEffSig(constants::nM);
   std::vector<double> nSig(constants::nM);
   std::vector<double> errNSig(constants::nM);
+  std::vector<double> nSigggH(constants::nM);
+  std::vector<double> errNSigggH(constants::nM);
 
   for (int i=0; i<constants::nM; ++i) {
 
@@ -469,6 +472,11 @@ int main(int argc, char* argv[]) {
     errNSig.at(i)   = sigCutFlow->GetBinError(nCuts);
     effSig.at(i)    = sigCutFlow->GetBinContent(nCuts)/(constants::xsH[i]*lumi);
     errEffSig.at(i) = sigCutFlow->GetBinError(nCuts)/(constants::xsH[i]*lumi);
+
+    hstring = std::string("hCutFlow_GluGluM")+ss.str();
+    TH1D* sigggHCutFlow = (TH1D*) sigFile->Get(hstring.c_str());
+    nSigggH.at(i)   = sigggHCutFlow->GetBinContent(nCuts);
+    errNSigggH.at(i)= sigggHCutFlow->GetBinError(nCuts);
 
     std::cout << "mH : " << constants::mH[i] << "  eff : " << effSig.at(i) << "+/-" << errEffSig.at(i) << "  yield=" << nSig.at(i) << "+/-" << errNSig.at(i) <<std::endl;
     sigFile->Close();
@@ -591,6 +599,7 @@ int main(int argc, char* argv[]) {
 
   for (int i=0; i<constants::nM; ++i) {
 
+    double fSig      = 1 + errNSig.at(i)/nSig.at(i);
     double fSigPDF   = 1 + constants::syst_Sig_PDF[i];
     double fSigQCD   = 1 + constants::syst_Sig_QCD[i];
     double fSigElp   = 1 + constants::syst_Sig_El_p[i];
@@ -604,6 +613,20 @@ int main(int argc, char* argv[]) {
     double fSigUESp  = 1 + constants::syst_Sig_UES_p[i];
     double fSigUESm  = 1 + constants::syst_Sig_UES_m[i];
 
+    double fSigggH      = 1 + errNSigggH.at(i)/nSigggH.at(i);
+    double fSigggHPDF   = 1 + constants::syst_Sig_ggH_PDF[i];
+    double fSigggHQCD   = 1 + constants::syst_Sig_ggH_QCD[i];
+    double fSigggHElp   = 1 + constants::syst_Sig_ggH_El_p[i];
+    double fSigggHElm   = 1 + constants::syst_Sig_ggH_El_m[i];
+    double fSigggHMup   = 1 + constants::syst_Sig_ggH_Mu_p[i];
+    double fSigggHMum   = 1 + constants::syst_Sig_ggH_Mu_m[i];
+    double fSigggHJESp  = 1 + constants::syst_Sig_ggH_JES_p[i];
+    double fSigggHJESm  = 1 + constants::syst_Sig_ggH_JES_m[i];
+    double fSigggHJERp  = 1 + constants::syst_Sig_ggH_JER_p[i];
+    double fSigggHJERm  = 1 + constants::syst_Sig_ggH_JER_m[i];
+    double fSigggHUESp  = 1 + constants::syst_Sig_ggH_UES_p[i];
+    double fSigggHUESm  = 1 + constants::syst_Sig_ggH_UES_m[i];
+
     std::stringstream ss;
     ss << (int) constants::mH[i];
 
@@ -611,33 +634,38 @@ int main(int argc, char* argv[]) {
     txtFile.open(filename);
     txtFile << "# Invisible Higgs analysis for mH=" << constants::mH[i] << " GeV" << std::endl;
     txtFile << "imax 1" << std::endl;
-    txtFile << "jmax 6  number of backgrounds" << std::endl;
-    txtFile << "kmax 15  number of nuisance parameters (sources of systematical uncertainties)" << std::endl;
+    txtFile << "jmax 7  number of backgrounds" << std::endl;
+    txtFile << "kmax 19  number of nuisance parameters (sources of systematical uncertainties)" << std::endl;
     txtFile << "------------" << std::endl;
     txtFile << "# we have just one channel, in which we observe 0 events" << std::endl;
     txtFile << "bin 1" << std::endl;
     txtFile << "observation " << nObs << std::endl;
     txtFile << "------------" << std::endl;
-    txtFile << "bin               1  \t 1   \t 1   \t 1  \t 1    \t 1   \t 1     " << std::endl;
-    txtFile << "process          qqH \t zvv \t wmu \t wel \t wtau \t qcd \t others" << std::endl;
-    txtFile << "process           0  \t 1   \t 2   \t 3  \t 4    \t 5   \t 6     " << std::endl;
-    txtFile << "rate            " << nSig.at(i) << "\t" << nBG_Z << "\t" << nBG_WMu << "\t" << nBG_WEl << "\t" << nBG_WTau << "\t" << nBG_QCD << "\t" << nBG_Other << std::endl;
+    txtFile << "bin              1 \t 1  \t 1   \t 1   \t 1  \t 1    \t 1   \t 1     " << std::endl;
+    txtFile << "process          ggH\t qqH \t zvv \t wmu \t wel \t wtau \t qcd \t others" << std::endl;
+    txtFile << "process          -1 \t 0  \t 1   \t 2   \t 3  \t 4    \t 5   \t 6     " << std::endl;
+    txtFile << "rate            " << nSigggH.at(i) << "\t" << nSig.at(i) << "\t" << nBG_Z << "\t" << nBG_WMu << "\t" << nBG_WEl << "\t" << nBG_WTau << "\t" << nBG_QCD << "\t" << nBG_Other << std::endl;
     txtFile << "------------" << std::endl;
-    txtFile << "lumi_8TeV     lnN   " << fLum << "\t - \t - \t - \t - \t - \t" << fLum << std::endl;
-    txtFile << "CMS_eff_e     lnN   " << fSigElm << "/" << fSigElp << "\t" << fZElm << "/" << fZElp << "\t" << fWMuElm << "/" << fWMuElp << "\t" << fWElElm << "/" << fWElElp << "\t" << fWTauElm << "/" << fWTauElp << "\t" << fQCDElm << "/" << fQCDElp << "\t" << fOtherElm << "/" << fOtherElp << std::endl;
-    txtFile << "CMS_eff_m     lnN   " << fSigMum << "/" << fSigMup << "\t" << fZMum << "/" << fZMup << "\t" << fWMuMum << "/" << fWMuMup << "\t" << fWElMum << "/" << fWElMup << "\t" << fWTauMum << "/" << fWTauMup << "\t" << fQCDMum << "/" << fQCDMup << "\t" << fOtherMum << "/" << fOtherMup << std::endl;
-    txtFile << "CMS_scale_j   lnN   " << fSigJESm << "/" << fSigJESp << "\t" << fZJESm << "/" << fZJESp << "\t" << fWMuJESm << "/" << fWMuJESp << "\t" << fWElJESm << "/" << fWElJESp << "\t" << fWTauJESm << "/" << fWTauJESp << "\t" << fQCDJESm << "/" << fQCDJESp << "\t" << fOtherJESm << "/" << fOtherJESp << std::endl;
-    txtFile << "CMS_res_j     lnN   " << fSigJERm << "/" << fSigJERp << "\t" << fZJERm << "/" << fZJERp << "\t" << fWMuJERm << "/" << fWMuJERp << "\t" << fWElJERm << "/" << fWElJERp << "\t" << fWTauJERm << "/" << fWTauJERp << "\t" << fQCDJERm << "/" << fQCDJERp << "\t" << fOtherJERm << "/" << fOtherJERp << std::endl;
-    txtFile << "CMS_scale_met lnN   " << fSigUESm << "/" << fSigUESp << "\t" << fZUESm << "/" << fZUESp << "\t" << fWMuUESm << "/" << fWMuUESp << "\t" << fWElUESm << "/" << fWElUESp << "\t" << fWTauUESm << "/" << fWTauUESp << "\t" << fQCDUESm << "/" << fQCDUESp << "\t" << fOtherUESm << "/" << fOtherUESp << std::endl;
-    txtFile << "pdf_qqbar     lnN   " << fSigPDF  << "\t - \t - \t - \t - \t - \t - \t" << std::endl;
-    txtFile << "QCD_qqH       lnN   " << fSigQCD  << "\t - \t - \t - \t - \t - \t - \t" << std::endl;
-    txtFile << "CMS_VBFHinv_zvv_stat      gmN " << nCtrlZ << "  -\t" << aZ << "\t - \t - \t - \t - \t - " << std::endl;
-    txtFile << "CMS_VBFHinv_zvv_norm      lnN     - \t" << fZ << "\t - \t - \t - \t - \t - " << std::endl;
-    txtFile << "CMS_VBFHinv_wmu_norm      lnN     - \t - \t" << fWMu << "\t - \t - \t - \t - " << std::endl;
-    txtFile << "CMS_VBFHinv_wel_norm      lnN     - \t - \t - \t" << fWEl << "\t - \t - \t - " << std::endl;
-    txtFile << "CMS_VBFHinv_wtau_norm     lnN     - \t - \t - \t - \t" << fWTau << "\t - \t - " << std::endl;
-    txtFile << "CMS_VBFHinv_qcd_norm      lnN     - \t - \t - \t - \t - \t" << fQCD << "\t - " << std::endl;
-    txtFile << "CMS_VBFHinv_other_norm    lnN     - \t - \t - \t - \t - \t - \t" << fOther << std::endl;
+    txtFile << "lumi_8TeV     lnN   " << fLum << "\t" << fLum << "\t - \t - \t - \t - \t - \t" << fLum << std::endl;
+    txtFile << "CMS_eff_e     lnN   " << fSigggHElm << "/" << fSigggHElp << "\t" << fSigElm << "/" << fSigElp << "\t" << fZElm << "/" << fZElp << "\t" << fWMuElm << "/" << fWMuElp << "\t" << fWElElm << "/" << fWElElp << "\t" << fWTauElm << "/" << fWTauElp << "\t" << fQCDElm << "/" << fQCDElp << "\t" << fOtherElm << "/" << fOtherElp << std::endl;
+    txtFile << "CMS_eff_m     lnN   " << fSigggHMum << "/" << fSigggHMup << "\t" << fSigMum << "/" << fSigMup << "\t" << fZMum << "/" << fZMup << "\t" << fWMuMum << "/" << fWMuMup << "\t" << fWElMum << "/" << fWElMup << "\t" << fWTauMum << "/" << fWTauMup << "\t" << fQCDMum << "/" << fQCDMup << "\t" << fOtherMum << "/" << fOtherMup << std::endl;
+    txtFile << "CMS_scale_j   lnN   " << fSigggHJESm << "/" << fSigggHJESp << "\t" << fSigJESm << "/" << fSigJESp << "\t" << fZJESm << "/" << fZJESp << "\t" << fWMuJESm << "/" << fWMuJESp << "\t" << fWElJESm << "/" << fWElJESp << "\t" << fWTauJESm << "/" << fWTauJESp << "\t" << fQCDJESm << "/" << fQCDJESp << "\t" << fOtherJESm << "/" << fOtherJESp << std::endl;
+    txtFile << "CMS_res_j     lnN   " << fSigggHJERm << "/" << fSigggHJERp << "\t" << fSigJERm << "/" << fSigJERp << "\t" << fZJERm << "/" << fZJERp << "\t" << fWMuJERm << "/" << fWMuJERp << "\t" << fWElJERm << "/" << fWElJERp << "\t" << fWTauJERm << "/" << fWTauJERp << "\t" << fQCDJERm << "/" << fQCDJERp << "\t" << fOtherJERm << "/" << fOtherJERp << std::endl;
+    txtFile << "CMS_scale_met lnN   " << fSigggHUESm << "/" << fSigggHUESp << "\t" << fSigUESm << "/" << fSigUESp << "\t" << fZUESm << "/" << fZUESp << "\t" << fWMuUESm << "/" << fWMuUESp << "\t" << fWElUESm << "/" << fWElUESp << "\t" << fWTauUESm << "/" << fWTauUESp << "\t" << fQCDUESm << "/" << fQCDUESp << "\t" << fOtherUESm << "/" << fOtherUESp << std::endl;
+    txtFile << "pdf_qqbar                 lnN    - \t" << fSigPDF  << "\t - \t - \t - \t - \t - \t - \t" << std::endl;
+    txtFile << "QCDscale_qqH              lnN    - \t" << fSigQCD  << "\t - \t - \t - \t - \t - \t - \t" << std::endl;
+    txtFile << "pdf_gg                    lnN   " << fSigggHPDF  << "\t - \t - \t - \t - \t - \t - \t - \t" << std::endl;
+    txtFile << "QCDscale_ggH              lnN   " << fSigggHQCD  << "\t - \t - \t - \t - \t - \t - \t - \t" << std::endl;
+    //    txtFile << "UEPS                      lnN   " << fSigggHUEPS  << "\t - \t - \t - \t - \t - \t - \t" << std::endl;
+    txtFile << "CMS_VBFHinv_zvv_stat      gmN " << nCtrlZ << " -\t -\t" << aZ << "\t - \t - \t - \t - \t - " << std::endl;
+    txtFile << "CMS_VBFHinv_zvv_norm      lnN     - \t - \t" << fZ << "\t - \t - \t - \t - \t - " << std::endl;
+    txtFile << "CMS_VBFHinv_wmu_norm      lnN     - \t - \t - \t" << fWMu << "\t - \t - \t - \t - " << std::endl;
+    txtFile << "CMS_VBFHinv_wel_norm      lnN     - \t - \t - \t - \t" << fWEl << "\t - \t - \t - " << std::endl;
+    txtFile << "CMS_VBFHinv_wtau_norm     lnN     - \t - \t - \t - \t - \t" << fWTau << "\t - \t - " << std::endl;
+    txtFile << "CMS_VBFHinv_qcd_norm      lnN     - \t - \t - \t - \t - \t - \t" << fQCD << "\t - " << std::endl;
+    txtFile << "CMS_VBFHinv_other_norm    lnN     - \t - \t - \t - \t - \t - \t - \t" << fOther << std::endl;
+    txtFile << "CMS_VBFHinv_ggH_norm      lnN    " << fSigggH << " \t - \t - \t - \t - \t - \t - \t - \t"  << std::endl;
+    txtFile << "CMS_VBFHinv_qqH_norm      lnN     - \t " << fSig << "\t - \t - \t - \t - \t - \t - \t"  << std::endl;
     txtFile.close();
 
   }

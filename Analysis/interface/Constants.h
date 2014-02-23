@@ -165,7 +165,7 @@ namespace constants {
   static const int nM = 6;
   static const double mH[6]  = { 110.,  125.,  150.,  200.,   300.,   400.   };  // GeV
 
-  // cross-sections
+  // cross-sections from YR2
   static const double xsH[6] = { 1.809, 1.578, 1.280, 0.8685, 0.4408, 0.2543 };  // pb
 
   // systematics
@@ -181,6 +181,26 @@ namespace constants {
   static const double syst_Sig_JER_p[6]  = { 0.034,  0.024,  0.019,  0.020,  0.004,  0.024 };
   static const double syst_Sig_UES_m[6]  = { -0.006,  -0.007,  -0.005,  -0.007,  -0.009,  0.0009 };
   static const double syst_Sig_UES_p[6]  = { 0.004,  0.004,  0.002,  0.0006,  0.004,  0.004 };
+
+
+  //// ggH signal properties ////
+
+  // cross-sections from YR2
+  static const double xsggH[6] = { 24.70, 19.27, 13.55, 7.081, 3.594, 2.921 };  // pb
+
+  // systematics
+  static const double syst_Sig_ggH_QCD[6]    = { 0., 0.782, 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_PDF[6]    = { 0., 0.113, 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_El_m[6]   = { 0., 0., 0., 0., 0., 0. };  //no effect on signal
+  static const double syst_Sig_ggH_El_p[6]   = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_Mu_m[6]   = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_Mu_p[6]   = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_JES_m[6]  = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_JES_p[6]  = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_JER_m[6]  = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_JER_p[6]  = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_UES_m[6]  = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_UES_p[6]  = { 0., 0., 0., 0., 0., 0. };
 
 }
 
