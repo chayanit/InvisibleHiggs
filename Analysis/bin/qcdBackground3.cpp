@@ -58,10 +58,10 @@ int main(int argc, char* argv[]) {
     cuts.cut("sgnEtaJJ")+
     cuts.cut("dEtaJJ")+
     cuts.cut("Mjj");
-  TCut cutSpesh = cuts.zMuMuGen() +
+  TCut cutSpesh = //cuts.zMuMuGenMass() +
     cuts.cut("trigger")+
     cuts.cut("metFilter")+
-    cuts.cut("EVeto")+
+    //cuts.cut("EVeto")+
     cuts.cut("dijet")+
     cuts.cut("sgnEtaJJ")+
     cuts.cut("dEtaJJ")+
@@ -127,6 +127,7 @@ int main(int argc, char* argv[]) {
 
     TH2D* hTmp_METCJV        = new TH2D("hTmp_METCJV", "", 2, metEdges, 2, cjvEdges);
     TH2D* hTmp_HiDPhi_METCJV = new TH2D("hTmp_HiDPhi_METCJV", "", 2, metEdges, 2, cjvEdges);
+    TH1D* hTmp_ZGen	     = new TH1D("hTmp_ZGen", "", 1, 0, 1);
 
     TH1D* hTmpHi_CJVP_MET  = new TH1D("hTmpHi_CJVP_MET",  "", metBins, 0., metMax);
     TH1D* hTmpHi_CJVF_MET  = new TH1D("hTmpHi_CJVF_MET",  "", metBins, 0., metMax);    
@@ -139,7 +140,7 @@ int main(int argc, char* argv[]) {
     TH1D* hTmpLo_METF_CJEt = new TH1D("hTmpLo_METF_CJEt", "", 17, 30., 200.);
    
     double weight = (dataset.isData ? 1. : lumi * dataset.sigma / dataset.nEvents);
-    if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
+    //if(dataset.name == "EWK_ZvvFake") weight *=  (constants::sigma_Zvv_EWK/constants::sigma_Zuu_EWK);
 
     if (dataset.isData) {
       std::cout << "Analysing Data         : " << dataset.name << std::endl;
@@ -205,19 +206,40 @@ int main(int argc, char* argv[]) {
     }
     else {
       std::cout << "Analysing BG MC        : " << dataset.name << std::endl;
-      
-      TCut cutLo = puWeight * trigWeight * elVetoWeight * muVetoWeight * (cutD + cutBase + cutLoDPhi);
-      TCut cutHi = puWeight * trigWeight * elVetoWeight * muVetoWeight * (cutD + cutBase + cutHiDPhi);
-      if (dataset.name=="WJets" ||
-	  dataset.name=="W1Jets" ||
-	  dataset.name=="W2Jets" ||
-	  dataset.name=="W3Jets" ||
-	  dataset.name=="W4Jets") {
-	cutLo *= cuts.wWeight();
-	cutHi *= cuts.wWeight();
-      }  
-      tree->Draw("cenJetEt:met>>hTmp_METCJV",        cutLo);
-      tree->Draw("cenJetEt:met>>hTmp_HiDPhi_METCJV", cutHi);
+
+      TCut cutGen("");      
+      TCut cutLo(""); 
+      TCut cutHi("");
+
+      if (dataset.name == "EWK_ZvvFake") {
+	cutGen = puWeight * cutD; 
+	cutLo  = puWeight * trigWeight * (cutD + cutSpesh + cutLoDPhi);
+	cutHi  = puWeight * trigWeight * (cutD + cutSpesh + cutHiDPhi);
+
+        tree->Draw("cenJetEt:metNoMuon>>hTmp_METCJV",        cutLo);
+        tree->Draw("cenJetEt:metNoMuon>>hTmp_HiDPhi_METCJV", cutHi);
+ 	tree->Draw("0.5>>hTmp_ZGen", cutGen);
+
+	hTmp_ZGen->Scale(weight);
+      }
+      else {
+	cutLo = puWeight * trigWeight * elVetoWeight * muVetoWeight * (cutD + cutBase + cutLoDPhi);
+	cutHi = puWeight * trigWeight * elVetoWeight * muVetoWeight * (cutD + cutBase + cutHiDPhi); 
+
+      	if (dataset.name=="WJets" ||
+	    dataset.name=="W1Jets" ||
+	    dataset.name=="W2Jets" ||
+	    dataset.name=="W3Jets" ||
+	    dataset.name=="W4Jets") {
+		cutLo *= cuts.wWeight();
+		cutHi *= cuts.wWeight();
+      	}  
+
+	tree->Draw("cenJetEt:met>>hTmp_METCJV",        cutLo);
+        tree->Draw("cenJetEt:met>>hTmp_HiDPhi_METCJV", cutHi);
+      }
+
+      if (dataset.name == "EWK_ZvvFake") weight *= ((lumi/1000.) * constants::sigma_Zvv_EWK)/hTmp_ZGen->GetBinContent(1); 
 
       hTmp_METCJV->Scale(weight);
       hTmp_HiDPhi_METCJV->Scale(weight);
@@ -226,8 +248,16 @@ int main(int argc, char* argv[]) {
       hBG_HiDPhi_METCJV->Add(hTmp_HiDPhi_METCJV, 1.);
 
       // control plots
-      TCut ctrlHiMETP = cutHi + TCut("met>130");
-      TCut ctrlHiMETF = cutHi + TCut("met>50&&met<130");
+      TCut ctrlHiMETP(""); 
+      TCut ctrlHiMETF(""); 
+      if (dataset.name == "EWK_ZvvFake") { 
+	ctrlHiMETP = cutHi + TCut("metNoMuon>130");
+	ctrlHiMETF = cutHi + TCut("metNoMuon>50&&metNoMuon<130");
+      }
+      else {
+	ctrlHiMETP = cutHi + TCut("met>130");
+	ctrlHiMETF = cutHi + TCut("met>50&&met<130");
+      }
       TCut ctrlHiCJVP = cutHi + TCut("cenJetEt<30.");
       TCut ctrlHiCJVF = cutHi + TCut("cenJetEt>30.");
 
@@ -246,8 +276,16 @@ int main(int argc, char* argv[]) {
       hBGHi_METP_CJEt->Add(hTmpHi_METP_CJEt, 1.);
       hBGHi_METF_CJEt->Add(hTmpHi_METF_CJEt, 1.);
 
-      TCut ctrlLoMETP = cutLo + TCut("met>130");
-      TCut ctrlLoMETF = cutLo + TCut("met<130");
+      TCut ctrlLoMETP("");
+      TCut ctrlLoMETF(""); 
+      if (dataset.name == "EWK_ZvvFake") {
+        ctrlHiMETP = cutLo + TCut("metNoMuon>130");
+        ctrlHiMETF = cutLo + TCut("metNoMuon>50&&metNoMuon<130");
+      }
+      else {
+        ctrlHiMETP = cutLo + TCut("met>130");
+        ctrlHiMETF = cutLo + TCut("met>50&&met<130");
+      }
       TCut ctrlLoCJVP = cutLo + TCut("cenJetEt<30.");
       TCut ctrlLoCJVF = cutLo + TCut("cenJetEt>30.");
 

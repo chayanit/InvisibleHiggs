@@ -4,6 +4,12 @@ SignalM150_POWHEG		99874		1.280			0
 SignalM200_POWHEG		49922		0.8685			0
 SignalM300_POWHEG		49945		0.4408			0
 SignalM400_POWHEG		49964		0.2543			0
+GluGluM110                      199981          24.70                   0
+GluGluM125                      199981          19.27                   0
+GluGluM150                      199976          13.55                   0
+GluGluM200                      199984          7.081                   0
+GluGluM300                      199988          3.594                   0
+GluGluM400                      199984          2.921                   0
 Zvv_50to100			4040980		381.2			0
 Zvv_100to200			4416646		160.3 			0
 Zvv_200to400			5055885		41.49			0

@@ -64,10 +64,13 @@ int main(int argc, char* argv[]) {
   // Cuts for control plots
   // Get puWeight etc added below if necessary
   // standard TightMjj selection - essentially signal selection but no DPhiJJ and no cjv
+  TCut METNoMuon("metNoMuon>130.");
   TCut cutTightMjj_basic = cuts.cutWTau("trigger") + cuts.cutWTau("lVeto") + cuts.cutWTau("dijet") + cuts.cutWTau("dEtaJJ") + cuts.cutWTau("MET") + cuts.cutWTau("Mjj"); 
+  TCut cutTightMjj_spesh = cuts.cutWTau("trigger") + cuts.cutWTau("dijet") + cuts.cutWTau("dEtaJJ") + METNoMuon + cuts.cutWTau("Mjj");
   TCut cutTightMjj(""); // used to add in PU, trig corr, wWeight etc
 
   TCut cutDPhiSignalNoCJV_basic = cutTightMjj_basic + cuts.cutWTau("dPhiJJ"); //standard DPhiSignalNoCJV selection
+  TCut cutDPhiSignalNoCJV_spesh = cutTightMjj_spesh + cuts.cutWTau("dPhiJJ"); 
   TCut cutDPhiSignalNoCJV(""); // used to add in PU, trig corr, wWeight etc
   
   ////////////////////////////////////
@@ -145,7 +148,7 @@ int main(int argc, char* argv[]) {
 
     // Weight to lumi
     double weight = (dataset.isData) ? 1. : (lumi * dataset.sigma / dataset.nEvents);
-    if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
+    //if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
     // double weight = 1.;
 
     ///////////////////////////////
@@ -159,6 +162,7 @@ int main(int argc, char* argv[]) {
     TCut wWeight(""); // do inside dataset loop to avoid it affecting EWK samples!
     TCut yStarWeight("");
     TCut mjjWeight("");
+    TCut cutGen("");
     TCut otherCuts = puWeight * trigCorrWeight; 
     if(!(dataset.isData)) otherCuts *= lVetoWeight;
 
@@ -268,18 +272,26 @@ int main(int argc, char* argv[]) {
 
         otherCuts *= yStarWeight * mjjWeight;
 
-        // Setup control plot cuts 
+	TH1D* hTmp_ZGen          = new TH1D("hTmp_ZGen", "", 1, 0, 1);
+
+        // Setup control plot cuts
+	cutGen		   = puWeight * cutD;
         cutTightMjj        = otherCuts * (cutD + cutTightMjj_basic);
         cutDPhiSignalNoCJV = otherCuts * (cutD + cutDPhiSignalNoCJV_basic);
 
-        // Count number of tau in control region in bg
-        cutWTau_C = otherCuts * (cutD  && cuts.cutWTau("wTau") && cutDPhiSignalNoCJV_basic);
+	// Count number of tau in control region in bg
+	if (dataset.name == "EWK_ZvvFake") cutWTau_C = puWeight * trigCorrWeight * (cutD  && cuts.cutWTau("wTau") && cutDPhiSignalNoCJV_spesh);
+	else cutWTau_C = otherCuts * (cutD  && cuts.cutWTau("wTau") && cutDPhiSignalNoCJV_basic);
+
         tree->Draw("vbfDPhi>>hWTau_BGC_DPhi_tmp", cutWTau_C);
+	tree->Draw("0.5>>hTmp_ZGen", cutGen);
+      	hTmp_ZGen->Scale(weight);
         
+	if (dataset.name == "EWK_ZvvFake") weight *= ((lumi/1000.) * constants::sigma_Zvv_EWK)/hTmp_ZGen->GetBinContent(1);
+
         hWTau_BGC_DPhi_tmp->Scale(weight);
         
         hWTau_BGC_DPhi->Add(hWTau_BGC_DPhi_tmp);
-
 
         // debug output
         std::cout << "  N ctrl region (dphi<1) : " << hWTau_BGC_DPhi_tmp->GetBinContent(1) << " +/- " << hWTau_BGC_DPhi_tmp->GetBinError(1) << std::endl;
