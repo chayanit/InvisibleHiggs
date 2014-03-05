@@ -5,11 +5,11 @@ namespace constants {
   //// Backgrounds ////
 
   //  Z extrapolation
-  static const double ratioZToNuNuZToLL = 5.616; 	//from MCFM 6425342.388/1144135.943 = 5.616
-  static const double sigma_Zvv_QCD = 5.616*(3503710/3);
-  static const double sigma_Zvv_EWK = 450.;
+  static const double ratioZToNuNuZToLL = 5.651; 	//from MCFM 6465/1144 = 5.651
+  static const double sigma_Zvv_QCD = 5.651*(3503710/3);
+  static const double sigma_Zvv_EWK = 460.*3;
   static const double sigma_Zuu_QCD = 3503710.0/3;
-  static const double sigma_Zuu_EWK = 304.;
+  static const double sigma_Zuu_EWK = 303.;
 
   // background values and total uncertainty (temporary!)
   static const double nBG_WTau   = 0.;
@@ -27,12 +27,12 @@ namespace constants {
   static const double syst_Z_El_p     = 0.0;
   static const double syst_Z_Mu_m     = 0.049;
   static const double syst_Z_Mu_p     = -0.039;
-  static const double syst_Z_JES_m    = -0.050;
-  static const double syst_Z_JES_p    = 0.0026;
-  static const double syst_Z_JER_m    = -0.027;
-  static const double syst_Z_JER_p    = 0.023;
-  static const double syst_Z_UES_m    = -0.015;
-  static const double syst_Z_UES_p    = -0.0023;
+  static const double syst_Z_JES_m    = -0.058;
+  static const double syst_Z_JES_p    = -0.006;
+  static const double syst_Z_JER_m    = -0.017;
+  static const double syst_Z_JER_p    = 0.016;
+  static const double syst_Z_UES_m    = -0.016;
+  static const double syst_Z_UES_p    = -0.0018;
 
   // W->munu
   static const double syst_WMu        = 0.20;    // 20% extrapolation systematics
@@ -61,14 +61,14 @@ namespace constants {
   static const double syst_WEl_UES_p   = -0.024;
 
   // W->taunu
-  static const double syst_WTau       = 0.22;    // 20% extrapolation + 8% tau ID + 5& lepton contamination
+  static const double syst_WTau       = 0.22;    // 20% extrapolation + 8% tau ID + 5% lepton contamination
   static const double syst_WTau_El_m  = -0.01;   //from Analysis B
   static const double syst_WTau_El_p  = 0.011;   //form Analysis B
   static const double syst_WTau_Mu_m  = 0.0001;
   static const double syst_WTau_Mu_p  = -0.0002;
-  static const double syst_WTau_JES_m = 0.074;
+  static const double syst_WTau_JES_m = 0.076;
   static const double syst_WTau_JES_p = 0.019;
-  static const double syst_WTau_JER_m = -0.024;
+  static const double syst_WTau_JER_m = -0.022;
   static const double syst_WTau_JER_p = -0.036;
   static const double syst_WTau_UES_m = 0.007;
   static const double syst_WTau_UES_p = 0.004;
@@ -88,12 +88,12 @@ namespace constants {
   static const double syst_QCD3_El_p   = 0.039;    //0.07/0.02 * 0.011
   static const double syst_QCD3_Mu_m   = -0.002;
   static const double syst_QCD3_Mu_p   = -0.0009;
-  static const double syst_QCD3_JES_m  = 0.499;
-  static const double syst_QCD3_JES_p  = -0.553;
-  static const double syst_QCD3_JER_m  = 0.155;
-  static const double syst_QCD3_JER_p  = -0.173;
-  static const double syst_QCD3_UES_m  = 0.028;
-  static const double syst_QCD3_UES_p  = -0.018;
+  static const double syst_QCD3_JES_m  = 0.529;
+  static const double syst_QCD3_JES_p  = -0.586;
+  static const double syst_QCD3_JER_m  = 0.163;
+  static const double syst_QCD3_JER_p  = -0.182;
+  static const double syst_QCD3_UES_m  = 0.029;
+  static const double syst_QCD3_UES_p  = -0.019;
 
   // ttbar
   static const double syst_TTbar         = 0.07;   // 7% x-section
@@ -195,12 +195,12 @@ namespace constants {
   static const double syst_Sig_ggH_El_p[6]   = { 0., 0., 0., 0., 0., 0. };
   static const double syst_Sig_ggH_Mu_m[6]   = { 0., 0., 0., 0., 0., 0. };
   static const double syst_Sig_ggH_Mu_p[6]   = { 0., 0., 0., 0., 0., 0. };
-  static const double syst_Sig_ggH_JES_m[6]  = { 0., 0., 0., 0., 0., 0. };
-  static const double syst_Sig_ggH_JES_p[6]  = { 0., 0., 0., 0., 0., 0. };
-  static const double syst_Sig_ggH_JER_m[6]  = { 0., 0., 0., 0., 0., 0. };
-  static const double syst_Sig_ggH_JER_p[6]  = { 0., 0., 0., 0., 0., 0. };
-  static const double syst_Sig_ggH_UES_m[6]  = { 0., 0., 0., 0., 0., 0. };
-  static const double syst_Sig_ggH_UES_p[6]  = { 0., 0., 0., 0., 0., 0. };
+  static const double syst_Sig_ggH_JES_m[6]  = { -0.02, -0.24, -0.002, -0.14, -0.06, -0.008 };
+  static const double syst_Sig_ggH_JES_p[6]  = { 0.17, 0.13, 0.13, 0.14, 0.08, 0.16 };
+  static const double syst_Sig_ggH_JER_m[6]  = { -0.002, 0.13, -0.001, -0.13, -0.02, 0.008 };
+  static const double syst_Sig_ggH_JER_p[6]  = { 0.23, 0., 0.013, 0.07, -0.048, 0.086 };
+  static const double syst_Sig_ggH_UES_m[6]  = { -0.009, 0., -0.001, -0.003, 0.02, 0. };
+  static const double syst_Sig_ggH_UES_p[6]  = { 0.003, 0., 0.112, 0., 0.01, 0.036 };
 
 }
 

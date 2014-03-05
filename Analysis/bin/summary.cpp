@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
   double syst_BG_Z_p = sqrt(pow(hZ_Syst->GetBinError(1),2)    // for summary table
 			    +pow(nBG_Z*constants::syst_Z,2)
 			    +pow(nBG_Z*constants::syst_Z_Mu_m,2)
-			    +pow(nBG_Z*constants::syst_Z_JES_p,2)
+			    //+pow(nBG_Z*constants::syst_Z_JES_p,2)
 			    +pow(nBG_Z*constants::syst_Z_JER_p,2));
   double syst_BG_Z_m = sqrt(pow(hZ_Syst->GetBinError(1),2)
 			    +pow(nBG_Z*constants::syst_Z,2)
