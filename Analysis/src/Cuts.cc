@@ -16,6 +16,18 @@ Cuts::Cuts() {
   addCut("CJV",        "cenJetEt<30.");
   addCut("dPhiJJ",     "vbfDPhi<1.0");
 
+  addZvvCut("trigger",    "hltResult2>0.");
+  addZvvCut("metFilter",  "metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
+  addZvvCut("EVeto",      "");
+  addZvvCut("MuVeto",     "");
+  addZvvCut("dijet",      "jet1Pt>50.&&abs(jet1Eta)<4.7&&jet2Pt>50.&&abs(jet2Eta)<4.7");
+  addZvvCut("sgnEtaJJ",   "(jet1Eta*jet2Eta)<0.");
+  addZvvCut("dEtaJJ",     "vbfDEta>4.2");
+  addZvvCut("MET",        "metNoMuon>130.");
+  addZvvCut("Mjj",        "vbfM>1100.");
+  addZvvCut("CJV",        "cenJetEt<30.");
+  addZvvCut("dPhiJJ",     "vbfDPhi<1.0");
+
   addZMuMuCut("trigger",   "hltResult2>0. && metflag0 && metflag1 && metflag2 && metflag3 && metflag4 && metflag5 && metflag6 && metflag7 && metflag8");
   addZMuMuCut("z",         "zChannel==1 && zMass>60. && zMass<120.");
   addZMuMuCut("lVeto",     "ele1Pt<10. && mu3Pt<10.");
@@ -73,6 +85,12 @@ void Cuts::addCut(std::string name, std::string cut) {
   cuts_.push_back(c);
 }
 
+void Cuts::addZvvCut(std::string name, std::string cut) {
+  namesZvv_.push_back(name);
+  TCut c(cut.c_str());
+  cutsZvv_.push_back(c);
+}
+
 void Cuts::addZMuMuCut(std::string name, std::string cut) {
   namesZMuMu_.push_back(name);
   TCut c(cut.c_str());
@@ -110,6 +128,12 @@ TCut Cuts::cut(std::string s) {
   return TCut();
 }
 
+TCut Cuts::cutZvv(std::string s) {
+  for (unsigned i=0; i<namesZvv_.size(); ++i) {
+    if (namesZvv_.at(i) == s) return cutsZvv_.at(i);
+  }
+  return TCut();
+}
 
 TCut Cuts::cutZMuMu(std::string s) {
   for (unsigned i=0; i<namesZMuMu_.size(); ++i) {
@@ -187,12 +211,21 @@ TCut Cuts::cutflow(unsigned i) {
 }
 
 
+TCut Cuts::cutflowEWKZvv(unsigned i) {
+  TCut tmp;
+  for (unsigned j=0; j<i+1; ++j) {
+    tmp += cutsZvv_.at(j);
+  }
+  return tmp;
+}
+
+
 TCut Cuts::cutDataset(std::string name) {
 
   TCut tmp;
   if (name == "WJets") return tmp;//"wgennj==0");
   else if (name == "DYJetsToLL" || name == "DYJetsToLL_NoTrig") return TCut("zgenpt<100.");
-  else if (name == "EWK_ZvvFake") return TCut("zltype==2 && zgenmass>60. && zgenmass<120.");
+  else if (name == "EWK_ZvvFake") return TCut("zltype==2 && zgenmass>80. && zgenmass<100.");
   else return tmp;
 
 }
@@ -335,7 +368,7 @@ TCut Cuts::zMuMuGen() {
 }
 
 TCut Cuts::zMuMuGenMass() {
-  TCut tmp("zltype==2 && zgenmass>60. && zgenmass<120.");
+  TCut tmp("zltype==2 && zgenmass>80. && zgenmass<100.");
   return tmp;
 }
 

@@ -42,6 +42,9 @@ int main(int argc, char* argv[]) {
   TCut elVetoWeight = cuts.elVetoWeight(options.leptCorr);
   TCut muVetoWeight = cuts.muVetoWeight(options.leptCorr);
 
+  TCut puWeight("puWeight");
+  TCut trigCorrWeight( "(trigCorrWeight>0) ? trigCorrWeight : 1." );
+
   // output file
   TFile* ofile = TFile::Open( (options.oDir+std::string("/Efficiency.root")).c_str(), "RECREATE");
 
@@ -73,9 +76,6 @@ int main(int argc, char* argv[]) {
 
     //cuts
     TCut cutD     = cuts.cutDataset(dataset.name);
-    TCut puWeight("puWeight");
-    TCut trigCorrWeight("trigCorrWeight");
-    //TCut trigCorrWeight("1.");
     TCut wWeight("");
     TCut leptonWeight("");
     if (!(dataset.isData)) leptonWeight = elVetoWeight*muVetoWeight;
@@ -100,22 +100,28 @@ int main(int argc, char* argv[]) {
     TH1D* hCutFlowEl = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
     hname = std::string("hCutFlowTau_")+dataset.name;
     TH1D* hCutFlowTau = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
+    hname = std::string("hCutFlowEWK_")+dataset.name;
+    TH1D* hCutFlowEWK = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
 
     for (unsigned c=0; c<nCuts; ++c) {
 
-      TCut cut, cutMu, cutEl, cutTau;
+      TCut cut, cutMu, cutEl, cutTau, cutEWK;
 
       if(c == nCuts-1) {
       	cut    = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.cutflow(c));
       	cutMu  = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.wMuGen() + cuts.cutflow(c));
       	cutEl  = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.wElGen() + cuts.cutflow(c));
       	cutTau = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.wTauGen() + cuts.cutflow(c));
+
+        cutEWK = puWeight * trigCorrWeight * (cutD + cuts.cutflowEWKZvv(c));
       }
       else {
         cut    = puWeight * wWeight * leptonWeight * (cutD + cuts.cutflow(c));
         cutMu  = puWeight * wWeight * leptonWeight * (cutD + cuts.wMuGen() + cuts.cutflow(c));
         cutEl  = puWeight * wWeight * leptonWeight * (cutD + cuts.wElGen() + cuts.cutflow(c));
         cutTau = puWeight * wWeight * leptonWeight * (cutD + cuts.wTauGen() + cuts.cutflow(c));
+
+	cutEWK = puWeight * (cutD + cuts.cutflowEWKZvv(c));
       }
       //      std::cout << cut << std::endl;
 
@@ -123,6 +129,11 @@ int main(int argc, char* argv[]) {
       tree->Draw("0.5>>h", cut);
       hCutFlow->SetBinContent(c+1, h->GetBinContent(1));
       hCutFlow->SetBinError(c+1, h->GetBinError(1));
+
+      TH1D* hEWK = new TH1D("hEWK","", 1, 0., 1.);
+      tree->Draw("0.5>>hEWK", cutEWK);
+      hCutFlowEWK->SetBinContent(c+1, hEWK->GetBinContent(1));
+      hCutFlowEWK->SetBinError(c+1, hEWK->GetBinError(1));
 
       TH1D* hMu = new TH1D("hMu","", 1, 0., 1.);
       tree->Draw("0.5>>hMu", cutMu);
@@ -143,24 +154,28 @@ int main(int argc, char* argv[]) {
       delete hMu;
       delete hEl;
       delete hTau;
+      delete hEWK;
     }
 
     double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents;
-    if(dataset.name == "EWK_ZvvFake") weight *= constants::ratioZToNuNuZToLL;
+    if(dataset.name == "EWK_ZvvFake") weight *= (constants::sigma_Zvv_EWK/constants::sigma_Zuu_EWK);
 
     hCutFlow->Scale(weight);
     hCutFlowMu->Scale(weight);
     hCutFlowEl->Scale(weight);
     hCutFlowTau->Scale(weight);
+    hCutFlowEWK->Scale(weight);
  
-    std::cout << "  N (dphi<1.0) : " << hCutFlow->GetBinContent(nCuts) << " +/- " << hCutFlow->GetBinError(nCuts) << std::endl;
+    std::cout << "  N (dphi<1.0) : " << hCutFlowEWK->GetBinContent(nCuts) << " +/- " << hCutFlowEWK->GetBinError(nCuts) << std::endl;
 
     // sum binned datasets
     if (dataset.name.compare(0,3,"QCD")==0) hQCD->Add(hCutFlow);
-    if (dataset.name.compare(0,3,"Zvv")==0 || 
-	dataset.name == "EWK_ZvvFake" ) {
+    if (dataset.name.compare(0,3,"Zvv")==0) {
       hZNuNu->Add(hCutFlow);
     }
+
+    if (dataset.name == "EWK_ZvvFake")  hZNuNu->Add(hCutFlowEWK);
+
     if (dataset.name=="WJets" ||
         dataset.name=="W1Jets" ||
         dataset.name=="W2Jets" ||
@@ -189,6 +204,7 @@ int main(int argc, char* argv[]) {
 
     ofile->cd();
     hCutFlow->Write("", TObject::kOverwrite);
+    hCutFlowEWK->Write("", TObject::kOverwrite);
 
     ifile->Close();
 
@@ -215,12 +231,13 @@ int main(int argc, char* argv[]) {
   ofstream texFile;
   texFile.open(options.oDir+std::string("/cutflow.tex"));
  
-  texFile << "Cut & N(Data) & N($Z\\rightarrow\\nu\\nu$) & N($W\\rightarrow \\mu\\nu$) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV \\\\" << std::endl;
+  texFile << "Cut & N(Data) & N($Z\\rightarrow\\nu\\nu$) & N($W\\rightarrow \\mu\\nu$) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV) & N(signal ggH $m_H=125$~\\GeV) \\\\" << std::endl;
 
   TH1D* hData   = (TH1D*) ofile->Get("hCutFlow_METABCD");
   TH1D* hZEWK   = (TH1D*) ofile->Get("hCutFlow_EWK_ZvvFake");
   TH1D* hTTbar  = (TH1D*) ofile->Get("hCutFlow_TTBar");
   TH1D* hSignal = (TH1D*) ofile->Get("hCutFlow_SignalM125_POWHEG");
+  TH1D* hSigggH = (TH1D*) ofile->Get("hCutFlow_GluGluM125");
 
   // cutflow table
   for (unsigned i=0; i<nCuts; ++i) {
@@ -236,7 +253,8 @@ int main(int argc, char* argv[]) {
     texFile << "$" << hSingleT->GetBinContent(i+1) << " \\pm " << hSingleT->GetBinError(i+1) << "$ & ";
     texFile << "$" << hDiboson->GetBinContent(i+1) << " \\pm " << hDiboson->GetBinError(i+1) << "$ & ";
     texFile << "$" << hDYLL->GetBinContent(i+1) << " \\pm " << hDYLL->GetBinError(i+1) << "$ & ";
-    texFile << "$" << hSignal->GetBinContent(i+1) << " \\pm " << hSignal->GetBinError(i+1) << "$ \\\\ " << std::endl;
+    texFile << "$" << hSignal->GetBinContent(i+1) << " \\pm " << hSignal->GetBinError(i+1) << "$ & ";
+    texFile << "$" << hSigggH->GetBinContent(i+1) << " \\pm " << hSigggH->GetBinError(i+1) << "$ \\\\ " << std::endl;
   }
 
   texFile << std::endl << std::endl;

@@ -12,6 +12,7 @@ class Cuts {
 
   // setters
   void addCut(std::string name, std::string cut);
+  void addZvvCut(std::string name, std::string cut);
   void addZMuMuCut(std::string name, std::string cut);
   void addWMuCut(std::string name, std::string cut);
   void addWElCut(std::string name, std::string cut);
@@ -22,6 +23,10 @@ class Cuts {
   unsigned nCuts() { return cuts_.size(); }
   TCut cut(std::string name);
   std::string cutName(unsigned i);
+
+  unsigned nZvvCuts() { return cutsZvv_.size(); }
+  TCut cutZvv(std::string name);
+  std::string cutNameZvv(unsigned i) { return namesZvv_.at(i); }
 
   unsigned nZMuMuCuts() { return cutsZMuMu_.size(); }
   TCut cutZMuMu(std::string name);
@@ -49,6 +54,7 @@ class Cuts {
 
   // cutflow
   TCut cutflow(unsigned i);
+  TCut cutflowEWKZvv(unsigned i);
 
   // dataset-dependent cut
   TCut cutDataset(std::string name);
@@ -112,6 +118,9 @@ class Cuts {
   
   std::vector<std::string> names_;
   std::vector<TCut> cuts_;
+
+  std::vector<std::string> namesZvv_;
+  std::vector<TCut> cutsZvv_;
 
   std::vector<std::string> namesZMuMu_;
   std::vector<TCut> cutsZMuMu_;
