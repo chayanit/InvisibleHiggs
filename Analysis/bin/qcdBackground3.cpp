@@ -345,8 +345,16 @@ int main(int argc, char* argv[]) {
   TH2D* hEst_METCJV = new TH2D("hEst_METCJV", "", 2, metEdges, 2, cjvEdges);
   hEst_METCJV->Add(hData_METCJV, hBG_METCJV, +1., -1.);
 
+  TH2D* hEst_METCJV_Stat = new TH2D("hEst_METCJV_Stat", "", 2, metEdges, 2, cjvEdges);
+  hEst_METCJV_Stat->Add(hData_METCJV, hBG_METCJV, +1., -1.);
+
+  TH2D* hEst_METCJV_Syst = new TH2D("hEst_METCJV_Syst", "", 2, metEdges, 2, cjvEdges);
+  hEst_METCJV_Syst->Add(hData_METCJV, hBG_METCJV, +1., -1.);
+
   // clear signal region
   hEst_METCJV->SetBinContent(2, 1, 0.);
+  hEst_METCJV_Stat->SetBinContent(2, 1, 0.);
+  hEst_METCJV_Syst->SetBinContent(2, 1, 0.);
 
   // do the ABCD calculation
   double a = hEst_METCJV->GetBinContent(1, 2);
@@ -359,8 +367,24 @@ int main(int argc, char* argv[]) {
   double c_ferr = hEst_METCJV->GetBinError(1,1) / hEst_METCJV->GetBinContent(1,1);
   double d_ferr = sqrt( pow(a_ferr,2) + pow(b_ferr,2) + pow(c_ferr,2) );
 
+  double a_fstat = hData_METCJV->GetBinError(1,2) / hData_METCJV->GetBinContent(1,2);
+  double b_fstat = hData_METCJV->GetBinError(2,2) / hData_METCJV->GetBinContent(2,2);
+  double c_fstat = hData_METCJV->GetBinError(1,1) / hData_METCJV->GetBinContent(1,1);
+  double d_fstat = sqrt( pow(a_fstat,2) + pow(b_fstat,2) + pow(c_fstat,2) );
+
+  double a_fsyst = hBG_METCJV->GetBinError(1,2) / hBG_METCJV->GetBinContent(1,2);
+  double b_fsyst = hBG_METCJV->GetBinError(2,2) / hBG_METCJV->GetBinContent(2,2);
+  double c_fsyst = hBG_METCJV->GetBinError(1,1) / hBG_METCJV->GetBinContent(1,1);
+  double d_fsyst = sqrt( pow(a_fsyst,2) + pow(b_fsyst,2) + pow(c_fsyst,2) );
+
   hEst_METCJV->SetBinContent(2, 1, d);
   hEst_METCJV->SetBinError(2, 1, d * d_ferr);
+
+  hEst_METCJV_Stat->SetBinContent(2, 1, d);
+  hEst_METCJV_Stat->SetBinError(2, 1, d * d_fstat);
+
+  hEst_METCJV_Syst->SetBinContent(2, 1, d);
+  hEst_METCJV_Syst->SetBinError(2, 1, d * d_fsyst);
 
   // print out
   std::cout << "Data :" << std::endl;
@@ -384,12 +408,12 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
 
   std::cout << "Data-BG :" << std::endl;
-  std::cout << "  A = " << a << " +/- " << a * a_ferr << std::endl;
-  std::cout << "  B = " << b << " +/- " << b * b_ferr << std::endl;
-  std::cout << "  C = " << c << " +/- " << c * c_ferr << std::endl;
+  std::cout << "  A = " << a << " +/- " << a * a_fstat << " +/- " << a * a_fsyst << std::endl;
+  std::cout << "  B = " << b << " +/- " << b * b_fstat << " +/- " << b * b_fsyst << std::endl;
+  std::cout << "  C = " << c << " +/- " << c * c_fstat << " +/- " << c * c_fsyst << std::endl;
   std::cout << std::endl;
   std::cout << "Estimate :" << std::endl;
-  std::cout << "  D = " << d << " +/- " << d * d_ferr << std::endl;
+  std::cout << "  D = " << d << " +/- " << d * d_fstat << " +/- " << d * d_fsyst << std::endl;
   std::cout << std::endl;
 
 
@@ -716,6 +740,8 @@ int main(int argc, char* argv[]) {
   hBG_METCJV->Write("", TObject::kOverwrite);
   hSignal_METCJV->Write("", TObject::kOverwrite);
   hEst_METCJV->Write("", TObject::kOverwrite);
+  hEst_METCJV_Stat->Write("", TObject::kOverwrite);
+  hEst_METCJV_Syst->Write("", TObject::kOverwrite);
 
   hData_HiDPhi_METCJV->Write("", TObject::kOverwrite);
   hBG_HiDPhi_METCJV->Write("", TObject::kOverwrite);

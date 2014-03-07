@@ -234,7 +234,7 @@ int main(int argc, char* argv[]) {
   texFile << "Cut & N(Data) & N($Z\\rightarrow\\nu\\nu$) & N($W\\rightarrow \\mu\\nu$) & N(QCD) & N($t\\bar{t}$) & N(single $t$) & N(diboson) & N(DY) & N(signal $m_H=125$~\\GeV) & N(signal ggH $m_H=125$~\\GeV) \\\\" << std::endl;
 
   TH1D* hData   = (TH1D*) ofile->Get("hCutFlow_METABCD");
-  TH1D* hZEWK   = (TH1D*) ofile->Get("hCutFlow_EWK_ZvvFake");
+  TH1D* hZEWK   = (TH1D*) ofile->Get("hCutFlowEWK_EWK_ZvvFake");
   TH1D* hTTbar  = (TH1D*) ofile->Get("hCutFlow_TTBar");
   TH1D* hSignal = (TH1D*) ofile->Get("hCutFlow_SignalM125_POWHEG");
   TH1D* hSigggH = (TH1D*) ofile->Get("hCutFlow_GluGluM125");

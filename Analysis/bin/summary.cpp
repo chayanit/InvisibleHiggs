@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
 
 
   // get QCD BG info
-  double nBG_QCD(0.), errBG_QCD(0.), stat_BG_QCD(0.), syst_BG_QCD_p(0.), syst_BG_QCD_m(0.);
+  double nBG_QCD(0.), errBG_QCD(0.), stat_BG_QCD(0.), stat_MC_QCD(0.), syst_BG_QCD(0.), syst_BG_QCD_p(0.), syst_BG_QCD_m(0.);
   std::cout << "Getting QCD background with method " << options.qcdMethod << std::endl;
   if (options.qcdMethod==1) {
     TFile* qFile = TFile::Open((oDir+std::string("/QCDBackground.root")).c_str(), "READ");
@@ -219,15 +219,20 @@ int main(int argc, char* argv[]) {
       std::cerr << "Could not open " << oDir << "/QCD3/QCD3.root. Can't go any further" << std::endl;
       exit(1);
     }
-    TH2D* hQCD = (TH2D*) qFile->Get("hEst_METCJV");
+    TH2D* hQCD 		= (TH2D*) qFile->Get("hEst_METCJV");		// for datacards
+    TH2D* hQCD_Stat	= (TH2D*) qFile->Get("hEst_METCJV_Stat");	// only data stat
+    TH2D* hQCD_Syst 	= (TH2D*) qFile->Get("hEst_METCJV_Syst");	// only MC stat
     nBG_QCD     = hQCD->GetBinContent(2,1);
     stat_BG_QCD = hQCD->GetBinError(2,1);
-    syst_BG_QCD_p = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
+    stat_MC_QCD = hQCD_Stat->GetBinError(2,1);
+    syst_BG_QCD_p = sqrt(pow(hQCD_Syst->GetBinError(2,1),2) 
+			 +pow(nBG_QCD*constants::syst_QCD3,2)
                          +pow(nBG_QCD*constants::syst_QCD3_El_p,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JES_m,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JER_m,2)
                          +pow(nBG_QCD*constants::syst_QCD3_UES_m,2));
-    syst_BG_QCD_m = sqrt( pow(nBG_QCD*constants::syst_QCD3,2)
+    syst_BG_QCD_m = sqrt(pow(hQCD_Syst->GetBinError(2,1),2) 
+			 +pow(nBG_QCD*constants::syst_QCD3,2)
                          +pow(nBG_QCD*constants::syst_QCD3_El_m,2)
                          +pow(nBG_QCD*constants::syst_QCD3_Mu_m,2)
 			 +pow(nBG_QCD*constants::syst_QCD3_JES_p,2)
@@ -358,7 +363,7 @@ int main(int argc, char* argv[]) {
 			       pow(stat_BG_WMu,2) +
 			       pow(stat_BG_WEl,2) +
 			       pow(stat_BG_WTau,2) +
-			       pow(stat_BG_QCD,2) +
+			       pow(stat_MC_QCD,2) +
 			       pow(stat_BG_TTbar,2) +
 			       pow(stat_BG_SingleT,2) +
 			       pow(stat_BG_Diboson,2) +
@@ -417,7 +422,7 @@ int main(int argc, char* argv[]) {
   texFile << "$W \\rightarrow e \\nu$  \t & $" << nBG_WEl << " \\pm " << stat_BG_WEl << " \\pm " << syst_BG_WEl_p << "/" << syst_BG_WEl_m  << "$ \t &  $" << nBG_WElMC << " \\pm " << syst_BG_WElMC << "$ \\\\" << std::endl;
   texFile << "$W \\rightarrow \\mu\\nu$ \t & $" << nBG_WMu << " \\pm " << stat_BG_WMu << " \\pm " << syst_BG_WMu_p << "/" << syst_BG_WMu_m  << "$ \t & $" << nBG_WMuMC << " \\pm " << syst_BG_WMuMC << "$ \\\\" << std::endl;
   texFile << "$W \\rightarrow \\tau \\nu$ \t & $" << nBG_WTau << " \\pm " << stat_BG_WTau << " \\pm " << syst_BG_WTau_p << "/" << syst_BG_WTau_m  << "$ \t & $" << nBG_WTauMC << " \\pm " << syst_BG_WTauMC << "$ \\\\" << std::endl;
-  texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_BG_QCD << " \\pm " << syst_BG_QCD_p << "/" << syst_BG_QCD_m  << "$ \t & - \\\\" << std::endl;
+  texFile << "QCD multijet \t & $" << nBG_QCD << " \\pm " << stat_MC_QCD << " \\pm " << syst_BG_QCD_p << "/" << syst_BG_QCD_m  << "$ \t & - \\\\" << std::endl;
   texFile << "$t\\bar{t}$ \t & -	\t & $" << nBG_TTbar << " \\pm " << syst_BG_TTbar_p << "/" << syst_BG_TTbar_m << "$ \\\\" << std::endl;
   texFile << "single t \t & -  \t & $" << nBG_SingleT << " \\pm " << syst_BG_SingleT_p << "/" << syst_BG_SingleT_m << "$ \\\\" << std::endl;
   texFile << "$VV$ \t & -  \t & $" << nBG_Diboson << " \\pm " << syst_BG_Diboson_p << "/" << syst_BG_Diboson_m << "$ \\\\" << std::endl;
