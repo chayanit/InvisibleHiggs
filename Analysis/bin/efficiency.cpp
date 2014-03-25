@@ -58,10 +58,11 @@ int main(int argc, char* argv[]) {
   TH1D* hWEWK    = new TH1D("hCutFlow_WEWK", "", nCuts, 0., nCuts);
   TH1D* hWEWKMu  = new TH1D("hCutFlow_WEWKMu", "", nCuts, 0., nCuts);
   TH1D* hWEWKEl  = new TH1D("hCutFlow_WEWKEl", "", nCuts, 0., nCuts);
-  TH1D* hWEWKTau  = new TH1D("hCutFlow_WEWKTau", "", nCuts, 0., nCuts);
+  TH1D* hWEWKTau = new TH1D("hCutFlow_WEWKTau", "", nCuts, 0., nCuts);
   TH1D* hSingleT = new TH1D("hCutFlow_SingleTSum", "", nCuts, 0., nCuts);
-  TH1D* hDYLL  = new TH1D("hCutFlow_DYLL", "", nCuts, 0., nCuts);
+  TH1D* hDYLL    = new TH1D("hCutFlow_DYLL", "", nCuts, 0., nCuts);
   TH1D* hDiboson = new TH1D("hCutFlow_Diboson", "", nCuts, 0., nCuts);
+  TH1D* hDibosonNoWG = new TH1D("hCutFlow_DibosonNoWG", "", nCuts, 0., nCuts); 
 
   for (unsigned i=0; i<datasets.size(); ++i) {
 
@@ -94,6 +95,8 @@ int main(int argc, char* argv[]) {
     // do cutflow
     std::string hname = std::string("hCutFlow_")+dataset.name;
     TH1D* hCutFlow = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
+    hname = std::string("hCutFlow_unweighted_")+dataset.name;
+    TH1D* hCutFlow_unweighted = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
     hname = std::string("hCutFlowMu_")+dataset.name;
     TH1D* hCutFlowMu = new TH1D(hname.c_str(), "", nCuts, 0., nCuts);
     hname = std::string("hCutFlowEl_")+dataset.name;
@@ -105,7 +108,9 @@ int main(int argc, char* argv[]) {
 
     for (unsigned c=0; c<nCuts; ++c) {
 
-      TCut cut, cutMu, cutEl, cutTau, cutEWK;
+      TCut cut, cutMu, cutEl, cutTau, cutEWK, cut_unweighted;
+
+      cut_unweighted = cutD + cuts.cutflow(c);
 
       if(c == nCuts-1) {
       	cut    = puWeight * trigCorrWeight * wWeight * leptonWeight * (cutD + cuts.cutflow(c));
@@ -129,6 +134,11 @@ int main(int argc, char* argv[]) {
       tree->Draw("0.5>>h", cut);
       hCutFlow->SetBinContent(c+1, h->GetBinContent(1));
       hCutFlow->SetBinError(c+1, h->GetBinError(1));
+
+      TH1D* h_unweighted = new TH1D("h_unweighted","", 1, 0., 1.);
+      tree->Draw("0.5>>h_unweighted", cut_unweighted);
+      hCutFlow_unweighted->SetBinContent(c+1, h_unweighted->GetBinContent(1));
+      hCutFlow_unweighted->SetBinError(c+1, h_unweighted->GetBinError(1));
 
       TH1D* hEWK = new TH1D("hEWK","", 1, 0., 1.);
       tree->Draw("0.5>>hEWK", cutEWK);
@@ -155,6 +165,7 @@ int main(int argc, char* argv[]) {
       delete hEl;
       delete hTau;
       delete hEWK;
+      delete h_unweighted;
     }
 
     double weight = (dataset.isData) ? 1. : lumi * dataset.sigma / dataset.nEvents;
@@ -165,8 +176,11 @@ int main(int argc, char* argv[]) {
     hCutFlowEl->Scale(weight);
     hCutFlowTau->Scale(weight);
     hCutFlowEWK->Scale(weight);
+
+    if(dataset.name == "EWK_ZvvFake") std::cout << "  N (dphi<1.0) : " << hCutFlowEWK->GetBinContent(nCuts) << " +/- " << hCutFlowEWK->GetBinError(nCuts) << std::endl;
+    else std::cout << "  N (dphi<1.0) : " << hCutFlow->GetBinContent(nCuts) << " +/- " << hCutFlow->GetBinError(nCuts) << std::endl; 
  
-    std::cout << "  N (dphi<1.0) : " << hCutFlowEWK->GetBinContent(nCuts) << " +/- " << hCutFlowEWK->GetBinError(nCuts) << std::endl;
+    std::cout << "  N (dphi<1.0) (unweighted) : " << hCutFlow_unweighted->GetBinContent(nCuts) << " +/- " << hCutFlow_unweighted->GetBinError(nCuts) << std::endl; 
 
     // sum binned datasets
     if (dataset.name.compare(0,3,"QCD")==0) hQCD->Add(hCutFlow);
@@ -198,13 +212,17 @@ int main(int argc, char* argv[]) {
     if (dataset.name.compare(0,2,"WW")==0 ||
 	dataset.name.compare(0,2,"WZ")==0 ||
 	dataset.name.compare(0,2,"ZZ")==0 ||
-	dataset.name.compare(0,2,"WG")==0)
+	dataset.name.compare(0,2,"WG")==0)	//separate out from Diboson process in data cards due to low stat but large weight (commented from combination group)
+    {
       hDiboson->Add(hCutFlow);
+      if(dataset.name != "WG") hDibosonNoWG->Add(hCutFlow);
+    }
     if (dataset.name.compare(0,2,"DY")==0) hDYLL->Add(hCutFlow);
 
     ofile->cd();
     hCutFlow->Write("", TObject::kOverwrite);
     hCutFlowEWK->Write("", TObject::kOverwrite);
+    hCutFlow_unweighted->Write("", TObject::kOverwrite);
 
     ifile->Close();
 
@@ -223,6 +241,7 @@ int main(int argc, char* argv[]) {
   hWTauNu->Write("",TObject::kOverwrite);  
   hSingleT->Write("",TObject::kOverwrite);  
   hDiboson->Write("",TObject::kOverwrite);
+  hDibosonNoWG->Write("",TObject::kOverwrite);
   hDYLL->Write("",TObject::kOverwrite);  
 
   // write TeX file

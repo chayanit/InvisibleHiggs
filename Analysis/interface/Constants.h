@@ -108,7 +108,7 @@ namespace constants {
   static const double syst_TTbar_UES_m   = 0.0;
   static const double syst_TTbar_UES_p   = 0.0;
 
-  // diboson
+  // diboson with WG
   static const double syst_Diboson       = 0.18;   // 18% x-section
   static const double syst_Diboson_El_m  = 0.005;  //0.01/0.02 * 0.01
   static const double syst_Diboson_El_p  = -0.006; //0.01/0.02 * 0.011
@@ -120,6 +120,32 @@ namespace constants {
   static const double syst_Diboson_JER_p = -0.26;
   static const double syst_Diboson_UES_m = -0.0001;
   static const double syst_Diboson_UES_p = 0.003;
+
+  // doboson no WG
+  static const double syst_DibosonNoWG       = 0.18;   // 18% x-section
+  static const double syst_DibosonNoWG_El_m  = 0.02;   //0.04/0.02 * 0.01
+  static const double syst_DibosonNoWG_El_p  = -0.022;  //0.04/0.02 * 0.011
+  static const double syst_DibosonNoWG_Mu_m  = 0.0;
+  static const double syst_DibosonNoWG_Mu_p  = 0.0;
+  static const double syst_DibosonNoWG_JES_m = -0.305;
+  static const double syst_DibosonNoWG_JES_p = 0.106;
+  static const double syst_DibosonNoWG_JER_m = -0.051;
+  static const double syst_DibosonNoWG_JER_p = 0.078;
+  static const double syst_DibosonNoWG_UES_m = -0.0002;
+  static const double syst_DibosonNoWG_UES_p = 0.031;
+
+  // WG
+  static const double syst_WG		 = 0.18;   // 18% x-section
+  static const double syst_WG_El_m  	 = 0.0;  	
+  static const double syst_WG_El_p  	 = 0.0; 
+  static const double syst_WG_Mu_m  	 = 0.003;
+  static const double syst_WG_Mu_p  	 = -0.003;
+  static const double syst_WG_JES_m 	 = -0.33;
+  static const double syst_WG_JES_p 	 = -0.067;
+  static const double syst_WG_JER_m 	 = 0.0;
+  static const double syst_WG_JER_p 	 = -0.377;
+  static const double syst_WG_UES_m 	 = 0.0;
+  static const double syst_WG_UES_p 	 = -0.006;
 
   // single T
   static const double syst_SingleT       = 0.16;   // 16% x-section
@@ -159,6 +185,18 @@ namespace constants {
   static const double syst_Other_UES_m   = -0.0004;
   static const double syst_Other_UES_p   = 0.003;
 
+  // Summed all minor BGs no WG
+  static const double syst_OtherNoWG_El_m    = 0.025;    //0.05/0.02 * 0.01
+  static const double syst_OtherNoWG_El_p    = -0.028;   //0.05/0.02 * 0.011
+  static const double syst_OtherNoWG_Mu_m    = 0.0009;
+  static const double syst_OtherNoWG_Mu_p    = 0.0004;
+  static const double syst_OtherNoWG_JES_m   = -0.299;
+  static const double syst_OtherNoWG_JES_p   = 0.288;
+  static const double syst_OtherNoWG_JER_m   = -0.053;
+  static const double syst_OtherNoWG_JER_p   = 0.16;
+  static const double syst_OtherNoWG_UES_m   = -0.0008;
+  static const double syst_OtherNoWG_UES_p   = 0.012;
+
   //// Signal properties ////
 
   // masses
@@ -189,7 +227,7 @@ namespace constants {
   static const double xsggH[6] = { 24.70, 19.27, 13.55, 7.081, 3.594, 2.921 };  // pb
 
   // systematics
-  static const double syst_Sig_ggH_QCD[6]    = { 0.807, 0.807, 0.807, 0.807, 0.807, 0.807 };
+  static const double syst_Sig_ggH_QCD[6]    = { 0.604, 0.604, 0.604, 0.604, 0.604, 0.604 };
   static const double syst_Sig_ggH_PDF[6]    = { 0.113, 0.113, 0.113, 0.113, 0.113, 0.113 };
   static const double syst_Sig_ggH_El_m[6]   = { 0., 0., 0., 0., 0., 0. };  //no effect on signal
   static const double syst_Sig_ggH_El_p[6]   = { 0., 0., 0., 0., 0., 0. };

@@ -11,7 +11,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) :
   oDir(""),
   datasetFile(""),
   lumi(0.),
-  qcdMethod(1),
+  wTauMethod(2),
+  qcdMethod(3),
   doMCFMWeights(false),
   leptCorr("central")
  {
