@@ -57,7 +57,7 @@
   // 0 = add to the BG stack, 1 = data (black points), 2 = signal MC (non-stacked line), 3 = signal MC (line, stacked on top of BG)
   signalPlots.addDataset("tt+DY+VV","t#bar{t}, tW, DY, VV", kAzure-2, 0);
   signalPlots.addDataset("V+jets", kPink-4,0);
-  signalPlots.addDataset("Signal 100%BR","#splitline{VBF m_{H} = 125 GeV,}{BR(H#rightarrowinv) = 100%}",kRed, 3);
+  signalPlots.addDataset("Signal 100%BR","#splitline{VBF m_{H} = 125 GeV,}{B(H#rightarrowinv) = 100%}",kRed, 3);
   signalPlots.addDataset("METABCD",    kBlack, 1);
 
   // Now that we've added in some datasets, let's plot some hists

@@ -346,7 +346,7 @@ int main(int argc, char* argv[]) {
   // This is because the Tlegend entry involves some odd characters, which are best not used in filenames for safety
   plots.addDataset("tt+DY+VV","t#bar{t}, tW, DY, VV", kAzure-2, 0);
   plots.addDataset("V+jets", kPink-4,0);
-  plots.addDataset("Signal 100%BR","#splitline{VBF m_{H} = 125 GeV,}{BR(H#rightarrowinv) = 100%}",kRed, 3);
+  plots.addDataset("Signal 100%BR","#splitline{VBF m_{H} = 125 GeV,}{B(H#rightarrowinv) = 100%}",kRed, 3);
   plots.addDataset("METABCD",    kBlack, 1);
 
   plots.setLumi(19.5); // doens't rescale anything, just adds a bit of text on the plot
