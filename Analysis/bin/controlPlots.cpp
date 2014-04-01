@@ -344,7 +344,7 @@ int main(int argc, char* argv[]) {
   // Note that here I've used the overloaded method addDataset, which allows you to specify a filename for the input ROOT file
   // *and* also allows you to specify what to put in the TLegend. (By default, it uses the filename as the TLegend entry)
   // This is because the Tlegend entry involves some odd characters, which are best not used in filenames for safety
-  plots.addDataset("tt+DY+VV","t#bar{t}, tW, DY, VV", kAzure-2, 0);
+  plots.addDataset("tt+DY+VV","t#bar{t}, tW, DY(ll)+jets, VV", kAzure-2, 0);
   plots.addDataset("V+jets", kPink-4,0);
   plots.addDataset("Signal 100%BR","#splitline{VBF m_{H} = 125 GeV,}{B(H#rightarrowinv) = 100%}",kRed, 3);
   plots.addDataset("METABCD",    kBlack, 1);

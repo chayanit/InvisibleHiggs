@@ -55,7 +55,7 @@
   // There is also an argument for the colour to be used.
   // The last argument is the plotting option:
   // 0 = add to the BG stack, 1 = data (black points), 2 = signal MC (non-stacked line), 3 = signal MC (line, stacked on top of BG)
-  signalPlots.addDataset("tt+DY+VV","t#bar{t}, tW, DY, VV", kAzure-2, 0);
+  signalPlots.addDataset("tt+DY+VV","t#bar{t}, tW, DY(ll)+jets, VV", kAzure-2, 0);
   signalPlots.addDataset("V+jets", kPink-4,0);
   signalPlots.addDataset("Signal 100%BR","#splitline{VBF m_{H} = 125 GeV,}{B(H#rightarrowinv) = 100%}",kRed, 3);
   signalPlots.addDataset("METABCD",    kBlack, 1);
@@ -91,7 +91,7 @@
   std::string histDir = "/afs/cern.ch/work/r/raggleto/scratch0/InvHiggsV11/CMSSW_5_3_7_patch5/src/InvisibleHiggs/Analysis/ZBackground2/ZBackground/";
   StackPlot zPlots(histDir, plotDir);
   zPlots.addDataset("tt+VV", "t#bar{t}, tW, VV", kAzure-2, 0);
-  zPlots.addDataset("DY+jets", kPink-4,0);
+  zPlots.addDataset("DY+jets", "DY(ll)+jets", kPink-4, 0);
   zPlots.addDataset("METABCD", kBlack, 1);
   
   zPlots.setLegPos(0.70,0.60,0.93,0.89);

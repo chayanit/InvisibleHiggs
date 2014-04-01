@@ -610,7 +610,7 @@ int main(int argc, char* argv[]) {
 
   //  plots.addDataset("DiBoson", kViolet-6, 0);
   plots.addDataset("tt+VV", "t#bar{t}, tW, VV", kAzure-2, 0);
-  plots.addDataset("DY+jets", kPink-4,0);
+  plots.addDataset("DY+jets", "DY(ll)+jets", kPink-4, 0);
   plots.addDataset("METABCD", kBlack, 1);
 
   plots.draw("ZCtrlZpT",	"Z_p_{T} [GeV]",		"N_{events}"	,1,"RATIO");
