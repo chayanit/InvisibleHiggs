@@ -136,7 +136,7 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   bool drawRatioPlot; 
   bool drawSignal; // if both are false, it's a N-1 plot
 
-  if (ratioPlotOption == "RATIO") {
+  if (ratioPlotOption == "RATIO" || ratioPlotOption == "RATIO_Z") {
     drawRatioPlot = true; // draw a ratio plot below
     drawSignal = false;
   } else {
@@ -497,7 +497,8 @@ void StackPlot::draw(std::string hname, std::string xTitle, std::string yTitle, 
   std::stringstream s; // convert float to string to make concatenation easier
   s << lumi_;
   cms->AddText(("#sqrt{s} = 8 TeV, L = "+s.str()+" fb^{-1}").c_str());
-  cms->AddText("VBF H(inv)");
+  if(ratioPlotOption == "RATIO_Z") 	cms->AddText("VBF H(inv) Z(ll) enriched");
+  else 					cms->AddText("VBF H(inv)");
   cms->AddText(label_.c_str());   // any other text user has specified
 
   // This works. DON'T use SetX1NDC EVEN THOUGH it says NDC above.

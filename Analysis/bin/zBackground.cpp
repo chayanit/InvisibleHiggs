@@ -612,25 +612,26 @@ int main(int argc, char* argv[]) {
   plots.addDataset("tt+VV", "t#bar{t}, tW, VV", kAzure-2, 0);
   plots.addDataset("DY+jets", "DY(ll)+jets", kPink-4, 0);
   plots.addDataset("METABCD", kBlack, 1);
+  plots.setScaleMCtoData(true); //rescale MC to data
 
-  plots.draw("ZCtrlZpT",	"Z_p_{T} [GeV]",		"N_{events}"	,1,"RATIO");
-  plots.draw("ZCtrlJet1pT", 	"Leading jet p_{T} [GeV]", 	"N_{events}"	,1,"RATIO");
-  plots.draw("ZCtrlJet1Eta", 	"Leading jet #eta", 		"N_{events}"	,1,"RATIO");
-  plots.draw("ZCtrlJet2pT",     "Sub-leading jet p_{T} [GeV]",  "N_{events}"	,1,"RATIO");
-  plots.draw("ZCtrlJet2Eta",    "Sub-leading jet #eta",         "N_{events}"	,1,"RATIO");
-  plots.draw("ZCtrlCenJetpT",	"Central jet p_{T} [GeV]",	"N_{events}"    ,1,"RATIO");
-  plots.draw("ZCtrlDEtajj",	"#Delta #eta_{jj}",		"N_{events}"	,1,"RATIO");
+  plots.draw("ZCtrlZpT",	"Z_p_{T} [GeV]",		"N_{events}"	,1,"RATIO_Z");
+  plots.draw("ZCtrlJet1pT", 	"Leading jet p_{T} [GeV]", 	"N_{events}"	,1,"RATIO_Z");
+  plots.draw("ZCtrlJet1Eta", 	"Leading jet #eta", 		"N_{events}"	,1,"RATIO_Z");
+  plots.draw("ZCtrlJet2pT",     "Sub-leading jet p_{T} [GeV]",  "N_{events}"	,1,"RATIO_Z");
+  plots.draw("ZCtrlJet2Eta",    "Sub-leading jet #eta",         "N_{events}"	,1,"RATIO_Z");
+  plots.draw("ZCtrlCenJetpT",	"Central jet p_{T} [GeV]",	"N_{events}"    ,1,"RATIO_Z");
+  plots.draw("ZCtrlDEtajj",	"#Delta #eta_{jj}",		"N_{events}"	,1,"RATIO_Z");
   plots.setYMax(5.e2);
   plots.setXMin(1100.);
   plots.setXMax(2600.);
-  plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"Events / 100 GeV"	,1,"RATIO");
+  plots.draw("ZCtrlMjj", 	"M_{jj} [GeV]",			"Events / 100 GeV"	,1,"RATIO_Z");
   plots.setYMax(5.e2);
   plots.setXMin(130.);
-  plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"Events / 20 GeV"	,1,"RATIO");
-  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj}",		"Events"	,1,"RATIO");
+  plots.draw("ZCtrlMET", 	"E_{T}^{miss} [GeV]",		"Events / 20 GeV"	,1,"RATIO_Z");
+  plots.draw("ZCtrlDPhijj", 	"#Delta #phi_{jj}",		"Events"	,1,"RATIO_Z");
   plots.setYMax(80.);
   plots.setYMin(0.);
-  plots.draw("ZCtrlZMass",      "M_{#mu#mu}  [GeV]",      "Events / 5 GeV"    ,0,"RATIO");
+  plots.draw("ZCtrlZMass",      "M_{#mu#mu}  [GeV]",      "Events / 5 GeV"    ,0,"RATIO_Z");
 
   //store histograms
   ofile->cd();

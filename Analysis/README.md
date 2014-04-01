@@ -95,6 +95,7 @@ Although this varies from program to program, typically we do something like (se
 To aid in quickly making cosmetic changes to plots for the paper, the folder `scripts/plotting` has some scripts that quickly allow you to make changes to the plot cosmetics, without having to re-run the full Z and controlPlot programs. Instructions for use:
 
 - run the `zBackground` and `controlPlot` programs once to write the necessary histrograms to ROOT files. These will be needed. 
+Note the datasets file you should use to run controlPlot is datasets_v11f_scaled.txt so we do not need another scaling in this program but only for Z
 - make any necessary changes to the cosmetics in `src/StackPlot.cc` and `include/Stackplot.h`.
 - run the script `makePlotsScripts.sh` in `scripts/plotting`. This converts the class defined in `StackPlot.cc` into a standalone class to be used in ROOT.
 - run `root -q -b plotScript.C` to remake the plots with your new cosmetic changes. Please check `plotScript.C` first though for input/output folders!

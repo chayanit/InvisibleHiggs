@@ -29,8 +29,8 @@
 	}
 
   // Location of root files with hists - cahnge these to suit your setup
-  std::string signalDir = "/afs/cern.ch/work/r/raggleto/scratch0/InvHiggsV11/CMSSW_5_3_7_patch5/src/InvisibleHiggs/Analysis/controlPlots/ControlPlots/";
-	std::string plotDir = "/afs/cern.ch/work/r/raggleto/scratch0/InvHiggsV11/CMSSW_5_3_7_patch5/src/InvisibleHiggs/Analysis/scripts/plotting/";
+  std::string signalDir = "/afs/cern.ch/work/c/chayanit/private/VBFInvHiggs_PATv11NoNu/CMSSW_5_3_7_patch5/src/InvisibleHiggs/Analysis/output/Result_AfterCWR_NewXsec/Central_fixWG/ControlPlots/";
+	std::string plotDir = "/afs/cern.ch/work/c/chayanit/private/VBFInvHiggs_PATv11NoNu/CMSSW_5_3_7_patch5/src/InvisibleHiggs/Analysis/scripts/plotting/";
 	
   //////////////////////////////
   // Make signal region plots //
@@ -88,7 +88,7 @@
   // Make Z control plots //
   //////////////////////////
 
-  std::string histDir = "/afs/cern.ch/work/r/raggleto/scratch0/InvHiggsV11/CMSSW_5_3_7_patch5/src/InvisibleHiggs/Analysis/ZBackground2/ZBackground/";
+  std::string histDir = "/afs/cern.ch/work/c/chayanit/private/VBFInvHiggs_PATv11NoNu/CMSSW_5_3_7_patch5/src/InvisibleHiggs/Analysis/output/Result_AfterCWR_NewXsec/Central_fixWG/ZBackground/";
   StackPlot zPlots(histDir, plotDir);
   zPlots.addDataset("tt+VV", "t#bar{t}, tW, VV", kAzure-2, 0);
   zPlots.addDataset("DY+jets", "DY(ll)+jets", kPink-4, 0);
@@ -101,13 +101,13 @@
   zPlots.setYMax(5.e2);
   zPlots.setXMin(1100.);
   zPlots.setXMax(2600.);
-  zPlots.draw("ZCtrlMjj","M_{jj} [GeV]","Events / 100 GeV",1,"RATIO");
+  zPlots.draw("ZCtrlMjj","M_{jj} [GeV]","Events / 100 GeV",1,"RATIO_Z");
   zPlots.setYMax(5.e2);
   zPlots.setXMin(130.);
-  zPlots.draw("ZCtrlMET","E_{T}^{miss} [GeV]","Events / 20 GeV",1,"RATIO");
+  zPlots.draw("ZCtrlMET","E_{T}^{miss} [GeV]","Events / 20 GeV",1,"RATIO_Z");
   zPlots.setYMax(80.);
   zPlots.setYMin(0.);
-  zPlots.draw("ZCtrlZMass","M_{#mu#mu}  [GeV]","Events / 5 GeV",0,"RATIO");
+  zPlots.draw("ZCtrlZMass","M_{#mu#mu}  [GeV]","Events / 5 GeV",0,"RATIO_Z");
 
   ////////////////////
   // Make N-1 plots //
