@@ -249,9 +249,9 @@ class InvHiggsInfo { //: public TObject {
   Double_t puWeight;
 
   // MC corrections
-  //Double_t trigCorrWeight;
-  Double_t trigCorrWeight_BCD;
-  Double_t trigCorrWeight_D;
+  Double_t trigCorrWeight;
+  Double_t trigCorrWeight3D_BCD;
+  Double_t trigCorrWeight3D_D;
 
   // Lepton ID efficiency corrections
   // Tight (for control regions)

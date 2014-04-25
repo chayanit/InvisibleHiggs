@@ -299,6 +299,10 @@ private:
 
   // trigger data/MC weights
   TFile* fTrigCorr_;
+  TH1D*  hTrigCorrL1MET_;
+  TH1D*  hTrigCorrJet_;
+  TH1D*  hTrigCorrMET_;
+  TH1D*  hTrigCorrMjj_;
   TH3D*  hTrigCorrDijet35_;
   TH3D*  hTrigCorrDijet30_;
   bool   doTrigCorr_;
@@ -404,6 +408,10 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
   doHltBit_(true),
   lumiWeights_(),
   fTrigCorr_(0),
+  hTrigCorrL1MET_(0),
+  hTrigCorrJet_(0),
+  hTrigCorrMET_(0),
+  hTrigCorrMjj_(0),
   hTrigCorrDijet35_(0),
   hTrigCorrDijet30_(0),
   doTrigCorr_(0),
@@ -451,7 +459,11 @@ InvHiggsInfoProducer::InvHiggsInfoProducer(const edm::ParameterSet& iConfig):
 
   if (stat(trigCorrFile.c_str(), &buf) != -1) {
     std::cout << "Reading trigger corrections from " << trigCorrFile << std::endl;
-    fTrigCorr_      = TFile::Open(trigCorrFile.c_str());
+    fTrigCorr_        = TFile::Open(trigCorrFile.c_str());
+    hTrigCorrL1MET_   = (TH1D*) fTrigCorr_->Get("METL1");
+    hTrigCorrJet_     = (TH1D*) fTrigCorr_->Get("JetHLT");
+    hTrigCorrMET_     = (TH1D*) fTrigCorr_->Get("METHLT");
+    hTrigCorrMjj_     = (TH1D*) fTrigCorr_->Get("MjjHLT");
     hTrigCorrDijet35_ = (TH3D*) fTrigCorr_->Get("h3DHLT_Dijet35_BCD");
     hTrigCorrDijet30_ = (TH3D*) fTrigCorr_->Get("h3DHLT_Dijet30_D");
     doTrigCorr_     = true;
@@ -1129,13 +1141,29 @@ void InvHiggsInfoProducer::doPUReweighting(const edm::Event& iEvent) {
 
 void InvHiggsInfoProducer::doTrigCorrWeights() {
 
-  //double weight=1.;
+  double weight=1.;
   double weightBCD = 1.;
   double weightD   = 1.;
 
   if (doTrigCorr_) {
+
+    int bin  = hTrigCorrJet_->FindBin(info_->jet1Pt);
+    weight  *= hTrigCorrJet_->GetBinContent(bin);
+
+    bin      = hTrigCorrJet_->FindBin(info_->jet2Pt);
+    weight  *= hTrigCorrJet_->GetBinContent(bin);
+
+    bin      = hTrigCorrMjj_->FindBin(info_->vbfM);
+    weight  *= hTrigCorrMjj_->GetBinContent(bin);
+
+    bin      = hTrigCorrL1MET_->FindBin(info_->metNoMuon);
+    weight  *= hTrigCorrL1MET_->GetBinContent(bin);
+
+    bin      = hTrigCorrMET_->FindBin(info_->metNoMuon);
+    weight  *= hTrigCorrMET_->GetBinContent(bin);
     
-    int bin     = hTrigCorrDijet35_->FindBin(info_->jet2Pt,info_->metNoMuon,info_->vbfM);
+    // 3D efficiencies 
+    bin   	= hTrigCorrDijet35_->FindBin(info_->jet2Pt,info_->metNoMuon,info_->vbfM);
     weightBCD  *= hTrigCorrDijet35_->GetBinContent(bin);
 
     bin 	= hTrigCorrDijet30_->FindBin(info_->jet2Pt,info_->metNoMuon,info_->vbfM);
@@ -1145,9 +1173,9 @@ void InvHiggsInfoProducer::doTrigCorrWeights() {
 
   }
 
-  //info_->trigCorrWeight = weight;
-  info_->trigCorrWeight_BCD = weightBCD;
-  info_->trigCorrWeight_D   = weightD;
+  info_->trigCorrWeight       = weight;
+  info_->trigCorrWeight3D_BCD = weightBCD;
+  info_->trigCorrWeight3D_D   = weightD;
 
 }
 

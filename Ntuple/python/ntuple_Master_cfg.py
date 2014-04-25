@@ -195,10 +195,9 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
         switchJetCollection(process, 
                             cms.InputTag('ak5PFJets'),   
                             doJTA            = True,            
-                            doBTagging       = False,            
+                            doBTagging       = True,            
                             jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']),
                             doType1MET       = True,            
-                            genJetCollection = cms.InputTag("ak5GenJets"),
                             doJetID          = False,
                             jetIdLabel       = "ak5"
                             )
@@ -206,10 +205,10 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
         switchJetCollection(process, 
                             cms.InputTag('ak5PFJets'),   
                             doJTA            = True,            
-                            doBTagging       = False,            
+                            doBTagging       = True,            
                             jetCorrLabel     = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute']),
                             doType1MET       = True,            
-                            genJetCollection = cms.InputTag("ak5GenJets"),
+                            genJetCollection = cms.InputTag("ak5GenJetsNoNu"),
                             doJetID          = False,
                             jetIdLabel       = "ak5"
                             )
@@ -498,6 +497,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
 
                 # Generate PAT
                 process.pfParticleSelectionSequence *
+                process.genParticlesForJetsNoNu *
+                process.ak5GenJetsNoNu *
                 process.patDefaultSequence *
                 process.goodPatJets *
                 process.PhysicsObjectSequence *
@@ -537,6 +538,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
 
                 # Generate PAT
                 process.pfParticleSelectionSequence *
+                process.genParticlesForJetsNoNu *
+                process.ak5GenJetsNoNu *
                 process.patDefaultSequence *
                 process.goodPatJets *
                 process.PhysicsObjectSequence *
@@ -586,6 +589,8 @@ def addInvHiggsProcess(process, iRunOnData=True, iData="ParkedData", iHLTFilter=
                                        ,'keep GenMETs_*_*_*'
                                        ,'keep *_addPileupInfo_*_*'
                                        ,'keep LHEEventProduct_*_*_*'
+                                       ,'keep ak5GenJets_*_*_*'
+                                       ,'keep ak5GenJetsNoNu_*_*_*'
                                        ]
         
     process.out.fileName = 'patTuple.root'

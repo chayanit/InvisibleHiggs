@@ -796,6 +796,16 @@ process.ak7PFJetsL2L3Residual = cms.EDProducer("PFJetCorrectionProducer",
 )
 
 
+process.bToCharmDecayVertexMerged = cms.EDProducer("BtoCharmDecayVertexMerger",
+    minvecSumIMifsmallDRUnique = cms.untracked.double(5.5),
+    minDRUnique = cms.untracked.double(0.4),
+    minCosPAtomerge = cms.untracked.double(0.99),
+    primaryVertices = cms.InputTag("offlinePrimaryVertices"),
+    maxPtreltomerge = cms.untracked.double(7777.0),
+    secondaryVertices = cms.InputTag("inclusiveMergedVerticesFiltered")
+)
+
+
 process.ca4GenJets = cms.EDProducer("FastjetJetProducer",
     Active_Area_Repeats = cms.int32(5),
     src = cms.InputTag("genParticlesForJets"),
@@ -2222,6 +2232,84 @@ process.combinatoricRecoTausTancTransform = cms.EDProducer("RecoTauMVATransform"
         )),
     toTransform = cms.InputTag("combinatoricRecoTausDiscriminationByTanc"),
     PFTauProducer = cms.InputTag("combinatoricRecoTaus")
+)
+
+
+process.combinedInclusiveSecondaryVertexBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertex'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("inclusiveSecondaryVertexFinderTagInfos"))
+)
+
+
+process.combinedInclusiveSecondaryVertexPositiveBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertexPositive'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("inclusiveSecondaryVertexFinderTagInfos"))
+)
+
+
+process.combinedMVABJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedMVA'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"), cms.InputTag("softPFMuonsTagInfos"), cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.combinedSecondaryVertexBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertex'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"))
+)
+
+
+process.combinedSecondaryVertexBJetTagsAOD = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertex'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosAOD"), cms.InputTag("secondaryVertexTagInfosAOD"))
+)
+
+
+process.combinedSecondaryVertexMVABJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertexMVA'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"))
+)
+
+
+process.combinedSecondaryVertexNegativeBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertexNegative'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexNegativeTagInfos"))
+)
+
+
+process.combinedSecondaryVertexPositiveBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertexPositive'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"))
+)
+
+
+process.combinedSecondaryVertexSoftPFLeptonV1BJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertexSoftPFLeptonV1'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"), cms.InputTag("softPFMuonsTagInfos"), cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.combinedSecondaryVertexV1BJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertexV1'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"))
+)
+
+
+process.combinedSecondaryVertexV1NegativeBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertexV1Negative'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexNegativeTagInfos"))
+)
+
+
+process.combinedSecondaryVertexV1PositiveBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('combinedSecondaryVertexV1Positive'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"))
+)
+
+
+process.doubleSecondaryVertexHighEffBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('doubleVertex2Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("inclusiveSecondaryVertexFinderFilteredTagInfos"))
 )
 
 
@@ -8486,6 +8574,73 @@ process.genParticlesForJetsNoNu = cms.EDProducer("InputGenJetsParticleSelector",
 )
 
 
+process.ghostTrackBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('ghostTrack'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("ghostTrackVertexTagInfos"))
+)
+
+
+process.ghostTrackVertexTagInfos = cms.EDProducer("SecondaryVertexProducer",
+    extSVDeltaRToJet = cms.double(0.3),
+    beamSpotTag = cms.InputTag("offlineBeamSpot"),
+    vertexReco = cms.PSet(
+        primcut = cms.double(2.0),
+        seccut = cms.double(4.0),
+        maxFitChi2 = cms.double(10.0),
+        fitType = cms.string('RefitGhostTrackWithVertices'),
+        mergeThreshold = cms.double(3.0),
+        finder = cms.string('gtvr')
+    ),
+    vertexSelection = cms.PSet(
+        sortCriterium = cms.string('dist3dError')
+    ),
+    constraint = cms.string('BeamSpot'),
+    trackIPTagInfos = cms.InputTag("impactParameterTagInfos"),
+    vertexCuts = cms.PSet(
+        distSig3dMax = cms.double(99999.9),
+        fracPV = cms.double(0.65),
+        distVal2dMax = cms.double(2.5),
+        useTrackWeights = cms.bool(True),
+        maxDeltaRToJetAxis = cms.double(0.5),
+        v0Filter = cms.PSet(
+            k0sMassWindow = cms.double(0.05)
+        ),
+        distSig2dMin = cms.double(3.0),
+        multiplicityMin = cms.uint32(1),
+        massMax = cms.double(6.5),
+        distSig2dMax = cms.double(99999.9),
+        distVal3dMax = cms.double(99999.9),
+        minimumTrackWeight = cms.double(0.5),
+        distVal3dMin = cms.double(-99999.9),
+        distVal2dMin = cms.double(0.01),
+        distSig3dMin = cms.double(-99999.9)
+    ),
+    useExternalSV = cms.bool(False),
+    minimumTrackWeight = cms.double(0.5),
+    usePVError = cms.bool(True),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(8),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(2),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.2),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(99999.9),
+        ptMin = cms.double(1.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip3dSig'),
+    extSVCollection = cms.InputTag("secondaryVertices")
+)
+
+
 process.gk5GenJets = cms.EDProducer("FastjetJetProducer",
     Active_Area_Repeats = cms.int32(5),
     src = cms.InputTag("genParticlesForJets"),
@@ -12891,6 +13046,170 @@ process.ic5PFJetsL2L3Residual = cms.EDProducer("PFJetCorrectionProducer",
 )
 
 
+process.impactParameterMVABJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('impactParameterMVAComputer'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.impactParameterTagInfos = cms.EDProducer("TrackIPProducer",
+    maximumTransverseImpactParameter = cms.double(0.2),
+    minimumNumberOfHits = cms.int32(8),
+    minimumTransverseMomentum = cms.double(1.0),
+    primaryVertex = cms.InputTag("offlinePrimaryVertices"),
+    maximumLongitudinalImpactParameter = cms.double(17.0),
+    computeProbabilities = cms.bool(True),
+    ghostTrackPriorDeltaR = cms.double(0.03),
+    jetTracks = cms.InputTag("ak5JetTracksAssociatorAtVertex"),
+    jetDirectionUsingGhostTrack = cms.bool(False),
+    minimumNumberOfPixelHits = cms.int32(2),
+    jetDirectionUsingTracks = cms.bool(False),
+    computeGhostTrack = cms.bool(True),
+    useTrackQuality = cms.bool(False),
+    maximumChiSquared = cms.double(5.0)
+)
+
+
+process.impactParameterTagInfosAOD = cms.EDProducer("TrackIPProducer",
+    maximumTransverseImpactParameter = cms.double(0.2),
+    minimumNumberOfHits = cms.int32(8),
+    minimumTransverseMomentum = cms.double(1.0),
+    primaryVertex = cms.InputTag("offlinePrimaryVertices"),
+    maximumLongitudinalImpactParameter = cms.double(17.0),
+    computeGhostTrack = cms.bool(True),
+    ghostTrackPriorDeltaR = cms.double(0.03),
+    jetTracks = cms.InputTag("jetTracksAssociatorAtVertex"),
+    jetDirectionUsingGhostTrack = cms.bool(False),
+    minimumNumberOfPixelHits = cms.int32(2),
+    jetDirectionUsingTracks = cms.bool(False),
+    computeProbabilities = cms.bool(True),
+    useTrackQuality = cms.bool(False),
+    maximumChiSquared = cms.double(5.0)
+)
+
+
+process.inclusiveSecondaryVertexFinderFilteredTagInfos = cms.EDProducer("SecondaryVertexProducer",
+    extSVDeltaRToJet = cms.double(0.5),
+    beamSpotTag = cms.InputTag("offlineBeamSpot"),
+    vertexReco = cms.PSet(
+        seccut = cms.double(6.0),
+        primcut = cms.double(1.8),
+        smoothing = cms.bool(False),
+        weightthreshold = cms.double(0.001),
+        minweight = cms.double(0.5),
+        finder = cms.string('avr')
+    ),
+    vertexSelection = cms.PSet(
+        sortCriterium = cms.string('dist3dError')
+    ),
+    constraint = cms.string('BeamSpot'),
+    trackIPTagInfos = cms.InputTag("impactParameterTagInfos"),
+    vertexCuts = cms.PSet(
+        distSig3dMax = cms.double(99999.9),
+        fracPV = cms.double(0.79),
+        distVal2dMax = cms.double(2.5),
+        useTrackWeights = cms.bool(True),
+        maxDeltaRToJetAxis = cms.double(0.5),
+        v0Filter = cms.PSet(
+            k0sMassWindow = cms.double(0.05)
+        ),
+        distSig2dMin = cms.double(2.0),
+        multiplicityMin = cms.uint32(2),
+        massMax = cms.double(6.5),
+        distSig2dMax = cms.double(99999.9),
+        distVal3dMax = cms.double(99999.9),
+        minimumTrackWeight = cms.double(0.5),
+        distVal3dMin = cms.double(-99999.9),
+        distVal2dMin = cms.double(0.01),
+        distSig3dMin = cms.double(-99999.9)
+    ),
+    useExternalSV = cms.bool(True),
+    minimumTrackWeight = cms.double(0.5),
+    usePVError = cms.bool(True),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(8),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(2),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.2),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(99999.9),
+        ptMin = cms.double(1.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip3dSig'),
+    extSVCollection = cms.InputTag("bToCharmDecayVertexMerged")
+)
+
+
+process.inclusiveSecondaryVertexFinderTagInfos = cms.EDProducer("SecondaryVertexProducer",
+    extSVDeltaRToJet = cms.double(0.3),
+    beamSpotTag = cms.InputTag("offlineBeamSpot"),
+    vertexReco = cms.PSet(
+        seccut = cms.double(6.0),
+        primcut = cms.double(1.8),
+        smoothing = cms.bool(False),
+        weightthreshold = cms.double(0.001),
+        minweight = cms.double(0.5),
+        finder = cms.string('avr')
+    ),
+    vertexSelection = cms.PSet(
+        sortCriterium = cms.string('dist3dError')
+    ),
+    constraint = cms.string('BeamSpot'),
+    trackIPTagInfos = cms.InputTag("impactParameterTagInfos"),
+    vertexCuts = cms.PSet(
+        distSig3dMax = cms.double(99999.9),
+        fracPV = cms.double(0.79),
+        distVal2dMax = cms.double(2.5),
+        useTrackWeights = cms.bool(True),
+        maxDeltaRToJetAxis = cms.double(0.5),
+        v0Filter = cms.PSet(
+            k0sMassWindow = cms.double(0.05)
+        ),
+        distSig2dMin = cms.double(2.0),
+        multiplicityMin = cms.uint32(2),
+        massMax = cms.double(6.5),
+        distSig2dMax = cms.double(99999.9),
+        distVal3dMax = cms.double(99999.9),
+        minimumTrackWeight = cms.double(0.5),
+        distVal3dMin = cms.double(-99999.9),
+        distVal2dMin = cms.double(0.01),
+        distSig3dMin = cms.double(-99999.9)
+    ),
+    useExternalSV = cms.bool(True),
+    minimumTrackWeight = cms.double(0.5),
+    usePVError = cms.bool(True),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(8),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(2),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.2),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(99999.9),
+        ptMin = cms.double(1.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip3dSig'),
+    extSVCollection = cms.InputTag("inclusiveMergedVertices")
+)
+
+
 process.isoDeposits = cms.EDProducer("CandIsoDepositProducer",
     src = cms.InputTag(""),
     MultipleDepositsFlag = cms.bool(False),
@@ -13114,6 +13433,30 @@ process.iterativeCone7HiGenJets = cms.EDProducer("SubEventGenJetProducer",
     maxProblematicHcalCells = cms.uint32(9999999),
     jetAlgorithm = cms.string('IterativeCone'),
     rParam = cms.double(0.7)
+)
+
+
+process.jetBProbabilityBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('jetBProbability'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.jetBProbabilityBJetTagsAOD = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('jetBProbability'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosAOD"))
+)
+
+
+process.jetProbabilityBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('jetProbability'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.jetProbabilityBJetTagsAOD = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('jetProbability'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosAOD"))
 )
 
 
@@ -14116,6 +14459,92 @@ process.muonMatch = cms.EDProducer("MCMatcher",
 )
 
 
+process.negativeCombinedMVABJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeCombinedMVA'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexNegativeTagInfos"), cms.InputTag("softPFMuonsTagInfos"), cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.negativeCombinedSecondaryVertexSoftPFLeptonV1BJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeCombinedSecondaryVertexSoftPFLeptonV1'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexNegativeTagInfos"), cms.InputTag("softPFMuonsTagInfos"), cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.negativeOnlyJetBProbabilityJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeOnlyJetBProbability'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.negativeOnlyJetProbabilityJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeOnlyJetProbability'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.negativeSoftPFElectronBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeSoftPFElectron'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.negativeSoftPFElectronByIP2dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeSoftPFElectronByIP2d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.negativeSoftPFElectronByIP3dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeSoftPFElectronByIP3d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.negativeSoftPFElectronByPtBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeSoftPFElectronByPt'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.negativeSoftPFMuonBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeSoftPFMuon'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.negativeSoftPFMuonByIP2dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeSoftPFMuonByIP2d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.negativeSoftPFMuonByIP3dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeSoftPFMuonByIP3d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.negativeSoftPFMuonByPtBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('negativeSoftPFMuonByPt'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.negativeTrackCountingHighEffJetTags = cms.EDProducer("JetTagProducer",
+    trackQualityClass = cms.string('any'),
+    jetTagComputer = cms.string('negativeTrackCounting3D2nd'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.negativeTrackCountingHighPurJetTags = cms.EDProducer("JetTagProducer",
+    trackQualityClass = cms.string('any'),
+    jetTagComputer = cms.string('negativeTrackCounting3D3rd'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
 process.particleFlowDisplacedVertex = cms.EDProducer("PFDisplacedVertexProducer",
     verbose = cms.untracked.bool(False),
     primaryVertexCut = cms.double(2.5),
@@ -14301,7 +14730,7 @@ process.patJetGenJetMatch = cms.EDProducer("GenJetMatcher",
     maxDeltaR = cms.double(0.4),
     checkCharge = cms.bool(False),
     resolveAmbiguities = cms.bool(True),
-    matched = cms.InputTag("ak5GenJets")
+    matched = cms.InputTag("ak5GenJetsNoNu")
 )
 
 
@@ -14372,11 +14801,10 @@ process.patJets = cms.EDProducer("PATJetProducer",
     addEfficiencies = cms.bool(False),
     jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactors")),
     trackAssociationSource = cms.InputTag("jetTracksAssociatorAtVertex"),
-    tagInfoSources = cms.VInputTag(),
-    discriminatorSources = cms.VInputTag(cms.InputTag("combinedSecondaryVertexBJetTags"), cms.InputTag("combinedSecondaryVertexMVABJetTags"), cms.InputTag("jetBProbabilityBJetTags"), cms.InputTag("jetProbabilityBJetTags"), cms.InputTag("simpleSecondaryVertexHighEffBJetTags"), 
-        cms.InputTag("simpleSecondaryVertexHighPurBJetTags"), cms.InputTag("softElectronByPtBJetTags"), cms.InputTag("softElectronByIP3dBJetTags"), cms.InputTag("softMuonBJetTags"), cms.InputTag("softMuonByPtBJetTags"), 
-        cms.InputTag("softMuonByIP3dBJetTags"), cms.InputTag("trackCountingHighEffBJetTags"), cms.InputTag("trackCountingHighPurBJetTags")),
-    addBTagInfo = cms.bool(False),
+    tagInfoSources = cms.VInputTag(cms.InputTag("impactParameterTagInfosAOD"), cms.InputTag("secondaryVertexTagInfosAOD")),
+    discriminatorSources = cms.VInputTag(cms.InputTag("jetBProbabilityBJetTagsAOD"), cms.InputTag("jetProbabilityBJetTagsAOD"), cms.InputTag("trackCountingHighPurBJetTagsAOD"), cms.InputTag("trackCountingHighEffBJetTagsAOD"), cms.InputTag("simpleSecondaryVertexHighEffBJetTagsAOD"), 
+        cms.InputTag("simpleSecondaryVertexHighPurBJetTagsAOD"), cms.InputTag("combinedSecondaryVertexBJetTagsAOD")),
+    addBTagInfo = cms.bool(True),
     embedCaloTowers = cms.bool(True),
     addResolutions = cms.bool(False),
     getJetMCFlavour = cms.bool(True),
@@ -16946,6 +17374,78 @@ process.pileupJetIdProducer = cms.EDProducer("PileupJetIdProducer",
 )
 
 
+process.positiveCombinedMVABJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveCombinedMVA'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"), cms.InputTag("softPFMuonsTagInfos"), cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.positiveCombinedSecondaryVertexSoftPFLeptonV1BJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveCombinedSecondaryVertexSoftPFLeptonV1'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"), cms.InputTag("secondaryVertexTagInfos"), cms.InputTag("softPFMuonsTagInfos"), cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.positiveOnlyJetBProbabilityJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveOnlyJetBProbability'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.positiveOnlyJetProbabilityJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveOnlyJetProbability'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.positiveSoftPFElectronBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveSoftPFElectron'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.positiveSoftPFElectronByIP2dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveSoftPFElectronByIP2d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.positiveSoftPFElectronByIP3dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveSoftPFElectronByIP3d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.positiveSoftPFElectronByPtBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveSoftPFElectronByPt'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.positiveSoftPFMuonBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveSoftPFMuon'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.positiveSoftPFMuonByIP2dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveSoftPFMuonByIP2d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.positiveSoftPFMuonByIP3dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveSoftPFMuonByIP3d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.positiveSoftPFMuonByPtBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('positiveSoftPFMuonByPt'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
 process.puJetId = cms.EDProducer("PileupJetIdProducer",
     residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
     runMvas = cms.bool(False),
@@ -18031,6 +18531,67 @@ process.secondaryVertexTagInfos = cms.EDProducer("SecondaryVertexProducer",
 )
 
 
+process.secondaryVertexTagInfosAOD = cms.EDProducer("SecondaryVertexProducer",
+    extSVDeltaRToJet = cms.double(0.3),
+    beamSpotTag = cms.InputTag("offlineBeamSpot"),
+    vertexReco = cms.PSet(
+        seccut = cms.double(6.0),
+        primcut = cms.double(1.8),
+        smoothing = cms.bool(False),
+        weightthreshold = cms.double(0.001),
+        minweight = cms.double(0.5),
+        finder = cms.string('avr')
+    ),
+    vertexSelection = cms.PSet(
+        sortCriterium = cms.string('dist3dError')
+    ),
+    constraint = cms.string('BeamSpot'),
+    trackIPTagInfos = cms.InputTag("impactParameterTagInfosAOD"),
+    vertexCuts = cms.PSet(
+        distSig3dMax = cms.double(99999.9),
+        fracPV = cms.double(0.65),
+        distVal2dMax = cms.double(2.5),
+        useTrackWeights = cms.bool(True),
+        maxDeltaRToJetAxis = cms.double(0.5),
+        v0Filter = cms.PSet(
+            k0sMassWindow = cms.double(0.05)
+        ),
+        distSig2dMin = cms.double(3.0),
+        multiplicityMin = cms.uint32(2),
+        massMax = cms.double(6.5),
+        distSig2dMax = cms.double(99999.9),
+        distVal3dMax = cms.double(99999.9),
+        minimumTrackWeight = cms.double(0.5),
+        distVal3dMin = cms.double(-99999.9),
+        distVal2dMin = cms.double(0.01),
+        distSig3dMin = cms.double(-99999.9)
+    ),
+    useExternalSV = cms.bool(False),
+    minimumTrackWeight = cms.double(0.5),
+    usePVError = cms.bool(True),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(8),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(2),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.2),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(99999.9),
+        ptMin = cms.double(1.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip3dSig'),
+    extSVCollection = cms.InputTag("secondaryVertices")
+)
+
+
 process.selectElectrons = cms.EDProducer("InvHiggsPATElectronIdSelector",
     idLabel = cms.string('tight'),
     src = cms.InputTag("cleanPatElectrons")
@@ -19046,8 +19607,62 @@ process.shrinkingConePFTauProducerSansRefs = cms.EDProducer("RecoTauProducer",
 )
 
 
+process.simpleInclusiveSecondaryVertexHighEffBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex2Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("inclusiveSecondaryVertexFinderFilteredTagInfos"))
+)
+
+
+process.simpleInclusiveSecondaryVertexHighPurBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex3Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("inclusiveSecondaryVertexFinderFilteredTagInfos"))
+)
+
+
+process.simpleSecondaryVertexBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex2Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("secondaryVertexTagInfos"))
+)
+
+
+process.simpleSecondaryVertexHighEffBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex2Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("secondaryVertexTagInfos"))
+)
+
+
+process.simpleSecondaryVertexHighEffBJetTagsAOD = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex2Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("secondaryVertexTagInfosAOD"))
+)
+
+
+process.simpleSecondaryVertexHighPurBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex3Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("secondaryVertexTagInfos"))
+)
+
+
+process.simpleSecondaryVertexHighPurBJetTagsAOD = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex3Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("secondaryVertexTagInfosAOD"))
+)
+
+
 process.simpleSecondaryVertexNegativeBJetTags = cms.EDProducer("JetTagProducer",
     jetTagComputer = cms.string('simpleSecondaryVertex'),
+    tagInfos = cms.VInputTag(cms.InputTag("secondaryVertexNegativeTagInfos"))
+)
+
+
+process.simpleSecondaryVertexNegativeHighEffBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex2Trk'),
+    tagInfos = cms.VInputTag(cms.InputTag("secondaryVertexNegativeTagInfos"))
+)
+
+
+process.simpleSecondaryVertexNegativeHighPurBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('simpleSecondaryVertex3Trk'),
     tagInfos = cms.VInputTag(cms.InputTag("secondaryVertexNegativeTagInfos"))
 )
 
@@ -19486,6 +20101,80 @@ process.smearedGoodPatJetsResUp = cms.EDProducer("SmearedPATJetProducer",
 )
 
 
+process.softMuonTagInfos = cms.EDProducer("SoftLepton",
+    muonSelection = cms.uint32(1),
+    leptons = cms.InputTag("muons"),
+    primaryVertex = cms.InputTag("offlinePrimaryVertices"),
+    leptonCands = cms.InputTag(""),
+    leptonId = cms.InputTag(""),
+    refineJetAxis = cms.uint32(0),
+    jets = cms.InputTag("ak5CaloJets"),
+    leptonDeltaRCut = cms.double(0.4),
+    leptonChi2Cut = cms.double(9999.0)
+)
+
+
+process.softPFElectronBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('softPFElectron'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.softPFElectronByIP2dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('softPFElectronByIP2d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.softPFElectronByIP3dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('softPFElectronByIP3d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.softPFElectronByPtBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('softPFElectronByPt'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFElectronsTagInfos"))
+)
+
+
+process.softPFElectronsTagInfos = cms.EDProducer("SoftPFElectronTagInfoProducer",
+    jets = cms.InputTag("ak5PFJets"),
+    primaryVertex = cms.InputTag("offlinePrimaryVertices")
+)
+
+
+process.softPFMuonBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('softPFMuon'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.softPFMuonByIP2dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('softPFMuonByIP2d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.softPFMuonByIP3dBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('softPFMuonByIP3d'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.softPFMuonByPtBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('softPFMuonByPt'),
+    tagInfos = cms.VInputTag(cms.InputTag("softPFMuonsTagInfos"))
+)
+
+
+process.softPFMuonsTagInfos = cms.EDProducer("SoftPFMuonTagInfoProducer",
+    MuonId = cms.int32(0),
+    jets = cms.InputTag("ak5PFJets"),
+    primaryVertex = cms.InputTag("offlinePrimaryVertices")
+)
+
+
 process.tauGenJetMatch = cms.EDProducer("GenJetMatcher",
     src = cms.InputTag("hpsPFTauProducer"),
     maxDPtRel = cms.double(3.0),
@@ -19592,6 +20281,30 @@ process.tauMatch = cms.EDProducer("MCMatcher",
     checkCharge = cms.bool(True),
     resolveAmbiguities = cms.bool(True),
     matched = cms.InputTag("genParticles")
+)
+
+
+process.trackCountingHighEffBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('trackCounting3D2nd'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.trackCountingHighEffBJetTagsAOD = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('trackCounting3D2nd'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosAOD"))
+)
+
+
+process.trackCountingHighPurBJetTags = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('trackCounting3D3rd'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfos"))
+)
+
+
+process.trackCountingHighPurBJetTagsAOD = cms.EDProducer("JetTagProducer",
+    jetTagComputer = cms.string('trackCounting3D3rd'),
+    tagInfos = cms.VInputTag(cms.InputTag("impactParameterTagInfosAOD"))
 )
 
 
@@ -20324,6 +21037,33 @@ process.HBHENoiseFilter = cms.EDFilter("HBHENoiseFilter",
 )
 
 
+process.bVertexFilter = cms.EDFilter("BVertexFilter",
+    primaryVertices = cms.InputTag("offlinePrimaryVertices"),
+    minVertices = cms.int32(0),
+    useVertexKinematicAsJetAxis = cms.bool(True),
+    vertexFilter = cms.PSet(
+        distSig3dMax = cms.double(99999.9),
+        fracPV = cms.double(0.65),
+        distVal2dMax = cms.double(2.5),
+        useTrackWeights = cms.bool(True),
+        maxDeltaRToJetAxis = cms.double(0.1),
+        v0Filter = cms.PSet(
+            k0sMassWindow = cms.double(0.05)
+        ),
+        distSig2dMin = cms.double(3.0),
+        multiplicityMin = cms.uint32(2),
+        massMax = cms.double(6.5),
+        distSig2dMax = cms.double(99999.9),
+        distVal3dMax = cms.double(99999.9),
+        minimumTrackWeight = cms.double(0.5),
+        distVal3dMin = cms.double(-99999.9),
+        distVal2dMin = cms.double(0.01),
+        distSig3dMin = cms.double(-99999.9)
+    ),
+    secondaryVertices = cms.InputTag("secondaryVertices")
+)
+
+
 process.bestWENu = cms.EDFilter("LargestPtCandViewSelector",
     maxNumber = cms.uint32(5),
     src = cms.InputTag("wToENu")
@@ -20589,6 +21329,33 @@ process.hltHighLevel = cms.EDFilter("HLTHighLevel",
         'HLT_DiJet30_MJJ700_AllJets_DEta3p5_VBF_v*'),
     throw = cms.bool(False),
     andOr = cms.bool(True)
+)
+
+
+process.inclusiveMergedVerticesFiltered = cms.EDFilter("BVertexFilter",
+    primaryVertices = cms.InputTag("offlinePrimaryVertices"),
+    minVertices = cms.int32(0),
+    useVertexKinematicAsJetAxis = cms.bool(True),
+    vertexFilter = cms.PSet(
+        distSig3dMax = cms.double(99999.9),
+        fracPV = cms.double(0.65),
+        distVal2dMax = cms.double(2.5),
+        useTrackWeights = cms.bool(True),
+        maxDeltaRToJetAxis = cms.double(0.1),
+        v0Filter = cms.PSet(
+            k0sMassWindow = cms.double(0.05)
+        ),
+        distSig2dMin = cms.double(3.0),
+        multiplicityMin = cms.uint32(2),
+        massMax = cms.double(6.5),
+        distSig2dMax = cms.double(99999.9),
+        distVal3dMax = cms.double(99999.9),
+        minimumTrackWeight = cms.double(0.5),
+        distVal3dMin = cms.double(-99999.9),
+        distVal2dMin = cms.double(0.01),
+        distSig3dMin = cms.double(-99999.9)
+    ),
+    secondaryVertices = cms.InputTag("inclusiveMergedVertices")
 )
 
 
@@ -21117,6 +21884,9 @@ process.patElectronTrackIsolation = cms.Sequence(process.eleIsoDepositTk+process
 process.pfMEtSysShiftCorrSequence = cms.Sequence(process.selectedVerticesForMEtCorr+process.pfMEtSysShiftCorr)
 
 
+process.btaggingAOD = cms.Sequence(process.impactParameterTagInfosAOD+process.secondaryVertexTagInfosAOD+process.jetBProbabilityBJetTagsAOD+process.jetProbabilityBJetTagsAOD+process.trackCountingHighPurBJetTagsAOD+process.trackCountingHighEffBJetTagsAOD+process.simpleSecondaryVertexHighEffBJetTagsAOD+process.simpleSecondaryVertexHighPurBJetTagsAOD+process.combinedSecondaryVertexBJetTagsAOD)
+
+
 process.hpsPFTauDiscriminationByIsolationSeq = cms.Sequence(process.hpsPFTauDiscriminationByVLooseIsolation+process.hpsPFTauDiscriminationByLooseIsolation+process.hpsPFTauDiscriminationByMediumIsolation+process.hpsPFTauDiscriminationByTightIsolation)
 
 
@@ -21133,6 +21903,9 @@ process.hpsTancTauDiscriminantSequence = cms.Sequence(process.hpsTancTausDiscrim
 
 
 process.hpsPFTauDiscriminationByMVAIsolationSeq = cms.Sequence(process.kt6PFJetsForRhoComputationVoronoi+process.hpsPFTauDiscriminationByIsolationMVAraw+process.hpsPFTauDiscriminationByLooseIsolationMVA+process.hpsPFTauDiscriminationByMediumIsolationMVA+process.hpsPFTauDiscriminationByTightIsolationMVA+process.hpsPFTauDiscriminationByIsolationMVA2raw+process.hpsPFTauDiscriminationByLooseIsolationMVA2+process.hpsPFTauDiscriminationByMediumIsolationMVA2+process.hpsPFTauDiscriminationByTightIsolationMVA2)
+
+
+process.btagging = cms.Sequence(process.impactParameterTagInfos+process.trackCountingHighEffBJetTags+process.trackCountingHighPurBJetTags+process.jetProbabilityBJetTags+process.jetBProbabilityBJetTags+process.secondaryVertexTagInfos+process.simpleSecondaryVertexHighEffBJetTags+process.simpleSecondaryVertexHighPurBJetTags+process.combinedSecondaryVertexBJetTags+process.combinedSecondaryVertexMVABJetTags+process.ghostTrackVertexTagInfos+process.ghostTrackBJetTags+process.softPFMuonsTagInfos+process.softPFMuonBJetTags+process.softPFElectronsTagInfos+process.softPFElectronBJetTags)
 
 
 process.patElectronHcalIsolation = cms.Sequence(process.eleIsoDepositHcalFromTowers+process.eleIsoFromDepsHcalFromTowers)
@@ -21198,9 +21971,6 @@ process.smearedPatPFMetSequence = cms.Sequence(process.patPFMetForMEtUncertainty
 process.patElectronEcalIsolation = cms.Sequence(process.eleIsoDepositEcalFromHits+process.eleIsoFromDepsEcalFromHitsByCrystal)
 
 
-process.patPhotonTrackIsolation = cms.Sequence(process.gamIsoDepositTk+process.gamIsoFromDepsTk)
-
-
 process.hpsPFTauDiscriminationByChargedIsolationSeq = cms.Sequence(process.hpsPFTauDiscriminationByVLooseChargedIsolation+process.hpsPFTauDiscriminationByLooseChargedIsolation+process.hpsPFTauDiscriminationByMediumChargedIsolation+process.hpsPFTauDiscriminationByTightChargedIsolation)
 
 
@@ -21244,6 +22014,9 @@ process.patShrinkingConePFTauDiscrimination = cms.Sequence()
 
 
 process.hpsPFTauDiscriminationByIsolationSeqDBSumPtCorr = cms.Sequence(process.hpsPFTauDiscriminationByVLooseIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByLooseIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByMediumIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByTightIsolationDBSumPtCorr)
+
+
+process.patPhotonTrackIsolation = cms.Sequence(process.gamIsoDepositTk+process.gamIsoFromDepsTk)
 
 
 process.pfPhotonIsolationSequence = cms.Sequence(process.photonPFIsolationDepositsSequence+process.phPFIsoValueCharged03PFId+process.phPFIsoValueChargedAll03PFId+process.phPFIsoValueGamma03PFId+process.phPFIsoValueNeutral03PFId+process.phPFIsoValuePU03PFId+process.phPFIsoValueCharged04PFId+process.phPFIsoValueChargedAll04PFId+process.phPFIsoValueGamma04PFId+process.phPFIsoValueNeutral04PFId+process.phPFIsoValuePU04PFId)
@@ -21375,9 +22148,6 @@ process.recoTauClassicShrinkingConeSequence = cms.Sequence(process.recoTauCommon
 process.producePatPFMETCorrections = cms.Sequence(process.smearedPatPFMetSequence+process.pfCandsNotInJet+process.selectedPatJetsForMETtype1p2Corr+process.selectedPatJetsForMETtype2Corr+process.patPFJetMETtype1p2Corr+process.patPFJetMETtype2Corr+process.type0PFMEtCorrectionPFCandToVertexAssociation+process.patPFMETtype0Corr+process.pfCandMETcorr+process.patType1CorrectedPFMet+process.patType1p2CorrectedPFMet)
 
 
-process.muonPFIsolationSequence = cms.Sequence(process.muonPFIsolationDepositsSequence+process.muPFIsoValueCharged03+process.muPFIsoValueChargedAll03+process.muPFIsoValueGamma03+process.muPFIsoValueNeutral03+process.muPFIsoValueGammaHighThreshold03+process.muPFIsoValueNeutralHighThreshold03+process.muPFIsoValuePU03+process.muPFIsoValueCharged04+process.muPFIsoValueChargedAll04+process.muPFIsoValueGamma04+process.muPFIsoValueNeutral04+process.muPFIsoValueGammaHighThreshold04+process.muPFIsoValueNeutralHighThreshold04+process.muPFIsoValuePU04)
-
-
 process.type0PFMEtCorrection = cms.Sequence(process.type0PFMEtCorrectionPFCandToVertexAssociation+process.pfMETcorrType0)
 
 
@@ -21394,6 +22164,9 @@ process.recoTauClassicShrinkingConeMVASequence = cms.Sequence(process.produceShr
 
 
 process.updateHPSPFTaus = cms.Sequence(process.hpsPFTauDiscriminationByDecayModeFinding+process.hpsPFTauDiscriminationByChargedIsolationSeq+process.hpsPFTauDiscriminationByMVAIsolationSeq+process.hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByRawChargedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByRawGammaIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByVLooseIsolation+process.hpsPFTauDiscriminationByLooseIsolation+process.hpsPFTauDiscriminationByMediumIsolation+process.hpsPFTauDiscriminationByTightIsolation+process.hpsPFTauDiscriminationByVLooseIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByLooseIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByMediumIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByTightIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByVLooseCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr+process.hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits+process.hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr3Hits+process.hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr3Hits+process.hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr3Hits+process.hpsPFTauDiscriminationByLooseElectronRejection+process.hpsPFTauDiscriminationByMediumElectronRejection+process.hpsPFTauDiscriminationByTightElectronRejection+process.hpsPFTauDiscriminationByMVAElectronRejection+process.hpsPFTauDiscriminationByMVA2rawElectronRejection+process.hpsPFTauDiscriminationByMVA2LooseElectronRejection+process.hpsPFTauDiscriminationByMVA2VLooseElectronRejection+process.hpsPFTauDiscriminationByMVA2MediumElectronRejection+process.hpsPFTauDiscriminationByMVA2TightElectronRejection+process.hpsPFTauDiscriminationByLooseMuonRejection+process.hpsPFTauDiscriminationByMediumMuonRejection+process.hpsPFTauDiscriminationByTightMuonRejection+process.hpsPFTauDiscriminationByLooseMuonRejection2+process.hpsPFTauDiscriminationByMediumMuonRejection2+process.hpsPFTauDiscriminationByTightMuonRejection2+process.hpsPFTauDiscriminationByLooseMuonRejection3+process.hpsPFTauDiscriminationByTightMuonRejection3+process.hpsPFTauDiscriminationByMVA3rawElectronRejection+process.hpsPFTauDiscriminationByMVA3LooseElectronRejection+process.hpsPFTauDiscriminationByMVA3VTightElectronRejection+process.hpsPFTauDiscriminationByMVA3MediumElectronRejection+process.hpsPFTauDiscriminationByMVA3TightElectronRejection+process.hpsPFTauDiscriminationByDeadECALElectronRejection)
+
+
+process.muonPFIsolationSequence = cms.Sequence(process.muonPFIsolationDepositsSequence+process.muPFIsoValueCharged03+process.muPFIsoValueChargedAll03+process.muPFIsoValueGamma03+process.muPFIsoValueNeutral03+process.muPFIsoValueGammaHighThreshold03+process.muPFIsoValueNeutralHighThreshold03+process.muPFIsoValuePU03+process.muPFIsoValueCharged04+process.muPFIsoValueChargedAll04+process.muPFIsoValueGamma04+process.muPFIsoValueNeutral04+process.muPFIsoValueGammaHighThreshold04+process.muPFIsoValueNeutralHighThreshold04+process.muPFIsoValuePU04)
 
 
 process.stdElectronSequencePFIso = cms.Sequence(process.pfElectronIsolationSequencePFIso)
@@ -21450,7 +22223,7 @@ process.patCandidates = cms.Sequence(process.makePatElectrons+process.makePatMuo
 process.PFBRECO = cms.Sequence(process.pfNoPileUpSequence+process.pfParticleSelectionSequence+process.pfPhotonSequence+process.pfMuonSequence+process.pfNoMuon+process.pfElectronSequence+process.pfNoElectron+process.pfJetSequence+process.pfNoJet+process.pfTauSequence+process.pfNoTau+process.pfMET)
 
 
-process.patDefaultSequence = cms.Sequence(process.electronMatch+process.eleIsoSequence+process.patElectrons+process.makePatMuons+process.makePatTaus+process.makePatPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.patJetCharge+process.patJetPartonMatch+process.patJetGenJetMatch+process.patJetFlavourId+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates)
+process.patDefaultSequence = cms.Sequence(process.electronMatch+process.eleIsoSequence+process.patElectrons+process.makePatMuons+process.makePatTaus+process.makePatPhotons+process.patJetCorrections+process.jetTracksAssociatorAtVertex+process.btaggingAOD+process.patJetCharge+process.patJetPartonMatch+process.patJetGenJetMatch+process.patJetFlavourId+process.patJets+process.patMETCorrections+process.patMETs+process.patMETsPF+process.patCandidateSummary+process.selectedPatCandidates+process.cleanPatCandidates+process.countPatCandidates)
 
 
 process.p0 = cms.Path(process.HBHENoiseFilter)
@@ -21480,7 +22253,7 @@ process.p7 = cms.Path(process.trkPOGFilters)
 process.p8 = cms.Path(process.primaryVertexFilter)
 
 
-process.p = cms.Path(process.vbfFilter+process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.patDefaultSequence+process.goodPatJets+process.PhysicsObjectSequence+process.metUncertaintySequence+process.puJetIdSqeuence+process.puJetIdSmeared+process.puJetMvaSmeared+process.puJetIdResUp+process.puJetMvaResUp+process.puJetIdResDown+process.puJetMvaResDown+process.puJetIdEnUp+process.puJetMvaEnUp+process.puJetIdEnDown+process.puJetMvaEnDown+process.WSequence+process.ZSequence+process.invHiggsInfo)
+process.p = cms.Path(process.vbfFilter+process.noscraping+process.primaryVertexFilter+process.type0PFMEtCorrection+process.recoTauClassicHPSSequence+process.pfParticleSelectionSequence+process.genParticlesForJetsNoNu+process.ak5GenJetsNoNu+process.patDefaultSequence+process.goodPatJets+process.PhysicsObjectSequence+process.metUncertaintySequence+process.puJetIdSqeuence+process.puJetIdSmeared+process.puJetMvaSmeared+process.puJetIdResUp+process.puJetMvaResUp+process.puJetIdResDown+process.puJetMvaResDown+process.puJetIdEnUp+process.puJetMvaEnUp+process.puJetIdEnDown+process.puJetMvaEnDown+process.WSequence+process.ZSequence+process.invHiggsInfo)
 
 
 process.MessageLogger = cms.Service("MessageLogger",
@@ -22345,8 +23118,522 @@ process.ak7PFResidual = cms.ESProducer("LXXXCorrectionESProducer",
 )
 
 
+process.combinedMVA = cms.ESProducer("CombinedMVAJetTagESProducer",
+    useCategories = cms.bool(False),
+    calibrationRecord = cms.string('CombinedMVA'),
+    jetTagComputers = cms.VPSet(cms.PSet(
+        discriminator = cms.bool(True),
+        variables = cms.bool(False),
+        jetTagComputer = cms.string('jetProbability')
+    ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('combinedSecondaryVertex')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('softPFMuon')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('softPFElectron')
+        ))
+)
+
+
+process.combinedSecondaryVertex = cms.ESProducer("CombinedSecondaryVertexESProducer",
+    useTrackWeights = cms.bool(True),
+    pseudoMultiplicityMin = cms.uint32(2),
+    correctVertexMass = cms.bool(True),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    pseudoVertexV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.05)
+    ),
+    charmCut = cms.double(1.5),
+    vertexFlip = cms.bool(False),
+    minimumTrackWeight = cms.double(0.5),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    trackMultiplicityMin = cms.uint32(3),
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(2.0),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip2dSig'),
+    trackFlip = cms.bool(False),
+    calibrationRecords = cms.vstring('CombinedSVRecoVertex', 
+        'CombinedSVPseudoVertex', 
+        'CombinedSVNoVertex'),
+    useCategories = cms.bool(True),
+    categoryVariableName = cms.string('vertexCategory')
+)
+
+
+process.combinedSecondaryVertexMVA = cms.ESProducer("CombinedSecondaryVertexESProducer",
+    useTrackWeights = cms.bool(True),
+    pseudoMultiplicityMin = cms.uint32(2),
+    correctVertexMass = cms.bool(True),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    pseudoVertexV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.05)
+    ),
+    charmCut = cms.double(1.5),
+    vertexFlip = cms.bool(False),
+    minimumTrackWeight = cms.double(0.5),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    trackMultiplicityMin = cms.uint32(3),
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(2.0),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip2dSig'),
+    trackFlip = cms.bool(False),
+    calibrationRecords = cms.vstring('CombinedSVMVARecoVertex', 
+        'CombinedSVMVAPseudoVertex', 
+        'CombinedSVMVANoVertex'),
+    useCategories = cms.bool(True),
+    categoryVariableName = cms.string('vertexCategory')
+)
+
+
+process.combinedSecondaryVertexNegative = cms.ESProducer("CombinedSecondaryVertexESProducer",
+    charmCut = cms.double(1.5),
+    useTrackWeights = cms.bool(True),
+    useCategories = cms.bool(True),
+    pseudoMultiplicityMin = cms.uint32(2),
+    categoryVariableName = cms.string('vertexCategory'),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(0),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    calibrationRecords = cms.vstring('CombinedSVRecoVertex', 
+        'CombinedSVPseudoVertex', 
+        'CombinedSVNoVertex'),
+    pseudoVertexV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.05)
+    ),
+    correctVertexMass = cms.bool(True),
+    vertexFlip = cms.bool(True),
+    minimumTrackWeight = cms.double(0.5),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    trackMultiplicityMin = cms.uint32(3),
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(0),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(-2.0),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip2dSig'),
+    trackFlip = cms.bool(True)
+)
+
+
+process.combinedSecondaryVertexPositive = cms.ESProducer("CombinedSecondaryVertexESProducer",
+    charmCut = cms.double(1.5),
+    useTrackWeights = cms.bool(True),
+    useCategories = cms.bool(True),
+    pseudoMultiplicityMin = cms.uint32(2),
+    categoryVariableName = cms.string('vertexCategory'),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(0),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    calibrationRecords = cms.vstring('CombinedSVRecoVertex', 
+        'CombinedSVPseudoVertex', 
+        'CombinedSVNoVertex'),
+    pseudoVertexV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.05)
+    ),
+    correctVertexMass = cms.bool(True),
+    vertexFlip = cms.bool(False),
+    minimumTrackWeight = cms.double(0.5),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    trackMultiplicityMin = cms.uint32(3),
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(0),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(2.0),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip2dSig'),
+    trackFlip = cms.bool(False)
+)
+
+
+process.combinedSecondaryVertexSoftPFLeptonV1 = cms.ESProducer("CombinedMVAJetTagESProducer",
+    useCategories = cms.bool(False),
+    calibrationRecord = cms.string('CombinedCSVSL'),
+    jetTagComputers = cms.VPSet(cms.PSet(
+        discriminator = cms.bool(True),
+        variables = cms.bool(False),
+        jetTagComputer = cms.string('jetProbability')
+    ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('combinedSecondaryVertexV1')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('softPFMuon')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('softPFElectron')
+        ))
+)
+
+
+process.combinedSecondaryVertexV1 = cms.ESProducer("CombinedSecondaryVertexESProducer",
+    useTrackWeights = cms.bool(True),
+    pseudoMultiplicityMin = cms.uint32(2),
+    correctVertexMass = cms.bool(True),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    pseudoVertexV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.05)
+    ),
+    charmCut = cms.double(1.5),
+    vertexFlip = cms.bool(False),
+    minimumTrackWeight = cms.double(0.5),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    trackMultiplicityMin = cms.uint32(3),
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(2.0),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip2dSig'),
+    trackFlip = cms.bool(False),
+    calibrationRecords = cms.vstring('CombinedSVRetrainRecoVertex', 
+        'CombinedSVRetrainPseudoVertex', 
+        'CombinedSVRetrainNoVertex'),
+    useCategories = cms.bool(True),
+    categoryVariableName = cms.string('vertexCategory')
+)
+
+
+process.combinedSecondaryVertexV1Negative = cms.ESProducer("CombinedSecondaryVertexESProducer",
+    charmCut = cms.double(1.5),
+    useTrackWeights = cms.bool(True),
+    useCategories = cms.bool(True),
+    pseudoMultiplicityMin = cms.uint32(2),
+    categoryVariableName = cms.string('vertexCategory'),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(0),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    calibrationRecords = cms.vstring('CombinedSVRetrainRecoVertex', 
+        'CombinedSVRetrainPseudoVertex', 
+        'CombinedSVRetrainNoVertex'),
+    pseudoVertexV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.05)
+    ),
+    correctVertexMass = cms.bool(True),
+    vertexFlip = cms.bool(True),
+    minimumTrackWeight = cms.double(0.5),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    trackMultiplicityMin = cms.uint32(3),
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(0),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(-2.0),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip2dSig'),
+    trackFlip = cms.bool(True)
+)
+
+
+process.combinedSecondaryVertexV1Positive = cms.ESProducer("CombinedSecondaryVertexESProducer",
+    charmCut = cms.double(1.5),
+    useTrackWeights = cms.bool(True),
+    useCategories = cms.bool(True),
+    pseudoMultiplicityMin = cms.uint32(2),
+    categoryVariableName = cms.string('vertexCategory'),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(0),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    calibrationRecords = cms.vstring('CombinedSVRetrainRecoVertex', 
+        'CombinedSVRetrainPseudoVertex', 
+        'CombinedSVRetrainNoVertex'),
+    pseudoVertexV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.05)
+    ),
+    correctVertexMass = cms.bool(True),
+    vertexFlip = cms.bool(False),
+    minimumTrackWeight = cms.double(0.5),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    trackMultiplicityMin = cms.uint32(3),
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(0),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(2.0),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSort = cms.string('sip2dSig'),
+    trackFlip = cms.bool(False)
+)
+
+
+process.doubleVertex2Trk = cms.ESProducer("SimpleSecondaryVertexESProducer",
+    minTracks = cms.uint32(2),
+    minVertices = cms.uint32(2),
+    unBoost = cms.bool(False),
+    useSignificance = cms.bool(True),
+    use3d = cms.bool(True)
+)
+
+
 process.fakeForIdealAlignment = cms.ESProducer("FakeAlignmentProducer",
     appendToDataLabel = cms.string('fakeForIdeal')
+)
+
+
+process.ghostTrack = cms.ESProducer("GhostTrackESProducer",
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    charmCut = cms.double(1.5),
+    trackSort = cms.string('sip2dSig'),
+    minimumTrackWeight = cms.double(0.5),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    calibrationRecords = cms.vstring('GhostTrackRecoVertex', 
+        'GhostTrackPseudoVertex', 
+        'GhostTrackNoVertex'),
+    useCategories = cms.bool(True),
+    categoryVariableName = cms.string('vertexCategory')
 )
 
 
@@ -22582,6 +23869,35 @@ process.idealForDigiTrackerGeometry = cms.ESProducer("TrackerDigiGeometryESModul
     fromDDD = cms.bool(True),
     applyAlignment = cms.bool(False),
     alignmentsLabel = cms.string('fakeForIdeal')
+)
+
+
+process.impactParameterMVAComputer = cms.ESProducer("GenericMVAJetTagESProducer",
+    useCategories = cms.bool(False),
+    calibrationRecord = cms.string('ImpactParameterMVA')
+)
+
+
+process.jetBProbability = cms.ESProducer("JetBProbabilityESProducer",
+    deltaR = cms.double(-1.0),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    trackIpSign = cms.int32(1),
+    minimumProbability = cms.double(0.005),
+    numberOfBTracks = cms.uint32(4),
+    maximumDecayLength = cms.double(5.0)
+)
+
+
+process.jetProbability = cms.ESProducer("JetProbabilityESProducer",
+    deltaR = cms.double(0.3),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    trackIpSign = cms.int32(1),
+    minimumProbability = cms.double(0.005),
+    maximumDecayLength = cms.double(5.0)
 )
 
 
@@ -22985,6 +24301,264 @@ process.kt6PFResidual = cms.ESProducer("LXXXCorrectionESProducer",
 )
 
 
+process.negativeCombinedMVA = cms.ESProducer("CombinedMVAJetTagESProducer",
+    useCategories = cms.bool(False),
+    calibrationRecord = cms.string('CombinedMVA'),
+    jetTagComputers = cms.VPSet(cms.PSet(
+        discriminator = cms.bool(True),
+        variables = cms.bool(False),
+        jetTagComputer = cms.string('negativeOnlyJetProbability')
+    ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('combinedSecondaryVertexNegative')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('negativeSoftPFMuon')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('negativeSoftPFElectron')
+        ))
+)
+
+
+process.negativeCombinedSecondaryVertexSoftPFLeptonV1 = cms.ESProducer("CombinedMVAJetTagESProducer",
+    useCategories = cms.bool(False),
+    calibrationRecord = cms.string('CombinedCSVSL'),
+    jetTagComputers = cms.VPSet(cms.PSet(
+        discriminator = cms.bool(True),
+        variables = cms.bool(False),
+        jetTagComputer = cms.string('negativeOnlyJetProbability')
+    ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('combinedSecondaryVertexV1Negative')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('negativeSoftPFMuon')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('negativeSoftPFElectron')
+        ))
+)
+
+
+process.negativeOnlyJetBProbability = cms.ESProducer("JetBProbabilityESProducer",
+    deltaR = cms.double(-1.0),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    trackIpSign = cms.int32(-1),
+    minimumProbability = cms.double(0.005),
+    numberOfBTracks = cms.uint32(4),
+    maximumDecayLength = cms.double(5.0)
+)
+
+
+process.negativeOnlyJetProbability = cms.ESProducer("JetProbabilityESProducer",
+    deltaR = cms.double(0.3),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    trackIpSign = cms.int32(-1),
+    minimumProbability = cms.double(0.005),
+    maximumDecayLength = cms.double(5.0)
+)
+
+
+process.negativeSoftPFElectron = cms.ESProducer("ElectronTaggerESProducer",
+    ipSign = cms.string('negative')
+)
+
+
+process.negativeSoftPFElectronByIP2d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(False),
+    ipSign = cms.string('negative')
+)
+
+
+process.negativeSoftPFElectronByIP3d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(True),
+    ipSign = cms.string('negative')
+)
+
+
+process.negativeSoftPFElectronByPt = cms.ESProducer("LeptonTaggerByPtESProducer",
+    ipSign = cms.string('negative')
+)
+
+
+process.negativeSoftPFMuon = cms.ESProducer("MuonTaggerESProducer",
+    ipSign = cms.string('negative')
+)
+
+
+process.negativeSoftPFMuonByIP2d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(False),
+    ipSign = cms.string('negative')
+)
+
+
+process.negativeSoftPFMuonByIP3d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(True),
+    ipSign = cms.string('negative')
+)
+
+
+process.negativeSoftPFMuonByPt = cms.ESProducer("LeptonTaggerByPtESProducer",
+    ipSign = cms.string('negative')
+)
+
+
+process.negativeTrackCounting3D2nd = cms.ESProducer("NegativeTrackCountingESProducer",
+    deltaR = cms.double(-1.0),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    maximumDecayLength = cms.double(5.0),
+    nthTrack = cms.int32(2)
+)
+
+
+process.negativeTrackCounting3D3rd = cms.ESProducer("NegativeTrackCountingESProducer",
+    deltaR = cms.double(-1.0),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    maximumDecayLength = cms.double(5.0),
+    nthTrack = cms.int32(3)
+)
+
+
+process.positiveCombinedMVA = cms.ESProducer("CombinedMVAJetTagESProducer",
+    useCategories = cms.bool(False),
+    calibrationRecord = cms.string('CombinedMVA'),
+    jetTagComputers = cms.VPSet(cms.PSet(
+        discriminator = cms.bool(True),
+        variables = cms.bool(False),
+        jetTagComputer = cms.string('positiveOnlyJetProbability')
+    ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('combinedSecondaryVertexPositive')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('positiveSoftPFMuon')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('positiveSoftPFElectron')
+        ))
+)
+
+
+process.positiveCombinedSecondaryVertexSoftPFLeptonV1 = cms.ESProducer("CombinedMVAJetTagESProducer",
+    useCategories = cms.bool(False),
+    calibrationRecord = cms.string('CombinedCSVSL'),
+    jetTagComputers = cms.VPSet(cms.PSet(
+        discriminator = cms.bool(True),
+        variables = cms.bool(False),
+        jetTagComputer = cms.string('positiveOnlyJetProbability')
+    ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('combinedSecondaryVertexV1Positive')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('positiveSoftPFMuon')
+        ), 
+        cms.PSet(
+            discriminator = cms.bool(True),
+            variables = cms.bool(False),
+            jetTagComputer = cms.string('positiveSoftPFElectron')
+        ))
+)
+
+
+process.positiveOnlyJetBProbability = cms.ESProducer("JetBProbabilityESProducer",
+    deltaR = cms.double(-1.0),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    trackIpSign = cms.int32(1),
+    minimumProbability = cms.double(0.005),
+    numberOfBTracks = cms.uint32(4),
+    maximumDecayLength = cms.double(5.0)
+)
+
+
+process.positiveOnlyJetProbability = cms.ESProducer("JetProbabilityESProducer",
+    deltaR = cms.double(0.3),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    trackIpSign = cms.int32(1),
+    minimumProbability = cms.double(0.005),
+    maximumDecayLength = cms.double(5.0)
+)
+
+
+process.positiveSoftPFElectron = cms.ESProducer("ElectronTaggerESProducer",
+    ipSign = cms.string('positive')
+)
+
+
+process.positiveSoftPFElectronByIP2d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(False),
+    ipSign = cms.string('positive')
+)
+
+
+process.positiveSoftPFElectronByIP3d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(True),
+    ipSign = cms.string('positive')
+)
+
+
+process.positiveSoftPFElectronByPt = cms.ESProducer("LeptonTaggerByPtESProducer",
+    ipSign = cms.string('positive')
+)
+
+
+process.positiveSoftPFMuon = cms.ESProducer("MuonTaggerESProducer",
+    ipSign = cms.string('positive')
+)
+
+
+process.positiveSoftPFMuonByIP2d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(False),
+    ipSign = cms.string('positive')
+)
+
+
+process.positiveSoftPFMuonByIP3d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(True),
+    ipSign = cms.string('positive')
+)
+
+
+process.positiveSoftPFMuonByPt = cms.ESProducer("LeptonTaggerByPtESProducer",
+    ipSign = cms.string('positive')
+)
+
+
 process.siPixelQualityESProducer = cms.ESProducer("SiPixelQualityESProducer",
     ListOfRecordToMerge = cms.VPSet(cms.PSet(
         record = cms.string('SiPixelQualityFromDbRcd'),
@@ -23075,7 +24649,79 @@ process.simpleSecondaryVertex2Trk = cms.ESProducer("SimpleSecondaryVertexESProdu
 )
 
 
+process.simpleSecondaryVertex3Trk = cms.ESProducer("SimpleSecondaryVertexESProducer",
+    minTracks = cms.uint32(3),
+    unBoost = cms.bool(False),
+    useSignificance = cms.bool(True),
+    use3d = cms.bool(True)
+)
+
+
 process.sistripconn = cms.ESProducer("SiStripConnectivity")
+
+
+process.softPFElectron = cms.ESProducer("ElectronTaggerESProducer",
+    ipSign = cms.string('any')
+)
+
+
+process.softPFElectronByIP2d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(False),
+    ipSign = cms.string('any')
+)
+
+
+process.softPFElectronByIP3d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(True),
+    ipSign = cms.string('any')
+)
+
+
+process.softPFElectronByPt = cms.ESProducer("LeptonTaggerByPtESProducer",
+    ipSign = cms.string('any')
+)
+
+
+process.softPFMuon = cms.ESProducer("MuonTaggerESProducer",
+    ipSign = cms.string('any')
+)
+
+
+process.softPFMuonByIP2d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(False),
+    ipSign = cms.string('any')
+)
+
+
+process.softPFMuonByIP3d = cms.ESProducer("LeptonTaggerByIPESProducer",
+    use3d = cms.bool(True),
+    ipSign = cms.string('any')
+)
+
+
+process.softPFMuonByPt = cms.ESProducer("LeptonTaggerByPtESProducer",
+    ipSign = cms.string('any')
+)
+
+
+process.trackCounting3D2nd = cms.ESProducer("TrackCountingESProducer",
+    deltaR = cms.double(-1.0),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    maximumDecayLength = cms.double(5.0),
+    nthTrack = cms.int32(2)
+)
+
+
+process.trackCounting3D3rd = cms.ESProducer("TrackCountingESProducer",
+    deltaR = cms.double(-1.0),
+    maximumDistanceToJetAxis = cms.double(0.07),
+    impactParameterType = cms.int32(0),
+    trackQualityClass = cms.string('any'),
+    maximumDecayLength = cms.double(5.0),
+    nthTrack = cms.int32(3)
+)
 
 
 process.BTagRecord = cms.ESSource("EmptyESSource",
@@ -23676,6 +25322,60 @@ process.TrackAssociatorParameters = cms.PSet(
     useHcal = cms.bool(True)
 )
 
+process.combinedSecondaryVertexCommon = cms.PSet(
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(2.0),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    useTrackWeights = cms.bool(True),
+    pseudoMultiplicityMin = cms.uint32(2),
+    correctVertexMass = cms.bool(True),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    charmCut = cms.double(1.5),
+    vertexFlip = cms.bool(False),
+    minimumTrackWeight = cms.double(0.5),
+    pseudoVertexV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.05)
+    ),
+    trackMultiplicityMin = cms.uint32(3),
+    trackSort = cms.string('sip2dSig'),
+    trackFlip = cms.bool(False)
+)
+
 process.cutbased = cms.PSet(
     cutBased = cms.bool(True),
     JetIdParams = cms.PSet(
@@ -23875,6 +25575,44 @@ process.fieldScaling = cms.PSet(
         0.978, 0.998, 0.998, 0.991)
 )
 
+process.ghostTrackCommon = cms.PSet(
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    ),
+    trackPairV0Filter = cms.PSet(
+        k0sMassWindow = cms.double(0.03)
+    ),
+    charmCut = cms.double(1.5),
+    trackSort = cms.string('sip2dSig'),
+    minimumTrackWeight = cms.double(0.5)
+)
+
+process.ghostTrackVertexRecoBlock = cms.PSet(
+    vertexReco = cms.PSet(
+        primcut = cms.double(2.0),
+        seccut = cms.double(4.0),
+        maxFitChi2 = cms.double(10.0),
+        fitType = cms.string('RefitGhostTrackWithVertices'),
+        mergeThreshold = cms.double(3.0),
+        finder = cms.string('gtvr')
+    )
+)
+
 process.hpsTancRequireDecayMode = cms.PSet(
     BooleanOperator = cms.string('and'),
     decayMode = cms.PSet(
@@ -24069,6 +25807,48 @@ process.tautagInfoModifer = cms.PSet(
     pfTauTagInfoSrc = cms.InputTag("pfRecoTauTagInfoProducer"),
     name = cms.string('TTIworkaround'),
     plugin = cms.string('RecoTauTagInfoWorkaroundModifer')
+)
+
+process.trackPseudoSelectionBlock = cms.PSet(
+    trackPseudoSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(2.0),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    )
+)
+
+process.trackSelectionBlock = cms.PSet(
+    trackSelection = cms.PSet(
+        totalHitsMin = cms.uint32(0),
+        jetDeltaRMax = cms.double(0.3),
+        qualityClass = cms.string('highPurity'),
+        pixelHitsMin = cms.uint32(0),
+        sip3dSigMin = cms.double(-99999.9),
+        sip3dSigMax = cms.double(99999.9),
+        maxDistToAxis = cms.double(0.07),
+        sip2dValMax = cms.double(99999.9),
+        maxDecayLen = cms.double(5),
+        ptMin = cms.double(0.0),
+        sip2dSigMax = cms.double(99999.9),
+        sip2dSigMin = cms.double(-99999.9),
+        sip3dValMax = cms.double(99999.9),
+        sip3dValMin = cms.double(-99999.9),
+        sip2dValMin = cms.double(-99999.9),
+        normChi2Max = cms.double(99999.9)
+    )
 )
 
 process.vertexCutsBlock = cms.PSet(
